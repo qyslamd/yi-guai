@@ -7,6 +7,7 @@
 #include <QtDebug>
 #include <QUrl>
 #include <QCloseEvent>
+#include <QTimerEvent>
 #include <QTimer>
 #include <QThread>
 
@@ -19,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent)
     initSignalSlot();
 
     addOneBrowserPage("https://www.baidu.com/");
+
+//    timer_id_close_ = startTimer(500);
 }
 
 MainWindow::~MainWindow()
@@ -38,26 +41,24 @@ int MainWindow::addOneBrowserPage(const QString &url, bool switchTo)
     return index;
 }
 
+void MainWindow::timerEvent(QTimerEvent *event)
+{
+    if(event->timerId() == timer_id_close_){
+
+    }
+}
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    this->hide();   // 由于下边的定时器延迟
+    return;
     qInfo()<<__FUNCTION__;
-    while(ui->tabWidget->count() > 0){
-        onTabPageCloseRequested(0);
-    }
 
     if(allow_close_){
         event->accept();
         return;
+    }else{
+        event->ignore();
     }
-
-    event->ignore();
-
-    QTimer::singleShot(500, [this]()
-    {
-        allow_close_ = true;
-        close();
-    });
 
 }
 
@@ -95,6 +96,7 @@ void MainWindow::initPage(CefQWidget *page)
         ui->tabWidget->addTab(window, "");
         initPage(window);
     });
+
 }
 
 void MainWindow::onTabPageCloseRequested(int index)

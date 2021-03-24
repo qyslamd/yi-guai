@@ -15,6 +15,11 @@ BrowserWindow::BrowserWindow(Delegate *delagate, const std::string &startup_url)
     client_handler_ = new CefClientHandler(this, startup_url);
 }
 
+BrowserWindow::~BrowserWindow()
+{
+    qInfo()<<__FUNCTION__;
+}
+
 void BrowserWindow::CreateBrowser(ClientWindowHandle parent_handle,
                                   const CefRect &rect,
                                   const CefBrowserSettings &settings,
@@ -103,6 +108,11 @@ void BrowserWindow::closeBrowser(bool force_close)
     if(browser_){
         browser_->GetHost()->CloseBrowser(force_close);
     }
+}
+
+void BrowserWindow::onBrowserComfirmClose()
+{
+    client_handler_->DetachDelegate();
 }
 
 void BrowserWindow::onBrowserNewForgroundPage(CefWindowInfo &windowInfo,

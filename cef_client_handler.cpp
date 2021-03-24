@@ -17,6 +17,11 @@ CefClientHandler::CefClientHandler(Delegate *delegate,
 
 }
 
+CefClientHandler::~CefClientHandler()
+{
+    qInfo()<<__FUNCTION__;
+}
+
 void CefClientHandler::DetachDelegate()
 {
     if (!CURRENTLY_ON_MAIN_THREAD()) {

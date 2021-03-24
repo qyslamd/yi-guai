@@ -66,7 +66,13 @@ void CefQWidget::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
 
 void CefQWidget::OnBrowserWindowClosing(CefRefPtr<CefBrowser> browser)
 {
-    this->deleteLater();
+    if(browser_window_ && browser_window_->IsClosing())
+    {
+        qInfo()<<__FUNCTION__;
+        browser_window_->onBrowserComfirmClose();
+        // 关键问题是释放引用计数
+        this->deleteLater();
+    }
 }
 
 void CefQWidget::onBrowserWindowAddressChange(const std::string &url)

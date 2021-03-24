@@ -36,6 +36,7 @@ public:
     // |delegate| must outlive this object.
     explicit BrowserWindow(Delegate* delegate, const std::string &startup_url);
 
+    ~BrowserWindow();
     // Create a new browser and native window.
     void CreateBrowser(ClientWindowHandle parent_handle,
                        const CefRect& rect,
@@ -62,6 +63,8 @@ public:
     CefRefPtr<CefBrowser> GetBrowser() const;
     bool IsClosing() const;
     void closeBrowser(bool force_close);
+
+    void onBrowserComfirmClose();
 protected:
     // Allow deletion via scoped_ptr only.
     friend struct base::DefaultDeleter<BrowserWindow>;
