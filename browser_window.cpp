@@ -103,13 +103,6 @@ bool BrowserWindow::IsClosing() const
     return is_closing_;
 }
 
-void BrowserWindow::closeBrowser(bool force_close)
-{
-    if(browser_){
-        browser_->GetHost()->CloseBrowser(force_close);
-    }
-}
-
 void BrowserWindow::onBrowserComfirmClose()
 {
     client_handler_->DetachDelegate();
@@ -139,8 +132,9 @@ void BrowserWindow::OnBrowserClosing(CefRefPtr<CefBrowser> browser)
 {
     REQUIRE_MAIN_THREAD();
     DCHECK_EQ(browser->GetIdentifier(), browser_->GetIdentifier());
-    is_closing_ = true;
-    delegate_->OnBrowserWindowClosing(browser);
+    is_closing_ = true; // 修改标志，通知到窗口
+
+    delegate_->OnBrowserWindowClosing();
 }
 
 void BrowserWindow::OnBrowserClosed(CefRefPtr<CefBrowser> browser)
@@ -156,7 +150,7 @@ void BrowserWindow::OnBrowserClosed(CefRefPtr<CefBrowser> browser)
     client_handler_ = nullptr;
 
     // |this| may be deleted.
-//    delegate_->OnBrowserWindowDestroyed(browser);
+    delegate_->OnBrowserWindowDestroyed();
 }
 
 void BrowserWindow::onBrowserAddressChange(const std::string &url)

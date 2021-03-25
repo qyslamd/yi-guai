@@ -20,8 +20,6 @@ MainWindow::MainWindow(QWidget *parent)
     initSignalSlot();
 
     addOneBrowserPage("https://www.baidu.com/");
-
-//    timer_id_close_ = startTimer(500);
 }
 
 MainWindow::~MainWindow()
@@ -41,24 +39,20 @@ int MainWindow::addOneBrowserPage(const QString &url, bool switchTo)
     return index;
 }
 
-void MainWindow::timerEvent(QTimerEvent *event)
-{
-    if(event->timerId() == timer_id_close_){
-
-    }
-}
-
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    return;
     qInfo()<<__FUNCTION__;
 
-    if(allow_close_){
-        event->accept();
-        return;
-    }else{
-        event->ignore();
+    while (ui->tabWidget->count() > 0){
+        onTabPageCloseRequested(0);
     }
+
+//    if(allow_close_){
+//        event->accept();
+//        return;
+//    }else{
+//        event->ignore();
+//    }
 
 }
 
@@ -103,5 +97,6 @@ void MainWindow::onTabPageCloseRequested(int index)
 {
     auto widget = ui->tabWidget->widget(index);
     ui->tabWidget->removeTab(index);
-    widget->close(); //隐藏
+
+    widget->close();
 }

@@ -9,6 +9,9 @@
 #include <QHBoxLayout>
 #include <QCloseEvent>
 #include <QTimer>
+#include <QDateTime>
+
+#include <include/base/cef_logging.h>
 
 CefQWidget::CefQWidget(const QString &startup_url, QWidget *parent)
     : QWidget(parent)
@@ -16,6 +19,8 @@ CefQWidget::CefQWidget(const QString &startup_url, QWidget *parent)
     , qwindow_containter_(nullptr)
     , layout_(new QHBoxLayout(this))
 {
+    // Makes Qt delete this widget when the widget has accepted the close event
+//    setAttribute(Qt::WA_DeleteOnClose, true);
     browser_window_.reset(new BrowserWindow(this, startup_url.toStdString()));
     initUi();
 
@@ -48,6 +53,9 @@ CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
 CefQWidget::~CefQWidget()
 {
     qInfo()<<__FUNCTION__;
+
+    // The window and browser should already have been destroyed.
+    DCHECK(browser_destroyed_);
 }
 
 void CefQWidget::onBrowserWindowNewForgroundPage(CefWindowInfo &windowInfo,
@@ -64,15 +72,16 @@ void CefQWidget::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
     resizeBorser();
 }
 
-void CefQWidget::OnBrowserWindowClosing(CefRefPtr<CefBrowser> browser)
+void CefQWidget::OnBrowserWindowClosing()
 {
-    if(browser_window_ && browser_window_->IsClosing())
-    {
-        qInfo()<<__FUNCTION__;
-        browser_window_->onBrowserComfirmClose();
-        // 关键问题是释放引用计数
-        this->deleteLater();
-    }
+    qInfo()<<__FUNCTION__<<"browser should do action after 'CefClientHandler::DoClose' "<<QTime::currentTime();
+//    browser_window_.reset();
+    close();
+}
+
+void CefQWidget::OnBrowserWindowDestroyed()
+{
+    browser_window_.reset();
 }
 
 void CefQWidget::onBrowserWindowAddressChange(const std::string &url)
@@ -94,11 +103,24 @@ void CefQWidget::resizeEvent(QResizeEvent *event)
 
 void CefQWidget::closeEvent(QCloseEvent *event)
 {
+    // 关闭浏览器触发点
     if(browser_window_ && !browser_window_->IsClosing()){
-        qInfo()<<__FUNCTION__<<"browser closing";
-        browser_window_->closeBrowser(false);
+        qInfo()<<__FUNCTION__<<"browser start close "<<QTime::currentTime();
+        auto browser = browser_window_->GetBrowser();
+        if(browser){
+            // Notify the browser window that we would like to close it. This
+            // will result in a call to ClientHandler::DoClose() if the
+            // JavaScript 'onbeforeunload' event handler allows it.
+            browser->GetHost()->CloseBrowser(false);
+        }
+        // Cancel the close.
         event->ignore();
+    }else{
+        // Allow the close.
+        event->accept();
+        browser_destroyed_ = true;
     }
+
 }
 
 void CefQWidget::initUi()

@@ -23,7 +23,6 @@ public:
 signals:
     void windowWannaClose();
 protected:
-    void timerEvent(QTimerEvent *event) override;
     void closeEvent(QCloseEvent *evnet) override;
 private:
     Ui::MainWindow *ui;
@@ -33,7 +32,6 @@ private:
     void initPage(CefQWidget *page);
 
     bool allow_close_ = false;
-    int timer_id_close_;
 private slots:
     void onTabPageCloseRequested(int index);
 };

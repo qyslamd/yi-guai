@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
     }
 
     QApplication qt_app(argc, argv);
+//    qt_app.setQuitOnLastWindowClosed(false);    // 最后一个窗口退出不退出应用
 
     // Parse command-line arguments for use in this method.
     CefRefPtr<CefCommandLine> command_line = CefCommandLine::CreateCommandLine();

@@ -5,6 +5,8 @@
 #include <include/wrapper/cef_helpers.h>
 
 #include <QtDebug>
+#include <QDateTime>
+#include <QApplication>
 
 
 int CefClientHandler::total_created_ = 0;
@@ -87,14 +89,14 @@ void CefClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 bool CefClientHandler::DoClose(CefRefPtr<CefBrowser> browser)
 {
     CEF_REQUIRE_UI_THREAD();
-    qInfo()<<__FUNCTION__;
+    qInfo()<<__FUNCTION__<<"browser closing "<<QTime::currentTime();
 
     NotifyBrowserClosing(browser);
 
-    // Allow the close. For windowed browsers this will result in the OS close
+    // Return false to allow the close. For windowed browsers this will result in the OS close
     // event being sent.
+    // Return true to pevent send close to Toplevel window
     return true;
-    // 不能给顶层窗口发Close
 }
 
 void CefClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
@@ -104,7 +106,7 @@ void CefClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
     browser_count_--;
     qInfo()<<__FUNCTION__<<"Total browser count:"<<total_created_;
 
-//    NotifyBrowserClosed(browser);
+    NotifyBrowserClosed(browser);
 }
 
 void CefClientHandler::NotifyBrowserCreated(CefRefPtr<CefBrowser> browser)
@@ -142,8 +144,8 @@ void CefClientHandler::NotifyBrowserClosed(CefRefPtr<CefBrowser> browser)
         return;
     }
 
-    if (delegate_)
-        delegate_->OnBrowserClosed(browser);
+//    if (delegate_)
+//        delegate_->OnBrowserClosed(browser);
 }
 
 void CefClientHandler::NotifyBrowserAddressChange(CefRefPtr<CefBrowser> browser,
