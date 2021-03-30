@@ -54,6 +54,11 @@ CefQWidget::~CefQWidget()
     qInfo()<<__FUNCTION__;
 }
 
+void CefQWidget::onTopLevelWindowStateChanged()
+{
+    resizeBorser();
+}
+
 void CefQWidget::onBrowserWindowNewForgroundPage(CefWindowInfo &windowInfo,
                                                  CefRefPtr<CefClient> &client,
                                                  CefBrowserSettings &settings)

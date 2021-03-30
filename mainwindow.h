@@ -20,9 +20,11 @@ public:
     ~MainWindow();
 
     int addOneBrowserPage(const QString &url, bool switchTo = false);
-
+signals:
+    void topLevelWindowStateChanged();
 protected:
     void closeEvent(QCloseEvent *evnet) override;
+    void changeEvent(QEvent *event) override;
 private:
     Ui::MainWindow *ui;
 

@@ -26,6 +26,9 @@ signals:
     void browserAddressChange(const QString &url);
     void browserTitleChange(const QString &title);
 
+public slots:
+    void onTopLevelWindowStateChanged();
+
     // BrowserWindow::Delegate interface
 protected:
     void onBrowserWindowNewForgroundPage(CefWindowInfo &windowInfo,

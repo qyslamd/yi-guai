@@ -7,7 +7,6 @@
 #include <QtDebug>
 #include <QUrl>
 #include <QCloseEvent>
-#include <QTimerEvent>
 #include <QTimer>
 #include <QThread>
 
@@ -53,6 +52,14 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 }
 
+void MainWindow::changeEvent(QEvent *event)
+{
+    if(event->type() == QEvent::WindowStateChange)
+    {
+        emit topLevelWindowStateChanged();
+    }
+}
+
 void MainWindow::initUi()
 {
     ui->tabWidget->setTabsClosable(true);
@@ -82,6 +89,9 @@ void MainWindow::initPage(CefQWidget *page)
             close();
         }
     });
+
+    // 顶层窗口的窗口状态改变应该通知到page去，
+    connect(this, &MainWindow::topLevelWindowStateChanged, page, &CefQWidget::onTopLevelWindowStateChanged);
 
     connect(page, &CefQWidget::browserAddressChange, [this](const QString &address)
     {
