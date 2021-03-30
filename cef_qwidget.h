@@ -31,7 +31,7 @@ protected:
     void onBrowserWindowNewForgroundPage(CefWindowInfo &windowInfo,
                                               CefRefPtr<CefClient> &client,
                                               CefBrowserSettings &settings) override;
-    void OnBrowserCreated(CefRefPtr<CefBrowser> browser) override;
+    void OnBrowserCreated() override;
     void OnBrowserWindowClosing() override;
     void onBrowserWindowAddressChange(const std::string &url) override;
     void onBrowserWindowTitleChange(const std::string &title) override;

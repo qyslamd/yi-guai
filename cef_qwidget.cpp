@@ -24,7 +24,7 @@ CefQWidget::CefQWidget(const QString &startup_url, QWidget *parent)
     initUi();
 
     auto handle = (HWND)window_->winId();
-    CefRect rect{};
+    CefRect rect{x(), y(), width(), height()};  // 给个初始范围，不然浏览器创建完成后的移动窗口会出现黑色背景
     CefBrowserSettings browser_settings;
     browser_window_->CreateBrowser(handle,
                                    rect,
@@ -63,9 +63,12 @@ void CefQWidget::onBrowserWindowNewForgroundPage(CefWindowInfo &windowInfo,
     emit browserNewForgroundPage(window);
 }
 
-void CefQWidget::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
+void CefQWidget::OnBrowserCreated()
 {
-    resizeBorser();
+    // 浏览器创建完成的时候可能本类还未构造完
+    QTimer::singleShot(50, [this](){
+        resizeBorser();
+    });
 }
 
 void CefQWidget::OnBrowserWindowClosing()

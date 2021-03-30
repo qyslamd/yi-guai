@@ -125,15 +125,17 @@ void BrowserWindow::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
 
     browser_ = browser;
 
-    delegate_->OnBrowserCreated(browser);
+    delegate_->OnBrowserCreated();
 }
 
 void BrowserWindow::OnBrowserClosing(CefRefPtr<CefBrowser> browser)
 {
     REQUIRE_MAIN_THREAD();
     DCHECK_EQ(browser->GetIdentifier(), browser_->GetIdentifier());
-    is_closing_ = true; // 修改标志，通知到窗口
+    // 修改标志
+    is_closing_ = true;
 
+    // 通知到Qt的窗口
     delegate_->OnBrowserWindowClosing();
 }
 

@@ -43,10 +43,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     user_close_ = true;
     if(ui->tabWidget->count() > 0){
+        // 一个一个的关闭，等待关闭完
         onTabPageCloseRequested(0);
         event->ignore();
         return;
     }else{
+        // 真正的关闭
         event->accept();
     }
 }
@@ -73,7 +75,9 @@ void MainWindow::initPage(CefQWidget *page)
     {
         auto index = ui->tabWidget->indexOf(page);
         ui->tabWidget->removeTab(index);
+        // 必须要删除才能真正的释放cef的browser
         page->deleteLater();
+        // 关掉一个以后，紧接着判断是不是用户在关闭整个窗口
         if(user_close_){
             close();
         }
@@ -92,7 +96,8 @@ void MainWindow::initPage(CefQWidget *page)
     });
     connect(page, &CefQWidget::browserNewForgroundPage, [this](CefQWidget *window)
     {
-        ui->tabWidget->addTab(window, "");
+        auto index = ui->tabWidget->addTab(window, "");
+        ui->tabWidget->setCurrentIndex(index);
         initPage(window);
     });
 
@@ -100,6 +105,8 @@ void MainWindow::initPage(CefQWidget *page)
 
 void MainWindow::onTabPageCloseRequested(int index)
 {
-    auto widget = ui->tabWidget->widget(index);
-    widget->close();
+    auto page = ui->tabWidget->widget(index);
+    if(page){
+        page->close();
+    }
 }
