@@ -20,8 +20,7 @@ public:
     ~MainWindow();
 
     int addOneBrowserPage(const QString &url, bool switchTo = false);
-signals:
-    void windowWannaClose();
+
 protected:
     void closeEvent(QCloseEvent *evnet) override;
 private:
@@ -31,7 +30,9 @@ private:
     void initSignalSlot();
     void initPage(CefQWidget *page);
 
-    bool allow_close_ = false;
+    bool user_close_ = false;
+
+    QList<CefQWidget *> closing_page_list_;
 private slots:
     void onTabPageCloseRequested(int index);
 };

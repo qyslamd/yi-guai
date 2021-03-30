@@ -21,6 +21,7 @@ public:
                QWidget *parent = nullptr);
     ~CefQWidget();
 signals:
+    void browserClosing(CefQWidget *page);
     void browserNewForgroundPage(CefQWidget *window);
     void browserAddressChange(const QString &url);
     void browserTitleChange(const QString &title);
@@ -32,7 +33,6 @@ protected:
                                               CefBrowserSettings &settings) override;
     void OnBrowserCreated(CefRefPtr<CefBrowser> browser) override;
     void OnBrowserWindowClosing() override;
-    void OnBrowserWindowDestroyed() override;
     void onBrowserWindowAddressChange(const std::string &url) override;
     void onBrowserWindowTitleChange(const std::string &title) override;
 
@@ -46,9 +46,6 @@ private:
     scoped_ptr<BrowserWindow> browser_window_;
     QWidget *qwindow_containter_;
     QHBoxLayout *layout_;
-
-    bool window_destroyed_ = false;
-    bool browser_destroyed_ = false;
 
 private:
     void resizeBorser();

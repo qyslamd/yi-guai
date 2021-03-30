@@ -95,7 +95,7 @@ bool CefClientHandler::DoClose(CefRefPtr<CefBrowser> browser)
 
     // Return false to allow the close. For windowed browsers this will result in the OS close
     // event being sent.
-    // Return true to pevent send close to Toplevel window
+    // and return true to pevent sending close signal to Toplevel window
     return true;
 }
 
@@ -105,8 +105,6 @@ void CefClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
     total_created_ --;
     browser_count_--;
     qInfo()<<__FUNCTION__<<"Total browser count:"<<total_created_;
-
-    NotifyBrowserClosed(browser);
 }
 
 void CefClientHandler::NotifyBrowserCreated(CefRefPtr<CefBrowser> browser)
@@ -133,19 +131,6 @@ void CefClientHandler::NotifyBrowserClosing(CefRefPtr<CefBrowser> browser)
 
     if (delegate_)
         delegate_->OnBrowserClosing(browser);
-}
-
-void CefClientHandler::NotifyBrowserClosed(CefRefPtr<CefBrowser> browser)
-{
-    if (!CURRENTLY_ON_MAIN_THREAD()) {
-        // Execute this method on the main thread.
-        MAIN_POST_CLOSURE(
-                    base::Bind(&CefClientHandler::NotifyBrowserClosed, this, browser));
-        return;
-    }
-
-//    if (delegate_)
-//        delegate_->OnBrowserClosed(browser);
 }
 
 void CefClientHandler::NotifyBrowserAddressChange(CefRefPtr<CefBrowser> browser,

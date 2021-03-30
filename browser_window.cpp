@@ -137,22 +137,6 @@ void BrowserWindow::OnBrowserClosing(CefRefPtr<CefBrowser> browser)
     delegate_->OnBrowserWindowClosing();
 }
 
-void BrowserWindow::OnBrowserClosed(CefRefPtr<CefBrowser> browser)
-{
-    REQUIRE_MAIN_THREAD();
-    qInfo()<<__FUNCTION__;
-    if (browser_.get()) {
-        DCHECK_EQ(browser->GetIdentifier(), browser_->GetIdentifier());
-        browser_ = nullptr;
-    }
-
-    client_handler_->DetachDelegate();
-    client_handler_ = nullptr;
-
-    // |this| may be deleted.
-    delegate_->OnBrowserWindowDestroyed();
-}
-
 void BrowserWindow::onBrowserAddressChange(const std::string &url)
 {
     REQUIRE_MAIN_THREAD();

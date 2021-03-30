@@ -23,9 +23,6 @@ public:
         // Called when the BrowserWindow is closing.
         virtual void OnBrowserWindowClosing() {};
 
-        // Called when the BrowserWindow has been destroyed.
-        virtual void OnBrowserWindowDestroyed() = 0;
-
         virtual void onBrowserWindowAddressChange(const std::string& url) = 0;
         virtual void onBrowserWindowTitleChange(const std::string& title) = 0;
     protected:
@@ -74,7 +71,6 @@ protected:
                                    CefBrowserSettings &settings) override;
     void OnBrowserCreated(CefRefPtr<CefBrowser> browser) override;
     void OnBrowserClosing(CefRefPtr<CefBrowser> browser) override;
-    void OnBrowserClosed(CefRefPtr<CefBrowser> browser)  override;
     void onBrowserAddressChange(const std::string &url)  override;
     void onBrowserTitleChange(const std::string &title)  override;
 

@@ -41,19 +41,14 @@ int MainWindow::addOneBrowserPage(const QString &url, bool switchTo)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    qInfo()<<__FUNCTION__;
-
-    while (ui->tabWidget->count() > 0){
+    user_close_ = true;
+    if(ui->tabWidget->count() > 0){
         onTabPageCloseRequested(0);
+        event->ignore();
+        return;
+    }else{
+        event->accept();
     }
-
-//    if(allow_close_){
-//        event->accept();
-//        return;
-//    }else{
-//        event->ignore();
-//    }
-
 }
 
 void MainWindow::initUi()
@@ -74,6 +69,16 @@ void MainWindow::initSignalSlot()
 
 void MainWindow::initPage(CefQWidget *page)
 {
+    connect(page, &CefQWidget::browserClosing, [this](CefQWidget *page)
+    {
+        auto index = ui->tabWidget->indexOf(page);
+        ui->tabWidget->removeTab(index);
+        page->deleteLater();
+        if(user_close_){
+            close();
+        }
+    });
+
     connect(page, &CefQWidget::browserAddressChange, [this](const QString &address)
     {
         ui->lineEdit->setText(QUrl(address).toDisplayString());
@@ -96,7 +101,5 @@ void MainWindow::initPage(CefQWidget *page)
 void MainWindow::onTabPageCloseRequested(int index)
 {
     auto widget = ui->tabWidget->widget(index);
-    ui->tabWidget->removeTab(index);
-
     widget->close();
 }

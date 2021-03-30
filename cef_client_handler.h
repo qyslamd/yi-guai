@@ -23,10 +23,6 @@ public:
 
         // Called when the browser is closing.
         virtual void OnBrowserClosing(CefRefPtr<CefBrowser> browser) = 0;
-
-        // Called when the browser has been closed.
-        virtual void OnBrowserClosed(CefRefPtr<CefBrowser> browser) = 0;
-
         virtual void onBrowserAddressChange(const std::string &url) = 0;
         virtual void onBrowserTitleChange(const std::string &url) = 0;
     protected:

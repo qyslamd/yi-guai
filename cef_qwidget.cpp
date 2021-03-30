@@ -12,6 +12,7 @@
 #include <QDateTime>
 
 #include <include/base/cef_logging.h>
+#include "mainwindow.h"
 
 CefQWidget::CefQWidget(const QString &startup_url, QWidget *parent)
     : QWidget(parent)
@@ -19,8 +20,6 @@ CefQWidget::CefQWidget(const QString &startup_url, QWidget *parent)
     , qwindow_containter_(nullptr)
     , layout_(new QHBoxLayout(this))
 {
-    // Makes Qt delete this widget when the widget has accepted the close event
-//    setAttribute(Qt::WA_DeleteOnClose, true);
     browser_window_.reset(new BrowserWindow(this, startup_url.toStdString()));
     initUi();
 
@@ -53,9 +52,6 @@ CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
 CefQWidget::~CefQWidget()
 {
     qInfo()<<__FUNCTION__;
-
-    // The window and browser should already have been destroyed.
-    DCHECK(browser_destroyed_);
 }
 
 void CefQWidget::onBrowserWindowNewForgroundPage(CefWindowInfo &windowInfo,
@@ -74,14 +70,8 @@ void CefQWidget::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
 
 void CefQWidget::OnBrowserWindowClosing()
 {
-    qInfo()<<__FUNCTION__<<"browser should do action after 'CefClientHandler::DoClose' "<<QTime::currentTime();
-//    browser_window_.reset();
-    close();
-}
-
-void CefQWidget::OnBrowserWindowDestroyed()
-{
-    browser_window_.reset();
+    qInfo()<<__FUNCTION__<<QTime::currentTime();
+    emit browserClosing(this);
 }
 
 void CefQWidget::onBrowserWindowAddressChange(const std::string &url)
@@ -115,12 +105,7 @@ void CefQWidget::closeEvent(QCloseEvent *event)
         }
         // Cancel the close.
         event->ignore();
-    }else{
-        // Allow the close.
-        event->accept();
-        browser_destroyed_ = true;
     }
-
 }
 
 void CefQWidget::initUi()
