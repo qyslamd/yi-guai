@@ -3,6 +3,7 @@
 
 #include "cef_qwidget.h"
 #include "cef_client_handler.h"
+#include "util_qt.h"
 
 #include <QtDebug>
 #include <QUrl>
@@ -40,7 +41,7 @@ int MainWindow::addOneBrowserPage(const QString &url, bool switchTo)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    user_close_ = true;
+    closing_ = true;
     if(ui->tabWidget->count() > 0){
         // 一个一个的关闭，等待关闭完
         onTabPageCloseRequested(0);
@@ -56,7 +57,7 @@ void MainWindow::changeEvent(QEvent *event)
 {
     if(event->type() == QEvent::WindowStateChange)
     {
-        emit topLevelWindowStateChanged();
+        emit topLevelWindowStateChanged(windowState(), ui->tabWidget->currentWidget()->size());
     }
 }
 
@@ -71,9 +72,17 @@ void MainWindow::initSignalSlot()
     {
         addOneBrowserPage("https://cn.bing.com/", true);
     });
-
     connect(ui->tabWidget, &QTabWidget::tabCloseRequested,
             this, &MainWindow::onTabPageCloseRequested);
+    connect(ui->lineEdit, &QLineEdit::returnPressed, [this]()
+    {
+        auto url = UtilQt::check_url(ui->lineEdit->text());
+        auto page = GetActivePage();
+        if(page){
+            page->Navigate(url);
+        }
+
+    });
 }
 
 void MainWindow::initPage(CefQWidget *page)
@@ -85,7 +94,7 @@ void MainWindow::initPage(CefQWidget *page)
         // 必须要删除才能真正的释放cef的browser
         page->deleteLater();
         // 关掉一个以后，紧接着判断是不是用户在关闭整个窗口
-        if(user_close_){
+        if(closing_){
             close();
         }
     });
@@ -111,6 +120,15 @@ void MainWindow::initPage(CefQWidget *page)
         initPage(window);
     });
 
+}
+
+CefQWidget *MainWindow::GetActivePage()
+{
+    auto widget = ui->tabWidget->currentWidget();
+    if(widget){
+        return qobject_cast<CefQWidget *>(widget);
+    }
+    return nullptr;
 }
 
 void MainWindow::onTabPageCloseRequested(int index)

@@ -32,11 +32,6 @@ void BrowserWindow::CreateBrowser(ClientWindowHandle parent_handle,
     RECT wnd_rect = {rect.x, rect.y, rect.x + rect.width, rect.y + rect.height};
     window_info.SetAsChild(parent_handle, wnd_rect);
 
-    //    if (GetWindowLongPtr(parent_handle, GWL_EXSTYLE) & WS_EX_NOACTIVATE) {
-    //      // Don't activate the browser window on creation.
-    //      window_info.ex_style |= WS_EX_NOACTIVATE;
-    //    }
-
     if(!CefBrowserHost::CreateBrowser(window_info, client_handler_,
                                   client_handler_->startup_url(), settings,
                                   extra_info, request_context))

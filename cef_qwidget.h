@@ -20,6 +20,9 @@ public:
                CefBrowserSettings &settings,
                QWidget *parent = nullptr);
     ~CefQWidget();
+
+    void Navigate(const QString &url);
+
 signals:
     void browserClosing(CefQWidget *page);
     void browserNewForgroundPage(CefQWidget *window);
@@ -27,7 +30,7 @@ signals:
     void browserTitleChange(const QString &title);
 
 public slots:
-    void onTopLevelWindowStateChanged();
+    void onTopLevelWindowStateChanged(Qt::WindowStates state, const QVariant &data);
 
     // BrowserWindow::Delegate interface
 protected:
@@ -51,7 +54,7 @@ private:
     QHBoxLayout *layout_;
 
 private:
-    void resizeBorser();
+    void resizeBorser(const QSize &size = QSize());
 
 };
 

@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -20,6 +20,7 @@ SOURCES += \
     message_loop/main_message_loop_multithreaded_win.cc \
     message_loop/main_message_loop_std.cc \
     mainwindow.cpp \
+    util_qt.cpp \
     util_win.cc
 
 
@@ -34,6 +35,7 @@ HEADERS += \
     message_loop/main_message_loop_multithreaded_win.h \
     message_loop/main_message_loop_std.h \
     mainwindow.h \
+    util_qt.h \
     util_win.h
 
 FORMS += \

@@ -21,21 +21,21 @@ public:
 
     int addOneBrowserPage(const QString &url, bool switchTo = false);
 signals:
-    void topLevelWindowStateChanged();
+    void topLevelWindowStateChanged(Qt::WindowStates state, const QVariant &data);
 protected:
     void closeEvent(QCloseEvent *evnet) override;
     void changeEvent(QEvent *event) override;
+private slots:
+    void onTabPageCloseRequested(int index);
 private:
     Ui::MainWindow *ui;
+    // Identifies whether the entire window needs to be closed
+    bool closing_ = false;
 
     void initUi();
     void initSignalSlot();
     void initPage(CefQWidget *page);
 
-    bool user_close_ = false;
-
-    QList<CefQWidget *> closing_page_list_;
-private slots:
-    void onTabPageCloseRequested(int index);
+    CefQWidget *GetActivePage();
 };
 #endif // MAINWINDOW_H

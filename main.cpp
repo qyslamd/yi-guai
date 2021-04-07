@@ -59,7 +59,6 @@ int main(int argc, char *argv[])
     }
 
     QApplication qt_app(argc, argv);
-//    qt_app.setQuitOnLastWindowClosed(false);    // 最后一个窗口退出不退出应用
 
     // Parse command-line arguments for use in this method.
     CefRefPtr<CefCommandLine> command_line = CefCommandLine::CreateCommandLine();
@@ -91,9 +90,6 @@ int main(int argc, char *argv[])
     settings.no_sandbox = true;
 #endif
 
-    // SimpleApp implements application-level callbacks for the browser process.
-    // It will create the first browser instance in OnContextInitialized() after
-    // CEF has initialized.
     CefRefPtr<CefApp> app(new CefAppBrowser);
 
     // Create the main message loop object.
@@ -126,9 +122,9 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-    int result = message_loop->Run();
+    message_loop->Run();
 
-    result = qt_app.exec();
+    int result = qt_app.exec();
 
     // Shut down CEF.
     CefShutdown();

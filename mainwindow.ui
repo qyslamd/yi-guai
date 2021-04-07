@@ -102,8 +102,8 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="styleSheet">
-       <string notr="true">QTabWidget::pane { /* The tab widget frame */
-     border-top: 2px solid #C2C7CB;
+       <string notr="true">QTabWidget::pane {
+     border-top: none;
  }</string>
       </property>
       <property name="currentIndex">
@@ -112,22 +112,6 @@
      </widget>
     </item>
    </layout>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>800</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menu">
-    <property name="title">
-     <string>大王叫我来巡山啊！</string>
-    </property>
-   </widget>
-   <addaction name="menu"/>
   </widget>
  </widget>
  <resources/>

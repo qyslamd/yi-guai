@@ -54,9 +54,20 @@ CefQWidget::~CefQWidget()
     qInfo()<<__FUNCTION__;
 }
 
-void CefQWidget::onTopLevelWindowStateChanged()
+void CefQWidget::Navigate(const QString &url)
 {
-    resizeBorser();
+    qInfo()<<__FUNCTION__<<url;
+    auto browser = browser_window_->GetBrowser();
+    if(browser){
+        browser->GetMainFrame()->LoadURL(url.toStdString());
+    }
+}
+
+void CefQWidget::onTopLevelWindowStateChanged(Qt::WindowStates state, const QVariant &data)
+{
+    if(state.testFlag(Qt::WindowMaximized) || state.testFlag(Qt::WindowNoState)){
+        resizeBorser(data.toSize());
+    }
 }
 
 void CefQWidget::onBrowserWindowNewForgroundPage(CefWindowInfo &windowInfo,
@@ -70,15 +81,11 @@ void CefQWidget::onBrowserWindowNewForgroundPage(CefWindowInfo &windowInfo,
 
 void CefQWidget::OnBrowserCreated()
 {
-    // 浏览器创建完成的时候可能本类还未构造完
-    QTimer::singleShot(50, [this](){
-        resizeBorser();
-    });
+    resizeBorser();
 }
 
 void CefQWidget::OnBrowserWindowClosing()
 {
-    qInfo()<<__FUNCTION__<<QTime::currentTime();
     emit browserClosing(this);
 }
 
@@ -95,7 +102,6 @@ void CefQWidget::onBrowserWindowTitleChange(const std::string &title)
 void CefQWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-
     resizeBorser();
 }
 
@@ -103,7 +109,7 @@ void CefQWidget::closeEvent(QCloseEvent *event)
 {
     // 关闭浏览器触发点
     if(browser_window_ && !browser_window_->IsClosing()){
-        qInfo()<<__FUNCTION__<<"browser start close "<<QTime::currentTime();
+        qInfo()<<__FUNCTION__;
         auto browser = browser_window_->GetBrowser();
         if(browser){
             // Notify the browser window that we would like to close it. This
@@ -121,7 +127,7 @@ void CefQWidget::initUi()
     window_->setFlag(Qt::FramelessWindowHint, true);
 
     if(!qwindow_containter_){
-        qwindow_containter_ = QWidget::createWindowContainer(window_);
+        qwindow_containter_ = QWidget::createWindowContainer(window_, this, Qt::Widget);
     }
 
     layout_->setContentsMargins(0,0,0,0);
@@ -130,12 +136,20 @@ void CefQWidget::initUi()
     setLayout(layout_);
 }
 
-void CefQWidget::resizeBorser()
+void CefQWidget::resizeBorser(const QSize &size)
 {
+    QRect rect;
+    if(size.isEmpty()){
+        rect = qwindow_containter_->rect();
+    }else{
+        rect.setX(0);
+        rect.setY(0);
+        rect.setWidth(size.width());
+        rect.setHeight(size.height());
+    }
     auto browser = browser_window_->GetBrowser();
-    auto rect = qwindow_containter_->rect();
     if(browser){
         HWND wnd = browser->GetHost()->GetWindowHandle();
-        ::MoveWindow(wnd, rect.x(), rect.y(), rect.width(), rect.height(), true);
+        ::MoveWindow(wnd, rect.x(), rect.y(), rect.width(), rect.height(), false);
     }
 }

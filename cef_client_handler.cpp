@@ -5,7 +5,6 @@
 #include <include/wrapper/cef_helpers.h>
 
 #include <QtDebug>
-#include <QDateTime>
 #include <QApplication>
 
 
@@ -89,13 +88,13 @@ void CefClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 bool CefClientHandler::DoClose(CefRefPtr<CefBrowser> browser)
 {
     CEF_REQUIRE_UI_THREAD();
-    qInfo()<<__FUNCTION__<<"browser closing "<<QTime::currentTime();
+    qInfo()<<__FUNCTION__<<"browser closing ";
 
     NotifyBrowserClosing(browser);
 
     // Return false to allow the close. For windowed browsers this will result in the OS close
     // event being sent.
-    // and return true to pevent sending close signal to Toplevel window
+    // and return true to pevent sending close signal to the toplevel window
     return true;
 }
 
