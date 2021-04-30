@@ -9,9 +9,12 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    browser_window.cpp \
-    cef_app_browser.cpp \
-    cef_client_handler.cpp \
+    widgets/Dp_Widget_Caption.cpp \
+    widgets/FramelessWindow.cpp \
+    dialogs/alertdialog.cpp \
+    browser/browser_window.cpp \
+    browser/cef_app_browser.cpp \
+    browser/cef_client_handler.cpp \
     cef_qwidget.cpp \
     main.cpp \
     message_loop/main_message_loop.cc \
@@ -20,14 +23,18 @@ SOURCES += \
     message_loop/main_message_loop_multithreaded_win.cc \
     message_loop/main_message_loop_std.cc \
     mainwindow.cpp \
-    util_qt.cpp \
-    util_win.cc
+    utils/util_qt.cpp \
+    utils/util_win.cc \
+    widgets/framewidget.cpp
 
 
 HEADERS += \
-    browser_window.h \
-    cef_app_browser.h \
-    cef_client_handler.h \
+    widgets/Dp_Widget_Caption.h \
+    widgets/FramelessWindow.h \
+    dialogs/alertdialog.h \
+    browser/browser_window.h \
+    browser/cef_app_browser.h \
+    browser/cef_client_handler.h \
     cef_qwidget.h \
     client_types.h \
     message_loop/main_message_loop.h \
@@ -35,19 +42,27 @@ HEADERS += \
     message_loop/main_message_loop_multithreaded_win.h \
     message_loop/main_message_loop_std.h \
     mainwindow.h \
-    util_qt.h \
-    util_win.h
+    utils/util_qt.h \
+    utils/util_win.h \
+    widgets/framewidget.h
 
 FORMS += \
-    mainwindow.ui
+    dialogs/alertdialog.ui \
+    mainwindow.ui \
+    widgets/framewidget.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-
+msvc {
+    QMAKE_CFLAGS += /utf-8
+    QMAKE_CXXFLAGS += /utf-8
+}
 win32{
+    QT += winextras
+
     equals(QT_ARCH,i386){
         CEF_DEP_PATH = $$PWD/../cef_depends/cef_4240_chromium_86/x86
     }else{

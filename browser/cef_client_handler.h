@@ -11,6 +11,8 @@ class CefClientHandler
         : public CefClient
         , public CefLifeSpanHandler
         , public CefDisplayHandler
+        , public CefJSDialogHandler
+        , public CefContextMenuHandler
 {
 public:
     class Delegate{
@@ -39,6 +41,10 @@ public:
     // CefClient interface
     CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() OVERRIDE { return this; }
     CefRefPtr<CefDisplayHandler> GetDisplayHandler() OVERRIDE { return this; }
+    CefRefPtr<CefJSDialogHandler> GetJSDialogHandler() OVERRIDE {return this;}
+    CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() OVERRIDE {return this;}
+
+    static int gBrowserCount;
 
     // CefLifeSpanHandler methods
 public:
@@ -70,6 +76,26 @@ public:
     bool OnConsoleMessage(CefRefPtr<CefBrowser> browser, cef_log_severity_t level, const CefString &message, const CefString &source, int line) override;
     bool OnAutoResize(CefRefPtr<CefBrowser> browser, const CefSize &new_size) override;
     void OnLoadingProgressChange(CefRefPtr<CefBrowser> browser, double progress) override;
+
+    // CefJSDialogHandler interface
+public:
+    bool OnJSDialog(CefRefPtr<CefBrowser> browser,
+                    const CefString &origin_url,
+                    JSDialogType dialog_type,
+                    const CefString &message_text,
+                    const CefString &default_prompt_text,
+                    CefRefPtr<CefJSDialogCallback> callback,
+                    bool &suppress_message) override;
+    // CefContextMenuHandler interface
+public:
+    void OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
+                             CefRefPtr<CefFrame> frame,
+                             CefRefPtr<CefContextMenuParams> params,
+                             CefRefPtr<CefMenuModel> model) override;
+    bool OnContextMenuCommand(CefRefPtr<CefBrowser> browser,
+                              CefRefPtr<CefFrame> frame,
+                              CefRefPtr<CefContextMenuParams> params,
+                              int command_id, EventFlags event_flags) override;
 
     // Returns the number of browsers currently using this handler. Can only be
     // called on the CEF UI thread.
@@ -121,8 +147,6 @@ private:
     // loop mode on Windows.
 
     Delegate* delegate_;
-
-    static int total_created_;
     // The current number of browsers using this handler.
     int browser_count_ = 0;
 

@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QMap>
 
-#include "cef_client_handler.h"
+#include "browser/cef_client_handler.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -20,8 +20,10 @@ public:
     ~MainWindow();
 
     int addOneBrowserPage(const QString &url, bool switchTo = false);
+    // QObject interface
+    bool event(QEvent *e) override;
 signals:
-    void topLevelWindowStateChanged(Qt::WindowStates state, const QVariant &data);
+    void windowStateChanged(Qt::WindowStates state, const QVariant &data);
 protected:
     void closeEvent(QCloseEvent *evnet) override;
     void changeEvent(QEvent *event) override;

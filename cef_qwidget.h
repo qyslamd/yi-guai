@@ -5,7 +5,7 @@
 
 #include <QWidget>
 #include <QWindow>
-#include "browser_window.h"
+#include "browser/browser_window.h"
 
 class QHBoxLayout;
 class CefQWidget

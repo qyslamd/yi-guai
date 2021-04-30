@@ -1,6 +1,8 @@
 ﻿#include "util_qt.h"
 #include <QUrl>
 #include <QtDebug>
+#include <QSettings>
+#include <QColor>
 
 namespace UtilQt {
 
@@ -60,6 +62,27 @@ namespace UtilQt {
 
         qDebug()<<__FUNCTION__<<qurl;
         return qurl.toString();
+    }
+
+    bool dwmColorPrevalence()
+    {
+#ifdef Q_OS_WIN
+    const QString path = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\DWM";
+    const QString key = "ColorPrevalence";
+    QSettings settings(path, QSettings::NativeFormat);
+
+    auto value = settings.value(key, false).toBool();
+    return value;
+#endif
+    return false;
+    }
+
+    QColor getForgroundColor(const QColor &backgroundColor)
+    {
+        auto color = backgroundColor;
+        double gray = (0.299 * color.red() +
+                       0.587 * color.green() + 0.114 * color.blue()) / 255;
+        return gray > 0.5 ? Qt::black : Qt::white;
     }
 
 }

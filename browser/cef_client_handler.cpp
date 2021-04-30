@@ -6,9 +6,10 @@
 
 #include <QtDebug>
 #include <QApplication>
+#include "dialogs/alertdialog.h"
 
 
-int CefClientHandler::total_created_ = 0;
+int CefClientHandler::gBrowserCount = 0;
 
 CefClientHandler::CefClientHandler(Delegate *delegate,
                                    const std::string &startup_url)
@@ -75,10 +76,10 @@ bool CefClientHandler::OnBeforePopup(
 void CefClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 {
     CEF_REQUIRE_UI_THREAD();
-    total_created_++;
+    gBrowserCount++;
     browser_count_ += 1;
 
-    qInfo()<<__FUNCTION__<<"Total browser count:"<<total_created_
+    qInfo()<<__FUNCTION__<<"Total browser count:"<<gBrowserCount
           <<"handler browser count:"<<browser_count_;
 
 
@@ -101,9 +102,9 @@ bool CefClientHandler::DoClose(CefRefPtr<CefBrowser> browser)
 void CefClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 {
     CEF_REQUIRE_UI_THREAD();
-    total_created_ --;
+    gBrowserCount --;
     browser_count_--;
-    qInfo()<<__FUNCTION__<<"Total browser count:"<<total_created_;
+    qInfo()<<__FUNCTION__<<"Total browser count:"<<gBrowserCount;
 }
 
 void CefClientHandler::NotifyBrowserCreated(CefRefPtr<CefBrowser> browser)
@@ -195,16 +196,22 @@ bool CefClientHandler::OnTooltip(CefRefPtr<CefBrowser> browser,
     return false;
 }
 
-void CefClientHandler::OnStatusMessage(CefRefPtr<CefBrowser> browser, const CefString &value)
+void CefClientHandler::OnStatusMessage(CefRefPtr<CefBrowser> browser,
+                                       const CefString &value)
 {
 }
 
-bool CefClientHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser, cef_log_severity_t level, const CefString &message, const CefString &source, int line)
+bool CefClientHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
+                                        cef_log_severity_t level,
+                                        const CefString &message,
+                                        const CefString &source,
+                                        int line)
 {
     return false;
 }
 
-bool CefClientHandler::OnAutoResize(CefRefPtr<CefBrowser> browser, const CefSize &new_size)
+bool CefClientHandler::OnAutoResize(CefRefPtr<CefBrowser> browser,
+                                    const CefSize &new_size)
 {
     return false;
 }
@@ -213,6 +220,48 @@ void CefClientHandler::OnLoadingProgressChange(CefRefPtr<CefBrowser> browser,
                                                double progress)
 {
 
+}
+
+bool CefClientHandler::OnJSDialog(CefRefPtr<CefBrowser> browser,
+                                  const CefString &origin_url,
+                                  CefJSDialogHandler::JSDialogType dialog_type,
+                                  const CefString &message_text,
+                                  const CefString &default_prompt_text,
+                                  CefRefPtr<CefJSDialogCallback> callback,
+                                  bool &suppress_message)
+{
+    //普通提示框 询问框
+    if(dialog_type == JSDIALOGTYPE_ALERT){
+//        AlertDialog dlg(QString::fromStdWString(origin_url),
+//                        QString::fromStdWString(message_text));
+//        dlg.exec();
+        auto hwnd = browser->GetHost()->GetWindowHandle();
+        ::MessageBox(hwnd, message_text.ToWString().c_str(), L"AAA", MB_OK);
+        suppress_message = true;
+        return false;
+    }else if(dialog_type == JSDIALOGTYPE_CONFIRM){
+
+    }else if(dialog_type == JSDIALOGTYPE_PROMPT){
+
+    }
+    return false;
+}
+
+void CefClientHandler::OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
+                                           CefRefPtr<CefFrame> frame,
+                                           CefRefPtr<CefContextMenuParams> params,
+                                           CefRefPtr<CefMenuModel> model)
+{
+
+}
+
+bool CefClientHandler::OnContextMenuCommand(CefRefPtr<CefBrowser> browser,
+                                            CefRefPtr<CefFrame> frame,
+                                            CefRefPtr<CefContextMenuParams> params,
+                                            int command_id,
+                                            CefContextMenuHandler::EventFlags event_flags)
+{
+    return false;
 }
 
 void CefClientHandler::NotifyBrowserNewForgroundPage(CefWindowInfo &windowInfo,

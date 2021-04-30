@@ -8,7 +8,7 @@
 #include <include/cef_command_line.h>
 #include <include/cef_sandbox_win.h>
 
-#include "cef_app_browser.h"
+#include "browser/cef_app_browser.h"
 #include "message_loop/main_message_loop.h"
 #include "message_loop/main_message_loop_multithreaded_win.h"
 #include "message_loop/main_message_loop_external_pump.h"
@@ -18,6 +18,7 @@
 #endif
 
 #include "cef_qwidget.h"
+#include "widgets/framewidget.h"
 
 #if defined(CEF_USE_SANDBOX)
 // The cef_sandbox.lib static library may not link successfully with all VS
@@ -121,6 +122,9 @@ int main(int argc, char *argv[])
 
     MainWindow w;
     w.show();
+
+    FrameWidget w2;
+    w2.show();
 
     message_loop->Run();
 

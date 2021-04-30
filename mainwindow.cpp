@@ -2,8 +2,8 @@
 #include "ui_mainwindow.h"
 
 #include "cef_qwidget.h"
-#include "cef_client_handler.h"
-#include "util_qt.h"
+#include "browser/cef_client_handler.h"
+#include "utils/util_qt.h"
 
 #include <QtDebug>
 #include <QUrl>
@@ -39,9 +39,15 @@ int MainWindow::addOneBrowserPage(const QString &url, bool switchTo)
     return index;
 }
 
+bool MainWindow::event(QEvent *e)
+{
+    return QMainWindow::event(e);
+}
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     closing_ = true;
+
     if(ui->tabWidget->count() > 0){
         // 一个一个的关闭，等待关闭完
         onTabPageCloseRequested(0);
@@ -49,6 +55,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         return;
     }else{
         // 真正的关闭
+        qInfo()<<__FUNCTION__;
         event->accept();
     }
 }
@@ -57,7 +64,8 @@ void MainWindow::changeEvent(QEvent *event)
 {
     if(event->type() == QEvent::WindowStateChange)
     {
-        emit topLevelWindowStateChanged(windowState(), ui->tabWidget->currentWidget()->size());
+        emit windowStateChanged(windowState(),
+                                        ui->tabWidget->currentWidget()->size());
     }
 }
 
@@ -100,7 +108,7 @@ void MainWindow::initPage(CefQWidget *page)
     });
 
     // 顶层窗口的窗口状态改变应该通知到page去，
-    connect(this, &MainWindow::topLevelWindowStateChanged, page, &CefQWidget::onTopLevelWindowStateChanged);
+    connect(this, &MainWindow::windowStateChanged, page, &CefQWidget::onTopLevelWindowStateChanged);
 
     connect(page, &CefQWidget::browserAddressChange, [this](const QString &address)
     {
@@ -113,11 +121,11 @@ void MainWindow::initPage(CefQWidget *page)
         ui->tabWidget->setTabText(index, title);
 
     });
-    connect(page, &CefQWidget::browserNewForgroundPage, [this](CefQWidget *window)
+    connect(page, &CefQWidget::browserNewForgroundPage, [this](CefQWidget *newPage)
     {
-        auto index = ui->tabWidget->addTab(window, "");
+        auto index = ui->tabWidget->addTab(newPage, "");
         ui->tabWidget->setCurrentIndex(index);
-        initPage(window);
+        initPage(newPage);
     });
 
 }
@@ -133,6 +141,9 @@ CefQWidget *MainWindow::GetActivePage()
 
 void MainWindow::onTabPageCloseRequested(int index)
 {
+    if(ui->tabWidget->count() == 1){
+        closing_ = true;
+    }
     auto page = ui->tabWidget->widget(index);
     if(page){
         page->close();
