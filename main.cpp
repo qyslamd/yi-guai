@@ -123,9 +123,6 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-    FrameWidget w2;
-    w2.show();
-
     message_loop->Run();
 
     int result = qt_app.exec();

@@ -3,6 +3,14 @@
 #include <QtDebug>
 #include <QSettings>
 #include <QColor>
+#include <QScreen>
+#include <QApplication>
+
+#ifdef Q_OS_WIN
+#include <Windows.h>
+#pragma comment(lib, "Gdi32.lib")
+#pragma comment(lib, "User32.lib")
+#endif
 
 namespace UtilQt {
 
@@ -84,5 +92,64 @@ namespace UtilQt {
                        0.587 * color.green() + 0.114 * color.blue()) / 255;
         return gray > 0.5 ? Qt::black : Qt::white;
     }
+#ifdef Q_OS_WIN
+    int sacleUI(int spec)
+    {
+        double rate = 0;
+        QList<QScreen*> screens = QApplication::screens();
+        if (screens.size() > 0) {
+            QScreen* screen = screens[0];
+            double dpi = screen->logicalDotsPerInch();
+            rate = dpi / 96.0;
+
+            if (rate < 1.1) {
+                rate = 1.0;
+            } else if (rate < 1.4) {
+                rate = 1.25;
+            } else if (rate < 1.6) {
+                rate = 1.5;
+            } else if (rate < 1.8) {
+                rate = 1.75;
+            } else {
+                rate = 2.0;
+            }
+        }
+        return int(spec * rate);
+    }
+
+    const float WIN_DEFAULT_DPI = 96.0;
+    float windowsDpiScaleX()
+    {
+        HDC screen = CreateDC(L"DISPLAY", NULL, NULL, NULL);/*GetDC(0)*/;
+        FLOAT dpiX = static_cast<FLOAT>(GetDeviceCaps(screen, LOGPIXELSX));
+        ReleaseDC(0, screen);
+        return dpiX / WIN_DEFAULT_DPI;
+
+    //    float rate = 0.0f;
+    //    QList<QScreen*> screens = QApplication::screens();
+    //    if (screens.size() > 0) {
+    //        QScreen* screen = screens[0];
+    //        double dpi = screen->logicalDotsPerInchX();
+    //        rate = dpi / 96.0;
+    //    }
+    //    return rate;
+    }
+
+    float windowsDpiScaleY() {
+        HDC screen = CreateDC(L"DISPLAY", NULL, NULL, NULL);/*GetDC(0)*/;
+        FLOAT dpiY = static_cast<FLOAT>(GetDeviceCaps(screen, LOGPIXELSY));
+        ReleaseDC(0, screen);
+        return dpiY / WIN_DEFAULT_DPI;
+
+    //    float rate = 0.0f;
+    //    QList<QScreen*> screens = QApplication::screens();
+    //    if (screens.size() > 0) {
+    //        QScreen* screen = screens[0];
+    //        double dpi = screen->logicalDotsPerInchY();
+    //        rate = dpi / 96.0;
+    //    }
+    //    return rate;
+    }
+#endif
 
 }

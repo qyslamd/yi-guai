@@ -26,7 +26,7 @@ protected:
     void leaveEvent(QEvent *event) override;
 
 private:
-    const int PADDING = 9;
+    const int Padding_ = 9;
     enum Direction { UP=0, DOWN=1, LEFT, RIGHT,
                      LEFTTOP, LEFTBOTTOM, RIGHTBOTTOM, RIGHTTOP, NONE };
 

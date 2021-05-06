@@ -17,8 +17,8 @@ FrameWidget::FrameWidget(QWidget *parent) :
 
     QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
     shadow->setOffset(0, 0);
-    shadow->setColor(Qt::gray); // QColor(38, 78, 119, 180)
-    shadow->setBlurRadius(9);
+    shadow->setColor(Qt::gray);
+    shadow->setBlurRadius(Padding_);
     ui->widgetShadow->setGraphicsEffect(shadow);
 
     isLeftPressDown = false;
@@ -41,35 +41,35 @@ void FrameWidget::region(const QPoint &cursorGlobalPoint)
     int x = cursorGlobalPoint.x();
     int y = cursorGlobalPoint.y();
 
-    if(tl.x() + PADDING >= x && tl.x() <= x && tl.y() + PADDING >= y && tl.y() <= y) {
+    if(tl.x() + Padding_ >= x && tl.x() <= x && tl.y() + Padding_ >= y && tl.y() <= y) {
         // 左上角
         dir = LEFTTOP;
         this->setCursor(QCursor(Qt::SizeFDiagCursor));  // 设置鼠标形状
-    } else if(x >= rb.x() - PADDING && x <= rb.x() && y >= rb.y() - PADDING && y <= rb.y()) {
+    } else if(x >= rb.x() - Padding_ && x <= rb.x() && y >= rb.y() - Padding_ && y <= rb.y()) {
         // 右下角
         dir = RIGHTBOTTOM;
         this->setCursor(QCursor(Qt::SizeFDiagCursor));
-    } else if(x <= tl.x() + PADDING && x >= tl.x() && y >= rb.y() - PADDING && y <= rb.y()) {
+    } else if(x <= tl.x() + Padding_ && x >= tl.x() && y >= rb.y() - Padding_ && y <= rb.y()) {
         //左下角
         dir = LEFTBOTTOM;
         this->setCursor(QCursor(Qt::SizeBDiagCursor));
-    } else if(x <= rb.x() && x >= rb.x() - PADDING && y >= tl.y() && y <= tl.y() + PADDING) {
+    } else if(x <= rb.x() && x >= rb.x() - Padding_ && y >= tl.y() && y <= tl.y() + Padding_) {
         // 右上角
         dir = RIGHTTOP;
         this->setCursor(QCursor(Qt::SizeBDiagCursor));
-    } else if(x <= tl.x() + PADDING && x >= tl.x()) {
+    } else if(x <= tl.x() + Padding_ && x >= tl.x()) {
         // 左边
         dir = LEFT;
         this->setCursor(QCursor(Qt::SizeHorCursor));
-    } else if( x <= rb.x() && x >= rb.x() - PADDING) {
+    } else if( x <= rb.x() && x >= rb.x() - Padding_) {
         // 右边
         dir = RIGHT;
         this->setCursor(QCursor(Qt::SizeHorCursor));
-    }else if(y >= tl.y() && y <= tl.y() + PADDING){
+    }else if(y >= tl.y() && y <= tl.y() + Padding_){
         // 上边
         dir = UP;
         this->setCursor(QCursor(Qt::SizeVerCursor));
-    } else if(y <= rb.y() && y >= rb.y() - PADDING) {
+    } else if(y <= rb.y() && y >= rb.y() - Padding_) {
         // 下边
         dir = DOWN;
         this->setCursor(QCursor(Qt::SizeVerCursor));
@@ -88,17 +88,17 @@ void FrameWidget::paintEvent(QPaintEvent *event)
 void FrameWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton) {
-        if(isLeftPressDown)
+        if(isLeftPressDown){
             isLeftPressDown = false;
-        if(dir != NONE) {
-//            this->releaseMouse();
-            this->setCursor(QCursor(Qt::ArrowCursor));
+            dir = NONE;
+            setCursor(QCursor(Qt::ArrowCursor));
         }
     }
 }
 
 void FrameWidget::leaveEvent(QEvent *event)
 {
+    dir = NONE;
     setCursor(QCursor(Qt::ArrowCursor));
 }
 
