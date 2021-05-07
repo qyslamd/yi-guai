@@ -1,0 +1,45 @@
+
+
+/******************************************
+Scope:Global Global QToolButton
+*/
+QToolButton{
+    border:none;
+    border-radius:4px;
+}
+
+QToolButton:hover{
+    background-color:#DCDCDC;
+}
+
+
+/******************************************
+Scope:Class AddressBar and it's children
+*/
+.NaviBar{
+background-color:#FCFCFC;
+}
+
+/******************************************
+Scope:Class AddressBar and it's children
+*/
+.AddressBar{
+    border:none;
+    border-radius:6px;
+}
+.AddressBar:hover{
+    border:1px solid #CCCCCC;
+}
+
+
+/******************************************
+Scope:Class TabBar and it's children
+*/
+.TabBar::close-button{
+    image: url(:/icons/resources/close_24px.png);
+}
+
+.TabBar::close-button:hover {
+    background-color:#CFCFCF;
+    border-radius:8px;
+}

@@ -2,7 +2,7 @@
 
 #include <QApplication>
 #include <QtDebug>
-
+#include <QFile>
 
 #include <include/base/cef_scoped_ptr.h>
 #include <include/cef_command_line.h>
@@ -26,6 +26,7 @@
 #pragma comment(lib, "cef_sandbox.lib")
 #endif
 
+void initQApp(QApplication *app);
 
 int main(int argc, char *argv[])
 {
@@ -60,6 +61,7 @@ int main(int argc, char *argv[])
     }
 
     QApplication qt_app(argc, argv);
+    initQApp(&qt_app);
 
     // Parse command-line arguments for use in this method.
     CefRefPtr<CefCommandLine> command_line = CefCommandLine::CreateCommandLine();
@@ -134,4 +136,14 @@ int main(int argc, char *argv[])
     qInfo()<<__FUNCTION__<<"after cef shutdown:"<<message_loop.get();
 
     return result;
+}
+
+void initQApp(QApplication *app)
+{
+    QFile file(":/styles/resources/normal.qss");
+    if(file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        auto all = file.readAll();
+        file.close();
+        app->setStyleSheet(all);
+    }
 }

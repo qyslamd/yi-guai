@@ -24,8 +24,8 @@ public:
     void Navigate(const QString &url);
 
 signals:
-    void browserClosing(CefQWidget *page);
-    void browserNewForgroundPage(CefQWidget *window);
+    void browserClosing();
+    void browserNewForgroundPage(CefQWidget *newPage);
     void browserAddressChange(const QString &url);
     void browserTitleChange(const QString &title);
 

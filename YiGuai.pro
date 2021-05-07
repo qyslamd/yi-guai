@@ -3,10 +3,12 @@ QT       += core gui network widgets
 CONFIG += c++11
 
 SOURCES += \
+    page.cpp \
     toolbars/addressbar.cpp \
     toolbars/bookmarkbar.cpp \
     toolbars/navibar.cpp \
     toolbars/tabbar.cpp \
+    toolbars/tabbarstyle.cpp \
     widgets/Dp_Widget_Caption.cpp \
     widgets/FramelessWindow.cpp \
     dialogs/alertdialog.cpp \
@@ -27,10 +29,13 @@ SOURCES += \
 
 
 HEADERS += \
+    globaldef.h \
+    page.h \
     toolbars/addressbar.h \
     toolbars/bookmarkbar.h \
     toolbars/navibar.h \
     toolbars/tabbar.h \
+    toolbars/tabbarstyle.h \
     widgets/Dp_Widget_Caption.h \
     widgets/FramelessWindow.h \
     dialogs/alertdialog.h \
@@ -91,3 +96,6 @@ win32{
         LIBS += -L$$CEF_DEP_PATH/libcef_dll_wrapper/MD -llibcef_dll_wrapper
     }
 }
+
+RESOURCES += \
+    resource.qrc

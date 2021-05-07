@@ -86,7 +86,7 @@ void CefQWidget::OnBrowserCreated()
 
 void CefQWidget::OnBrowserWindowClosing()
 {
-    emit browserClosing(this);
+    emit browserClosing();
 }
 
 void CefQWidget::onBrowserWindowAddressChange(const std::string &url)

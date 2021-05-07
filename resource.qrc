@@ -1,0 +1,24 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>resources/home_blabk_64px.png</file>
+        <file>resources/normal_back.png</file>
+        <file>resources/normal_forward.png</file>
+        <file>resources/normal_notify.png</file>
+        <file>resources/normal_refresh.png</file>
+        <file>resources/window_close_light_2x.png</file>
+        <file>resources/search_48px.png</file>
+        <file>resources/normal_settings.png</file>
+        <file>resources/site_info_26px.png</file>
+        <file>resources/site_safe_26px.png</file>
+        <file>resources/site_unsafe_26px.png</file>
+        <file>resources/normal_mark.png</file>
+        <file>resources/normal_more.png</file>
+        <file>resources/user_64px.png</file>
+        <file>resources/addb_30px.png</file>
+        <file>resources/normal_pagelist_hide.png</file>
+        <file>resources/close_24px.png</file>
+    </qresource>
+    <qresource prefix="/styles">
+        <file>resources/normal.qss</file>
+    </qresource>
+</RCC>
