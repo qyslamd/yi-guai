@@ -11,6 +11,7 @@ class AddressBar final: public QLineEdit
     Q_OBJECT
 public:
     AddressBar(QWidget *parent = nullptr);
+    bool eventFilter(QObject *obj, QEvent *ev) override;
 private:
     QAction *btn_site_info_;    /*网站信息*/
     decltype (btn_site_info_)
@@ -18,8 +19,12 @@ private:
     btn_zoom_hint_,     /*缩放提示*/
     btn_mark_site_;     /*收藏站点*/
 
+    QToolButton *internal_btn_siteInfo_ = nullptr;
+
+private:
     void initUi();
     void setAppearance();
+    void fuckButton();
 
 };
 

@@ -63,6 +63,44 @@ void CefQWidget::Navigate(const QString &url)
     }
 }
 
+void CefQWidget::GoBack()
+{
+    auto browser = browser_window_->GetBrowser();
+    if(browser){
+        if(browser->CanGoBack()){
+            browser->GoBack();
+        }
+    }
+}
+
+void CefQWidget::GoForward()
+{
+    auto browser = browser_window_->GetBrowser();
+    if(browser){
+        if(browser->CanGoForward()){
+            browser->GoForward();
+        }
+    }
+}
+
+void CefQWidget::Refresh()
+{
+    auto browser = browser_window_->GetBrowser();
+    if(browser){
+        browser->Reload();
+    }
+}
+
+void CefQWidget::StopLoading()
+{
+    auto browser = browser_window_->GetBrowser();
+    if(browser){
+        if(browser->IsLoading()){
+            browser->StopLoad();
+        }
+    }
+}
+
 void CefQWidget::onTopLevelWindowStateChanged(Qt::WindowStates state, const QVariant &data)
 {
     if(state.testFlag(Qt::WindowMaximized) || state.testFlag(Qt::WindowNoState)){

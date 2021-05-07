@@ -18,12 +18,21 @@ QToolButton:hover{
     background-color:#DCDCDC;
 }
 
+QToolButton:open{
+    border:1px solid #90C8F6;
+    background-color:#CFCFCF;
+}
+
 
 /******************************************
 Scope:Class AddressBar and it's children
 */
 .NaviBar{
 background-color:#FCFCFC;
+}
+
+QToolButton#NaviBarOptionBtn::menu-indicator{
+    image: none;
 }
 
 /******************************************
@@ -36,7 +45,6 @@ Scope:Class AddressBar and it's children
 .AddressBar:hover{
     border:1px solid #CCCCCC;
 }
-
 
 /******************************************
 Scope:Class TabBar and it's children

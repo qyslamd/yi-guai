@@ -66,7 +66,7 @@ bool MainWindow::event(QEvent *e)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    closing_ = true;
+    window_closing_ = true;
 
     if(stack_browsers_->count() > 0 || tab_bar_->count() > 0){
         // 一个一个的关闭，等待关闭完
@@ -235,7 +235,7 @@ void MainWindow::onTabBarCurrentChanged(int index)
 void MainWindow::onTabBarCloseRequested(int index)
 {
     if(stack_browsers_->count() == 1){
-        closing_ = true;
+        window_closing_ = true;
     }
     auto page = stack_browsers_->widget(index);
     if(page){
@@ -253,12 +253,44 @@ void MainWindow::onTabBarTabMoved(int from, int to)
 
 void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
 {
-    if(cmd == NaviBarCmd::Navigate){
+    auto page = GetActivePage();
+    if(cmd == NaviBarCmd::Navigate)
+    {
         auto url = UtilQt::check_url(para.toString());
-        auto page = GetActivePage();
         if(page){
             page->getBrowserWidget()->Navigate(url);
         }
+    } else if(cmd == NaviBarCmd::Back)
+    {
+        if(page){
+            page->getBrowserWidget()->GoBack();
+        }
+    }else if(cmd == NaviBarCmd::Forward)
+    {
+        if(page){
+            page->getBrowserWidget()->GoForward();
+        }
+    }
+    else if(cmd == NaviBarCmd::Refresh)
+    {
+        if(page){
+            page->getBrowserWidget()->Refresh();
+        }
+    }else if(cmd == NaviBarCmd::StopLoading)
+    {
+        if(page){
+            page->getBrowserWidget()->StopLoading();
+        }
+    } else if(cmd == NaviBarCmd::NewTabPage){
+        auto url = para.toString();
+        if(url.isEmpty()){
+            url = "https://cn.bing.com/";
+        }
+        addNewPage(url, true);
+    } else if(cmd == NaviBarCmd::NewWindow){
+        qInfo()<<__FUNCTION__<<"TODO:";
+    } else if(cmd == NaviBarCmd::NewInprivateWindow) {
+        qInfo()<<__FUNCTION__<<"TODO:";
     }
 }
 
@@ -279,8 +311,9 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &data)
             page->deleteLater();
 
             // 关掉一个以后，紧接着判断是不是用户在关闭整个窗口
-            if(closing_){
-                close();
+            if(window_closing_){
+                QTimer::singleShot(0, this, &MainWindow::close);
+//                close();
             }
         }
 
@@ -301,5 +334,4 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &data)
             navi_bar_->setLoadingState(page->IsLoading(),page->CanGoBack(), page->CanGoForward());
         }
     }
-
 }

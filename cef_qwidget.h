@@ -22,6 +22,10 @@ public:
     ~CefQWidget();
 
     void Navigate(const QString &url);
+    void GoBack();
+    void GoForward();
+    void Refresh();
+    void StopLoading();
 
 signals:
     void browserClosing();

@@ -47,7 +47,7 @@ private:
     BookmarkBar *bookmark_bar_ = nullptr; /*书签栏*/
     QStackedWidget *stack_browsers_ = nullptr;    /*浏览器窗口栈*/
 
-    bool closing_ = false;  /*窗口是否正在关闭*/
+    bool window_closing_ = false;  /*窗口是否正在关闭*/
 
 private:
     void initUi();

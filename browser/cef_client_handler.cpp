@@ -199,6 +199,7 @@ bool CefClientHandler::OnTooltip(CefRefPtr<CefBrowser> browser,
 void CefClientHandler::OnStatusMessage(CefRefPtr<CefBrowser> browser,
                                        const CefString &value)
 {
+
 }
 
 bool CefClientHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,

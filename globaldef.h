@@ -7,6 +7,16 @@
 enum class NaviBarCmd {
     None = -1,
     Navigate,
+    Back,
+    Forward,
+    Refresh,
+    StopLoading,
+    NewTabPage,
+    NewWindow,
+    NewInprivateWindow,
+    ZoomIn,
+    ZoomReset,
+    ZoomOut,
 };
 
 enum class PageCmd{
