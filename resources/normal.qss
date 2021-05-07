@@ -1,4 +1,10 @@
+/******************************************
+Scope:Global Global font-family
+*/
 
+*{
+font-family:"Microsoft Yahei";
+}
 
 /******************************************
 Scope:Global Global QToolButton

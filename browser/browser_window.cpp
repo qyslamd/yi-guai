@@ -147,3 +147,12 @@ void BrowserWindow::onBrowserTitleChange(const std::string &title)
 
      delegate_->onBrowserWindowTitleChange(title);
 }
+
+void BrowserWindow::onBrowserLoadingStateChange(bool isLoading,
+                                                bool canGoBack,
+                                                bool canGoForward)
+{
+    REQUIRE_MAIN_THREAD();
+
+    delegate_->onBrowserWindowLoadingStateChange(isLoading,canGoBack,canGoForward);
+}

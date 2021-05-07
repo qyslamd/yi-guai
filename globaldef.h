@@ -12,6 +12,9 @@ enum class NaviBarCmd {
 enum class PageCmd{
     None = -1,
     Closing,
+    Address,
+    Title,
+    LoadingState,
 };
 
 #endif // GLOBALDEF_H

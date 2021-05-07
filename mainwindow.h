@@ -8,6 +8,7 @@
 #include "globaldef.h"
 
 class QVBoxLayout;
+class QHBoxLayout;
 class QToolButton;
 class TabBar;
 class NaviBar;
@@ -25,6 +26,7 @@ public:
     ~MainWindow();
 
     int addNewPage(const QString &url, bool switchTo = false);
+    int addNewPage(Page *page);
     // QObject interface
     bool event(QEvent *e) override;
 signals:
@@ -32,9 +34,12 @@ signals:
 protected:
     void closeEvent(QCloseEvent *evnet) override;
     void changeEvent(QEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
 private:
     QVBoxLayout *layout_;   /*整个窗口的布局*/
 
+    QHBoxLayout* tabbar_layout_;    /*标签栏布局*/
     QToolButton *btn_dock_tabs_ = nullptr;    /*停靠标签按钮*/
     TabBar *tab_bar_ = nullptr;   /*标签栏*/
     QToolButton *btn_add_page_ = nullptr; /*添加新标签按钮*/

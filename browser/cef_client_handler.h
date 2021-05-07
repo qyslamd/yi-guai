@@ -13,6 +13,7 @@ class CefClientHandler
         , public CefDisplayHandler
         , public CefJSDialogHandler
         , public CefContextMenuHandler
+        , public CefLoadHandler
 {
 public:
     class Delegate{
@@ -27,6 +28,10 @@ public:
         virtual void OnBrowserClosing(CefRefPtr<CefBrowser> browser) = 0;
         virtual void onBrowserAddressChange(const std::string &url) = 0;
         virtual void onBrowserTitleChange(const std::string &url) = 0;
+
+        virtual void onBrowserLoadingStateChange(bool isLoading,
+                                                 bool canGoBack,
+                                                 bool canGoForward) = 0;
     protected:
         virtual ~Delegate() {}
     };
@@ -43,6 +48,7 @@ public:
     CefRefPtr<CefDisplayHandler> GetDisplayHandler() OVERRIDE { return this; }
     CefRefPtr<CefJSDialogHandler> GetJSDialogHandler() OVERRIDE {return this;}
     CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() OVERRIDE {return this;}
+    CefRefPtr<CefLoadHandler> GetLoadHandler() OVERRIDE {return this;}
 
     static int gBrowserCount;
 
@@ -96,6 +102,24 @@ public:
                               CefRefPtr<CefFrame> frame,
                               CefRefPtr<CefContextMenuParams> params,
                               int command_id, EventFlags event_flags) override;
+    // CefLoadHandler interface
+public:
+    void OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
+                              bool isLoading,
+                              bool canGoBack,
+                              bool canGoForward) override;
+    void OnLoadStart(CefRefPtr<CefBrowser> browser,
+                     CefRefPtr<CefFrame> frame,
+                     TransitionType transition_type) override;
+    void OnLoadEnd(CefRefPtr<CefBrowser> browser,
+                   CefRefPtr<CefFrame> frame,
+                   int httpStatusCode) override;
+    void OnLoadError(CefRefPtr<CefBrowser> browser,
+                     CefRefPtr<CefFrame> frame,
+                     ErrorCode errorCode,
+                     const CefString &errorText,
+                     const CefString &failedUrl) override;
+
 
     // Returns the number of browsers currently using this handler. Can only be
     // called on the CEF UI thread.

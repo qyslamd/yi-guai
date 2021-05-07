@@ -25,6 +25,9 @@ public:
 
         virtual void onBrowserWindowAddressChange(const std::string& url) = 0;
         virtual void onBrowserWindowTitleChange(const std::string& title) = 0;
+        virtual void onBrowserWindowLoadingStateChange(bool isLoading,
+                                                       bool canGoBack,
+                                                       bool canGoForward) = 0;
     protected:
         virtual ~Delegate() {}
     };
@@ -73,6 +76,9 @@ protected:
     void OnBrowserClosing(CefRefPtr<CefBrowser> browser) override;
     void onBrowserAddressChange(const std::string &url)  override;
     void onBrowserTitleChange(const std::string &title)  override;
+    void onBrowserLoadingStateChange(bool isLoading,
+                                     bool canGoBack,
+                                     bool canGoForward) override;
 
 private:
     Delegate* delegate_;

@@ -264,6 +264,40 @@ bool CefClientHandler::OnContextMenuCommand(CefRefPtr<CefBrowser> browser,
     return false;
 }
 
+void CefClientHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
+                                            bool isLoading,
+                                            bool canGoBack,
+                                            bool canGoForward)
+{
+    if (delegate_)
+        delegate_->onBrowserLoadingStateChange(isLoading,
+                                               canGoBack,
+                                               canGoForward);
+}
+
+void CefClientHandler::OnLoadStart(CefRefPtr<CefBrowser> browser,
+                                   CefRefPtr<CefFrame> frame,
+                                   CefLoadHandler::TransitionType transition_type)
+{
+
+}
+
+void CefClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser,
+                                 CefRefPtr<CefFrame> frame,
+                                 int httpStatusCode)
+{
+
+}
+
+void CefClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
+                                   CefRefPtr<CefFrame> frame,
+                                   CefLoadHandler::ErrorCode errorCode,
+                                   const CefString &errorText,
+                                   const CefString &failedUrl)
+{
+
+}
+
 void CefClientHandler::NotifyBrowserNewForgroundPage(CefWindowInfo &windowInfo,
                                                      CefRefPtr<CefClient> &client,
                                                      CefBrowserSettings &settings)

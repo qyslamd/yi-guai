@@ -99,6 +99,15 @@ void CefQWidget::onBrowserWindowTitleChange(const std::string &title)
     emit browserTitleChange(QString::fromStdString(title));
 }
 
+void CefQWidget::onBrowserWindowLoadingStateChange(bool isLoading,
+                                                   bool canGoBack,
+                                                   bool canGoForward)
+{
+    emit browserLoadingStateChange(isLoading,
+                              canGoBack,
+                              canGoForward);
+}
+
 void CefQWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);

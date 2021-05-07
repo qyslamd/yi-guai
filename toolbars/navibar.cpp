@@ -49,6 +49,19 @@ void NaviBar::setSpacing(int spacing)
     }
 }
 
+void NaviBar::setAddress(const QString &url)
+{
+    address_bar_->setText(url);
+}
+
+void NaviBar::setLoadingState(bool isLoading, bool canGoBack, bool canGoForward)
+{
+    btn_back_->setEnabled(canGoBack);
+    btn_forward_->setEnabled(canGoForward);
+    btn_refresh_->setVisible(!isLoading);
+    btn_stop_->setVisible(isLoading);
+}
+
 void NaviBar::paintEvent(QPaintEvent *event)
 {
     QFrame::paintEvent(event);

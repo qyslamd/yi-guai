@@ -28,6 +28,9 @@ signals:
     void browserNewForgroundPage(CefQWidget *newPage);
     void browserAddressChange(const QString &url);
     void browserTitleChange(const QString &title);
+    void browserLoadingStateChange(bool isLoading,
+                                   bool canGoBack,
+                                   bool canGoForward);
 
 public slots:
     void onTopLevelWindowStateChanged(Qt::WindowStates state, const QVariant &data);
@@ -41,6 +44,9 @@ protected:
     void OnBrowserWindowClosing() override;
     void onBrowserWindowAddressChange(const std::string &url) override;
     void onBrowserWindowTitleChange(const std::string &title) override;
+    void onBrowserWindowLoadingStateChange(bool isLoading,
+                                     bool canGoBack,
+                                     bool canGoForward) override;
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

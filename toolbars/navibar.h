@@ -14,6 +14,9 @@ class NaviBar final: public QFrame
 public:
     NaviBar(QWidget *parent = nullptr);
     void setSpacing(int spacing);
+    void setAddress(const QString &url);
+    void setLoadingState(bool isLoading, bool canGoBack, bool canGoForward);
+
 signals:
     void naviBarCmd(NaviBarCmd cmd, const QVariant &para);
 protected:

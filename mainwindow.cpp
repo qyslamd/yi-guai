@@ -18,10 +18,13 @@
 #include <QThread>
 #include <QToolButton>
 
+#ifdef Q_OS_WIN
+#include <Windows.h>
+#endif
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    resize(1100,600);
     initUi();
     setAppearance();
     initSignalSlot();
@@ -44,6 +47,15 @@ int MainWindow::addNewPage(const QString &url, bool switchTo)
     if(switchTo){
         tab_bar_->setCurrentIndex(index);
     }
+    return index;
+}
+
+int MainWindow::addNewPage(Page *page)
+{
+    initPage(page);
+    auto index = stack_browsers_->addWidget(page);
+    tab_bar_->insertTab(index, "");
+    tab_bar_->setCurrentIndex(index);
     return index;
 }
 
@@ -77,8 +89,59 @@ void MainWindow::changeEvent(QEvent *event)
     }
 }
 
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+    return QMainWindow::mousePressEvent(event);
+    if(this->isFullScreen()){
+    }
+#ifdef Q_OS_WIN
+    int h = 0;
+    h += layout_->contentsMargins().top();
+    h += tabbar_layout_->contentsMargins().top();
+    h += tab_bar_->height();
+
+    QRect dragRect(0, 0, width(), h);
+    if(dragRect.contains(event->pos())){
+        if(::ReleaseCapture()){
+            SendMessage(HWND(this->winId()), WM_SYSCOMMAND, SC_MOVE + HTCAPTION, 0);
+            event->ignore();
+        }
+    }
+#endif
+    QMainWindow::mousePressEvent(event);
+}
+
+void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    return QMainWindow::mouseDoubleClickEvent(event);
+    if(this->isFullScreen()){
+    }
+#ifdef Q_OS_WIN
+    int h = 0;
+    h += layout_->contentsMargins().top();
+    h += tabbar_layout_->contentsMargins().top();
+    h += tab_bar_->height();
+
+    QRect dragRect(0, 0, width(), h);
+    if(!dragRect.contains(event->pos())){
+        return QMainWindow::mouseDoubleClickEvent(event);
+    }
+    auto state = windowState();
+    if(state.testFlag(Qt::WindowNoState)){
+        showMaximized();
+    }else{
+        if(this->isMaximized()){
+            showNormal();
+        }
+    }
+
+#endif
+    QMainWindow::mouseDoubleClickEvent(event);
+}
+
 void MainWindow::initUi()
 {
+    resize(1100,600);
     QPalette pl = palette();
     pl.setColor(QPalette::Active, QPalette::Window, QColor("#CECECE"));
     pl.setColor(QPalette::Inactive, QPalette::Window, QColor("#E8E8E8"));
@@ -98,18 +161,18 @@ void MainWindow::initUi()
     stack_browsers_ = new QStackedWidget;
     stack_browsers_->setLineWidth(0);
 
-    auto tabbar_layout = new QHBoxLayout;
-    tabbar_layout->setContentsMargins(6, 6, 0, 0);
-    tabbar_layout->setSpacing(2);
-    tabbar_layout->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
-    tabbar_layout->addWidget(btn_dock_tabs_);
-    tabbar_layout->addWidget(tab_bar_);
-    tabbar_layout->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
-    tabbar_layout->addWidget(btn_add_page_);
-    tabbar_layout->addStretch();
-    tabbar_layout->addSpacerItem(new QSpacerItem(180,10,QSizePolicy::Fixed));
+    tabbar_layout_ = new QHBoxLayout;
+    tabbar_layout_->setContentsMargins(6, 6, 0, 0);
+    tabbar_layout_->setSpacing(2);
+    tabbar_layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
+    tabbar_layout_->addWidget(btn_dock_tabs_);
+    tabbar_layout_->addWidget(tab_bar_);
+    tabbar_layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
+    tabbar_layout_->addWidget(btn_add_page_);
+    tabbar_layout_->addStretch();
+    tabbar_layout_->addSpacerItem(new QSpacerItem(180,10,QSizePolicy::Fixed));
 
-    layout_->addLayout(tabbar_layout);
+    layout_->addLayout(tabbar_layout_);
     layout_->addWidget(navi_bar_);
     layout_->addWidget(bookmark_bar_);
     layout_->addWidget(stack_browsers_);
@@ -145,8 +208,12 @@ void MainWindow::initSignalSlot()
 void MainWindow::initPage(Page *page)
 {
     connect(page, &Page::pageCmd, this, &MainWindow::onPageCmd);
+    connect(page, &Page::newPage, [this](Page *page){addNewPage(page);});
     // 顶层窗口的窗口状态改变应该通知到page去，
-    connect(this, &MainWindow::windowStateChanged, page, &Page::onTopLevelWindowStateChanged);
+    connect(this, &MainWindow::windowStateChanged, [page](Qt::WindowStates state, const QVariant &data)
+    {
+        page->getBrowserWidget()->onTopLevelWindowStateChanged(state, data);
+    });
 
 }
 
@@ -197,24 +264,42 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
 
 void MainWindow::onPageCmd(PageCmd cmd, const QVariant &data)
 {
-    if(cmd == PageCmd::Closing){
-        auto sender = QObject::sender();
-        if(sender){
-            auto page = qobject_cast<Page *>(sender);
-            if(page){
-                tab_bar_->removeTab(stack_browsers_->indexOf(page));
-                stack_browsers_->removeWidget(page);
-                // 必须要删除才能真正的释放cef的browser
-                page->deleteLater();
+    auto sender = QObject::sender();
+    Page *page = nullptr;
+    if(sender){
+        page = qobject_cast<Page *>(sender);
+    }
 
-                // 关掉一个以后，紧接着判断是不是用户在关闭整个窗口
-                if(closing_){
-                    close();
-                }
+    if(cmd == PageCmd::Closing)
+    {
+        if(page){
+            tab_bar_->removeTab(stack_browsers_->indexOf(page));
+            stack_browsers_->removeWidget(page);
+            // 必须要删除才能真正的释放cef的browser
+            page->deleteLater();
+
+            // 关掉一个以后，紧接着判断是不是用户在关闭整个窗口
+            if(closing_){
+                close();
             }
         }
-    } else if(cmd == PageCmd::None){
 
+    } else if(cmd == PageCmd::Address)
+    {
+        if(page && page == GetActivePage()){
+            QUrl url(data.toString());
+            navi_bar_->setAddress(url.toDisplayString());
+        }
+    } else if(cmd == PageCmd::Title)
+    {
+        auto index = stack_browsers_->indexOf(page);
+        tab_bar_->setTabText(index, data.toString());
+    } else if(cmd == PageCmd::LoadingState)
+    {
+        if(page && page == GetActivePage()){
+            QUrl url(data.toString());
+            navi_bar_->setLoadingState(page->IsLoading(),page->CanGoBack(), page->CanGoForward());
+        }
     }
 
 }
