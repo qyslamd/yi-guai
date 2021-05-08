@@ -56,12 +56,13 @@ private:
     void initSignalSlot();
     void initPage(Page *page);
     Page *GetActivePage();
+    Page *GetPage(int index);
 
 private slots:
     void onTabBarCurrentChanged(int index);
     void onTabBarCloseRequested(int index);
     void onTabBarTabMoved(int from, int to);
     void onNaviBarCmd(NaviBarCmd cmd, const QVariant &para);
-    void onPageCmd(PageCmd cmd, const QVariant &data);
+    void onPageCmd(PageCmd cmd, const QVariant &para);
 };
 #endif // MAINWINDOW_H

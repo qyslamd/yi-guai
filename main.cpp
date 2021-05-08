@@ -18,6 +18,7 @@
 #endif
 
 #include "cef_qwidget.h"
+#include "managers/mainwindowmgr.h"
 #include "widgets/framewidget.h"
 
 #if defined(CEF_USE_SANDBOX)
@@ -122,8 +123,9 @@ int main(int argc, char *argv[])
         qInfo()<<"CefInitialize initialized succeed!";
     }
 
-    MainWindow w;
-    w.show();
+//    MainWindow w;
+//    w.show();
+    MainWindowMgr::instance().createWindow();
 
     message_loop->Run();
 

@@ -45,6 +45,9 @@ Scope:Class AddressBar and it's children
 .AddressBar:hover{
     border:1px solid #CCCCCC;
 }
+.AddressBar:focus{
+    border:2px solid #A3CFEC;
+}
 
 /******************************************
 Scope:Class TabBar and it's children

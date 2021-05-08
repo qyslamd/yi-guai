@@ -106,15 +106,8 @@ NaviBar::NaviBar(QWidget *parent)
     initSignals();
 
     setAppearance();
-}
 
-void NaviBar::setSpacing(int spacing)
-{
-    if(spacing < 0){
-       layout_->setSpacing(0);
-    }else{
-       layout_->setSpacing(spacing);
-    }
+    layout_->setSpacing(10);
 }
 
 void NaviBar::setAddress(const QString &url)
@@ -128,6 +121,13 @@ void NaviBar::setLoadingState(bool isLoading, bool canGoBack, bool canGoForward)
     btn_forward_->setEnabled(canGoForward);
     btn_refresh_->setVisible(!isLoading);
     btn_stop_->setVisible(isLoading);
+}
+
+void NaviBar::setFocus(bool focus)
+{
+    if(focus){
+        address_bar_->clearFocus();
+    }
 }
 
 bool NaviBar::eventFilter(QObject *obj, QEvent *ev)
@@ -161,6 +161,11 @@ void NaviBar::initSignals()
     connect(address_bar_, &AddressBar::returnPressed, this, [this]()
     {
         emit naviBarCmd(NaviBarCmd::Navigate, address_bar_->text());
+    });
+    connect(address_bar_, &AddressBar::viewSiteInfo, this, [this]()
+    {
+        auto rect = address_bar_->gGeometryBtnSiteInfo();
+        emit naviBarCmd(NaviBarCmd::ViewSiteInfo, rect);
     });
     connect(btn_back_, &QToolButton::clicked, this, [this]()
     {

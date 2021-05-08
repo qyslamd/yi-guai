@@ -14,6 +14,7 @@ class CefClientHandler
         , public CefJSDialogHandler
         , public CefContextMenuHandler
         , public CefLoadHandler
+        , public CefFocusHandler
 {
 public:
     class Delegate{
@@ -28,10 +29,14 @@ public:
         virtual void OnBrowserClosing(CefRefPtr<CefBrowser> browser) = 0;
         virtual void onBrowserAddressChange(const std::string &url) = 0;
         virtual void onBrowserTitleChange(const std::string &url) = 0;
+        virtual void onBrowserFaviconChange(CefRefPtr<CefImage> image,
+                                            const std::string &url) = 0;
 
         virtual void onBrowserLoadingStateChange(bool isLoading,
                                                  bool canGoBack,
                                                  bool canGoForward) = 0;
+
+        virtual void onBrowserGotFocus(CefRefPtr<CefBrowser> ) {}
     protected:
         virtual ~Delegate() {}
     };
@@ -44,11 +49,12 @@ public:
     void DetachDelegate();
 
     // CefClient interface
-    CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() OVERRIDE { return this; }
-    CefRefPtr<CefDisplayHandler> GetDisplayHandler() OVERRIDE { return this; }
-    CefRefPtr<CefJSDialogHandler> GetJSDialogHandler() OVERRIDE {return this;}
-    CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() OVERRIDE {return this;}
-    CefRefPtr<CefLoadHandler> GetLoadHandler() OVERRIDE {return this;}
+    CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override { return this; }
+    CefRefPtr<CefDisplayHandler> GetDisplayHandler() override { return this; }
+    CefRefPtr<CefJSDialogHandler> GetJSDialogHandler() override {return this;}
+    CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() override {return this;}
+    CefRefPtr<CefLoadHandler> GetLoadHandler() override {return this;}
+//    CefRefPtr<CefFocusHandler> GetFocusHandler() override{ return this; }
 
     static int gBrowserCount;
 
@@ -66,10 +72,10 @@ public:
             CefRefPtr<CefClient>& client,
             CefBrowserSettings& settings,
             CefRefPtr<CefDictionaryValue>& extra_info,
-            bool* no_javascript_access) OVERRIDE;
-    void OnAfterCreated(CefRefPtr<CefBrowser> browser) OVERRIDE;
-    bool DoClose(CefRefPtr<CefBrowser> browser) OVERRIDE;
-    void OnBeforeClose(CefRefPtr<CefBrowser> browser) OVERRIDE;
+            bool* no_javascript_access) override;
+    void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
+    bool DoClose(CefRefPtr<CefBrowser> browser) override;
+    void OnBeforeClose(CefRefPtr<CefBrowser> browser) override;
 
     // CefDisplayHandler interface
 public:
@@ -120,6 +126,12 @@ public:
                      const CefString &errorText,
                      const CefString &failedUrl) override;
 
+    // CefFocusHandler interface
+public:
+    void OnTakeFocus(CefRefPtr<CefBrowser> browser, bool next) override;
+    bool OnSetFocus(CefRefPtr<CefBrowser> browser, FocusSource source) override;
+    void OnGotFocus(CefRefPtr<CefBrowser> browser) override;
+
 
     // Returns the number of browsers currently using this handler. Can only be
     // called on the CEF UI thread.
@@ -148,6 +160,9 @@ public:
     std::string startup_url() const { return startup_url_; }
 
 private:
+    // favicon download help class
+    friend class ClientDownloadImageCallback;
+
     // Execute Delegate notifications on the main thread.
     void NotifyBrowserNewForgroundPage(CefWindowInfo& windowInfo,
                                        CefRefPtr<CefClient>& client,
@@ -159,8 +174,10 @@ private:
     void NotifyBrowserAddressChange(CefRefPtr<CefBrowser> browser,
                                      CefRefPtr<CefFrame> frame,
                                      const CefString &url);
-    void NotifyBroserTitleChange(CefRefPtr<CefBrowser> browser,
+    void NotifyBrowserTitleChange(CefRefPtr<CefBrowser> browser,
                                  const CefString &title);
+    void NotifyBrowserFavicon(CefRefPtr<CefImage> image,
+                             const CefString &icon_url);
 
     // The startup URL.
     const std::string startup_url_;

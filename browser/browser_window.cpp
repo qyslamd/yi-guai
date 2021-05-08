@@ -148,6 +148,13 @@ void BrowserWindow::onBrowserTitleChange(const std::string &title)
      delegate_->onBrowserWindowTitleChange(title);
 }
 
+void BrowserWindow::onBrowserFaviconChange(CefRefPtr<CefImage> image,
+                                           const std::string &url)
+{
+    REQUIRE_MAIN_THREAD();
+    delegate_->onBrowserWindowFaviconChange(image, url);
+}
+
 void BrowserWindow::onBrowserLoadingStateChange(bool isLoading,
                                                 bool canGoBack,
                                                 bool canGoForward)
@@ -155,4 +162,10 @@ void BrowserWindow::onBrowserLoadingStateChange(bool isLoading,
     REQUIRE_MAIN_THREAD();
 
     delegate_->onBrowserWindowLoadingStateChange(isLoading,canGoBack,canGoForward);
+}
+
+void BrowserWindow::onBrowserGotFocus(CefRefPtr<CefBrowser> browser)
+{
+    REQUIRE_MAIN_THREAD();
+    delegate_->OnBrowserGotFocus();
 }

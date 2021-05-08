@@ -10,9 +10,16 @@
 #include <QCloseEvent>
 #include <QTimer>
 #include <QDateTime>
+#include <QStyle>
+#include <QStandardPaths>
+#include <QStyle>
+#include <QDir>
 
 #include <include/base/cef_logging.h>
 #include "mainwindow.h"
+
+#include "managers/favicon_manager.h"
+#include "utils/util_qt.h"
 
 CefQWidget::CefQWidget(const QString &startup_url, QWidget *parent)
     : QWidget(parent)
@@ -129,6 +136,7 @@ void CefQWidget::OnBrowserWindowClosing()
 
 void CefQWidget::onBrowserWindowAddressChange(const std::string &url)
 {
+    url_ = QString::fromStdString(url);
     emit browserAddressChange(QString::fromStdString(url));
 }
 
@@ -137,13 +145,95 @@ void CefQWidget::onBrowserWindowTitleChange(const std::string &title)
     emit browserTitleChange(QString::fromStdString(title));
 }
 
+void CefQWidget::onBrowserWindowFaviconChange(CefRefPtr<CefImage> image,
+                                      const std::string &url)
+{
+    if(image == nullptr || image->IsEmpty())
+    {
+        QPixmap defaultPix = style()->standardPixmap(QStyle::SP_FileIcon);
+        emit browserFaviconChange(defaultPix);
+        return;
+    }
+    auto cacheDir = UtilQt::appDataPath();
+    QDir dir(cacheDir);
+    if(!dir.exists()){
+        dir.mkpath(dir.path());
+    }
+    const char * sudDir = "iconCache";
+    if(!dir.cd(sudDir)){
+        dir.mkdir(sudDir);
+    }
+    dir.cd(sudDir);
+
+    auto file_path = UtilQt::GetFileNameFromURL(QString::fromStdString(url));
+    file_path = dir.absoluteFilePath(file_path);
+    QString subFix = QFileInfo(QString::fromStdString(url)).suffix();
+    int width = 16;
+    int height = 16;
+    QPixmap pixmap;
+
+    // 有些臃肿，故意如此
+    if(subFix.compare("svg", Qt::CaseInsensitive) == 0)
+    {
+        CefRefPtr<CefBinaryValue> value = image->GetAsPNG(1.0, true,width, height);
+        uchar * buffer = (uchar*)malloc(value->GetSize());
+        memset(buffer, 0, value->GetSize());
+        value->GetData(buffer, value->GetSize(), 0);
+
+        pixmap.loadFromData(buffer,value->GetSize());
+        free(buffer);
+    }
+    else if(subFix.compare("ico", Qt::CaseInsensitive) == 0)
+    {
+        CefRefPtr<CefBinaryValue> value = image->GetAsPNG(0.0, true, width, height);
+        uchar * buffer = (uchar*)malloc(value->GetSize());
+        memset(buffer, 0, value->GetSize());
+        value->GetData(buffer, value->GetSize(), 0);
+        pixmap.loadFromData(buffer,value->GetSize());
+        free(buffer);
+        QIcon icon(pixmap);
+        pixmap = icon.pixmap(QSize(16,16));
+
+        if(! QFile(file_path).exists()){
+            pixmap.save(file_path);
+        }
+        FaviconManager::Instance().addIconRecord(url_, file_path);
+    }
+    else if(subFix.compare("png", Qt::CaseInsensitive) == 0)
+    {
+        CefRefPtr<CefBinaryValue> value = image->GetAsPNG(0.0, true, width, height);
+        uchar * buffer = (uchar*)malloc(value->GetSize());
+        memset(buffer, 0, value->GetSize());
+        value->GetData(buffer, value->GetSize(), 0);
+
+        pixmap.loadFromData(buffer,value->GetSize());
+        free(buffer);
+
+        if(! QFile(file_path).exists()){
+            pixmap.save(file_path);
+        }
+        FaviconManager::Instance().addIconRecord(url_, file_path);
+    }
+    else {
+        pixmap = style()->standardPixmap(QStyle::SP_FileIcon);
+    }
+    emit browserFaviconChange(pixmap);
+
+    Q_UNUSED(url);
+}
+
 void CefQWidget::onBrowserWindowLoadingStateChange(bool isLoading,
                                                    bool canGoBack,
                                                    bool canGoForward)
 {
     emit browserLoadingStateChange(isLoading,
                               canGoBack,
-                              canGoForward);
+                                   canGoForward);
+}
+
+void CefQWidget::OnBrowserGotFocus()
+{
+    emit browserFocusChange(true);
 }
 
 void CefQWidget::resizeEvent(QResizeEvent *event)

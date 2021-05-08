@@ -8,6 +8,7 @@ class QHBoxLayout;
 class QVBoxLayout;
 class CefQWidget;
 class QDockWidget;
+class SiteInfoPopup;
 
 ///
 /// \brief The Page class
@@ -20,9 +21,17 @@ public:
     Page(CefQWidget *browser, QWidget *parent = nullptr);
 
     CefQWidget* getBrowserWidget();
+    QString GetUrl() const {return url_;}
+    QString GetTitle() const {return title_;}
+    QPixmap GetFavicon() const {return favicon_; }
+
     bool IsLoading() const {return isLoading_;}
     bool CanGoBack() const {return canGoBack_;}
     bool CanGoForward() const {return canGoForward_;}
+
+
+    void showSiteInfomation(const QRect &rect);
+
 signals:
     void pageCmd(PageCmd cmd, const QVariant &data);
     void newPage(Page *page);
@@ -32,14 +41,15 @@ private:
     QVBoxLayout *main_layout_ = nullptr;   /*整体布局*/
     CefQWidget *browser_widget_ = nullptr;    /*浏览器QWidget*/
     QDockWidget *dock_dev_tool_ = nullptr;    /*开发者工具停靠窗口*/
+    SiteInfoPopup *site_info_popup_ = nullptr;  /*站点信息查看*/
 
     QString url_;
+    QString title_;
+    QPixmap favicon_;
     bool isLoading_;
     bool canGoBack_;
     bool canGoForward_;
 private:
-    void initUi();
-    void initUi(const QString &url);
     void initBrowser();
 };
 

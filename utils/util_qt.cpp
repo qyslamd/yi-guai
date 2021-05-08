@@ -5,6 +5,9 @@
 #include <QColor>
 #include <QScreen>
 #include <QApplication>
+#include <QStandardPaths>
+#include <QFile>
+#include <QFileInfo>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -148,8 +151,79 @@ namespace UtilQt {
     //        double dpi = screen->logicalDotsPerInchY();
     //        rate = dpi / 96.0;
     //    }
-    //    return rate;
+        //    return rate;
     }
+
+    const QString appDataPath()
+    {
+        auto loc = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        return loc;
+    }
+
+    QByteArray readFileUtf8(const QString &path)
+    {
+        QFile file(path);
+        if(!file.exists()){
+            return QByteArray();
+        }
+        if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+            return  QByteArray();
+        }
+        auto result = QString(file.readAll());
+        file.close();
+
+        return result.toUtf8();
+    }
+
+    long long writeStringToFile(const QString &path, const QString &data)
+    {
+        QFile file(path);
+
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
+            return 0;
+
+        file.write(data.toUtf8().data());
+        file.close();
+
+        return data.size();
+    }
+
+    std::string GetFileExtension(const std::string &path)
+    {
+        size_t sep = path.find_last_of(".");
+        if (sep != std::string::npos)
+            return path.substr(sep + 1);
+        return std::string();
+    }
+
+    QString readFileString(const QString &path)
+    {
+        QString result;
+        QFile file(path);
+        if(!file.exists()){
+            return result;
+        }
+        if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+            return result;
+        }
+        result = QString(file.readAll());
+        file.close();
+
+        return result;
+    }
+
+    QString GetFileNameFromURL(const QString &url)
+    {
+        QUrl qUrl(url);
+        if(qUrl.isEmpty() || !qUrl.isValid()){
+            return "default.ico";
+        }
+
+        QString subFix = QFileInfo(url).suffix();
+        QString name = qUrl.host();
+        return name + "." + subFix;
+    }
+
 #endif
 
 }

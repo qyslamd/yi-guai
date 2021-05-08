@@ -16,9 +16,10 @@ class NaviBar final: public QFrame
     Q_OBJECT
 public:
     NaviBar(QWidget *parent = nullptr);
-    void setSpacing(int spacing);
+
     void setAddress(const QString &url);
     void setLoadingState(bool isLoading, bool canGoBack, bool canGoForward);
+    void setFocus(bool focus);
 
     bool eventFilter(QObject *obj, QEvent *ev) override;
 

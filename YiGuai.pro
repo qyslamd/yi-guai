@@ -3,7 +3,11 @@ QT       += core gui network widgets
 CONFIG += c++11
 
 SOURCES += \
+    managers/appconfig.cpp \
+    managers/favicon_manager.cpp \
+    managers/mainwindowmgr.cpp \
     page.cpp \
+    popups/SiteInfoPopup.cpp \
     toolbars/addressbar.cpp \
     toolbars/bookmarkbar.cpp \
     toolbars/navibar.cpp \
@@ -30,7 +34,11 @@ SOURCES += \
 
 HEADERS += \
     globaldef.h \
+    managers/appconfig.h \
+    managers/favicon_manager.h \
+    managers/mainwindowmgr.h \
     page.h \
+    popups/SiteInfoPopup.h \
     toolbars/addressbar.h \
     toolbars/bookmarkbar.h \
     toolbars/navibar.h \

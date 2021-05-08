@@ -8,6 +8,9 @@
 #include "toolbars/navibar.h"
 #include "toolbars/bookmarkbar.h"
 
+#include "managers/mainwindowmgr.h"
+#include "managers/appconfig.h"
+
 #include <QVBoxLayout>
 #include <QStackedWidget>
 #include <QStatusBar>
@@ -17,6 +20,9 @@
 #include <QTimer>
 #include <QThread>
 #include <QToolButton>
+#include <QApplication>
+#include <QScreen>
+#include <QDialog>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -29,7 +35,9 @@ MainWindow::MainWindow(QWidget *parent)
     setAppearance();
     initSignalSlot();
 
-    addNewPage("https://www.baidu.com/");
+    QTimer::singleShot(40,[this](){
+        addNewPage("https://www.baidu.com/");
+    });
 }
 
 MainWindow::~MainWindow()
@@ -75,7 +83,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         return;
     }else{
         // 真正的关闭
-        qInfo()<<__FUNCTION__;
+        AppConfig::setWindowGeometry(saveGeometry());
         event->accept();
     }
 }
@@ -141,7 +149,20 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
 
 void MainWindow::initUi()
 {
-    resize(1100,600);
+    static bool first_window = true;
+    if(first_window)
+    {   // 首个窗口设置记录的位置和大小
+        auto geo = AppConfig::windowGeometry();
+        if(geo.isEmpty() || !restoreGeometry(geo)){
+            const QRect availableGeometry =  qApp->primaryScreen()->availableGeometry();
+            const QSize size = (availableGeometry.size() * 4) / 5;
+            resize(size);
+            move(availableGeometry.center() - QPoint(size.width(), size.height()) / 2);
+
+        }
+        first_window = false;
+    }
+
     QPalette pl = palette();
     pl.setColor(QPalette::Active, QPalette::Window, QColor("#CECECE"));
     pl.setColor(QPalette::Inactive, QPalette::Window, QColor("#E8E8E8"));
@@ -154,8 +175,10 @@ void MainWindow::initUi()
 
     layout_ = new QVBoxLayout;
     btn_dock_tabs_ = new QToolButton;
+    btn_dock_tabs_->setToolTip(tr("open vertical tabs"));
     tab_bar_ = new TabBar;
     btn_add_page_ = new QToolButton;
+    btn_add_page_->setToolTip(tr("Add a tab page"));
     navi_bar_ = new NaviBar;
     bookmark_bar_ = new BookmarkBar;
     stack_browsers_ = new QStackedWidget;
@@ -167,7 +190,6 @@ void MainWindow::initUi()
     tabbar_layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
     tabbar_layout_->addWidget(btn_dock_tabs_);
     tabbar_layout_->addWidget(tab_bar_);
-    tabbar_layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
     tabbar_layout_->addWidget(btn_add_page_);
     tabbar_layout_->addStretch();
     tabbar_layout_->addSpacerItem(new QSpacerItem(180,10,QSizePolicy::Fixed));
@@ -226,10 +248,25 @@ Page *MainWindow::GetActivePage()
     return nullptr;
 }
 
+Page *MainWindow::GetPage(int index)
+{
+    return qobject_cast<Page*>(stack_browsers_->widget(index));
+}
+
 void MainWindow::onTabBarCurrentChanged(int index)
 {
+    // 控制stacked切换到对应的窗口
     if (index < stack_browsers_->count() && index >= 0)
         stack_browsers_->setCurrentIndex(index);
+
+    // 地址栏需要改变
+    auto page = GetPage(index);
+    if(page){
+        navi_bar_->setAddress(page->GetUrl());
+        navi_bar_->setLoadingState(page->IsLoading(),
+                                   page->CanGoBack(),
+                                   page->CanGoForward());
+    }
 }
 
 void MainWindow::onTabBarCloseRequested(int index)
@@ -281,20 +318,27 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         if(page){
             page->getBrowserWidget()->StopLoading();
         }
-    } else if(cmd == NaviBarCmd::NewTabPage){
+    } else if(cmd == NaviBarCmd::ViewSiteInfo)
+    {
+        if(page){
+            auto rect = para.toRect();
+            page->showSiteInfomation(rect);
+        }
+    }
+    else if(cmd == NaviBarCmd::NewTabPage){
         auto url = para.toString();
         if(url.isEmpty()){
             url = "https://cn.bing.com/";
         }
         addNewPage(url, true);
     } else if(cmd == NaviBarCmd::NewWindow){
-        qInfo()<<__FUNCTION__<<"TODO:";
+        MainWindowMgr::instance().createWindow();
     } else if(cmd == NaviBarCmd::NewInprivateWindow) {
         qInfo()<<__FUNCTION__<<"TODO:";
     }
 }
 
-void MainWindow::onPageCmd(PageCmd cmd, const QVariant &data)
+void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
 {
     auto sender = QObject::sender();
     Page *page = nullptr;
@@ -313,25 +357,31 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &data)
             // 关掉一个以后，紧接着判断是不是用户在关闭整个窗口
             if(window_closing_){
                 QTimer::singleShot(0, this, &MainWindow::close);
-//                close();
             }
         }
 
     } else if(cmd == PageCmd::Address)
     {
         if(page && page == GetActivePage()){
-            QUrl url(data.toString());
+            QUrl url(para.toString());
             navi_bar_->setAddress(url.toDisplayString());
         }
     } else if(cmd == PageCmd::Title)
     {
         auto index = stack_browsers_->indexOf(page);
-        tab_bar_->setTabText(index, data.toString());
+        tab_bar_->setTabText(index, para.toString());
+    }else if(cmd == PageCmd::Favicon)
+    {
+        auto index = stack_browsers_->indexOf(page);
+        tab_bar_->setTabIcon(index, QIcon(para.value<QPixmap>()));
     } else if(cmd == PageCmd::LoadingState)
     {
         if(page && page == GetActivePage()){
-            QUrl url(data.toString());
+            QUrl url(para.toString());
             navi_bar_->setLoadingState(page->IsLoading(),page->CanGoBack(), page->CanGoForward());
         }
+    } else if(cmd == PageCmd::FocusChange){
+        auto focus = para.toBool();
+        navi_bar_->setFocus(focus);
     }
 }

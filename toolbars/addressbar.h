@@ -12,6 +12,10 @@ class AddressBar final: public QLineEdit
 public:
     AddressBar(QWidget *parent = nullptr);
     bool eventFilter(QObject *obj, QEvent *ev) override;
+
+    QRect gGeometryBtnSiteInfo() const;
+signals:
+    void viewSiteInfo();
 private:
     QAction *btn_site_info_;    /*网站信息*/
     decltype (btn_site_info_)

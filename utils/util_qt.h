@@ -22,6 +22,12 @@ namespace UtilQt {
     extern float windowsDpiScaleY();
 #endif
 
+    extern const QString appDataPath();
+    extern std::string GetFileExtension(const std::string& path);
+    extern QString readFileString(const QString &path);
+    extern QByteArray readFileUtf8(const QString &path);
+    extern long long writeStringToFile(const QString &path, const QString &data);
+    extern QString GetFileNameFromURL(const QString &url);
 }
 
 #endif // UTIL_QT_H

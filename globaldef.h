@@ -2,6 +2,19 @@
 #define GLOBALDEF_H
 
 ///
+/// \brief The TabBarCmd enum
+///
+enum class TabBarCmd{
+    None = -1,
+    NewTabPage,
+    Reload,
+    Mute,
+    CloseTab,
+    CloseRight,
+    CloseOther,
+};
+
+///
 /// \brief The NaviBarCmd enum
 ///
 enum class NaviBarCmd {
@@ -11,6 +24,7 @@ enum class NaviBarCmd {
     Forward,
     Refresh,
     StopLoading,
+    ViewSiteInfo,
     NewTabPage,
     NewWindow,
     NewInprivateWindow,
@@ -19,12 +33,17 @@ enum class NaviBarCmd {
     ZoomOut,
 };
 
+///
+/// \brief The PageCmd enum
+///
 enum class PageCmd{
     None = -1,
     Closing,
     Address,
     Title,
+    Favicon,
     LoadingState,
+    FocusChange,
 };
 
 #endif // GLOBALDEF_H

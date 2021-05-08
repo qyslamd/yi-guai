@@ -7,9 +7,30 @@
 #include <QtDebug>
 #include <QApplication>
 #include "dialogs/alertdialog.h"
+#include "utils/util_qt.h"
 
 
 int CefClientHandler::gBrowserCount = 0;
+
+class ClientDownloadImageCallback : public CefDownloadImageCallback {
+public:
+    explicit ClientDownloadImageCallback(CefRefPtr<CefClientHandler> clientHandler)
+        : clientHandler_(clientHandler) {}
+
+    void OnDownloadImageFinished(const CefString& image_url,
+                                 int http_status_code,
+                                 CefRefPtr<CefImage> image) override {
+        if (image)
+            clientHandler_->NotifyBrowserFavicon(image, image_url);
+        Q_UNUSED(http_status_code);
+    }
+
+private:
+    CefRefPtr<CefClientHandler> clientHandler_;
+
+    IMPLEMENT_REFCOUNTING(ClientDownloadImageCallback);
+    DISALLOW_COPY_AND_ASSIGN(ClientDownloadImageCallback);
+};
 
 CefClientHandler::CefClientHandler(Delegate *delegate,
                                    const std::string &startup_url)
@@ -148,18 +169,35 @@ void CefClientHandler::NotifyBrowserAddressChange(CefRefPtr<CefBrowser> browser,
         delegate_->onBrowserAddressChange(url);
 }
 
-void CefClientHandler::NotifyBroserTitleChange(CefRefPtr<CefBrowser> browser,
+void CefClientHandler::NotifyBrowserTitleChange(CefRefPtr<CefBrowser> browser,
                                                const CefString &title)
 {
     if (!CURRENTLY_ON_MAIN_THREAD()) {
         // Execute this method on the main thread.
         MAIN_POST_CLOSURE(
-                    base::Bind(&CefClientHandler::NotifyBroserTitleChange, this, browser, title));
+                    base::Bind(&CefClientHandler::NotifyBrowserTitleChange, this, browser, title));
         return;
     }
 
     if (delegate_)
         delegate_->onBrowserTitleChange(title.ToString());
+}
+
+void CefClientHandler::NotifyBrowserFavicon(CefRefPtr<CefImage> image,
+                                           const CefString &icon_url)
+{
+    if (!CURRENTLY_ON_MAIN_THREAD()) {
+        // Execute this method on the main thread.
+        MAIN_POST_CLOSURE(
+                    base::Bind(&CefClientHandler::NotifyBrowserFavicon,
+                               this,
+                               image,
+                               icon_url));
+        return;
+    }
+
+    if (delegate_)
+        delegate_->onBrowserFaviconChange(image, icon_url);
 }
 
 
@@ -177,12 +215,25 @@ void CefClientHandler::OnTitleChange(CefRefPtr<CefBrowser> browser,
 {
     CEF_REQUIRE_UI_THREAD();
 
-    NotifyBroserTitleChange(browser, title);
+    NotifyBrowserTitleChange(browser, title);
 }
 
 void CefClientHandler::OnFaviconURLChange(CefRefPtr<CefBrowser> browser,
                                           const std::vector<CefString> &icon_urls)
 {
+    CEF_REQUIRE_UI_THREAD();
+    if ( !icon_urls.empty() )
+    {
+        for( size_t i = 0; i<icon_urls.size(); i++ )
+        {
+            std::string fileExtension = UtilQt::GetFileExtension(icon_urls[i]);
+            browser->GetHost()->DownloadImage(icon_urls[i], true, 48, true, new ClientDownloadImageCallback(this));
+            //            if(fileExtension.compare("ico")==0||fileExtension.compare("ICO")==0)
+            //            {
+            //                 break;
+            //            }
+        }
+    }
 }
 
 void CefClientHandler::OnFullscreenModeChange(CefRefPtr<CefBrowser> browser,
@@ -297,6 +348,24 @@ void CefClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
                                    const CefString &failedUrl)
 {
 
+}
+
+void CefClientHandler::OnTakeFocus(CefRefPtr<CefBrowser> browser, bool next)
+{
+
+}
+
+bool CefClientHandler::OnSetFocus(CefRefPtr<CefBrowser> browser,
+                                  CefFocusHandler::FocusSource source)
+{
+    return false;
+}
+
+void CefClientHandler::OnGotFocus(CefRefPtr<CefBrowser> browser)
+{
+    if(delegate_){
+        delegate_->onBrowserGotFocus(browser);
+    }
 }
 
 void CefClientHandler::NotifyBrowserNewForgroundPage(CefWindowInfo &windowInfo,
