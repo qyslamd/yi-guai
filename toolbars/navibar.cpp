@@ -199,13 +199,13 @@ void NaviBar::initSignals()
 
 void NaviBar::setAppearance()
 {
-    btn_back_->setIcon(QIcon(":/icons/resources/normal_back.png"));
-    btn_refresh_->setIcon(QIcon(":/icons/resources/normal_refresh.png"));
-    btn_stop_->setIcon(QIcon(":/icons/resources/window_close_light_2x.png"));
-    btn_forward_->setIcon(QIcon(":/icons/resources/normal_forward.png"));
-    btn_home_->setIcon(QIcon(":/icons/resources/home_blabk_64px.png"));
-    btn_user_->setIcon(QIcon(":/icons/resources/user_64px.png"));
-    btn_more_options_->setIcon(QIcon(":/icons/resources/normal_more.png"));
+    btn_back_->setIcon(QIcon(":/icons/resourcesimgs//normal_back.png"));
+    btn_refresh_->setIcon(QIcon(":/icons/resources/imgs/normal_refresh.png"));
+    btn_stop_->setIcon(QIcon(":/icons/resources/imgs/window_close_light_2x.png"));
+    btn_forward_->setIcon(QIcon(":/icons/resources/imgs/normal_forward.png"));
+    btn_home_->setIcon(QIcon(":/icons/resources/imgs/home_blabk_64px.png"));
+    btn_user_->setIcon(QIcon(":/icons/resources/imgs/user_64px.png"));
+    btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/normal_more.png"));
 
     QSize iconSize(26,26);
     for(auto item : this->children()){

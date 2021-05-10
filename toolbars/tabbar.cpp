@@ -62,6 +62,43 @@ TabBar::TabBar(QWidget *parent)
         emit menuTriggered(TabBarCmd::CloseOther, "");
     });
 
+
+    check_pos_timer_id_ = startTimer(1000);
+}
+
+bool TabBar::event(QEvent *e)
+{
+    switch(e->type()){
+    case QEvent::ToolTip:
+    {
+        auto helpEvent = static_cast<QHelpEvent *>(e);
+        auto index = tabAt(helpEvent->pos());   // 鼠标所在tab索引
+        auto rect = tabRect(index);
+        auto pos = QPoint(rect.x() + rect.width() / 2, rect.y() + rect.height());
+        pos = mapToGlobal(pos);
+        emit showPreview(pos, index);
+    }break;
+    default:
+        break;
+    }
+    return QTabBar::event(e);
+}
+
+void TabBar::timerEvent(QTimerEvent *event)
+{
+    QTabBar::timerEvent(event);
+    if(event->timerId() == check_pos_timer_id_){
+        auto pos = QCursor::pos();
+        pos = mapFromGlobal(pos);
+        if(tabAt(pos) == -1)
+            emit showPreview(QPoint(), -1);
+    }
+}
+
+void TabBar::mousePressEvent(QMouseEvent *event)
+{
+    QTabBar::mousePressEvent(event);
+    emit showPreview(QPoint(), -1);
 }
 
 QSize TabBar::tabSizeHint(int index) const

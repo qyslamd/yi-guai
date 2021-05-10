@@ -2,6 +2,24 @@ QT       += core gui network widgets
 
 CONFIG += c++11
 
+DESTDIR = $$OUT_PWD/bin
+TARGET = YiGuai
+
+win32{
+    VERSION = 4.0.2.666
+    RC_ICONS = icon_64px.ico
+    # 公司名称
+    QMAKE_TARGET_COMPANY = "zhouyohu@1663.com"
+    # 产品名称
+    QMAKE_TARGET_PRODUCT = "YiGuai Web Browser"
+    # 文件说明
+    QMAKE_TARGET_DESCRIPTION = "YiGuai browser based on Qt 5.14.2 (MSVC 2019, 32 bit) and CEF (chromium-86.0.4240.183)"
+    # 版权信息
+    QMAKE_TARGET_COPYRIGHT = "Copyright 2008-2016 The Qt Company Ltd. All rights reserved."
+    # 中文（简体）
+    RC_LANG = 0x0004
+}
+
 SOURCES += \
     managers/appconfig.cpp \
     managers/favicon_manager.cpp \
@@ -29,6 +47,7 @@ SOURCES += \
     mainwindow.cpp \
     utils/util_qt.cpp \
     utils/util_win.cc \
+    widgets/Tab_Thumbnail_Widget.cpp \
     widgets/framewidget.cpp
 
 
@@ -59,10 +78,12 @@ HEADERS += \
     mainwindow.h \
     utils/util_qt.h \
     utils/util_win.h \
+    widgets/Tab_Thumbnail_Widget.h \
     widgets/framewidget.h
 
 FORMS += \
     dialogs/alertdialog.ui \
+    widgets/Tab_Thumbnail_Widget.ui \
     widgets/framewidget.ui
 
 # Default rules for deployment.
@@ -84,26 +105,36 @@ win32{
     }
 
     MANI_PATH = $$CEF_DEP_PATH/manifests
+    WIN32_CEF_DEP_PATH      = $$replace(CEF_DEP_PATH, /, \\)
+    WIN32_PWD               = $$replace(PWD,/,\\)
+    WIN32_OUT_PWD           = $$replace(OUT_PWD, /, \\)
+    WIN32_BIN_DIR           = $$WIN32_OUT_PWD\\bin
 
     INCLUDEPATH += $$CEF_DEP_PATH
     LIBS += user32.lib \
             Gdi32.lib
 
     CONFIG(debug, debug|release){
-        DESTDIR = $$CEF_DEP_PATH/bin/Debug
-
         LIBS += -L$$CEF_DEP_PATH/bin/Debug -llibcef
         LIBS += -L$$CEF_DEP_PATH/libcef_dll_wrapper/MDd -llibcef_dll_wrapper
 
-        QMAKE_POST_LINK += mt -nologo -manifest $$MANI_PATH/cefclient.exe.manifest $$MANI_PATH/compatibility.manifest -outputresource:$$CEF_DEP_PATH/bin/Debug/$$TARGET".exe" $$escape_expand(\n\t)
+        QMAKE_POST_LINK += \
+        mt -nologo -manifest $$MANI_PATH/cefclient.exe.manifest $$MANI_PATH/compatibility.manifest -outputresource:$$OUT_PWD/bin/$$TARGET".exe" $$escape_expand(\n\t)
+        QMAKE_POST_LINK += \
+        xcopy $$WIN32_CEF_DEP_PATH\\bin\\Debug $$WIN32_BIN_DIR /y /e /h &&\
+        xcopy $$WIN32_CEF_DEP_PATH\\Resources  $$WIN32_BIN_DIR /y /e /h
 
     }else:CONFIG(release, debug|release){
-        DESTDIR = $$CEF_DEP_PATH/bin/Release
-
         LIBS += -L$$CEF_DEP_PATH/bin/Release -llibcef
         LIBS += -L$$CEF_DEP_PATH/libcef_dll_wrapper/MD -llibcef_dll_wrapper
+
+        QMAKE_POST_LINK +=\
+        xcopy $$WIN32_CEF_DEP_PATH\\bin\\Release $$WIN32_BIN_DIR /y /e /h &&\
+        xcopy $$WIN32_CEF_DEP_PATH\\Resources  $$WIN32_BIN_DIR /y /e /h
     }
 }
 
 RESOURCES += \
     resource.qrc
+
+TRANSLATIONS +=$$PWD/resources/i18n/$$TARGET"_zh.ts"

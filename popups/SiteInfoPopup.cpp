@@ -14,7 +14,7 @@ SiteInfoPopup::SiteInfoPopup(QWidget *parent)
 
     label_title_ = new QLabel(this);
     QToolButton *btnClose = new QToolButton(this);
-    btnClose->setIcon(QIcon(":/icons/resources/close_24px.png"));
+    btnClose->setIcon(QIcon(":/icons/resources/imgs/close_24px.png"));
     connect(btnClose, &QToolButton::clicked, this, &SiteInfoPopup::hide);
 
     titleLayout->addWidget(label_title_);

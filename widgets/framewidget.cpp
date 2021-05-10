@@ -1,5 +1,5 @@
 #include "framewidget.h"
-#include "ui_captionwidget.h"
+#include "ui_framewidget.h"
 
 #include <QGraphicsDropShadowEffect>
 #include <QMouseEvent>

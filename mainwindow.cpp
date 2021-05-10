@@ -7,6 +7,7 @@
 #include "toolbars/tabbar.h"
 #include "toolbars/navibar.h"
 #include "toolbars/bookmarkbar.h"
+#include "widgets/Tab_Thumbnail_Widget.h"
 
 #include "managers/mainwindowmgr.h"
 #include "managers/appconfig.h"
@@ -23,6 +24,7 @@
 #include <QApplication>
 #include <QScreen>
 #include <QDialog>
+#include <QPropertyAnimation>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -202,6 +204,13 @@ void MainWindow::initUi()
     centralWidget()->setLayout(layout_);
     layout_->setContentsMargins(0,0,0,0);
     layout_->setSpacing(0);
+
+
+    tab_thumbnail_ = new Tab_Thumbnail_Widget(this);
+    tab_thumbnail_anime_ = new QPropertyAnimation(this);
+    tab_thumbnail_anime_->setTargetObject(tab_thumbnail_);   // 动画作用的对象
+    tab_thumbnail_anime_->setPropertyName("geometry"); // 动画要动的属性
+    tab_thumbnail_anime_->setDuration(50);       // 动画持续时间
 }
 
 void MainWindow::setAppearance()
@@ -209,8 +218,8 @@ void MainWindow::setAppearance()
     QSize iconSize(24,24);
     btn_dock_tabs_->setIconSize(iconSize);
     btn_add_page_->setIconSize(iconSize);
-    btn_dock_tabs_->setIcon(QIcon(":/icons/resources/normal_pagelist_hide.png"));
-    btn_add_page_->setIcon(QIcon(":/icons/resources/addb_30px.png"));
+    btn_dock_tabs_->setIcon(QIcon(":/icons/resources/imgs/normal_pagelist_hide.png"));
+    btn_add_page_->setIcon(QIcon(":/icons/resources/imgs/addb_30px.png"));
 }
 
 void MainWindow::initSignalSlot()
@@ -218,6 +227,7 @@ void MainWindow::initSignalSlot()
     connect(tab_bar_, &QTabBar::currentChanged, this, &MainWindow::onTabBarCurrentChanged);
     connect(tab_bar_, &QTabBar::tabCloseRequested,this, &MainWindow::onTabBarCloseRequested);
     connect(tab_bar_, &QTabBar::tabMoved, this, &MainWindow::onTabBarTabMoved);
+    connect(tab_bar_,  &TabBar::showPreview, this, &MainWindow::onShowTabThumnail);
 
     connect(btn_add_page_, &QToolButton::clicked, [this]()
     {
@@ -262,10 +272,10 @@ void MainWindow::onTabBarCurrentChanged(int index)
     // 地址栏需要改变
     auto page = GetPage(index);
     if(page){
-        navi_bar_->setAddress(page->GetUrl());
-        navi_bar_->setLoadingState(page->IsLoading(),
-                                   page->CanGoBack(),
-                                   page->CanGoForward());
+        navi_bar_->setAddress(page->url());
+        navi_bar_->setLoadingState(page->isLoading(),
+                                   page->canGoBack(),
+                                   page->canGoForward());
     }
 }
 
@@ -378,10 +388,52 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
     {
         if(page && page == GetActivePage()){
             QUrl url(para.toString());
-            navi_bar_->setLoadingState(page->IsLoading(),page->CanGoBack(), page->CanGoForward());
+            navi_bar_->setLoadingState(page->isLoading(),page->canGoBack(), page->canGoForward());
         }
     } else if(cmd == PageCmd::FocusChange){
         auto focus = para.toBool();
         navi_bar_->setFocus(focus);
+    }
+}
+
+void MainWindow::onShowTabThumnail(const QPoint &g_pos, const int index)
+{
+    auto w = tab_thumbnail_;
+    auto anime = tab_thumbnail_anime_;
+    if(index > -1){
+        QSize size1(324,250);
+        QSize size2;
+        auto curIndex = stack_browsers_->currentIndex();
+        auto browserWnd = stack_browsers_->widget(index);
+        if(browserWnd){
+            w->setDescriptionTxt(tab_bar_->tabText(index));
+
+            // 获取缩略图，有两种情况
+            // 1.当前索引不是选中的，显示缩略图
+            // 2. 当前索引就是选中的，则显示文字
+            if(curIndex == index)
+            {
+                size2 = QSize(324,80);
+                w->setImgVisible(false);
+            }else{
+                size2 = size1;
+                auto img = browserWnd->grab();
+                w->setThumbnailImg(img);
+                w->setImgVisible(true);
+            }
+        }
+        // 算个坐标
+        auto pos = QPoint(g_pos.x() - w->width() / 2, g_pos.y());
+        if(w->isVisible()){
+            anime->setKeyValueAt(0, QRect(w->pos(), size1));
+            anime->setKeyValueAt(1, QRect(pos, size2));
+            anime->setLoopCount(1);
+            anime->start();
+        }else{
+            w->move(pos);
+            w->show();
+        }
+    }else{
+        w->hide();
     }
 }

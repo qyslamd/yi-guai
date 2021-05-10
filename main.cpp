@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
 
 void initQApp(QApplication *app)
 {
-    QFile file(":/styles/resources/normal.qss");
+    QFile file(":/styles/resources/styles/normal.qss");
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)){
         auto all = file.readAll();
         file.close();

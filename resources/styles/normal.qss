@@ -53,7 +53,7 @@ Scope:Class AddressBar and it's children
 Scope:Class TabBar and it's children
 */
 .TabBar::close-button{
-    image: url(:/icons/resources/close_24px.png);
+    image: url(:/icons/resources/imgs/close_24px.png);
 }
 
 .TabBar::close-button:hover {

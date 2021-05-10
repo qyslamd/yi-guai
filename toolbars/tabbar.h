@@ -13,16 +13,19 @@ class TabBar final: public QTabBar
     Q_OBJECT
 public:
     TabBar(QWidget *parent = nullptr);
+    bool event(QEvent *e) override;
 signals:
     void menuTriggered(TabBarCmd cmd, const QVariant &data);
+    void showPreview(const QPoint &g_pos, const int index);
 protected:
     // QTabBar interface
     QSize tabSizeHint(int index) const override;
     QSize minimumTabSizeHint(int index) const override;
 
     // QWidget interface
-    virtual void contextMenuEvent(QContextMenuEvent *event) override;
-
+    void contextMenuEvent(QContextMenuEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void timerEvent(QTimerEvent* event) override;
 private:
     QMenu *menu_;
     QAction *act_new_tab;
@@ -34,6 +37,8 @@ private:
     act_reopen_closed_,    /*重新打开关闭的标签页*/
     act_vertical_tab_mode_, /*垂直标签页模式*/
     act_add_all_favorates_; /*添加所有标签页到收藏夹*/
+
+    int check_pos_timer_id_;
 };
 
 #endif // TABBAR_H

@@ -21,13 +21,13 @@ public:
     Page(CefQWidget *browser, QWidget *parent = nullptr);
 
     CefQWidget* getBrowserWidget();
-    QString GetUrl() const {return url_;}
-    QString GetTitle() const {return title_;}
-    QPixmap GetFavicon() const {return favicon_; }
 
-    bool IsLoading() const {return isLoading_;}
-    bool CanGoBack() const {return canGoBack_;}
-    bool CanGoForward() const {return canGoForward_;}
+    QString url() const {return url_;}
+    QString title() const {return title_;}
+    QPixmap favicon() const {return favicon_; }
+    bool isLoading() const {return isLoading_;}
+    bool canGoBack() const {return canGoBack_;}
+    bool canGoForward() const {return canGoForward_;}
 
 
     void showSiteInfomation(const QRect &rect);

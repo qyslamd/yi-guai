@@ -16,6 +16,8 @@ class BookmarkBar;
 class QStackedWidget;
 class QStatusBar;
 class Page;
+class Tab_Thumbnail_Widget;
+class QPropertyAnimation;
 
 class MainWindow : public QMainWindow
 {
@@ -46,6 +48,8 @@ private:
     NaviBar *navi_bar_ = nullptr; /*导航栏*/
     BookmarkBar *bookmark_bar_ = nullptr; /*书签栏*/
     QStackedWidget *stack_browsers_ = nullptr;    /*浏览器窗口栈*/
+    Tab_Thumbnail_Widget *tab_thumbnail_ = nullptr; /*标签页预览窗口*/
+    QPropertyAnimation *tab_thumbnail_anime_ = nullptr;   /* tab预览窗口移动动画*/
 
     bool window_closing_ = false;  /*窗口是否正在关闭*/
 
@@ -64,5 +68,6 @@ private slots:
     void onTabBarTabMoved(int from, int to);
     void onNaviBarCmd(NaviBarCmd cmd, const QVariant &para);
     void onPageCmd(PageCmd cmd, const QVariant &para);
+    void onShowTabThumnail(const QPoint &g_pos, const int index);
 };
 #endif // MAINWINDOW_H

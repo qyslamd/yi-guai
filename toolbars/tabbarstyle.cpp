@@ -192,8 +192,8 @@ void TabbarStyle::drawTabBarTabShape(const QStyleOption *option,
             color = QColor(89,89,89);
             color.setAlphaF(0.3);
         }else{
-            color = QColor(195,195,195);
-            color.setAlphaF(0.4);
+            color = QColor(255,255,255);
+            color.setAlphaF(0.7);
         }
         drawShape(path, color);
     }else

@@ -78,8 +78,8 @@ void AddressBar::initUi()
 void AddressBar::setAppearance()
 {
     setMinimumHeight(30);
-    btn_site_info_->setIcon(QIcon(":/icons/resources/site_safe_26px.png"));
-    btn_mark_site_->setIcon(QIcon(":/icons/resources/normal_mark.png"));
+    btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/site_safe_26px.png"));
+    btn_mark_site_->setIcon(QIcon(":/icons/resources/imgs/normal_mark.png"));
 }
 
 void AddressBar::fuckButton()
