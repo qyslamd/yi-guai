@@ -25,6 +25,7 @@ SOURCES += \
     managers/favicon_manager.cpp \
     managers/mainwindowmgr.cpp \
     page.cpp \
+    popupbrowserwidget.cpp \
     popups/SiteInfoPopup.cpp \
     toolbars/addressbar.cpp \
     toolbars/bookmarkbar.cpp \
@@ -57,6 +58,7 @@ HEADERS += \
     managers/favicon_manager.h \
     managers/mainwindowmgr.h \
     page.h \
+    popupbrowserwidget.h \
     popups/SiteInfoPopup.h \
     toolbars/addressbar.h \
     toolbars/bookmarkbar.h \
@@ -83,6 +85,7 @@ HEADERS += \
 
 FORMS += \
     dialogs/alertdialog.ui \
+    popupbrowserwidget.ui \
     widgets/Tab_Thumbnail_Widget.ui \
     widgets/framewidget.ui
 

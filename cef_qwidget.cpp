@@ -17,6 +17,7 @@
 
 #include <include/base/cef_logging.h>
 #include "mainwindow.h"
+#include "popupbrowserwidget.h"
 
 #include "managers/favicon_manager.h"
 #include "utils/util_qt.h"
@@ -27,17 +28,9 @@ CefQWidget::CefQWidget(const QString &startup_url, QWidget *parent)
     , qwindow_containter_(nullptr)
     , layout_(new QHBoxLayout(this))
 {
+    newly_created_ = true;
     browser_window_.reset(new BrowserWindow(this, startup_url.toStdString()));
     initUi();
-
-    auto handle = (HWND)window_->winId();
-    CefRect rect{x(), y(), width(), height()};  // 给个初始范围，不然浏览器创建完成后的移动窗口会出现黑色背景
-    CefBrowserSettings browser_settings;
-    browser_window_->CreateBrowser(handle,
-                                   rect,
-                                   browser_settings,
-                                   nullptr,
-                                   nullptr);
 }
 
 CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
@@ -49,11 +42,13 @@ CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
     , qwindow_containter_(nullptr)
     , layout_(new QHBoxLayout(this))
 {
+    newly_created_ = false;
     browser_window_.reset(new BrowserWindow(this, ""));
     initUi();
 
     auto handle = (HWND)window_->winId();
     browser_window_->GetPopupConfig(handle, windowInfo, client, settings);
+    browser_state_ = Creating;
 }
 
 CefQWidget::~CefQWidget()
@@ -124,8 +119,44 @@ void CefQWidget::onBrowserWindowNewForgroundPage(CefWindowInfo &windowInfo,
     emit browserNewForgroundPage(window);
 }
 
+void CefQWidget::onBrowserWndPopupWnd(const CefPopupFeatures &popupFeatures,
+                                      CefWindowInfo &windowInfo,
+                                      CefRefPtr<CefClient> &client,
+                                      CefBrowserSettings &settings)
+{
+    CefQWidget *window = new CefQWidget(windowInfo, client, settings);
+
+    PopupBrowserWidget *popupBrowser = new PopupBrowserWidget(window);
+    popupBrowser->setAttribute(Qt::WA_DeleteOnClose);
+
+    /* CefPopupFeatures
+  int x;
+  int xSet;
+  int y;
+  int ySet;
+  int width;
+  int widthSet;
+  int height;
+  int heightSet;
+
+  int menuBarVisible;
+  int statusBarVisible;
+  int toolBarVisible;
+  int scrollbarsVisible;
+*/
+    int x,y,w,h;
+    x = popupFeatures.x < 0 ? 0 : popupFeatures.x;
+    y = popupFeatures.y < 0 ? 0 : popupFeatures.y;
+    w = popupFeatures.width < 0 ? 200 : popupFeatures.width;
+    h = popupFeatures.height < 0 ? 200 : popupFeatures.height;
+
+    popupBrowser->setGeometry(x,y,w,h);
+    popupBrowser->show();
+}
+
 void CefQWidget::OnBrowserCreated()
 {
+    browser_state_ = Created;
     resizeBorser();
 }
 
@@ -239,7 +270,26 @@ void CefQWidget::OnBrowserGotFocus()
 void CefQWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    resizeBorser();
+    switch(browser_state_){
+    case Empty:
+    {
+        auto handle = (HWND)window_->winId();
+        CefRect rect{x(), y(), width(), height()};  // 给个初始范围，不然浏览器创建完成后的移动窗口会出现黑色背景
+        CefBrowserSettings browser_settings;
+        browser_window_->CreateBrowser(handle,
+                                       rect,
+                                       browser_settings,
+                                       nullptr,
+                                       nullptr);
+        browser_state_ = Created;
+    }break;
+    case Creating:
+        break;
+    case Created:
+        resizeBorser();
+        break;
+    }
+
 }
 
 void CefQWidget::closeEvent(QCloseEvent *event)

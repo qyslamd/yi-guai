@@ -19,9 +19,13 @@ class CefClientHandler
 public:
     class Delegate{
     public:
-        virtual void onBrowserNewForgroundPage(CefWindowInfo &windowInfo,
-                                               CefRefPtr<CefClient> &client,
-                                               CefBrowserSettings &settings) = 0;
+        virtual void onBrowserForgroundTab(CefWindowInfo &windowInfo,
+                                           CefRefPtr<CefClient> &client,
+                                           CefBrowserSettings &settings) = 0;
+        virtual void onBrowserPopupWnd(const CefPopupFeatures& popupFeatures,
+                                       CefWindowInfo& windowInfo,
+                                       CefRefPtr<CefClient>& client,
+                                       CefBrowserSettings& settings) = 0;
         // Called when the browser is created.
         virtual void OnBrowserCreated(CefRefPtr<CefBrowser> browser) = 0;
 
@@ -42,7 +46,7 @@ public:
     };
 
     CefClientHandler(Delegate* delegate,
-                      const std::string& startup_url);
+                     const std::string& startup_url);
     ~CefClientHandler();
     // This object may outlive the Delegate object so it's necessary for the
     // Delegate to detach itself before destruction.
@@ -54,7 +58,7 @@ public:
     CefRefPtr<CefJSDialogHandler> GetJSDialogHandler() override {return this;}
     CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() override {return this;}
     CefRefPtr<CefLoadHandler> GetLoadHandler() override {return this;}
-//    CefRefPtr<CefFocusHandler> GetFocusHandler() override{ return this; }
+    //    CefRefPtr<CefFocusHandler> GetFocusHandler() override{ return this; }
 
     static int gBrowserCount;
 
@@ -164,20 +168,24 @@ private:
     friend class ClientDownloadImageCallback;
 
     // Execute Delegate notifications on the main thread.
-    void NotifyBrowserNewForgroundPage(CefWindowInfo& windowInfo,
-                                       CefRefPtr<CefClient>& client,
-                                       CefBrowserSettings& settings);
+    void NotifyForgroundTab(CefWindowInfo& windowInfo,
+                            CefRefPtr<CefClient>& client,
+                            CefBrowserSettings& settings);
+    void NotifyPopupWindow(const CefPopupFeatures &popupFeatures,
+                           CefWindowInfo &windowInfo,
+                           CefRefPtr<CefClient> &client,
+                           CefBrowserSettings &settings);
     void NotifyBrowserCreated(CefRefPtr<CefBrowser> browser);
     void NotifyBrowserClosing(CefRefPtr<CefBrowser> browser);
     void NotifyBrowserClosed(CefRefPtr<CefBrowser> browser);
 
     void NotifyBrowserAddressChange(CefRefPtr<CefBrowser> browser,
-                                     CefRefPtr<CefFrame> frame,
-                                     const CefString &url);
+                                    CefRefPtr<CefFrame> frame,
+                                    const CefString &url);
     void NotifyBrowserTitleChange(CefRefPtr<CefBrowser> browser,
-                                 const CefString &title);
+                                  const CefString &title);
     void NotifyBrowserFavicon(CefRefPtr<CefImage> image,
-                             const CefString &icon_url);
+                              const CefString &icon_url);
 
     // The startup URL.
     const std::string startup_url_;

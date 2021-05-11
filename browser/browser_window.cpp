@@ -5,6 +5,8 @@
 
 #include <QtDebug>
 #include <QThread>
+#include <QScreen>
+#include <QApplication>
 
 
 BrowserWindow::BrowserWindow(Delegate *delagate, const std::string &startup_url)
@@ -48,17 +50,14 @@ void BrowserWindow::GetPopupConfig(ClientWindowHandle temp_handle,
                                    CefBrowserSettings &settings)
 {
     CEF_REQUIRE_UI_THREAD();
-    qDebug()<<__FUNCTION__;
-
     client = client_handler_;
 
     // The window will be properly sized after the browser is created.
 #if defined(OS_WIN)
-    RECT rect;
-    rect.top = 0;
-    rect.left = 0;
-    rect.bottom = 200;
-    rect.right = 200;
+    auto screen = qApp->primaryScreen();
+    auto size = screen->availableSize();
+    RECT rect{0,0,size.width(),size.height()};
+//    ::GetWindowRect(temp_handle, &rect);
     windowInfo.SetAsChild(temp_handle, rect);
 #elif defined(OS_LINUX)
     CefRect rect(0, 0, width, height);
@@ -103,7 +102,7 @@ void BrowserWindow::onBrowserComfirmClose()
     client_handler_->DetachDelegate();
 }
 
-void BrowserWindow::onBrowserNewForgroundPage(CefWindowInfo &windowInfo,
+void BrowserWindow::onBrowserForgroundTab(CefWindowInfo &windowInfo,
                                               CefRefPtr<CefClient> &client,
                                               CefBrowserSettings &settings)
 {
@@ -111,6 +110,18 @@ void BrowserWindow::onBrowserNewForgroundPage(CefWindowInfo &windowInfo,
     delegate_->onBrowserWindowNewForgroundPage(windowInfo,
                                                client,
                                                settings);
+}
+
+void BrowserWindow::onBrowserPopupWnd(const CefPopupFeatures &popupFeatures,
+                                      CefWindowInfo &windowInfo,
+                                      CefRefPtr<CefClient> &client,
+                                      CefBrowserSettings &settings)
+{
+    REQUIRE_MAIN_THREAD();
+    delegate_->onBrowserWndPopupWnd(popupFeatures,
+                                    windowInfo,
+                                    client,
+                                    settings);
 }
 
 void BrowserWindow::OnBrowserCreated(CefRefPtr<CefBrowser> browser)

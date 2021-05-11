@@ -73,25 +73,61 @@ bool CefClientHandler::OnBeforePopup(
 {
     CEF_REQUIRE_UI_THREAD();
     // notify to outside
-    // return true to cancel create
+    // return true to cancel the creation
 
-    /*
-     * WOD_UNKNOWN,
-      WOD_CURRENT_TAB,
-      WOD_SINGLETON_TAB,
-      WOD_NEW_FOREGROUND_TAB,
-      WOD_NEW_BACKGROUND_TAB,
-      WOD_NEW_POPUP,
-      WOD_NEW_WINDOW,
-      WOD_SAVE_TO_DISK,
-      WOD_OFF_THE_RECORD,
-      WOD_IGNORE_ACTION
-     * */
-    if(target_disposition == WOD_NEW_FOREGROUND_TAB)
+    //参数释义：
+    // browser : 发出popup请求的浏览器对象
+    // frame : 发出popup请求的那个frame
+    // target_url : 要加载的目标url
+    // target_frame_name : 要加载的frame_name
+    // target_disposition : 显示方式
+    //
+
+    // notify to outside
+    switch(target_disposition){
+    case WOD_UNKNOWN:
     {
-        NotifyBrowserNewForgroundPage(windowInfo, client, settings);
+      qInfo()<<__FUNCTION__<<"WOD_UNKNOWN";
+    }break;
+    case WOD_CURRENT_TAB:
+      qInfo()<<__FUNCTION__<<"WOD_CURRENT_TAB";
+      break;
+    case WOD_SINGLETON_TAB:
+      qInfo()<<__FUNCTION__<<"WOD_SINGLETON_TAB";
+      break;
+    case WOD_NEW_FOREGROUND_TAB:
+    {
+      qInfo()<<__FUNCTION__<<"WOD_NEW_FOREGROUND_TAB";
+      NotifyForgroundTab(windowInfo,
+                           client,
+                           settings);
+      // Allow creation, but should be used as a child window of a window
+      return false;
+    }break;
+    case WOD_NEW_BACKGROUND_TAB:
+      qInfo()<<__FUNCTION__<<"WOD_NEW_BACKGROUND_TAB";
+      break;
+    case WOD_NEW_POPUP:{
+      qInfo()<<__FUNCTION__<<"WOD_NEW_POPUP";
+      NotifyPopupWindow(popupFeatures,windowInfo,client,settings);
+      return false;
+    }break;
+    case WOD_NEW_WINDOW:
+      qInfo()<<__FUNCTION__<<"WOD_NEW_WINDOW";
+      break;
+    case WOD_SAVE_TO_DISK:
+      qInfo()<<__FUNCTION__<<"WOD_SAVE_TO_DISK";
+      break;
+    case WOD_OFF_THE_RECORD:
+      qInfo()<<__FUNCTION__<<"WOD_OFF_THE_RECORD";
+      break;
+    case WOD_IGNORE_ACTION:
+      qInfo()<<__FUNCTION__<<"WOD_IGNORE_ACTION";
+      break;
     }
-    return false;
+
+    // return true to cancel create
+    return true;
 }
 
 void CefClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
@@ -368,23 +404,46 @@ void CefClientHandler::OnGotFocus(CefRefPtr<CefBrowser> browser)
     }
 }
 
-void CefClientHandler::NotifyBrowserNewForgroundPage(CefWindowInfo &windowInfo,
-                                                     CefRefPtr<CefClient> &client,
-                                                     CefBrowserSettings &settings)
+void CefClientHandler::NotifyForgroundTab(CefWindowInfo &windowInfo,
+                                          CefRefPtr<CefClient> &client,
+                                          CefBrowserSettings &settings)
 {
 //    if (!CURRENTLY_ON_MAIN_THREAD()) {
 //        // Execute this method on the main thread.
 //        MAIN_POST_CLOSURE(
-//                    base::Bind(&CefClientHandler::NotifyBrowserNewForgroundPage, this,
+//                    base::Bind(&CefClientHandler::NotifyForgroundTab, this,
 //                               windowInfo,
 //                               client,
-//                               settings,
-//                               extra_info));
+//                               settings));
 //        return;
 //    }
 
     if (delegate_)
-        delegate_->onBrowserNewForgroundPage(windowInfo,
-                                             client,
-                                             settings);
+        delegate_->onBrowserForgroundTab(windowInfo,
+                                         client,
+                                         settings);
+}
+
+void CefClientHandler::NotifyPopupWindow(const CefPopupFeatures &popupFeatures,
+                                         CefWindowInfo &windowInfo,
+                                         CefRefPtr<CefClient> &client,
+                                         CefBrowserSettings &settings)
+{
+//    if (!CURRENTLY_ON_MAIN_THREAD()) {
+//        // Execute this method on the main thread.
+//        MAIN_POST_CLOSURE(
+//                    base::Bind(&CefClientHandler::NotifyPopupWindow,
+//                               this,
+//                               popupFeatures,
+//                               windowInfo,
+//                               client,
+//                               settings));
+//        return;
+//    }
+
+    if (delegate_)
+        delegate_->onBrowserPopupWnd(popupFeatures,
+                                     windowInfo,
+                                     client,
+                                     settings);
 }

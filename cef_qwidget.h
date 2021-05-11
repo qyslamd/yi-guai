@@ -40,12 +40,15 @@ signals:
 
 public slots:
     void onTopLevelWindowStateChanged(Qt::WindowStates state, const QVariant &data);
-
     // BrowserWindow::Delegate interface
 protected:
     void onBrowserWindowNewForgroundPage(CefWindowInfo &windowInfo,
-                                              CefRefPtr<CefClient> &client,
-                                              CefBrowserSettings &settings) override;
+                                         CefRefPtr<CefClient> &client,
+                                         CefBrowserSettings &settings) override;
+    void onBrowserWndPopupWnd(const CefPopupFeatures &popupFeatures,
+                              CefWindowInfo &windowInfo,
+                              CefRefPtr<CefClient> &client,
+                              CefBrowserSettings &settings) override;
     void OnBrowserCreated() override;
     void OnBrowserWindowClosing() override;
     void onBrowserWindowAddressChange(const std::string &url) override;
@@ -53,15 +56,23 @@ protected:
     void onBrowserWindowFaviconChange(CefRefPtr<CefImage> image,
                                       const std::string &url) override;
     void onBrowserWindowLoadingStateChange(bool isLoading,
-                                     bool canGoBack,
-                                     bool canGoForward) override;
+                                           bool canGoBack,
+                                           bool canGoForward) override;
     void OnBrowserGotFocus() override;
-
+    // QWidget interface
 protected:
     void resizeEvent(QResizeEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
 
 private:
+    enum BrowserState{
+        Empty,
+        Creating,
+        Created
+    };
+    bool newly_created_ = true;
+    BrowserState browser_state_ = Empty;
+
     QString url_;
     QWindow *window_;
     scoped_ptr<BrowserWindow> browser_window_;

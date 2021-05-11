@@ -17,6 +17,10 @@ public:
         virtual void onBrowserWindowNewForgroundPage(CefWindowInfo &windowInfo,
                                                      CefRefPtr<CefClient> &client,
                                                      CefBrowserSettings &settings) = 0;
+        virtual void onBrowserWndPopupWnd(const CefPopupFeatures &popupFeatures,
+                                          CefWindowInfo &windowInfo,
+                                          CefRefPtr<CefClient> &client,
+                                          CefBrowserSettings &settings) = 0;
         // Called when the browser has been created.
         virtual void OnBrowserCreated() = 0;
 
@@ -73,9 +77,13 @@ protected:
     friend struct base::DefaultDeleter<BrowserWindow>;
 
     // ClientHandler::Delegate methods.
-    void onBrowserNewForgroundPage(CefWindowInfo &windowInfo,
+    void onBrowserForgroundTab(CefWindowInfo &windowInfo,
                                    CefRefPtr<CefClient> &client,
                                    CefBrowserSettings &settings) override;
+    void onBrowserPopupWnd(const CefPopupFeatures& popupFeatures,
+                           CefWindowInfo& windowInfo,
+                           CefRefPtr<CefClient>& client,
+                           CefBrowserSettings& settings) override;
     void OnBrowserCreated(CefRefPtr<CefBrowser> browser) override;
     void OnBrowserClosing(CefRefPtr<CefBrowser> browser) override;
     void onBrowserAddressChange(const std::string &url)  override;

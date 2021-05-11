@@ -40,10 +40,13 @@ Scope:Class AddressBar and it's children
 */
 .AddressBar{
     border:none;
+    padding-left:4px;
     border-radius:6px;
 }
 .AddressBar:hover{
     border:1px solid #CCCCCC;
+/*    border-left:none;
+    border-right:none;*/
 }
 .AddressBar:focus{
     border:2px solid #A3CFEC;

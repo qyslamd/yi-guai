@@ -9,6 +9,8 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QCursor>
+#include <QMouseEvent>
+#include <QTimer>
 #include <QGraphicsDropShadowEffect>
 
 AddressBar::AddressBar(QWidget *parent)
@@ -45,6 +47,15 @@ bool AddressBar::eventFilter(QObject *obj, QEvent *ev)
     return QLineEdit::eventFilter(obj, ev);
 }
 
+bool AddressBar::event(QEvent *ev)
+{
+    if(ev->type()== QEvent::FocusIn)
+    {
+        QTimer::singleShot(0, this, &QLineEdit::selectAll);
+    }
+    return QLineEdit::event(ev);
+}
+
 QRect AddressBar::gGeometryBtnSiteInfo() const
 {
     if(internal_btn_siteInfo_){
@@ -55,6 +66,11 @@ QRect AddressBar::gGeometryBtnSiteInfo() const
                      internal_btn_siteInfo_->height());
     }
     return QRect();
+}
+
+void AddressBar::mousePressEvent(QMouseEvent *event)
+{
+    QLineEdit::mousePressEvent(event);
 }
 
 void AddressBar::initUi()
