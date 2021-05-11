@@ -39,6 +39,8 @@ public:
         virtual void onBrowserLoadingStateChange(bool isLoading,
                                                  bool canGoBack,
                                                  bool canGoForward) = 0;
+        virtual void onBrowerLoadStart(CefLoadHandler::TransitionType transition_type) = 0;
+        virtual void onBrowerLoadEnd(int httpStatusCode) = 0;
 
         virtual void onBrowserGotFocus(CefRefPtr<CefBrowser> ) {}
     protected:

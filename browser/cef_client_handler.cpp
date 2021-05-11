@@ -367,14 +367,22 @@ void CefClientHandler::OnLoadStart(CefRefPtr<CefBrowser> browser,
                                    CefRefPtr<CefFrame> frame,
                                    CefLoadHandler::TransitionType transition_type)
 {
+    CEF_REQUIRE_UI_THREAD();
 
+    if(delegate_){
+        delegate_->onBrowerLoadStart(transition_type);
+    }
 }
 
 void CefClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser,
                                  CefRefPtr<CefFrame> frame,
                                  int httpStatusCode)
 {
+    CEF_REQUIRE_UI_THREAD();
 
+    if(delegate_){
+        delegate_->onBrowerLoadEnd(httpStatusCode);
+    }
 }
 
 void CefClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser,

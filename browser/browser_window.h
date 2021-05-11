@@ -31,6 +31,8 @@ public:
         virtual void onBrowserWindowTitleChange(const std::string& title) = 0;
         virtual void onBrowserWindowFaviconChange(CefRefPtr<CefImage> image,
                                                   const std::string &url) = 0;
+        virtual void onBrowerWindowLoadStart(CefLoadHandler::TransitionType transition_type) = 0;
+        virtual void onBrowerWindowLoadEnd(int code) = 0;
         virtual void onBrowserWindowLoadingStateChange(bool isLoading,
                                                        bool canGoBack,
                                                        bool canGoForward) = 0;
@@ -90,6 +92,8 @@ protected:
     void onBrowserTitleChange(const std::string &title)  override;
     void onBrowserFaviconChange(CefRefPtr<CefImage> image,
                                 const std::string &url) override;
+    void onBrowerLoadStart(CefLoadHandler::TransitionType transition_type) override;
+    void onBrowerLoadEnd(int httpStatusCode) override;
     void onBrowserLoadingStateChange(bool isLoading,
                                      bool canGoBack,
                                      bool canGoForward) override;

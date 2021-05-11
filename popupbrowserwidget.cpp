@@ -23,6 +23,7 @@ PopupBrowserWidget::PopupBrowserWidget(CefQWidget *browser, QWidget *parent)
     shadow->setColor(QColor(38, 78, 119, 127));
     shadow->setBlurRadius(3);
     ui->lineEdit->setGraphicsEffect(shadow);
+    ui->lineEdit->setReadOnly(true);
 
     ui->verticalLayout->addWidget(browser_);
 

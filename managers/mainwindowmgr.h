@@ -21,6 +21,7 @@ public:
         qInfo()<<__FUNCTION__;
     }
     void createWindow();
+    QRect lastWindowGeometry() const;
 signals:
 private:
     QSet<MainWindow *> windows_;

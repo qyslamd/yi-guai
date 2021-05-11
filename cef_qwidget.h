@@ -33,6 +33,8 @@ signals:
     void browserAddressChange(const QString &url);
     void browserTitleChange(const QString &title);
     void browserFaviconChange(const QPixmap &pix);
+    void browserLoadStart(CefLoadHandler::TransitionType transition_type);
+    void browserLoadEnd(int httpStatusCode);
     void browserLoadingStateChange(bool isLoading,
                                    bool canGoBack,
                                    bool canGoForward);
@@ -55,6 +57,8 @@ protected:
     void onBrowserWindowTitleChange(const std::string &title) override;
     void onBrowserWindowFaviconChange(CefRefPtr<CefImage> image,
                                       const std::string &url) override;
+    void onBrowerWindowLoadStart(CefLoadHandler::TransitionType transition_type) override;
+    void onBrowerWindowLoadEnd(int httpStatusCode) override;
     void onBrowserWindowLoadingStateChange(bool isLoading,
                                            bool canGoBack,
                                            bool canGoForward) override;

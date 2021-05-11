@@ -199,7 +199,7 @@ void NaviBar::initSignals()
 
 void NaviBar::setAppearance()
 {
-    btn_back_->setIcon(QIcon(":/icons/resourcesimgs//normal_back.png"));
+    btn_back_->setIcon(QIcon(":/icons/resources/imgs/normal_back.png"));
     btn_refresh_->setIcon(QIcon(":/icons/resources/imgs/normal_refresh.png"));
     btn_stop_->setIcon(QIcon(":/icons/resources/imgs/window_close_light_2x.png"));
     btn_forward_->setIcon(QIcon(":/icons/resources/imgs/normal_forward.png"));

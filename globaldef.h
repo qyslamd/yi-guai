@@ -42,6 +42,8 @@ enum class PageCmd{
     Address,
     Title,
     Favicon,
+    LoadStart,
+    LoadEnd,
     LoadingState,
     FocusChange,
 };

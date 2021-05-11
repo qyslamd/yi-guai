@@ -37,9 +37,9 @@ MainWindow::MainWindow(QWidget *parent)
     setAppearance();
     initSignalSlot();
 
-    QTimer::singleShot(40,[this](){
-        addNewPage("https://www.baidu.com/");
-    });
+    addNewPage("https://cn.bing.com/");
+//    QTimer::singleShot(40,[this](){
+//    });
 }
 
 MainWindow::~MainWindow()
@@ -384,7 +384,13 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
     {
         auto index = stack_browsers_->indexOf(page);
         tab_bar_->setTabIcon(index, QIcon(para.value<QPixmap>()));
-    } else if(cmd == PageCmd::LoadingState)
+    } else if(cmd == PageCmd::LoadStart)
+    {
+
+    } else if(cmd == PageCmd::LoadEnd)
+    {
+
+    }else if(cmd == PageCmd::LoadingState)
     {
         if(page && page == GetActivePage()){
             QUrl url(para.toString());

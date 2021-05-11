@@ -20,6 +20,7 @@
 #include "popupbrowserwidget.h"
 
 #include "managers/favicon_manager.h"
+#include "managers/mainwindowmgr.h"
 #include "utils/util_qt.h"
 
 CefQWidget::CefQWidget(const QString &startup_url, QWidget *parent)
@@ -144,13 +145,27 @@ void CefQWidget::onBrowserWndPopupWnd(const CefPopupFeatures &popupFeatures,
   int toolBarVisible;
   int scrollbarsVisible;
 */
-    int x,y,w,h;
-    x = popupFeatures.x < 0 ? 0 : popupFeatures.x;
-    y = popupFeatures.y < 0 ? 0 : popupFeatures.y;
-    w = popupFeatures.width < 0 ? 200 : popupFeatures.width;
-    h = popupFeatures.height < 0 ? 200 : popupFeatures.height;
 
-    popupBrowser->setGeometry(x,y,w,h);
+    auto rect = MainWindowMgr::instance().lastWindowGeometry();
+
+    int x = popupFeatures.x;
+    int y = popupFeatures.y;
+    int w = popupFeatures.width;
+    int h = popupFeatures.height;
+
+   if(x == 0 && y == 0 && w == 0 && h == 0){
+       x = rect.x() + 18;
+       y = rect.y() + 30;
+       w = rect.width();
+       h = rect.height();
+   }else{
+       x = x < 0 ? 0 : x;
+       y = y < 0 ? 0 : y;
+       w = w <= 150 ? rect.width() : w;
+       h = h <= 150 ? rect.height() : h;
+   }
+
+    popupBrowser->setGeometry(x, y, w, h);
     popupBrowser->show();
 }
 
@@ -251,6 +266,15 @@ void CefQWidget::onBrowserWindowFaviconChange(CefRefPtr<CefImage> image,
     emit browserFaviconChange(pixmap);
 
     Q_UNUSED(url);
+}
+
+void CefQWidget::onBrowerWindowLoadStart(CefLoadHandler::TransitionType transition_type)
+{
+    emit browserLoadStart(transition_type);
+}
+void CefQWidget::onBrowerWindowLoadEnd(int httpStatusCode)
+{
+    emit browserLoadEnd(httpStatusCode);
 }
 
 void CefQWidget::onBrowserWindowLoadingStateChange(bool isLoading,

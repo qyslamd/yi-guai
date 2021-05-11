@@ -166,6 +166,18 @@ void BrowserWindow::onBrowserFaviconChange(CefRefPtr<CefImage> image,
     delegate_->onBrowserWindowFaviconChange(image, url);
 }
 
+void BrowserWindow::onBrowerLoadStart(CefLoadHandler::TransitionType transition_type)
+{
+    REQUIRE_MAIN_THREAD();
+    delegate_->onBrowerWindowLoadStart(transition_type);
+}
+
+void BrowserWindow::onBrowerLoadEnd(int httpStatusCode)
+{
+    REQUIRE_MAIN_THREAD();
+    delegate_->onBrowerWindowLoadEnd(httpStatusCode);
+}
+
 void BrowserWindow::onBrowserLoadingStateChange(bool isLoading,
                                                 bool canGoBack,
                                                 bool canGoForward)

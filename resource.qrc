@@ -22,4 +22,7 @@
     <qresource prefix="/styles">
         <file>resources/styles/normal.qss</file>
     </qresource>
+    <qresource prefix="/i18ns">
+        <file>resources/i18n/YiGuai_zh.qm</file>
+    </qresource>
 </RCC>

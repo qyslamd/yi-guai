@@ -21,6 +21,14 @@ void MainWindowMgr::createWindow()
     window->show();
 }
 
+QRect MainWindowMgr::lastWindowGeometry() const
+{
+    auto iter = windows_.end();
+    --iter;
+    auto window = *iter;
+    return window->geometry();
+}
+
 void MainWindowMgr::closeAllWindows()
 {
     auto it = windows_.begin();

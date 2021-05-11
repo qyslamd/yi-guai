@@ -8,6 +8,7 @@
 #include <QDockWidget>
 #include <QVariant>
 #include <QUrl>
+#include <QStyle>
 
 Page::Page(const QString &startup_url, QWidget *parent)
     : QMainWindow(parent)
@@ -89,6 +90,26 @@ void Page::initBrowser()
     {
         title_ = title;
         emit pageCmd(PageCmd::Title, title);
+    });
+    connect(browser_widget_, &CefQWidget::browserLoadStart, [this](CefLoadHandler::TransitionType transition_type)
+    {
+        emit pageCmd(PageCmd::LoadStart, (int)transition_type);
+    });
+    connect(browser_widget_, &CefQWidget::browserLoadEnd, [this](int httpStatusCode)
+    {
+        const QStringList customSchemes{QString("about"),"chrome"};
+        auto parts = url_.split(":");
+        if(parts.count()  > 0){
+            auto scheme = parts.at(0).toLower();
+            if(customSchemes.contains(scheme)){
+                emit pageCmd(PageCmd::Favicon, style()->standardPixmap(QStyle::SP_MessageBoxInformation));
+            }
+        }
+
+        if(url_.startsWith("file://",Qt::CaseInsensitive)){
+            emit pageCmd(PageCmd::Favicon, style()->standardPixmap(QStyle::SP_FileIcon));
+        }
+        emit pageCmd(PageCmd::LoadEnd, httpStatusCode);
     });
     connect(browser_widget_, &CefQWidget::browserLoadingStateChange, [this](bool a, bool b, bool c)
     {

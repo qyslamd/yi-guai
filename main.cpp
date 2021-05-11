@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QtDebug>
 #include <QFile>
+#include <QTranslator>
 
 #include <include/base/cef_scoped_ptr.h>
 #include <include/cef_command_line.h>
@@ -27,11 +28,13 @@
 #pragma comment(lib, "cef_sandbox.lib")
 #endif
 
-void initQApp(QApplication *app);
+void intializeQtApp(QApplication *app);
+int initializeCef(int argc, char *argv[]);
+// Create the main message loop object.
+scoped_ptr<client::MainMessageLoop> message_loop;
 
 int main(int argc, char *argv[])
 {
-    using namespace client;
     // Enable High-DPI support on Windows 7 or newer.
     CefEnableHighDPISupport();
 
@@ -62,11 +65,52 @@ int main(int argc, char *argv[])
     }
 
     QApplication qt_app(argc, argv);
-    initQApp(&qt_app);
+    intializeQtApp(&qt_app);
+    if(initializeCef(argc, argv) == -1)
+    {
+        return -1;
+    }
 
+    MainWindowMgr::instance().createWindow();
+
+    message_loop->Run();
+
+    int result = qt_app.exec();
+
+    // Shut down CEF.
+    CefShutdown();
+
+    message_loop.reset();
+    qInfo()<<__FUNCTION__<<"after cef shutdown:"<<message_loop.get();
+
+    return result;
+}
+
+void intializeQtApp(QApplication *app)
+{
+    // 样式表
+    QFile file(":/styles/resources/styles/normal.qss");
+    if(file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        auto all = file.readAll();
+        file.close();
+        app->setStyleSheet(all);
+    }
+
+    //翻译
+    QTranslator *ts = new QTranslator(app);
+    ts->load(":/i18ns/resources/i18n/YiGuai_zh.qm");
+    app->installTranslator(ts);
+}
+
+int initializeCef(int argc, char *argv[])
+{
     // Parse command-line arguments for use in this method.
     CefRefPtr<CefCommandLine> command_line = CefCommandLine::CreateCommandLine();
+#ifdef OS_WIN
     command_line->InitFromString(::GetCommandLineW());
+#else
+    command_line->InitFromArgv(argc, argv);
+#endif
 
     // Specify CEF global settings here.
     CefSettings settings;
@@ -93,59 +137,36 @@ int main(int argc, char *argv[])
 #if !defined(CEF_USE_SANDBOX)
     settings.no_sandbox = true;
 #endif
-
-    CefRefPtr<CefApp> app(new CefAppBrowser);
-
-    // Create the main message loop object.
-    scoped_ptr<MainMessageLoop> message_loop;
     if (settings.multi_threaded_message_loop)
     {
         qInfo()<<"multi_threaded_message_loop";
-        message_loop.reset(new MainMessageLoopMultithreadedWin);
+        message_loop.reset(new client::MainMessageLoopMultithreadedWin);
     }
     else if (settings.external_message_pump)
     {
         qInfo()<<"external_message_pump";
-        message_loop = MainMessageLoopExternalPump::Create();
+        message_loop = client::MainMessageLoopExternalPump::Create();
     }
     else
     {
         qInfo()<<"MainMessageLoopStd";
-        message_loop.reset(new MainMessageLoopStd);
+        message_loop.reset(new client::MainMessageLoopStd);
     }
 
     // Initialize CEF.
-    if(!CefInitialize(main_args, settings, app.get(), sandbox_info))
+    CefRefPtr<CefApp> app(new CefAppBrowser);
+#if defined(Q_OS_WIN)
+    // Provide CEF with command-line arguments.
+    auto hInstance = GetModuleHandle(NULL);
+    CefMainArgs main_args(hInstance);
+#else
+    CefMainArgs main_args(argc, argv);
+#endif
+    if(!CefInitialize(main_args, settings, app.get(), nullptr))
     {
         qInfo()<<"CefInitialize initialized failed!";
-        return -1;
     }else{
         qInfo()<<"CefInitialize initialized succeed!";
     }
-
-//    MainWindow w;
-//    w.show();
-    MainWindowMgr::instance().createWindow();
-
-    message_loop->Run();
-
-    int result = qt_app.exec();
-
-    // Shut down CEF.
-    CefShutdown();
-
-    message_loop.reset();
-    qInfo()<<__FUNCTION__<<"after cef shutdown:"<<message_loop.get();
-
-    return result;
-}
-
-void initQApp(QApplication *app)
-{
-    QFile file(":/styles/resources/styles/normal.qss");
-    if(file.open(QIODevice::ReadOnly | QIODevice::Text)){
-        auto all = file.readAll();
-        file.close();
-        app->setStyleSheet(all);
-    }
+    return 0;
 }
