@@ -219,6 +219,21 @@ void CefClientHandler::NotifyBrowserTitleChange(CefRefPtr<CefBrowser> browser,
         delegate_->onBrowserTitleChange(title.ToString());
 }
 
+void CefClientHandler::NotifyStatusMessage(const CefString &msg)
+{
+    if (!CURRENTLY_ON_MAIN_THREAD()) {
+        // Execute this method on the main thread.
+        MAIN_POST_CLOSURE(
+                    base::Bind(&CefClientHandler::NotifyStatusMessage,
+                               this,
+                               msg));
+        return;
+    }
+
+    if (delegate_)
+        delegate_->onBrowserStatusMessage(msg.ToString());
+}
+
 void CefClientHandler::NotifyBrowserFavicon(CefRefPtr<CefImage> image,
                                            const CefString &icon_url)
 {
@@ -286,7 +301,9 @@ bool CefClientHandler::OnTooltip(CefRefPtr<CefBrowser> browser,
 void CefClientHandler::OnStatusMessage(CefRefPtr<CefBrowser> browser,
                                        const CefString &value)
 {
+    CEF_REQUIRE_UI_THREAD();
 
+    NotifyStatusMessage(value);
 }
 
 bool CefClientHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,

@@ -9,7 +9,7 @@ font-family:"Microsoft Yahei";
 /******************************************
 Scope:Global Global QToolButton
 */
-QToolButton{
+/*QToolButton{
     border:none;
     border-radius:4px;
 }
@@ -19,9 +19,9 @@ QToolButton:hover{
 }
 
 QToolButton:open{
-    border:1px solid #90C8F6;
-    background-color:#CFCFCF;
-}
+    background: #6f8ee9;
+    border:none;
+}*/
 
 
 /******************************************
@@ -33,6 +33,12 @@ background-color:#FCFCFC;
 
 QToolButton#NaviBarOptionBtn::menu-indicator{
     image: none;
+}
+
+QLabel#ZoomValueLabel{
+border:none;
+border-left:1px solid red;
+border-right:1px solid red;
 }
 
 /******************************************

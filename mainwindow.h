@@ -17,6 +17,7 @@ class QStackedWidget;
 class QStatusBar;
 class Page;
 class Tab_Thumbnail_Widget;
+class HistoryPopup;
 class QPropertyAnimation;
 
 class MainWindow : public QMainWindow
@@ -29,11 +30,15 @@ public:
 
     int addNewPage(const QString &url, bool switchTo = false);
     int addNewPage(Page *page);
-    // QObject interface
-    bool event(QEvent *e) override;
 signals:
     void windowStateChanged(Qt::WindowStates state, const QVariant &data);
+    void historyPopupVisibleChange(bool visible);
+public:
+    // QObject interface
+    bool event(QEvent *e) override;
+    bool eventFilter(QObject *obj, QEvent *event) override;
 protected:
+    bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
     void closeEvent(QCloseEvent *evnet) override;
     void changeEvent(QEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
@@ -51,6 +56,8 @@ private:
     Tab_Thumbnail_Widget *tab_thumbnail_ = nullptr; /*标签页预览窗口*/
     QPropertyAnimation *tab_thumbnail_anime_ = nullptr;   /* tab预览窗口移动动画*/
 
+    HistoryPopup *history_popup_ = nullptr; /*历史记录 popup*/
+
     bool window_closing_ = false;  /*窗口是否正在关闭*/
 
 private:
@@ -61,6 +68,7 @@ private:
     void initPage(Page *page);
     Page *GetActivePage();
     Page *GetPage(int index);
+    void onStatusMessage(const QString &msg);
 
 private slots:
     void onTabBarCurrentChanged(int index);

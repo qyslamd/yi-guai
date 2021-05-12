@@ -20,6 +20,7 @@ Page::Page(const QString &startup_url, QWidget *parent)
         setCentralWidget(new QWidget);
     }
     browser_widget_ = new CefQWidget(startup_url, this);
+    browser_widget_->setPage(this);
 
     main_layout_->addWidget(browser_widget_);
     centralWidget()->setLayout(main_layout_);
@@ -90,6 +91,10 @@ void Page::initBrowser()
     {
         title_ = title;
         emit pageCmd(PageCmd::Title, title);
+    });
+    connect(browser_widget_, &CefQWidget::browserStatusMessage, [this](const QString &msg)
+    {
+        emit pageCmd(PageCmd::StatusMessage, msg);
     });
     connect(browser_widget_, &CefQWidget::browserLoadStart, [this](CefLoadHandler::TransitionType transition_type)
     {

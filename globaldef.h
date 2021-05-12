@@ -25,12 +25,15 @@ enum class NaviBarCmd {
     Refresh,
     StopLoading,
     ViewSiteInfo,
+    History,
+    User,
     NewTabPage,
     NewWindow,
     NewInprivateWindow,
     ZoomIn,
     ZoomReset,
     ZoomOut,
+    QuitApp
 };
 
 ///
@@ -41,6 +44,7 @@ enum class PageCmd{
     Closing,
     Address,
     Title,
+    StatusMessage,
     Favicon,
     LoadStart,
     LoadEnd,

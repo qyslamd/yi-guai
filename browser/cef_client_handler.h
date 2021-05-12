@@ -33,6 +33,7 @@ public:
         virtual void OnBrowserClosing(CefRefPtr<CefBrowser> browser) = 0;
         virtual void onBrowserAddressChange(const std::string &url) = 0;
         virtual void onBrowserTitleChange(const std::string &url) = 0;
+        virtual void onBrowserStatusMessage(const std::string &msg) = 0;
         virtual void onBrowserFaviconChange(CefRefPtr<CefImage> image,
                                             const std::string &url) = 0;
 
@@ -186,6 +187,7 @@ private:
                                     const CefString &url);
     void NotifyBrowserTitleChange(CefRefPtr<CefBrowser> browser,
                                   const CefString &title);
+    void NotifyStatusMessage(const CefString &msg);
     void NotifyBrowserFavicon(CefRefPtr<CefImage> image,
                               const CefString &icon_url);
 

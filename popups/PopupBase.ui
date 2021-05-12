@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PopupBase</class>
+ <widget class="QWidget" name="PopupBase">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>402</width>
+    <height>391</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QFrame" name="frameShadow">
+     <property name="styleSheet">
+      <string notr="true">QFrame#frameShadow{
+border:none;
+border:1px solid #F5F5F5;
+border-radius:6px;
+background-color:white;
+}</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

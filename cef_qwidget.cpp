@@ -17,10 +17,11 @@
 
 #include <include/base/cef_logging.h>
 #include "mainwindow.h"
-#include "popupbrowserwidget.h"
+#include "popup.h"
+#include "page.h"
 
-#include "managers/favicon_manager.h"
-#include "managers/mainwindowmgr.h"
+#include "managers/FaviconManager.h"
+#include "managers/MainWindowManager.h"
 #include "utils/util_qt.h"
 
 CefQWidget::CefQWidget(const QString &startup_url, QWidget *parent)
@@ -55,6 +56,11 @@ CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
 CefQWidget::~CefQWidget()
 {
     qInfo()<<__FUNCTION__;
+}
+
+void CefQWidget::setPage(Page *page)
+{
+    page_ = page;
 }
 
 void CefQWidget::Navigate(const QString &url)
@@ -127,7 +133,7 @@ void CefQWidget::onBrowserWndPopupWnd(const CefPopupFeatures &popupFeatures,
 {
     CefQWidget *window = new CefQWidget(windowInfo, client, settings);
 
-    PopupBrowserWidget *popupBrowser = new PopupBrowserWidget(window);
+    Popup *popupBrowser = new Popup(window);
     popupBrowser->setAttribute(Qt::WA_DeleteOnClose);
 
     /* CefPopupFeatures
@@ -146,7 +152,7 @@ void CefQWidget::onBrowserWndPopupWnd(const CefPopupFeatures &popupFeatures,
   int scrollbarsVisible;
 */
 
-    auto rect = MainWindowMgr::instance().lastWindowGeometry();
+    auto rect = MainWndMgr::Instance().lastWindowGeometry();
 
     int x = popupFeatures.x;
     int y = popupFeatures.y;
@@ -189,6 +195,11 @@ void CefQWidget::onBrowserWindowAddressChange(const std::string &url)
 void CefQWidget::onBrowserWindowTitleChange(const std::string &title)
 {
     emit browserTitleChange(QString::fromStdString(title));
+}
+
+void CefQWidget::onBrowserWindowStatusMessage(const std::string &msg)
+{
+    emit browserStatusMessage(QString::fromStdString(msg));
 }
 
 void CefQWidget::onBrowserWindowFaviconChange(CefRefPtr<CefImage> image,
@@ -243,7 +254,7 @@ void CefQWidget::onBrowserWindowFaviconChange(CefRefPtr<CefImage> image,
         if(! QFile(file_path).exists()){
             pixmap.save(file_path);
         }
-        FaviconManager::Instance().addIconRecord(url_, file_path);
+        FaviconMgr::Instance().addIconRecord(url_, file_path);
     }
     else if(subFix.compare("png", Qt::CaseInsensitive) == 0)
     {
@@ -258,7 +269,7 @@ void CefQWidget::onBrowserWindowFaviconChange(CefRefPtr<CefImage> image,
         if(! QFile(file_path).exists()){
             pixmap.save(file_path);
         }
-        FaviconManager::Instance().addIconRecord(url_, file_path);
+        FaviconMgr::Instance().addIconRecord(url_, file_path);
     }
     else {
         pixmap = style()->standardPixmap(QStyle::SP_FileIcon);

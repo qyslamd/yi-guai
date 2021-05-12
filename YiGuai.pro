@@ -13,7 +13,7 @@ win32{
     # 产品名称
     QMAKE_TARGET_PRODUCT = "YiGuai Web Browser"
     # 文件说明
-    QMAKE_TARGET_DESCRIPTION = "YiGuai browser based on Qt 5.14.2 (MSVC 2019, 32 bit) and CEF (chromium-86.0.4240.183)"
+#    QMAKE_TARGET_DESCRIPTION = "YiGuai browser based on Qt 5.14.2 (MSVC 2019, 32 bit) and CEF (chromium-86.0.4240.183)"
     # 版权信息
     QMAKE_TARGET_COPYRIGHT = "Copyright 2008-2016 The Qt Company Ltd. All rights reserved."
     # 中文（简体）
@@ -21,17 +21,20 @@ win32{
 }
 
 SOURCES += \
-    managers/appconfig.cpp \
-    managers/favicon_manager.cpp \
-    managers/mainwindowmgr.cpp \
+    managers/AppCfgManager.cpp \
+    managers/CefSettingsManager.cpp \
+    managers/FaviconManager.cpp \
+    managers/MainWindowManager.cpp \
     page.cpp \
-    popupbrowserwidget.cpp \
+    popup.cpp \
+    popups/HistoryPopup.cpp \
+    popups/PopupBase.cpp \
     popups/SiteInfoPopup.cpp \
-    toolbars/addressbar.cpp \
-    toolbars/bookmarkbar.cpp \
-    toolbars/navibar.cpp \
-    toolbars/tabbar.cpp \
-    toolbars/tabbarstyle.cpp \
+    toolbars/AddressBar.cpp \
+    toolbars/BookmarkBar.cpp \
+    toolbars/NavigateBar.cpp \
+    toolbars/PagesTabBar.cpp \
+    toolbars/TabbarStyle.cpp \
     widgets/Dp_Widget_Caption.cpp \
     widgets/FramelessWindow.cpp \
     dialogs/alertdialog.cpp \
@@ -40,31 +43,34 @@ SOURCES += \
     browser/cef_client_handler.cpp \
     cef_qwidget.cpp \
     main.cpp \
-    message_loop/main_message_loop.cc \
-    message_loop/main_message_loop_external_pump.cc \
-    message_loop/main_message_loop_external_pump_win.cc \
-    message_loop/main_message_loop_multithreaded_win.cc \
-    message_loop/main_message_loop_std.cc \
+    browser/message_loop/main_message_loop.cc \
+    browser/message_loop/main_message_loop_external_pump.cc \
+    browser/message_loop/main_message_loop_external_pump_win.cc \
+    browser/message_loop/main_message_loop_multithreaded_win.cc \
+    browser/message_loop/main_message_loop_std.cc \
     mainwindow.cpp \
     utils/util_qt.cpp \
     utils/util_win.cc \
-    widgets/Tab_Thumbnail_Widget.cpp \
+    widgets/TabThumbnailWidget.cpp \
     widgets/framewidget.cpp
 
 
 HEADERS += \
     globaldef.h \
-    managers/appconfig.h \
-    managers/favicon_manager.h \
-    managers/mainwindowmgr.h \
+    managers/AppCfgManager.h \
+    managers/CefSettingsManager.h \
+    managers/FaviconManager.h \
+    managers/MainWindowManager.h \
     page.h \
-    popupbrowserwidget.h \
+    popup.h \
+    popups/HistoryPopup.h \
+    popups/PopupBase.h \
     popups/SiteInfoPopup.h \
-    toolbars/addressbar.h \
-    toolbars/bookmarkbar.h \
-    toolbars/navibar.h \
-    toolbars/tabbar.h \
-    toolbars/tabbarstyle.h \
+    toolbars/AddressBar.h \
+    toolbars/BookmarkBar.h \
+    toolbars/NavigateBar.h \
+    toolbars/PagesTabBar.h \
+    toolbars/TabbarStyle.h \
     widgets/Dp_Widget_Caption.h \
     widgets/FramelessWindow.h \
     dialogs/alertdialog.h \
@@ -72,21 +78,23 @@ HEADERS += \
     browser/cef_app_browser.h \
     browser/cef_client_handler.h \
     cef_qwidget.h \
-    client_types.h \
-    message_loop/main_message_loop.h \
-    message_loop/main_message_loop_external_pump.h \
-    message_loop/main_message_loop_multithreaded_win.h \
-    message_loop/main_message_loop_std.h \
+    browser/client_types.h \
+    browser/message_loop/main_message_loop.h \
+    browser/message_loop/main_message_loop_external_pump.h \
+    browser/message_loop/main_message_loop_multithreaded_win.h \
+    browser/message_loop/main_message_loop_std.h \
     mainwindow.h \
     utils/util_qt.h \
     utils/util_win.h \
-    widgets/Tab_Thumbnail_Widget.h \
+    widgets/TabThumbnailWidget.h \
     widgets/framewidget.h
 
 FORMS += \
     dialogs/alertdialog.ui \
-    popupbrowserwidget.ui \
-    widgets/Tab_Thumbnail_Widget.ui \
+    popup.ui \
+    popups/HistoryPopup.ui \
+    popups/PopupBase.ui \
+    widgets/TabThumbnailWidget.ui \
     widgets/framewidget.ui
 
 # Default rules for deployment.

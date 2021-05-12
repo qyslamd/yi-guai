@@ -4,13 +4,15 @@
 #include "cef_qwidget.h"
 #include "browser/cef_client_handler.h"
 #include "utils/util_qt.h"
-#include "toolbars/tabbar.h"
-#include "toolbars/navibar.h"
-#include "toolbars/bookmarkbar.h"
-#include "widgets/Tab_Thumbnail_Widget.h"
+#include "toolbars/PagesTabBar.h"
+#include "toolbars/NavigateBar.h"
+#include "toolbars/BookmarkBar.h"
+#include "widgets/TabThumbnailWidget.h"
 
-#include "managers/mainwindowmgr.h"
-#include "managers/appconfig.h"
+#include "managers/MainWindowManager.h"
+#include "managers/AppCfgManager.h"
+
+#include "popups/HistoryPopup.h"
 
 #include <QVBoxLayout>
 #include <QStackedWidget>
@@ -25,6 +27,7 @@
 #include <QScreen>
 #include <QDialog>
 #include <QPropertyAnimation>
+#include <QToolTip>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -33,13 +36,12 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+//    setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowSystemMenuHint);
     initUi();
     setAppearance();
     initSignalSlot();
 
     addNewPage("https://cn.bing.com/");
-//    QTimer::singleShot(40,[this](){
-//    });
 }
 
 MainWindow::~MainWindow()
@@ -73,6 +75,42 @@ bool MainWindow::event(QEvent *e)
 {
     return QMainWindow::event(e);
 }
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    auto type = event->type();
+    if(obj == history_popup_){
+        if(type == QEvent::Show || type == QEvent::Hide){
+            emit historyPopupVisibleChange(history_popup_->isVisible());
+        }
+    }
+    return QMainWindow::eventFilter(obj, event);
+}
+
+bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result)
+{
+#ifdef Q_OS_WIN
+    //Workaround for known bug -> check Qt forum : https://forum.qt.io/topic/93141/qtablewidget-itemselectionchanged/13
+    #if (QT_VERSION == QT_VERSION_CHECK(5, 11, 1))
+    MSG* msg = *reinterpret_cast<MSG**>(message);
+    #else
+    MSG* msg = reinterpret_cast<MSG*>(message);
+    #endif
+
+    switch (msg->message)
+    {
+    case WM_DWMCOLORIZATIONCOLORCHANGED:
+        return false;
+    case WM_DPICHANGED:
+        return false;
+    case WM_NCPAINT:
+
+        return false;
+    default:
+        break;
+    }
+    return QMainWindow::nativeEvent(eventType, message, result);
+#endif
+}
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
@@ -85,7 +123,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         return;
     }else{
         // 真正的关闭
-        AppConfig::setWindowGeometry(saveGeometry());
+        AppCfgMgr::setWindowGeometry(saveGeometry());
         event->accept();
     }
 }
@@ -101,8 +139,8 @@ void MainWindow::changeEvent(QEvent *event)
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
-    return QMainWindow::mousePressEvent(event);
     if(this->isFullScreen()){
+        return QMainWindow::mousePressEvent(event);
     }
 #ifdef Q_OS_WIN
     int h = 0;
@@ -154,7 +192,7 @@ void MainWindow::initUi()
     static bool first_window = true;
     if(first_window)
     {   // 首个窗口设置记录的位置和大小
-        auto geo = AppConfig::windowGeometry();
+        auto geo = AppCfgMgr::windowGeometry();
         if(geo.isEmpty() || !restoreGeometry(geo)){
             const QRect availableGeometry =  qApp->primaryScreen()->availableGeometry();
             const QSize size = (availableGeometry.size() * 4) / 5;
@@ -165,10 +203,10 @@ void MainWindow::initUi()
         first_window = false;
     }
 
-    QPalette pl = palette();
-    pl.setColor(QPalette::Active, QPalette::Window, QColor("#CECECE"));
-    pl.setColor(QPalette::Inactive, QPalette::Window, QColor("#E8E8E8"));
-    setPalette(pl);
+//    QPalette pl = palette();
+//    pl.setColor(QPalette::Active, QPalette::Window, QColor("#CECECE"));
+//    pl.setColor(QPalette::Inactive, QPalette::Window, QColor("#E8E8E8"));
+//    setPalette(pl);
 
     /*设置centralWidget*/
     if(!centralWidget()) {
@@ -211,6 +249,10 @@ void MainWindow::initUi()
     tab_thumbnail_anime_->setTargetObject(tab_thumbnail_);   // 动画作用的对象
     tab_thumbnail_anime_->setPropertyName("geometry"); // 动画要动的属性
     tab_thumbnail_anime_->setDuration(50);       // 动画持续时间
+
+    history_popup_ = new HistoryPopup(this);
+    history_popup_->resize(360, 600);
+    history_popup_->installEventFilter(this);
 }
 
 void MainWindow::setAppearance()
@@ -227,14 +269,14 @@ void MainWindow::initSignalSlot()
     connect(tab_bar_, &QTabBar::currentChanged, this, &MainWindow::onTabBarCurrentChanged);
     connect(tab_bar_, &QTabBar::tabCloseRequested,this, &MainWindow::onTabBarCloseRequested);
     connect(tab_bar_, &QTabBar::tabMoved, this, &MainWindow::onTabBarTabMoved);
-    connect(tab_bar_,  &TabBar::showPreview, this, &MainWindow::onShowTabThumnail);
+    connect(tab_bar_, &TabBar::showPreview, this, &MainWindow::onShowTabThumnail);
 
     connect(btn_add_page_, &QToolButton::clicked, [this]()
     {
        addNewPage("about:version", true);
     });
     connect(navi_bar_, &NaviBar::naviBarCmd, this, &MainWindow::onNaviBarCmd);
-
+    connect(this, &MainWindow::historyPopupVisibleChange, navi_bar_, &NaviBar::onHistoryPopupVisibleChange);
 }
 
 void MainWindow::initPage(Page *page)
@@ -261,6 +303,22 @@ Page *MainWindow::GetActivePage()
 Page *MainWindow::GetPage(int index)
 {
     return qobject_cast<Page*>(stack_browsers_->widget(index));
+}
+
+void MainWindow::onStatusMessage(const QString &msg)
+{
+    // if message is url, decode it
+    QUrl url(msg);
+    QString tempMsg = url.isValid()
+                          ? url.toDisplayString()
+                          : msg;
+    // get elide text
+    QFontMetrics fontMetrics(QToolTip::font());
+    tempMsg = fontMetrics.elidedText(tempMsg, Qt::ElideRight, this->width() / 2);
+
+    int x = this->x();
+    int y = this->y() + this->height();
+    QToolTip::showText(QPoint(x, y), tempMsg, this);
 }
 
 void MainWindow::onTabBarCurrentChanged(int index)
@@ -334,6 +392,14 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
             auto rect = para.toRect();
             page->showSiteInfomation(rect);
         }
+    }else if(cmd == NaviBarCmd::History)
+    {
+        auto pos = para.toPoint();
+        pos.ry() += 2;
+        pos.rx() -= history_popup_->width();
+        pos.rx() += history_popup_->shadowRightWidth();
+        history_popup_->move(pos);
+        history_popup_->show();
     }
     else if(cmd == NaviBarCmd::NewTabPage){
         auto url = para.toString();
@@ -342,8 +408,10 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         }
         addNewPage(url, true);
     } else if(cmd == NaviBarCmd::NewWindow){
-        MainWindowMgr::instance().createWindow();
+        MainWndMgr::Instance().createWindow();
     } else if(cmd == NaviBarCmd::NewInprivateWindow) {
+        qInfo()<<__FUNCTION__<<"TODO:";
+    }else if(cmd == NaviBarCmd::QuitApp) {
         qInfo()<<__FUNCTION__<<"TODO:";
     }
 }
@@ -380,6 +448,9 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
     {
         auto index = stack_browsers_->indexOf(page);
         tab_bar_->setTabText(index, para.toString());
+    }else if(cmd == PageCmd::StatusMessage)
+    {
+        onStatusMessage(para.toString());
     }else if(cmd == PageCmd::Favicon)
     {
         auto index = stack_browsers_->indexOf(page);
