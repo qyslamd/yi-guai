@@ -1,15 +1,17 @@
-﻿#ifndef CEFSETTINGS_MANAGER_H
-#define CEFSETTINGS_MANAGER_H
+﻿#ifndef CEF_MANAGER_H
+#define CEF_MANAGER_H
 #pragma once
 
 #include <include/cef_base.h>
 
-class CefSettingsMgr
+class CefManager
 {
 protected:
-    CefSettingsMgr();
+    CefManager();
 public:
-    static CefSettingsMgr& Instance();
+    static CefManager& Instance();
+    static std::string cefVersion();
+    void populateSettings(CefSettings &settings);
 
     ///
     /// \brief 分离式时，除了浏览器进程之外的进程可执行体路径
@@ -41,5 +43,5 @@ public:
 	static CefString accept_language_list;
 };
 
-#endif  // CEFSETTINGS_MANAGER_H
+#endif  // CEF_MANAGER_H
 

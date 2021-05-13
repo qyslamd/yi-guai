@@ -9,8 +9,6 @@
 #include "toolbars/BookmarkBar.h"
 #include "toolbars/NotificationBar.h"
 #include "widgets/TabThumbnailWidget.h"
-
-#include "managers/MainWindowManager.h"
 #include "managers/AppCfgManager.h"
 
 #include "popups/HistoryPopup.h"
@@ -26,6 +24,7 @@
 #include <QToolButton>
 #include <QApplication>
 #include <QScreen>
+#include <QFile>
 #include <QDialog>
 #include <QPropertyAnimation>
 #include <QToolTip>
@@ -35,15 +34,23 @@
 #include <QtWin>
 #endif
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
     : QMainWindow(parent)
+    , created_cfg_(cfg)
 {
 //    setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowSystemMenuHint);
     initUi();
     setAppearance();
     initSignalSlot();
 
-    addNewPage("https://cn.bing.com/");
+    auto url = cfg.url;
+    if(url.isEmpty()){
+        url = AppCfgMgr::homePageUrl();
+        if(url.isEmpty()){
+           url = "https://cn.bing.com/";
+        }
+    }
+    addNewPage(url);
 }
 
 MainWindow::~MainWindow()
@@ -206,7 +213,8 @@ void MainWindow::initUi()
     }
 
     QPalette pl = palette();
-    QColor activeColor("#F08080"), inActiveColor("#F5F5F5");    // CECECE E8E8E8
+    QColor activeColor("#F08080"), inActiveColor = activeColor;    // CECECE E8E8E8
+    inActiveColor.setAlphaF(0.7);
     if(UtilQt::dwmColorPrevalence()){
         activeColor = QtWin::realColorizationColor();
         activeColor.setAlphaF(1);
@@ -225,7 +233,7 @@ void MainWindow::initUi()
     layout_ = new QVBoxLayout;
     btn_dock_tabs_ = new QToolButton;
     btn_dock_tabs_->setToolTip(tr("open vertical tabs"));
-    tab_bar_ = new TabBar;
+    tab_bar_ = new TabBar(created_cfg_.is_inprivate);
     btn_add_page_ = new QToolButton;
     btn_add_page_->setToolTip(tr("Add a tab page"));
     navi_bar_ = new NaviBar;
@@ -275,6 +283,14 @@ void MainWindow::setAppearance()
     btn_add_page_->setIconSize(iconSize);
     btn_dock_tabs_->setIcon(QIcon(":/icons/resources/imgs/normal_pagelist_hide.png"));
     btn_add_page_->setIcon(QIcon(":/icons/resources/imgs/addb_30px.png"));
+
+    if(created_cfg_.is_inprivate){
+        QFile file(":/styles/resources/styles/inprivate.qss");
+        if(file.open(QIODevice::ReadOnly)){
+            auto all = file.readAll();
+            setStyleSheet(QString::fromUtf8(all));
+        }
+    }
 }
 
 void MainWindow::initSignalSlot()
@@ -375,6 +391,7 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
     if(cmd == NaviBarCmd::Navigate)
     {
         auto url = UtilQt::check_url(para.toString());
+        url = para.toString();
         if(page){
             page->getBrowserWidget()->Navigate(url);
         }
@@ -421,9 +438,14 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         }
         addNewPage(url, true);
     } else if(cmd == NaviBarCmd::NewWindow){
-        MainWndMgr::Instance().createWindow();
-    } else if(cmd == NaviBarCmd::NewInprivateWindow) {
-        qInfo()<<__FUNCTION__<<"TODO:";
+        MainWndMgr::Instance().createWindow(MainWndCfg());
+    } else if(cmd == NaviBarCmd::NewInprivateWindow)
+    {
+        auto rect = MainWndMgr::Instance().lastWindowGeometry();
+        rect.setX(rect.x() + 18);
+        rect.setY(rect.y() + 30);
+        MainWndCfg cfg{true, false, false,rect, ""};
+        MainWndMgr::Instance().createWindow(cfg);
     }else if(cmd == NaviBarCmd::QuitApp) {
         MainWndMgr::Instance().closeAllWindows();
     }

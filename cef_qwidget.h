@@ -13,7 +13,7 @@ class CefQWidget : public QWidget, public BrowserWindow::Delegate
 {
     Q_OBJECT
 public:
-    explicit CefQWidget(const QString &startup_url, QWidget *parent = nullptr);
+    explicit CefQWidget(const QString &url, QWidget *parent = nullptr);
     CefQWidget(CefWindowInfo &windowInfo, CefRefPtr<CefClient> &client, CefBrowserSettings &settings, QWidget *parent = nullptr);
     ~CefQWidget();
 

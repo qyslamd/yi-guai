@@ -23,9 +23,11 @@ win32{
 }
 
 SOURCES += \
+    browser/client_switches.cc \
+    browser/scheme_handler.cpp \
     managers/AddrInputManager.cpp \
     managers/AppCfgManager.cpp \
-    managers/CefSettingsManager.cpp \
+    managers/CefManager.cpp \
     managers/FaviconManager.cpp \
     managers/MainWindowManager.cpp \
     page.cpp \
@@ -60,10 +62,12 @@ SOURCES += \
 
 
 HEADERS += \
+    browser/client_switches.h \
+    browser/scheme_handler.h \
     globaldef.h \
     managers/AddrInputManager.h \
     managers/AppCfgManager.h \
-    managers/CefSettingsManager.h \
+    managers/CefManager.h \
     managers/FaviconManager.h \
     managers/MainWindowManager.h \
     page.h \

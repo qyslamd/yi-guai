@@ -1,0 +1,41 @@
+/******************************************
+Scope:Class NavigationBar and it's children
+*/
+.NaviBar{
+    background-color:#404244;
+}
+
+/******************************************
+Scope:Class AddressBar and it's children
+*/
+.AddressBar{
+background: #242424;
+    color:white;
+}
+.AddressBar:hover{
+    border:1px solid #DCDCDC;
+    color:white;
+}
+
+.AddressBar:focus{
+    border:2px solid #DCDCDC;
+}
+
+/******************************************
+Scope:Class AddressBar and it's children
+*/
+QMenu {
+    background-color: #ABABAB; /* sets background of the menu */
+    border: 1px solid black;
+}
+
+QMenu::item {
+    /* sets background of menu item. set this to something non-transparent
+        if you want menu color and menu item color to be different */
+    background-color: transparent;
+}
+
+QMenu::item:selected { /* when user selects item using mouse or keyboard */
+    background-color: #654321;
+}
+

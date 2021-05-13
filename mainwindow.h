@@ -5,6 +5,7 @@
 #include <QMap>
 
 #include "browser/cef_client_handler.h"
+#include "managers/MainWindowManager.h"
 #include "globaldef.h"
 
 class QVBoxLayout;
@@ -26,7 +27,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 public:
 
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(const MainWindowConfig &cfg, QWidget *parent = nullptr);
     ~MainWindow();
 
     int addNewPage(const QString &url, bool switchTo = false);
@@ -45,6 +46,8 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
 private:
+    MainWindowConfig created_cfg_;
+
     QVBoxLayout *layout_;   /*整个窗口的布局*/
 
     QHBoxLayout* tabbar_layout_;    /*标签栏布局*/

@@ -9,12 +9,12 @@
 #include <QApplication>
 
 
-BrowserWindow::BrowserWindow(Delegate *delagate, const std::string &startup_url)
+BrowserWindow::BrowserWindow(Delegate *delagate, const std::string &url)
     : delegate_(delagate)
     , is_closing_(false)
 {
     DCHECK(delegate_);
-    client_handler_ = new CefClientHandler(this, startup_url);
+    client_handler_ = new CefClientHandler(this, url);
 }
 
 BrowserWindow::~BrowserWindow()

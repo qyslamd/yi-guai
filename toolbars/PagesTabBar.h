@@ -12,7 +12,7 @@ class TabBar final: public QTabBar
 {
     Q_OBJECT
 public:
-    TabBar(QWidget *parent = nullptr);
+    TabBar(bool inprivate, QWidget *parent = nullptr);
     bool event(QEvent *e) override;
     int insertTab(int index, const QString &text);
 signals:

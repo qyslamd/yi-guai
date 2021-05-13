@@ -45,7 +45,7 @@ public:
 
     // Constructor may be called on any thread.
     // |delegate| must outlive this object.
-    explicit BrowserWindow(Delegate* delegate, const std::string &startup_url);
+    explicit BrowserWindow(Delegate* delegate, const std::string &url);
 
     ~BrowserWindow();
     // Create a new browser and native window.

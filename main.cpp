@@ -15,8 +15,9 @@
 #include <include/cef_sandbox_win.h>
 
 #include "managers/MainWindowManager.h"
-#include "managers/CefSettingsManager.h"
+#include "managers/CefManager.h"
 #include "browser/cef_app_browser.h"
+#include "browser/scheme_handler.h"
 #include "browser/message_loop/main_message_loop.h"
 #include "browser/message_loop/main_message_loop_multithreaded_win.h"
 #include "browser/message_loop/main_message_loop_external_pump.h"
@@ -77,7 +78,13 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    MainWndMgr::Instance().createWindow();
+    MainWindowConfig cfg{
+        false,
+        false,
+        false,
+        QRect(),
+        QString("https://www.baidu.com/")};
+    MainWndMgr::Instance().createWindow(cfg);
 
     message_loop->Run();
 
@@ -121,13 +128,9 @@ int initializeCef(int argc, char *argv[])
 #endif
 
     // Specify CEF global settings here.
-    CefSettingsMgr::Instance();
     CefSettings settings;
-    CefString(&settings.cache_path) = CefSettingsMgr::cache_path;
-    CefString(&settings.locale) = CefSettingsMgr::locale;
-    CefString(&settings.accept_language_list) = CefSettingsMgr::accept_language_list;
+    CefManager::Instance().populateSettings(settings);
 
-    settings.log_severity = LOGSEVERITY_WARNING;
 #ifdef OS_WIN
     settings.multi_threaded_message_loop =
             command_line->HasSwitch("multi-threaded-message-loop");
@@ -140,8 +143,6 @@ int initializeCef(int argc, char *argv[])
     }
     settings.external_message_pump = true;
 #endif
-//    settings.log_severity = LOGSEVERITY_WARNING;
-
     if (command_line->HasSwitch("enable-chrome-runtime")) {
         // Enable experimental Chrome runtime. See issue #2969 for details.
         settings.chrome_runtime = true;
@@ -182,5 +183,7 @@ int initializeCef(int argc, char *argv[])
     }else{
         qInfo()<<"CefInitialize initialized succeed!";
     }
+
+    custom_scheme::RegisterSchemeHandlers();
     return 0;
 }

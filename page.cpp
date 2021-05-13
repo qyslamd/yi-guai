@@ -10,7 +10,7 @@
 #include <QUrl>
 #include <QStyle>
 
-Page::Page(const QString &startup_url, QWidget *parent)
+Page::Page(const QString &url, QWidget *parent)
     : QMainWindow(parent)
     , main_layout_(new QVBoxLayout)
     , dock_dev_tool_(new QDockWidget)
@@ -20,7 +20,7 @@ Page::Page(const QString &startup_url, QWidget *parent)
     if(!centralWidget()){
         setCentralWidget(new QWidget);
     }
-    browser_widget_ = new CefQWidget(startup_url, this);
+    browser_widget_ = new CefQWidget(url, this);
 
     main_layout_->addWidget(browser_widget_);
     centralWidget()->setLayout(main_layout_);

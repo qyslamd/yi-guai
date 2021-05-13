@@ -9,17 +9,21 @@ class QSettings;
 class AppCfgMgr : public QObject
 {
     Q_OBJECT
-    explicit AppCfgMgr(QObject *parent = nullptr);
-    AppCfgMgr(const AppCfgMgr &);
-    AppCfgMgr& operator=(const AppCfgMgr &);
+public:
+    static QByteArray windowGeometry();
+    static void setWindowGeometry(const QByteArray &data);
+
+    static QString homePageUrl();
+    static void setHomePageUrl(const QString &data);
+
+    static QString newTabPageUrl();
+    static void setNewTabPageUrl(const QString &data);
+
 public:
     static AppCfgMgr& instance(){
         static AppCfgMgr inst;
         return inst;
     }
-    static QByteArray windowGeometry();
-    static void setWindowGeometry(const QByteArray &data);
-
     ~AppCfgMgr() {
         qInfo()<<__FUNCTION__;
     }
@@ -39,6 +43,10 @@ private:
                   const QVariant &data);
     void setValue(const QString &key,
                   const QVariant &data);
+
+    explicit AppCfgMgr(QObject *parent = nullptr);
+    AppCfgMgr(const AppCfgMgr &);
+    AppCfgMgr& operator=(const AppCfgMgr &);
 };
 
 #endif // APPCFGMANAGER_H

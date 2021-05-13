@@ -7,12 +7,12 @@
 #include <QContextMenuEvent>
 #include <QToolButton>
 
-TabBar::TabBar(QWidget *parent)
+TabBar::TabBar(bool inprivate, QWidget *parent)
     : QTabBar(parent)
 {
     setDrawBase(false);
     setTabsClosable(true);
-    setStyle(new TabbarStyle(false));
+    setStyle(new TabbarStyle(inprivate));
 
     menu_ = new QMenu(this);
     act_new_tab = new QAction( tr("Create a new tab page"),this);

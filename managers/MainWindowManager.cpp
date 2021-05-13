@@ -17,16 +17,23 @@ MainWndMgr& MainWndMgr::Instance(){
     return inst;
 }
 
-void MainWndMgr::createWindow()
+void MainWndMgr::createWindow(const MainWindowConfig &cfg)
 {
-    MainWindow *window = new MainWindow;
+    MainWindow *window = new MainWindow(cfg);
     window->setAttribute(Qt::WA_DeleteOnClose, true);
     connect(window, &MainWindow::destroyed, this, [=](){
         windows_.remove(window);
     });
 
     windows_.insert(window);
-    window->show();
+    if(!cfg.bounds.isEmpty())
+    {
+        window->setGeometry(cfg.bounds);
+    }
+    if(!cfg.initially_hidden)
+    {
+        window->show();
+    }
 }
 
 QRect MainWndMgr::lastWindowGeometry() const

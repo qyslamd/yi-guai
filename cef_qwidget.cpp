@@ -25,14 +25,14 @@
 #include "managers/MainWindowManager.h"
 #include "utils/util_qt.h"
 
-CefQWidget::CefQWidget(const QString &startup_url, QWidget *parent)
+CefQWidget::CefQWidget(const QString &url, QWidget *parent)
     : QWidget(parent)
     , window_(new QWindow)
     , qwindow_containter_(nullptr)
     , layout_(new QHBoxLayout(this))
 {
     newly_created_ = true;
-    browser_window_.reset(new BrowserWindow(this, startup_url.toStdString()));
+    browser_window_.reset(new BrowserWindow(this, url.toStdString()));
     initUi();
 }
 

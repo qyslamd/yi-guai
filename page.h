@@ -17,7 +17,7 @@ class Page : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit Page(const QString &startup_url, QWidget *parent = nullptr);
+    explicit Page(const QString &url, QWidget *parent = nullptr);
     Page(CefQWidget *browser, QWidget *parent = nullptr);
 
     CefQWidget* getBrowserWidget();

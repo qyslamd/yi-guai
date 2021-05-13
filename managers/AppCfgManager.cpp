@@ -27,6 +27,26 @@ void AppCfgMgr::setWindowGeometry(const QByteArray &data)
     instance().setValue("General","WindowPos", data);
 }
 
+QString AppCfgMgr::homePageUrl()
+{
+    return instance().value("General","HomePage", "").toString();
+}
+
+void AppCfgMgr::setHomePageUrl(const QString &data)
+{
+    instance().setValue("General","HomePage", data);
+}
+
+QString AppCfgMgr::newTabPageUrl()
+{
+    return instance().value("General","NewPageUrl", "").toString();
+}
+
+void AppCfgMgr::setNewTabPageUrl(const QString &data)
+{
+    instance().setValue("General","NewPageUrl", data);
+}
+
 QVariant AppCfgMgr::value(const QString &group,
                           const QString &key,
                           const QVariant &defualt)
