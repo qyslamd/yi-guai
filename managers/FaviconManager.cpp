@@ -1,9 +1,9 @@
 ﻿#include "FaviconManager.h"
 
+#include <QtDebug>
 #include <QDir>
 #include <QFileInfo>
 #include <QUrl>
-#include <QStandardPaths>
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonParseError>
@@ -66,12 +66,12 @@ void FaviconMgr::loadIcons()
 
     QJsonObject rootJsonObj;
     QJsonParseError jsonError;
-    QJsonDocument doucment = QJsonDocument::fromJson(data, &jsonError);
-    if (!doucment.isNull() && (jsonError.error == QJsonParseError::NoError))
+    QJsonDocument document = QJsonDocument::fromJson(data, &jsonError);
+    if (!document.isNull() && (jsonError.error == QJsonParseError::NoError))
     {
-        if (doucment.isObject())
+        if (document.isObject())
         {
-            rootJsonObj = doucment.object();
+            rootJsonObj = document.object();
         }
     }
 

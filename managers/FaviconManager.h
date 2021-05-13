@@ -2,7 +2,7 @@
 #define FAVICONMANAGER_H
 
 #include <QObject>
-#include <QtDebug>
+#include <QMap>
 
 class FaviconMgr : public QObject
 {
@@ -21,8 +21,8 @@ public:
 signals:
     void iconChanged(const QString &url);
 private:
-    QString record_file_path_;  // 记录文件本机路径
-    QMap<QString, QString> icons_cache_;    // 缓存
+    QString record_file_path_;
+    QMap<QString, QString> icons_cache_;
 
     void loadIcons();
     void saveToFile();

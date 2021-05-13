@@ -23,6 +23,7 @@ win32{
 }
 
 SOURCES += \
+    managers/AddrInputManager.cpp \
     managers/AppCfgManager.cpp \
     managers/CefSettingsManager.cpp \
     managers/FaviconManager.cpp \
@@ -60,6 +61,7 @@ SOURCES += \
 
 HEADERS += \
     globaldef.h \
+    managers/AddrInputManager.h \
     managers/AppCfgManager.h \
     managers/CefSettingsManager.h \
     managers/FaviconManager.h \

@@ -1,5 +1,4 @@
 #include "AddressBar.h"
-#include "utils/util_qt.h"
 
 #include <QCompleter>
 #include <QHBoxLayout>
@@ -14,6 +13,9 @@
 #include <QTimer>
 #include <QGraphicsDropShadowEffect>
 #include <QStringListModel>
+
+#include "utils/util_qt.h"
+#include "managers/AddrInputManager.h"
 
 AddressBar::AddressBar(QWidget *parent)
     : QLineEdit(parent)
@@ -89,6 +91,7 @@ void AddressBar::initUi()
     setGraphicsEffect(shadow);
 
     completer_->setModel(model_);
+    model_->setStringList(AddrInputMgr::Instance().inputList());
     setCompleter(completer_);
     connect(this, &QLineEdit::editingFinished, this, &AddressBar::onEditingFinishsed);
 
@@ -127,11 +130,11 @@ void AddressBar::onEditingFinishsed()
     auto text = this->text();
     if(QString::compare(text, QString("")) != 0)
     {
-        bool is_contains = word_list_.contains(text, Qt::CaseInsensitive);
-        if(!is_contains)
+        const auto list = AddrInputMgr::Instance().inputList();
+        if(!list.contains(text, Qt::CaseInsensitive))
         {
-            word_list_<<text;
-            model_->setStringList(word_list_);
+            AddrInputMgr::Instance().addRecord(text);
+            model_->setStringList(AddrInputMgr::Instance().inputList());
         }
     }
 }

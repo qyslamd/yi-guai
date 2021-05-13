@@ -43,8 +43,15 @@ CefSettingsMgr& CefSettingsMgr::Instance()
 CefSettingsMgr::CefSettingsMgr()
 {
     auto dataPath = UtilQt::appDataPath();
+    QDir dir(dataPath);
+    const char * sudDir = "CEF";
+    if(!dir.cd(sudDir)){
+        dir.mkdir(sudDir);
+    }
+    dir.cd(sudDir);
+    auto cachePath = dir.absolutePath();
 
-    cache_path.FromString(dataPath.toStdString());
+    cache_path.FromString(cachePath.toStdString());
 
     locale.FromString("zh-CN");
     accept_language_list.FromString("zh-CN");

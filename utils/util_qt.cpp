@@ -6,6 +6,7 @@
 #include <QScreen>
 #include <QApplication>
 #include <QStandardPaths>
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 
@@ -160,6 +161,20 @@ namespace UtilQt {
         return loc;
     }
 
+    const QString userDataPath(const QString &uerName)
+    {
+        auto dataPath = UtilQt::appDataPath();
+        if(uerName.isEmpty()){
+           return dataPath;
+        }
+        QDir dir(dataPath);
+        if(!dir.cd(uerName)){
+            dir.mkdir(uerName);
+        }
+        dir.cd(uerName);
+        return dir.absolutePath();
+    }
+
     QByteArray readFileUtf8(const QString &path)
     {
         QFile file(path);
@@ -222,6 +237,19 @@ namespace UtilQt {
         QString subFix = QFileInfo(url).suffix();
         QString name = qUrl.host();
         return name + "." + subFix;
+    }
+
+    long long writeDataToFile(const QString &path, const QByteArray &data)
+    {
+        QFile file(path);
+
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
+            return 0;
+
+        file.write(data.data());
+        file.close();
+
+        return data.size();
     }
 
 #endif

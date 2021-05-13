@@ -23,10 +23,12 @@ namespace UtilQt {
 #endif
 
     extern const QString appDataPath();
+    extern const QString userDataPath();
     extern std::string GetFileExtension(const std::string& path);
     extern QString readFileString(const QString &path);
     extern QByteArray readFileUtf8(const QString &path);
     extern long long writeStringToFile(const QString &path, const QString &data);
+    extern long long writeDataToFile(const QString &path, const QByteArray &data);
     extern QString GetFileNameFromURL(const QString &url);
 }
 

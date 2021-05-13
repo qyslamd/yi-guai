@@ -34,8 +34,6 @@ private:
 
     QToolButton *internal_btn_siteInfo_ = nullptr;
 
-    QStringList word_list_;
-
 private:
     void initUi();
     void setAppearance();
