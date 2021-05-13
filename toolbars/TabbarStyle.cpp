@@ -41,43 +41,32 @@ QRect TabbarStyle::subElementRect(QStyle::SubElement subElement,
                                   const QStyleOption *option,
                                   const QWidget *widget) const
 {
-    //    return QProxyStyle::subElementRect(subElement, option, widget);
-    //    auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
-        switch (subElement) {
-        case QStyle::SE_TabBarTabLeftButton:
-        {
-            auto rect = QProxyStyle::subElementRect(subElement, option, widget);
-            rect.setWidth(16);
-            rect.setX(rect.x() + 2);
-            rect.setHeight(16);
-            return rect;
+    const QStyleOptionTab *tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
+//    return QProxyStyle::subElementRect(subElement, option, widget);
+    switch (subElement) {
+    case QStyle::SE_TabBarTabLeftButton:
+    {
+        auto iconSize = tabOption->iconSize;
+        auto rect = QProxyStyle::subElementRect(QStyle::SE_TabBarTabLeftButton, option, widget);
+        rect.setWidth(16);
+        rect.setX(rect.x() + 2 + iconSize.width());
+        rect.setHeight(16);
+        return rect;
+    }
+        break;
+//    case QStyle::SE_TabBarTabText:
+//    {
+//        auto leftButtonRect = subElementRect(QStyle::SE_TabBarTabLeftButton, option, widget);
+//        auto textRect = QProxyStyle::subElementRect(subElement, option, widget);
 
-    //        auto position = tabOption->position;
-    //        if(position == QStyleOptionTab::Beginning ||position == QStyleOptionTab::OnlyOneTab ){
-    //            auto rect = QProxyStyle::subElementRect(subElement, option, widget);
-    //            return rect.marginsAdded(QMargins(-4,0,-4,0));
-    //        }
-        }
-            break;
-        case QStyle::SE_TabBarTabText:
-        {
-            auto leftButtonRect = this->subElementRect(QStyle::SE_TabBarTabLeftButton, option, widget);
-            auto textRect = QProxyStyle::subElementRect(subElement, option, widget);
-
-            textRect.setX(leftButtonRect.x() + leftButtonRect.width());
-            return textRect;
-
-    //        auto position = tabOption->position;
-    //        if(position == QStyleOptionTab::Beginning ||position == QStyleOptionTab::OnlyOneTab ){
-    //            auto rect = QProxyStyle::subElementRect(subElement, option, widget);
-    //            return rect.marginsAdded(QMargins(-4,0,-4,0));
-    //        }
-        }
-            break;
-        default:
-            break;
-        }
-        return QProxyStyle::subElementRect(subElement, option, widget);
+//        textRect.setX(leftButtonRect.x() + leftButtonRect.width());
+//        return textRect;
+//    }
+//        break;
+    default:
+        break;
+    }
+    return QProxyStyle::subElementRect(subElement, option, widget);
 }
 
 void TabbarStyle::drawTabBarTabLabel(const QStyleOption *option,
@@ -97,14 +86,22 @@ void TabbarStyle::drawTabBarTabLabel(const QStyleOption *option,
     linearGrad.setColorAt(1, color2);
 
     auto iconSize = tabOption->iconSize;
+    auto pixmap = tabOption->icon.pixmap(iconSize);
+#if 0
     QRect pR(textRect.x() - iconSize.width() / dpi_ - 2,
              textRect.y() + ( textRect.height() - iconSize.height() / dpi_ ) / 2,
              iconSize.width() / dpi_,
              iconSize.height() / dpi_);
-    auto pixmap = tabOption->icon.pixmap(iconSize);
+#else
+    auto rectAll = tabOption->rect;
+    QRect pR(rectAll.x() + iconSize.width() / 2,
+             rectAll.y() + ( rectAll.height() - iconSize.height()) / 2,
+             iconSize.width() / dpi_,
+             iconSize.height() / dpi_);
+#endif
     if(pixmap.isNull())
     {
-        painter->drawPixmap(pR, QPixmap(":/Resources/imgs/default_favicon_1x.png"));
+        painter->drawPixmap(pR, w->style()->standardPixmap(QStyle::SP_FileIcon));
     }
     else
     {
@@ -170,16 +167,21 @@ void TabbarStyle::drawTabBarTabShape(const QStyleOption *option,
             brush = QBrush(QColor("#3B3B3B"));
         }else{
             brush = QBrush(QColor("#D3D3D3")); //#F7F7F7
-            if(0){
+            if(1){
                 const QStyleOptionTab *tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
                 QRectF rect = tabOption->rect;
-                QLinearGradient linearGrad(QPointF(rect.x() + rect.width() / 2,
-                                                   rect.y()),
-                                           QPointF(rect.x() + rect.width() / 2,
-                                                   rect.y() + rect.height())
+                QLinearGradient linearGrad(QPointF(rect.x(),
+                                                   rect.y() + rect.height() /2),
+                                           QPointF(rect.x() + rect.width() ,
+                                                   rect.y() + rect.height() /2)
                                            );
-                linearGrad.setColorAt(0, Qt::white);
-                linearGrad.setColorAt(1, QColor(250,250,250));
+                linearGrad.setColorAt(0, "#FF0000");
+                linearGrad.setColorAt(0.2, "#FF7F00");
+                linearGrad.setColorAt(0.4, "#FFFF00");
+                linearGrad.setColorAt(0.6, "#00FF00");
+                linearGrad.setColorAt(0.72, "#00FFFF");
+                linearGrad.setColorAt(0.86, "#0000FF");
+                linearGrad.setColorAt(1, "#8B00FF");
                 brush = QBrush(linearGrad); // 拷贝赋值
             }
         }
@@ -187,15 +189,34 @@ void TabbarStyle::drawTabBarTabShape(const QStyleOption *option,
     }else if(state.testFlag(QStyle::State_MouseOver))
     {
         QPainterPath path = getHoveredShape(option, scale);
-        QColor color;
+        auto brush = painter->brush();
         if(isInprivate_){
-            color = QColor(89,89,89);
+            auto color = QColor(89,89,89);
             color.setAlphaF(0.3);
+            brush = color;
         }else{
-            color = QColor(255,255,255);
+            auto color = QColor(255,255,255);
             color.setAlphaF(0.7);
+            brush = color;
+            if(1){
+                const QStyleOptionTab *tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
+                QRectF rect = tabOption->rect;
+                QLinearGradient linearGrad(QPointF(rect.x() + rect.width() / 2,
+                                                   rect.y()),
+                                           QPointF(rect.x() + rect.width() / 2,
+                                                   rect.y() + rect.height())
+                                           );
+                linearGrad.setColorAt(0, "#FF0000");
+                linearGrad.setColorAt(0.2, "#FF7F00");
+                linearGrad.setColorAt(0.4, "#FFFF00");
+                linearGrad.setColorAt(0.6, "#00FF00");
+                linearGrad.setColorAt(0.72, "#00FFFF");
+                linearGrad.setColorAt(0.86, "#0000FF");
+                linearGrad.setColorAt(1, "#8B00FF");
+                brush = QBrush(linearGrad); // 拷贝赋值
+            }
         }
-        drawShape(path, color);
+        drawShape(path, brush);
     }else
     {
         auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);

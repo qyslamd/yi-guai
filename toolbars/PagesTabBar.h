@@ -14,6 +14,7 @@ class TabBar final: public QTabBar
 public:
     TabBar(QWidget *parent = nullptr);
     bool event(QEvent *e) override;
+    int insertTab(int index, const QString &text);
 signals:
     void menuTriggered(TabBarCmd cmd, const QVariant &data);
     void showPreview(const QPoint &g_pos, const int index);

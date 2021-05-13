@@ -6,8 +6,6 @@
 MainWndMgr::MainWndMgr(QObject *parent)
     : QObject(parent)
 {
-    connect(qApp, &QApplication::aboutToQuit, this, &MainWndMgr::closeAllWindows);
-
 }
 
 MainWndMgr::~MainWndMgr() {
@@ -26,6 +24,7 @@ void MainWndMgr::createWindow()
     connect(window, &MainWindow::destroyed, this, [=](){
         windows_.remove(window);
     });
+
     windows_.insert(window);
     window->show();
 }

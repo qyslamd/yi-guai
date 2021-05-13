@@ -49,7 +49,7 @@ public:
 
     ~BrowserWindow();
     // Create a new browser and native window.
-    void CreateBrowser(ClientWindowHandle parent_handle,
+    bool CreateBrowser(ClientWindowHandle parent_handle,
                        const CefRect& rect,
                        const CefBrowserSettings& settings,
                        CefRefPtr<CefDictionaryValue> extra_info,

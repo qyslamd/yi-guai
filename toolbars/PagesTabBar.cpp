@@ -1,9 +1,11 @@
 #include "PagesTabBar.h"
 #include "TabbarStyle.h"
 
+#include <QtDebug>
 #include <QMenu>
 #include <QAction>
 #include <QContextMenuEvent>
+#include <QToolButton>
 
 TabBar::TabBar(QWidget *parent)
     : QTabBar(parent)
@@ -18,9 +20,10 @@ TabBar::TabBar(QWidget *parent)
     act_reload_  = new QAction( tr("Reload"),this);
     act_reload_->setShortcut(QKeySequence(tr("Ctrl+R")));
     act_mute_ = new QAction( tr("Mute the page"),this);
+    act_mute_->setIcon(QIcon(":/icons/resources/imgs/normal_opensound.png"));
     act_close_this_     = new QAction( tr("Close this tab page"),this);
     act_close_this_->setShortcut(QKeySequence(tr("Ctrl+W")));
-    act_close_others_   = new QAction(tr("Close other tab-pages") ,this);
+    act_close_others_   = new QAction(tr("Close other tab pages") ,this);
     act_close_right_    = new QAction(tr("Close all on the right"), this);
     act_reopen_closed_ = new QAction(tr("Reopen closed tab pages"), this);
     act_vertical_tab_mode_ = new QAction(tr("Open vertical tab"), this);
@@ -76,12 +79,22 @@ bool TabBar::event(QEvent *e)
         auto rect = tabRect(index);
         auto pos = QPoint(rect.x() + rect.width() / 2, rect.y() + rect.height());
         pos = mapToGlobal(pos);
-        emit showPreview(pos, index);
+//        emit showPreview(pos, index);
     }break;
     default:
         break;
     }
     return QTabBar::event(e);
+}
+
+int TabBar::insertTab(int index, const QString &text)
+{
+    int ret = QTabBar::insertTab(index, text);
+    QToolButton *btn = new QToolButton;
+    btn->setToolTip(tr("mute this page"));
+    btn->setIcon(QIcon(":/icons/resources/imgs/normal_opensound.png"));
+    setTabButton(ret, QTabBar::LeftSide, btn);
+    return ret;
 }
 
 void TabBar::timerEvent(QTimerEvent *event)

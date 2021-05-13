@@ -6,10 +6,12 @@ DESTDIR = $$OUT_PWD/bin
 TARGET = YiGuai
 
 win32{
-    VERSION = 4.0.2.666
+    QT += winextras
+    VERSION = 0.0.1.12
+
     RC_ICONS = icon_64px.ico
     # 公司名称
-    QMAKE_TARGET_COMPANY = "zhouyohu@1663.com"
+    QMAKE_TARGET_COMPANY = "zhouyohu@163.com"
     # 产品名称
     QMAKE_TARGET_PRODUCT = "YiGuai Web Browser"
     # 文件说明
@@ -33,6 +35,7 @@ SOURCES += \
     toolbars/AddressBar.cpp \
     toolbars/BookmarkBar.cpp \
     toolbars/NavigateBar.cpp \
+    toolbars/NotificationBar.cpp \
     toolbars/PagesTabBar.cpp \
     toolbars/TabbarStyle.cpp \
     widgets/Dp_Widget_Caption.cpp \
@@ -69,6 +72,7 @@ HEADERS += \
     toolbars/AddressBar.h \
     toolbars/BookmarkBar.h \
     toolbars/NavigateBar.h \
+    toolbars/NotificationBar.h \
     toolbars/PagesTabBar.h \
     toolbars/TabbarStyle.h \
     widgets/Dp_Widget_Caption.h \
@@ -94,6 +98,7 @@ FORMS += \
     popup.ui \
     popups/HistoryPopup.ui \
     popups/PopupBase.ui \
+    toolbars/NotificationBar.ui \
     widgets/TabThumbnailWidget.ui \
     widgets/framewidget.ui
 
@@ -107,8 +112,6 @@ msvc {
     QMAKE_CXXFLAGS += /utf-8
 }
 win32{
-    QT += winextras
-
     equals(QT_ARCH,i386){
         CEF_DEP_PATH = $$PWD/../cef_depends/cef_4240_chromium_86/x86
     }else{

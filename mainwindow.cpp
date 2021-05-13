@@ -7,6 +7,7 @@
 #include "toolbars/PagesTabBar.h"
 #include "toolbars/NavigateBar.h"
 #include "toolbars/BookmarkBar.h"
+#include "toolbars/NotificationBar.h"
 #include "widgets/TabThumbnailWidget.h"
 
 #include "managers/MainWindowManager.h"
@@ -31,6 +32,7 @@
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
+#include <QtWin>
 #endif
 
 MainWindow::MainWindow(QWidget *parent)
@@ -46,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-
+    qInfo()<<__FUNCTION__;
 }
 
 int MainWindow::addNewPage(const QString &url, bool switchTo)
@@ -203,10 +205,17 @@ void MainWindow::initUi()
         first_window = false;
     }
 
-//    QPalette pl = palette();
-//    pl.setColor(QPalette::Active, QPalette::Window, QColor("#CECECE"));
-//    pl.setColor(QPalette::Inactive, QPalette::Window, QColor("#E8E8E8"));
-//    setPalette(pl);
+    QPalette pl = palette();
+    QColor activeColor("#F08080"), inActiveColor("#F5F5F5");    // CECECE E8E8E8
+    if(UtilQt::dwmColorPrevalence()){
+        activeColor = QtWin::realColorizationColor();
+        activeColor.setAlphaF(1);
+        inActiveColor = activeColor;
+        inActiveColor.setAlphaF(0.7);
+    }
+    pl.setColor(QPalette::Active, QPalette::Window, activeColor);
+    pl.setColor(QPalette::Inactive, QPalette::Window, inActiveColor);
+    setPalette(pl);
 
     /*设置centralWidget*/
     if(!centralWidget()) {
@@ -221,6 +230,7 @@ void MainWindow::initUi()
     btn_add_page_->setToolTip(tr("Add a tab page"));
     navi_bar_ = new NaviBar;
     bookmark_bar_ = new BookmarkBar;
+    notify_bar_ = new NotificationBar;
     stack_browsers_ = new QStackedWidget;
     stack_browsers_->setLineWidth(0);
 
@@ -237,6 +247,7 @@ void MainWindow::initUi()
     layout_->addLayout(tabbar_layout_);
     layout_->addWidget(navi_bar_);
     layout_->addWidget(bookmark_bar_);
+    layout_->addWidget(notify_bar_);
     layout_->addWidget(stack_browsers_);
 
     centralWidget()->setLayout(layout_);
@@ -253,6 +264,8 @@ void MainWindow::initUi()
     history_popup_ = new HistoryPopup(this);
     history_popup_->resize(360, 600);
     history_popup_->installEventFilter(this);
+
+    notify_bar_->hide();
 }
 
 void MainWindow::setAppearance()
@@ -412,7 +425,7 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
     } else if(cmd == NaviBarCmd::NewInprivateWindow) {
         qInfo()<<__FUNCTION__<<"TODO:";
     }else if(cmd == NaviBarCmd::QuitApp) {
-        qInfo()<<__FUNCTION__<<"TODO:";
+        MainWndMgr::Instance().closeAllWindows();
     }
 }
 

@@ -9,7 +9,7 @@ font-family:"Microsoft Yahei";
 /******************************************
 Scope:Global Global QToolButton
 */
-/*QToolButton{
+QToolButton{
     border:none;
     border-radius:4px;
 }
@@ -21,11 +21,11 @@ QToolButton:hover{
 QToolButton:open{
     background: #6f8ee9;
     border:none;
-}*/
+}
 
 
 /******************************************
-Scope:Class AddressBar and it's children
+Scope:Class NavigationBar and it's children
 */
 .NaviBar{
 background-color:#FCFCFC;
@@ -68,4 +68,11 @@ Scope:Class TabBar and it's children
 .TabBar::close-button:hover {
     background-color:#CFCFCF;
     border-radius:8px;
+}
+
+/******************************************
+Scope:Class NotificationBar and it's children
+*/
+.NotificationBar{
+background-color:#FCFCFC;
 }

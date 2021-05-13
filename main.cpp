@@ -95,12 +95,12 @@ int main(int argc, char *argv[])
 void intializeQtApp(QApplication *app)
 {
     // 样式表
-//    QFile file(":/styles/resources/styles/normal.qss");
-//    if(file.open(QIODevice::ReadOnly | QIODevice::Text)){
-//        auto all = file.readAll();
-//        file.close();
-//        app->setStyleSheet(all);
-//    }
+    QFile file(":/styles/resources/styles/normal.qss");
+    if(file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        auto all = file.readAll();
+        file.close();
+        app->setStyleSheet(all);
+    }
 
     //翻译
     QTranslator *ts = new QTranslator(app);

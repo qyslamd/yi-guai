@@ -14,6 +14,7 @@
 #include <QStandardPaths>
 #include <QStyle>
 #include <QDir>
+#include <QMessageBox>
 
 #include <include/base/cef_logging.h>
 #include "mainwindow.h"
@@ -56,11 +57,6 @@ CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
 CefQWidget::~CefQWidget()
 {
     qInfo()<<__FUNCTION__;
-}
-
-void CefQWidget::setPage(Page *page)
-{
-    page_ = page;
 }
 
 void CefQWidget::Navigate(const QString &url)
@@ -293,7 +289,7 @@ void CefQWidget::onBrowserWindowLoadingStateChange(bool isLoading,
                                                    bool canGoForward)
 {
     emit browserLoadingStateChange(isLoading,
-                              canGoBack,
+                                   canGoBack,
                                    canGoForward);
 }
 
@@ -309,14 +305,14 @@ void CefQWidget::resizeEvent(QResizeEvent *event)
     case Empty:
     {
         auto handle = (HWND)window_->winId();
-        CefRect rect{x(), y(), width(), height()};  // 给个初始范围，不然浏览器创建完成后的移动窗口会出现黑色背景
+        CefRect rect{x(), y(), event->size().width(), event->size().height()};
         CefBrowserSettings browser_settings;
         browser_window_->CreateBrowser(handle,
                                        rect,
                                        browser_settings,
                                        nullptr,
                                        nullptr);
-        browser_state_ = Created;
+        browser_state_ = Creating;
     }break;
     case Creating:
         break;

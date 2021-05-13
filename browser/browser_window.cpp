@@ -22,7 +22,7 @@ BrowserWindow::~BrowserWindow()
     qInfo()<<__FUNCTION__;
 }
 
-void BrowserWindow::CreateBrowser(ClientWindowHandle parent_handle,
+bool BrowserWindow::CreateBrowser(ClientWindowHandle parent_handle,
                                   const CefRect &rect,
                                   const CefBrowserSettings &settings,
                                   CefRefPtr<CefDictionaryValue> extra_info,
@@ -34,14 +34,9 @@ void BrowserWindow::CreateBrowser(ClientWindowHandle parent_handle,
     RECT wnd_rect = {rect.x, rect.y, rect.x + rect.width, rect.y + rect.height};
     window_info.SetAsChild(parent_handle, wnd_rect);
 
-    if(!CefBrowserHost::CreateBrowser(window_info, client_handler_,
-                                  client_handler_->startup_url(), settings,
-                                  extra_info, request_context))
-    {
-       qInfo()<<__FUNCTION__<<"CefBrowserHost::CreateBrowser failed!";
-    }else{
-        qInfo()<<__FUNCTION__<<"CefBrowserHost::CreateBrowser ok!";
-    }
+    return CefBrowserHost::CreateBrowser(window_info, client_handler_,
+                                         client_handler_->startup_url(), settings,
+                                         extra_info, request_context);
 }
 
 void BrowserWindow::GetPopupConfig(ClientWindowHandle temp_handle,
@@ -52,15 +47,15 @@ void BrowserWindow::GetPopupConfig(ClientWindowHandle temp_handle,
     CEF_REQUIRE_UI_THREAD();
     client = client_handler_;
 
-    // The window will be properly sized after the browser is created.
-#if defined(OS_WIN)
     auto screen = qApp->primaryScreen();
     auto size = screen->availableSize();
+
+    // The window will be properly sized after the browser is created.
+#if defined(OS_WIN)
     RECT rect{0,0,size.width(),size.height()};
-//    ::GetWindowRect(temp_handle, &rect);
     windowInfo.SetAsChild(temp_handle, rect);
 #elif defined(OS_LINUX)
-    CefRect rect(0, 0, width, height);
+    CefRect rect(0, 0, size.width(), size.height());
     windowInfo.SetAsChild(temp_handle, rect);
 #endif
 }
@@ -72,17 +67,11 @@ void BrowserWindow::ShowPopup(ClientWindowHandle parent_handle,
                               size_t height)
 {
     REQUIRE_MAIN_THREAD();
-
-    //    HWND hwnd = GetWindowHandle();
-    //    if (hwnd) {
-    //        SetParent(hwnd, parent_handle);
-    //        SetWindowPos(hwnd, NULL, x, y, static_cast<int>(width),
-    //                     static_cast<int>(height), SWP_NOZORDER | SWP_NOACTIVATE);
-
-    //        const bool no_activate =
-    //                GetWindowLongPtr(parent_handle, GWL_EXSTYLE) & WS_EX_NOACTIVATE;
-    //        ShowWindow(hwnd, no_activate ? SW_SHOWNOACTIVATE : SW_SHOW);
-    //    }
+    Q_UNUSED(parent_handle);
+    Q_UNUSED(x);
+    Q_UNUSED(y);
+    Q_UNUSED(width);
+    Q_UNUSED(height);
 }
 
 CefRefPtr<CefBrowser> BrowserWindow::GetBrowser() const

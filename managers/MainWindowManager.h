@@ -17,11 +17,12 @@ public:
     ~MainWndMgr();
     void createWindow();
     QRect lastWindowGeometry() const;
+    void closeAllWindows();
 signals:
+
 private:
     QSet<MainWindow *> windows_;
 
-    void closeAllWindows();
 
 };
 

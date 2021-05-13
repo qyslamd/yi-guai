@@ -17,8 +17,6 @@ public:
     CefQWidget(CefWindowInfo &windowInfo, CefRefPtr<CefClient> &client, CefBrowserSettings &settings, QWidget *parent = nullptr);
     ~CefQWidget();
 
-    void setPage(Page *page);
-
     void Navigate(const QString &url);
     void GoBack();
     void GoForward();
@@ -74,8 +72,6 @@ private:
     scoped_ptr<BrowserWindow> browser_window_;
     QWidget *qwindow_containter_;
     QHBoxLayout *layout_;
-
-    Page * page_ = nullptr;
 
 private:
     void initUi();

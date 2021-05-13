@@ -16,11 +16,11 @@ Page::Page(const QString &startup_url, QWidget *parent)
     , dock_dev_tool_(new QDockWidget)
     , site_info_popup_(new SiteInfoPopup(this))
 {
+    setMinimumHeight(100);
     if(!centralWidget()){
         setCentralWidget(new QWidget);
     }
     browser_widget_ = new CefQWidget(startup_url, this);
-    browser_widget_->setPage(this);
 
     main_layout_->addWidget(browser_widget_);
     centralWidget()->setLayout(main_layout_);
@@ -38,6 +38,7 @@ Page::Page(CefQWidget*browser, QWidget *parent)
     , dock_dev_tool_(new QDockWidget)
     , site_info_popup_(new SiteInfoPopup(this))
 {
+    setMinimumHeight(100);
     if(!centralWidget()){
         setCentralWidget(new QWidget);
     }

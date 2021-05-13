@@ -13,6 +13,7 @@ class QToolButton;
 class TabBar;
 class NaviBar;
 class BookmarkBar;
+class NotificationBar;
 class QStackedWidget;
 class QStatusBar;
 class Page;
@@ -52,6 +53,7 @@ private:
     QToolButton *btn_add_page_ = nullptr; /*添加新标签按钮*/
     NaviBar *navi_bar_ = nullptr; /*导航栏*/
     BookmarkBar *bookmark_bar_ = nullptr; /*书签栏*/
+    NotificationBar *notify_bar_ = nullptr; /*通知栏*/
     QStackedWidget *stack_browsers_ = nullptr;    /*浏览器窗口栈*/
     Tab_Thumbnail_Widget *tab_thumbnail_ = nullptr; /*标签页预览窗口*/
     QPropertyAnimation *tab_thumbnail_anime_ = nullptr;   /* tab预览窗口移动动画*/
