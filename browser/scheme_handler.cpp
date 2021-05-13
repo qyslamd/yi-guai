@@ -4,6 +4,9 @@
 #include <QFile>
 #include <QBuffer>
 #include <QPixmap>
+#include <QUrl>
+
+#include "utils/util_qt.h"
 
 // std::min和VC编译器定义的宏冲突
 #ifdef _MSC_VER
@@ -33,28 +36,13 @@ namespace custom_scheme {
         bool handled = false;
 
         std::string url = request->GetURL();
-        qInfo()<<__FUNCTION__<<QString::fromStdString(url);
-        if (strstr(url.c_str(), "handler.html") != nullptr) {
-            // Build the response html
-            data_ =
-                    "<html><head><title>Client Scheme Handler</title></head>"
-                      "<body bgcolor=\"white\">"
-                      "This contents of this page page are served by the "
-                      "ClientSchemeHandler class handling the client:// protocol."
-                      "<br/>You should see an image:"
-                      "<br/><img src=\"client://tests/logo.png\"><pre>";
+        QUrl qUrl(QString::fromStdString(url));
+        auto path = qUrl.path();
+        qInfo()<<__FUNCTION__<<path;
+        if (path.compare( "/", Qt::CaseInsensitive) == 0 || path.isEmpty()) {
+            auto content = UtilQt::readFileString(":/htmls/resources/html/HomePage.html");
+            data_.append(content.toStdString());
 
-            // Output a string representation of the request
-            //                  const std::string& dump = test_runner::DumpRequestContents(request);
-            //                  data_.append(dump);
-
-            data_.append(
-                        "</pre><br/>Try the test form:"
-                      "<form method=\"POST\" action=\"handler.html\">"
-                      "<input type=\"text\" name=\"field1\">"
-                      "<input type=\"text\" name=\"field2\">"
-                      "<input type=\"submit\">"
-                      "</form></body></html>");
             handled = true;
             // Set the resulting mime type
             mime_type_ = "text/html";
@@ -128,7 +116,7 @@ namespace custom_scheme {
     {
         // para1 is "schem"
         // para2 is "domain"
-        CefRegisterSchemeHandlerFactory("client", "tests",
+        CefRegisterSchemeHandlerFactory("yiguai", "tests",
                                           new ClientSchemeHandlerFactory());
     }
 

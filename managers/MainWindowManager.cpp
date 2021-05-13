@@ -2,6 +2,9 @@
 
 #include "mainwindow.h"
 #include <QApplication>
+#include <QScreen>
+
+#include "AppCfgManager.h"
 
 MainWndMgr::MainWndMgr(QObject *parent)
     : QObject(parent)
@@ -20,16 +23,39 @@ MainWndMgr& MainWndMgr::Instance(){
 void MainWndMgr::createWindow(const MainWindowConfig &cfg)
 {
     MainWindow *window = new MainWindow(cfg);
+
+    // The Qt::WA_DeleteOnClose attribute must be set,
+    // otherwise the resource will not be released
     window->setAttribute(Qt::WA_DeleteOnClose, true);
+
     connect(window, &MainWindow::destroyed, this, [=](){
         windows_.remove(window);
     });
 
-    windows_.insert(window);
-    if(!cfg.bounds.isEmpty())
-    {
-        window->setGeometry(cfg.bounds);
+    if(windows_.isEmpty()){
+        // 首个窗口还原配置中保存的位置大小信息
+        auto geo = AppCfgMgr::windowGeometry();
+        if(geo.isEmpty() || !window->restoreGeometry(geo)){
+            const QRect availableGeometry =  qApp->primaryScreen()->availableGeometry();
+            const QSize size = (availableGeometry.size() * 4) / 5;
+            auto pos = availableGeometry.center() - QPoint(size.width(), size.height()) / 2;
+            window->setGeometry(pos.x(),pos.y(),
+                                size.width(), size.height());
+        }
+    }else{
+        QRect targetRect = cfg.bounds;
+        if(cfg.bounds.isEmpty())
+        {
+            auto rect = MainWndMgr::Instance().lastWindowGeometry();
+            targetRect = QRect{rect.x() + AppCfgMgr::newWndOffsetX,
+                                      rect.y() + AppCfgMgr::newWndOffsetY,
+                                      rect.width(),
+                                      rect.height()};
+        }
+        window->setGeometry(targetRect);
     }
+
+    windows_.insert(window);
     if(!cfg.initially_hidden)
     {
         window->show();

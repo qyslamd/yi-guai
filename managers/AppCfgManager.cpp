@@ -3,6 +3,10 @@
 
 #include <QSettings>
 #include <QDir>
+#include <QRect>
+
+int AppCfgMgr::newWndOffsetX = 22;
+int AppCfgMgr::newWndOffsetY = 30;
 
 AppCfgMgr::AppCfgMgr(QObject *parent)
     : QObject(parent)

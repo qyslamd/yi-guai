@@ -146,4 +146,7 @@
     <qresource prefix="/i18ns">
         <file>resources/i18n/YiGuai_zh.qm</file>
     </qresource>
+    <qresource prefix="/htmls">
+        <file>resources/html/HomePage.html</file>
+    </qresource>
 </RCC>

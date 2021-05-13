@@ -69,7 +69,12 @@ Scope:Class TabBar and it's children
     background-color:#CFCFCF;
     border-radius:8px;
 }
-
+/******************************************
+Scope:Class TabPagesBar
+*/
+.TabPagesBar{
+    background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(12,123,179, 255), stop:1 rgba(242,186,232, 255));
+}
 /******************************************
 Scope:Class NotificationBar and it's children
 */

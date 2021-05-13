@@ -4,7 +4,7 @@
 #include "cef_qwidget.h"
 #include "browser/cef_client_handler.h"
 #include "utils/util_qt.h"
-#include "toolbars/PagesTabBar.h"
+#include "toolbars/TabPagesBar.h"
 #include "toolbars/NavigateBar.h"
 #include "toolbars/BookmarkBar.h"
 #include "toolbars/NotificationBar.h"
@@ -23,7 +23,6 @@
 #include <QThread>
 #include <QToolButton>
 #include <QApplication>
-#include <QScreen>
 #include <QFile>
 #include <QDialog>
 #include <QPropertyAnimation>
@@ -108,6 +107,7 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *r
     switch (msg->message)
     {
     case WM_DWMCOLORIZATIONCOLORCHANGED:
+        emit dwmColorChanged();
         return false;
     case WM_DPICHANGED:
         return false;
@@ -126,11 +126,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
     window_closing_ = true;
 
     if(stack_browsers_->count() > 0 || tab_bar_->count() > 0){
-        // 一个一个的关闭，等待关闭完
+        // 一个一个的关闭，等待关闭完，最后一个Page关闭后会再次触发 close
         onTabBarCloseRequested(0);
         event->ignore();
         return;
-    }else{
+    }else
+    {
         // 真正的关闭
         AppCfgMgr::setWindowGeometry(saveGeometry());
         event->accept();
@@ -152,12 +153,8 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
         return QMainWindow::mousePressEvent(event);
     }
 #ifdef Q_OS_WIN
-    int h = 0;
-    h += layout_->contentsMargins().top();
-    h += tabbar_layout_->contentsMargins().top();
-    h += tab_bar_->height();
 
-    QRect dragRect(0, 0, width(), h);
+    QRect dragRect(0, 0, width(), tab_bar_->height());
     if(dragRect.contains(event->pos())){
         if(::ReleaseCapture()){
             SendMessage(HWND(this->winId()), WM_SYSCOMMAND, SC_MOVE + HTCAPTION, 0);
@@ -174,12 +171,8 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
     if(this->isFullScreen()){
     }
 #ifdef Q_OS_WIN
-    int h = 0;
-    h += layout_->contentsMargins().top();
-    h += tabbar_layout_->contentsMargins().top();
-    h += tab_bar_->height();
 
-    QRect dragRect(0, 0, width(), h);
+    QRect dragRect(0, 0, width(), tab_bar_->height());
     if(!dragRect.contains(event->pos())){
         return QMainWindow::mouseDoubleClickEvent(event);
     }
@@ -198,28 +191,20 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
 
 void MainWindow::initUi()
 {
-    static bool first_window = true;
-    if(first_window)
-    {   // 首个窗口设置记录的位置和大小
-        auto geo = AppCfgMgr::windowGeometry();
-        if(geo.isEmpty() || !restoreGeometry(geo)){
-            const QRect availableGeometry =  qApp->primaryScreen()->availableGeometry();
-            const QSize size = (availableGeometry.size() * 4) / 5;
-            resize(size);
-            move(availableGeometry.center() - QPoint(size.width(), size.height()) / 2);
-
-        }
-        first_window = false;
-    }
-
     QPalette pl = palette();
     QColor activeColor("#F08080"), inActiveColor = activeColor;    // CECECE E8E8E8
     inActiveColor.setAlphaF(0.7);
-    if(UtilQt::dwmColorPrevalence()){
-        activeColor = QtWin::realColorizationColor();
-        activeColor.setAlphaF(1);
+    if(created_cfg_.is_inprivate){
+        activeColor = "#2E2F30";
         inActiveColor = activeColor;
         inActiveColor.setAlphaF(0.7);
+    }else{
+        if(UtilQt::dwmColorPrevalence()){
+            activeColor = QtWin::realColorizationColor();
+            activeColor.setAlphaF(1);
+            inActiveColor = activeColor;
+            inActiveColor.setAlphaF(0.7);
+        }
     }
     pl.setColor(QPalette::Active, QPalette::Window, activeColor);
     pl.setColor(QPalette::Inactive, QPalette::Window, inActiveColor);
@@ -230,29 +215,15 @@ void MainWindow::initUi()
         setCentralWidget(new QWidget);
     }
 
-    layout_ = new QVBoxLayout;
-    btn_dock_tabs_ = new QToolButton;
-    btn_dock_tabs_->setToolTip(tr("open vertical tabs"));
-    tab_bar_ = new TabBar(created_cfg_.is_inprivate);
-    btn_add_page_ = new QToolButton;
-    btn_add_page_->setToolTip(tr("Add a tab page"));
+    tab_bar_ = new TabPagesBar(created_cfg_.is_inprivate, this);
     navi_bar_ = new NaviBar;
     bookmark_bar_ = new BookmarkBar;
     notify_bar_ = new NotificationBar;
     stack_browsers_ = new QStackedWidget;
     stack_browsers_->setLineWidth(0);
 
-    tabbar_layout_ = new QHBoxLayout;
-    tabbar_layout_->setContentsMargins(6, 6, 0, 0);
-    tabbar_layout_->setSpacing(2);
-    tabbar_layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
-    tabbar_layout_->addWidget(btn_dock_tabs_);
-    tabbar_layout_->addWidget(tab_bar_);
-    tabbar_layout_->addWidget(btn_add_page_);
-    tabbar_layout_->addStretch();
-    tabbar_layout_->addSpacerItem(new QSpacerItem(180,10,QSizePolicy::Fixed));
-
-    layout_->addLayout(tabbar_layout_);
+    layout_ = new QVBoxLayout;
+    layout_->addWidget(tab_bar_);
     layout_->addWidget(navi_bar_);
     layout_->addWidget(bookmark_bar_);
     layout_->addWidget(notify_bar_);
@@ -278,12 +249,6 @@ void MainWindow::initUi()
 
 void MainWindow::setAppearance()
 {
-    QSize iconSize(24,24);
-    btn_dock_tabs_->setIconSize(iconSize);
-    btn_add_page_->setIconSize(iconSize);
-    btn_dock_tabs_->setIcon(QIcon(":/icons/resources/imgs/normal_pagelist_hide.png"));
-    btn_add_page_->setIcon(QIcon(":/icons/resources/imgs/addb_30px.png"));
-
     if(created_cfg_.is_inprivate){
         QFile file(":/styles/resources/styles/inprivate.qss");
         if(file.open(QIODevice::ReadOnly)){
@@ -295,15 +260,21 @@ void MainWindow::setAppearance()
 
 void MainWindow::initSignalSlot()
 {
-    connect(tab_bar_, &QTabBar::currentChanged, this, &MainWindow::onTabBarCurrentChanged);
-    connect(tab_bar_, &QTabBar::tabCloseRequested,this, &MainWindow::onTabBarCloseRequested);
-    connect(tab_bar_, &QTabBar::tabMoved, this, &MainWindow::onTabBarTabMoved);
-    connect(tab_bar_, &TabBar::showPreview, this, &MainWindow::onShowTabThumnail);
-
-    connect(btn_add_page_, &QToolButton::clicked, [this]()
+    connect(tab_bar_, &TabPagesBar::currentChanged, this, &MainWindow::onTabBarCurrentChanged);
+    connect(tab_bar_, &TabPagesBar::tabCloseRequested,this, &MainWindow::onTabBarCloseRequested);
+    connect(tab_bar_, &TabPagesBar::tabMoved, this, &MainWindow::onTabBarTabMoved);
+    connect(tab_bar_, &TabPagesBar::showPreview, this, &MainWindow::onShowTabThumnail);
+    connect(tab_bar_, &TabPagesBar::addPage, [this]()
     {
        addNewPage("about:version", true);
     });
+    connect(tab_bar_, &TabPagesBar::showDockPage, [this]()
+    {
+       addNewPage("about:version", true);
+    });
+#ifdef Q_OS_WIN
+    connect(this, &MainWindow::dwmColorChanged, tab_bar_, &TabPagesBar::onDwmColorChanged);
+#endif
     connect(navi_bar_, &NaviBar::naviBarCmd, this, &MainWindow::onNaviBarCmd);
     connect(this, &MainWindow::historyPopupVisibleChange, navi_bar_, &NaviBar::onHistoryPopupVisibleChange);
 }
@@ -441,10 +412,7 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         MainWndMgr::Instance().createWindow(MainWndCfg());
     } else if(cmd == NaviBarCmd::NewInprivateWindow)
     {
-        auto rect = MainWndMgr::Instance().lastWindowGeometry();
-        rect.setX(rect.x() + 18);
-        rect.setY(rect.y() + 30);
-        MainWndCfg cfg{true, false, false,rect, ""};
+        MainWndCfg cfg{true, false, false, QRect(), ""};
         MainWndMgr::Instance().createWindow(cfg);
     }else if(cmd == NaviBarCmd::QuitApp) {
         MainWndMgr::Instance().closeAllWindows();

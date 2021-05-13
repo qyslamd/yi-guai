@@ -35,11 +35,13 @@ SOURCES += \
     popups/HistoryPopup.cpp \
     popups/PopupBase.cpp \
     popups/SiteInfoPopup.cpp \
+    tests/testwidget.cpp \
     toolbars/AddressBar.cpp \
     toolbars/BookmarkBar.cpp \
     toolbars/NavigateBar.cpp \
     toolbars/NotificationBar.cpp \
-    toolbars/PagesTabBar.cpp \
+    toolbars/TabBar.cpp \
+    toolbars/TabPagesBar.cpp \
     toolbars/TabbarStyle.cpp \
     widgets/Dp_Widget_Caption.cpp \
     widgets/FramelessWindow.cpp \
@@ -75,11 +77,13 @@ HEADERS += \
     popups/HistoryPopup.h \
     popups/PopupBase.h \
     popups/SiteInfoPopup.h \
+    tests/testwidget.h \
     toolbars/AddressBar.h \
     toolbars/BookmarkBar.h \
     toolbars/NavigateBar.h \
     toolbars/NotificationBar.h \
-    toolbars/PagesTabBar.h \
+    toolbars/TabBar.h \
+    toolbars/TabPagesBar.h \
     toolbars/TabbarStyle.h \
     widgets/Dp_Widget_Caption.h \
     widgets/FramelessWindow.h \
@@ -104,6 +108,7 @@ FORMS += \
     popup.ui \
     popups/HistoryPopup.ui \
     popups/PopupBase.ui \
+    tests/testwidget.ui \
     toolbars/NotificationBar.ui \
     widgets/TabThumbnailWidget.ui \
     widgets/framewidget.ui

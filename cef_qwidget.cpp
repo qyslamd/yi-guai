@@ -23,6 +23,7 @@
 
 #include "managers/FaviconManager.h"
 #include "managers/MainWindowManager.h"
+#include "managers/AppCfgManager.h"
 #include "utils/util_qt.h"
 
 CefQWidget::CefQWidget(const QString &url, QWidget *parent)
@@ -156,8 +157,8 @@ void CefQWidget::onBrowserWndPopupWnd(const CefPopupFeatures &popupFeatures,
     int h = popupFeatures.height;
 
    if(x == 0 && y == 0 && w == 0 && h == 0){
-       x = rect.x() + 18;
-       y = rect.y() + 30;
+       x = rect.x() + AppCfgMgr::newWndOffsetX;
+       y = rect.y() + AppCfgMgr::newWndOffsetY;
        w = rect.width();
        h = rect.height();
    }else{

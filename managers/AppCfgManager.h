@@ -19,6 +19,10 @@ public:
     static QString newTabPageUrl();
     static void setNewTabPageUrl(const QString &data);
 
+    static int newWndOffsetX;
+    static int newWndOffsetY;
+
+
 public:
     static AppCfgMgr& instance(){
         static AppCfgMgr inst;

@@ -11,7 +11,7 @@
 class QVBoxLayout;
 class QHBoxLayout;
 class QToolButton;
-class TabBar;
+class TabPagesBar;
 class NaviBar;
 class BookmarkBar;
 class NotificationBar;
@@ -35,6 +35,9 @@ public:
 signals:
     void windowStateChanged(Qt::WindowStates state, const QVariant &data);
     void historyPopupVisibleChange(bool visible);
+#ifdef Q_OS_WIN
+    void dwmColorChanged();
+#endif
 public:
     // QObject interface
     bool event(QEvent *e) override;
@@ -49,11 +52,7 @@ private:
     MainWindowConfig created_cfg_;
 
     QVBoxLayout *layout_;   /*整个窗口的布局*/
-
-    QHBoxLayout* tabbar_layout_;    /*标签栏布局*/
-    QToolButton *btn_dock_tabs_ = nullptr;    /*停靠标签按钮*/
-    TabBar *tab_bar_ = nullptr;   /*标签栏*/
-    QToolButton *btn_add_page_ = nullptr; /*添加新标签按钮*/
+    TabPagesBar *tab_bar_ = nullptr;   /*标签栏*/
     NaviBar *navi_bar_ = nullptr; /*导航栏*/
     BookmarkBar *bookmark_bar_ = nullptr; /*书签栏*/
     NotificationBar *notify_bar_ = nullptr; /*通知栏*/

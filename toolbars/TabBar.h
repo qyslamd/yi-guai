@@ -1,5 +1,5 @@
-#ifndef PAGESTABBAR_H
-#define PAGESTABBAR_H
+#ifndef TABBAR_H
+#define TABBAR_H
 
 #include <QTabBar>
 #include "globaldef.h"
@@ -11,8 +11,9 @@ class QContextMenuEvent;
 class TabBar final: public QTabBar
 {
     Q_OBJECT
-public:
+    friend class TabPagesBar;
     TabBar(bool inprivate, QWidget *parent = nullptr);
+public:
     bool event(QEvent *e) override;
     int insertTab(int index, const QString &text);
 signals:
@@ -42,4 +43,4 @@ private:
     int check_pos_timer_id_;
 };
 
-#endif // PAGESTABBAR_H
+#endif // TABBAR_H

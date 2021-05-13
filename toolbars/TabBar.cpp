@@ -1,4 +1,4 @@
-#include "PagesTabBar.h"
+#include "TabBar.h"
 #include "TabbarStyle.h"
 
 #include <QtDebug>

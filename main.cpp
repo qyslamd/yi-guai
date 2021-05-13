@@ -9,6 +9,7 @@
 #include <QFile>
 #include <QTranslator>
 #include <QMessageBox>
+#include <QScreen>
 
 #include <include/base/cef_scoped_ptr.h>
 #include <include/cef_command_line.h>
@@ -16,6 +17,7 @@
 
 #include "managers/MainWindowManager.h"
 #include "managers/CefManager.h"
+#include "managers/AppCfgManager.h"
 #include "browser/cef_app_browser.h"
 #include "browser/scheme_handler.h"
 #include "browser/message_loop/main_message_loop.h"
@@ -25,6 +27,7 @@
 #include "cef_qwidget.h"
 #include "widgets/framewidget.h"
 #include "utils/util_qt.h"
+#include "tests/testwidget.h"
 
 #if defined(CEF_USE_SANDBOX)
 // The cef_sandbox.lib static library may not link successfully with all VS
@@ -77,7 +80,6 @@ int main(int argc, char *argv[])
                              QObject::tr("intialize cef failed!\n application will quit!"));
         return -1;
     }
-
     MainWindowConfig cfg{
         false,
         false,
@@ -85,6 +87,9 @@ int main(int argc, char *argv[])
         QRect(),
         QString("https://www.baidu.com/")};
     MainWndMgr::Instance().createWindow(cfg);
+
+    TestWidget w;
+    w.show();
 
     message_loop->Run();
 
