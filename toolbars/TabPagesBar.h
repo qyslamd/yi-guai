@@ -25,6 +25,7 @@ signals:
     void showPreview(const QPoint &g_pos, const int index);
     void addPage();
     void showDockPage();
+    void testBtnClicked();
 public slots:
      void setCurrentIndex(int index);
      void onDwmColorChanged();
@@ -33,6 +34,8 @@ private:
     QToolButton *btn_dock_tabs_ = nullptr;
     TabBar *tab_bar_;
     QToolButton *btn_add_page_;
+
+    QToolButton *btn_test_ = nullptr;
 
 private:
     void initUi();

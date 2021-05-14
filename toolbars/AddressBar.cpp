@@ -84,7 +84,7 @@ void AddressBar::mousePressEvent(QMouseEvent *event)
 
 void AddressBar::initUi()
 {
-    setAlignment(Qt::AlignLeft);
+    setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
     QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
     shadow->setOffset(0, 0);

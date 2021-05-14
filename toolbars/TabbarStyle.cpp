@@ -170,19 +170,17 @@ void TabbarStyle::drawTabBarTabShape(const QStyleOption *option,
             if(1){
                 const QStyleOptionTab *tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
                 QRectF rect = tabOption->rect;
-                QLinearGradient linearGrad(QPointF(rect.x(),
-                                                   rect.y() + rect.height() /2),
-                                           QPointF(rect.x() + rect.width() ,
-                                                   rect.y() + rect.height() /2)
+                QLinearGradient linearGrad(QPointF(rect.x() + rect.width() / 2, rect.y()),
+                                           QPointF(rect.x()  + rect.width() / 2,
+                                                   rect.y() + rect.height())
                                            );
-                linearGrad.setColorAt(0, "#FF0000");
-                linearGrad.setColorAt(0.2, "#FF7F00");
-                linearGrad.setColorAt(0.4, "#FFFF00");
-                linearGrad.setColorAt(0.6, "#00FF00");
-                linearGrad.setColorAt(0.72, "#00FFFF");
-                linearGrad.setColorAt(0.86, "#0000FF");
-                linearGrad.setColorAt(1, "#8B00FF");
-                brush = QBrush(linearGrad); // 拷贝赋值
+                QColor color1(0xFFFFFF);
+                color1.setAlphaF(0.7);
+                linearGrad.setColorAt(0, color1);
+                QColor color2(0xFFFFFF);
+                color2.setAlphaF(0.1);
+                linearGrad.setColorAt(1, color2);
+                brush = QBrush(linearGrad);
             }
         }
         drawShape(path, brush);
@@ -198,7 +196,7 @@ void TabbarStyle::drawTabBarTabShape(const QStyleOption *option,
             auto color = QColor(255,255,255);
             color.setAlphaF(0.7);
             brush = color;
-            if(1){
+            if(0){
                 const QStyleOptionTab *tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
                 QRectF rect = tabOption->rect;
                 QLinearGradient linearGrad(QPointF(rect.x() + rect.width() / 2,

@@ -6,6 +6,10 @@ Scope:Global Global font-family
 font-family:"Microsoft Yahei";
 }
 
+.MainWindow{
+border-image:url(:/icons/resources/imgs/th.jpg);
+}
+
 /******************************************
 Scope:Global Global QToolButton
 */
@@ -27,9 +31,9 @@ QToolButton:open{
 /******************************************
 Scope:Class NavigationBar and it's children
 */
-.NaviBar{
+/*.NaviBar{
 background-color:#FCFCFC;
-}
+}*/
 
 QToolButton#NaviBarOptionBtn::menu-indicator{
     image: none;
@@ -72,12 +76,13 @@ Scope:Class TabBar and it's children
 /******************************************
 Scope:Class TabPagesBar
 */
-.TabPagesBar{
+/*.TabPagesBar{
     background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(12,123,179, 255), stop:1 rgba(242,186,232, 255));
-}
+}*/
 /******************************************
 Scope:Class NotificationBar and it's children
 */
-.NotificationBar{
+/*.NotificationBar{
 background-color:#FCFCFC;
-}
+}*/
+

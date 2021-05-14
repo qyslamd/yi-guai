@@ -107,6 +107,15 @@ void CefQWidget::StopLoading()
     }
 }
 
+CefWindowHandle CefQWidget::getBrowserWindowHandle()
+{
+    auto browser = browser_window_->GetBrowser();
+    if(browser){
+        return browser->GetHost()->GetWindowHandle();
+    }
+    return 0;
+}
+
 void CefQWidget::onTopLevelWindowStateChanged(Qt::WindowStates state, const QVariant &data)
 {
     if(state.testFlag(Qt::WindowMaximized) || state.testFlag(Qt::WindowNoState)){

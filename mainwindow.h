@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QMap>
+#include <QFrame>
 
 #include "browser/cef_client_handler.h"
 #include "managers/MainWindowManager.h"
@@ -49,13 +50,24 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
 private:
-    MainWindowConfig created_cfg_;
+    MainWindowConfig created_cfg_{false, false, false, QRect(), ""};
 
-    QVBoxLayout *layout_;   /*整个窗口的布局*/
+    /*参见：QLayout::setMenuBar(QWidget *menuBar)，*/
+    QWidget *widget_north_ = nullptr;
+    QVBoxLayout *widget_north_layout_ = nullptr;
+    QMenuBar *menu_bar_ = nullptr;      /*MacOS需要菜单栏*/
     TabPagesBar *tab_bar_ = nullptr;   /*标签栏*/
     NaviBar *navi_bar_ = nullptr; /*导航栏*/
     BookmarkBar *bookmark_bar_ = nullptr; /*书签栏*/
     NotificationBar *notify_bar_ = nullptr; /*通知栏*/
+
+    QVBoxLayout *central_widget_layout_ = nullptr;
+    QHBoxLayout *central_area_layout_ = nullptr;
+
+    QWidget *widget_west_ = nullptr;
+    QWidget *widget_south_ = nullptr;
+    QWidget *widget_east_ = nullptr;
+
     QStackedWidget *stack_browsers_ = nullptr;    /*浏览器窗口栈*/
     Tab_Thumbnail_Widget *tab_thumbnail_ = nullptr; /*标签页预览窗口*/
     QPropertyAnimation *tab_thumbnail_anime_ = nullptr;   /* tab预览窗口移动动画*/

@@ -138,6 +138,8 @@
         <file>resources/imgs/tipicon_warn.png</file>
         <file>resources/imgs/tipicon_warn_mini.png</file>
         <file>resources/imgs/user_24px.png</file>
+        <file>resources/imgs/th.jpg</file>
+        <file>resources/imgs/view_64px.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file>resources/styles/normal.qss</file>

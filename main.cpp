@@ -85,11 +85,11 @@ int main(int argc, char *argv[])
         false,
         false,
         QRect(),
-        QString("https://www.baidu.com/")};
+        QString("https://cn.bing.com/")};
     MainWndMgr::Instance().createWindow(cfg);
 
-    TestWidget w;
-    w.show();
+//    TestWidget w;
+//    w.show();
 
     message_loop->Run();
 
@@ -134,7 +134,7 @@ int initializeCef(int argc, char *argv[])
 
     // Specify CEF global settings here.
     CefSettings settings;
-    CefManager::Instance().populateSettings(settings);
+    CefManager::Instance().populateSettings(settings, argc, argv);
 
 #ifdef OS_WIN
     settings.multi_threaded_message_loop =

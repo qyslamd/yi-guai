@@ -10,6 +10,10 @@
 #include "utils/util_qt.h"
 #include <include/internal/cef_types.h>
 #include <include/cef_version.h>
+#include <include/base/cef_scoped_ptr.h>
+#include <include/cef_command_line.h>
+
+#include "browser/client_switches.h"
 
 CefString CefManager::browser_sub_process_path;
 
@@ -60,8 +64,18 @@ std::string CefManager::cefVersion()
     return ss.str();
 }
 
-void CefManager::populateSettings(CefSettings &settings)
+void CefManager::populateSettings(CefSettings &settings, int argc, char *argv[])
 {
+    // Parse command-line arguments for use in this method.
+    CefRefPtr<CefCommandLine> command_line = CefCommandLine::CreateCommandLine();
+#ifdef OS_WIN
+    Q_UNUSED(argc);
+    Q_UNUSED(argv);
+    command_line->InitFromString(::GetCommandLineW());
+#else
+    command_line->InitFromArgv(argc, argv);
+#endif
+
     CefString(&settings.cache_path) = cache_path;
     CefString(&settings.root_cache_path) = root_cache_path;
     // linux会默认加载Locale
@@ -69,7 +83,15 @@ void CefManager::populateSettings(CefSettings &settings)
     CefString(&settings.locale) = locale;
     CefString(&settings.accept_language_list) = accept_language_list;
 #endif
-    settings.remote_debugging_port = remote_debugging_port;
+
+    if(command_line->HasSwitch("remote-debugging-port"))
+    {
+        std::string port = command_line->GetSwitchValue("remote-debugging-port");
+        uint portI = QString::fromStdString(port).toUInt();
+        settings.remote_debugging_port = portI == 0 ? remote_debugging_port : portI;
+    }else{
+        settings.remote_debugging_port = remote_debugging_port;
+    }
     settings.log_severity = LOGSEVERITY_WARNING;
     settings.background_color = background_color;
     settings.persist_session_cookies = persist_session_cookies;

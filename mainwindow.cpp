@@ -4,6 +4,7 @@
 #include "cef_qwidget.h"
 #include "browser/cef_client_handler.h"
 #include "utils/util_qt.h"
+#include "utils/util_win.h"
 #include "toolbars/TabPagesBar.h"
 #include "toolbars/NavigateBar.h"
 #include "toolbars/BookmarkBar.h"
@@ -27,10 +28,12 @@
 #include <QDialog>
 #include <QPropertyAnimation>
 #include <QToolTip>
+#include <QLabel>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
 #include <QtWin>
+#pragma comment(lib, "Gdi32.lib")
 #endif
 
 MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
@@ -191,6 +194,7 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
 
 void MainWindow::initUi()
 {
+#if 0
     QPalette pl = palette();
     QColor activeColor("#F08080"), inActiveColor = activeColor;    // CECECE E8E8E8
     inActiveColor.setAlphaF(0.7);
@@ -209,30 +213,61 @@ void MainWindow::initUi()
     pl.setColor(QPalette::Active, QPalette::Window, activeColor);
     pl.setColor(QPalette::Inactive, QPalette::Window, inActiveColor);
     setPalette(pl);
+#endif
+
+    /*删除QLayout原来的 Menubar */
+    auto menuBar = this->layout()->menuBar();
+    if(menuBar){
+        delete menuBar;
+        menuBar = nullptr;
+    }
+    widget_north_ = new QWidget(this);
+    widget_north_->setObjectName("mainwindow_north_widget");
+    widget_north_layout_ = new QVBoxLayout(widget_north_);
+    widget_north_layout_->setContentsMargins(0,0,0,0);
+    widget_north_layout_->setSpacing(0);
+
+    tab_bar_ = new TabPagesBar(created_cfg_.is_inprivate, this);
+    navi_bar_ = new NaviBar;
+    bookmark_bar_ = new BookmarkBar;
+    notify_bar_ = new NotificationBar;
+
+    widget_north_layout_->addWidget(tab_bar_);
+    widget_north_layout_->addWidget(navi_bar_);
+    widget_north_layout_->addWidget(bookmark_bar_);
+    widget_north_layout_->addWidget(notify_bar_);
+     /*设置成自定义的 MenuBar （其实是QWidget*）*/
+    layout()->setMenuBar(widget_north_);
+
 
     /*设置centralWidget*/
     if(!centralWidget()) {
         setCentralWidget(new QWidget);
     }
 
-    tab_bar_ = new TabPagesBar(created_cfg_.is_inprivate, this);
-    navi_bar_ = new NaviBar;
-    bookmark_bar_ = new BookmarkBar;
-    notify_bar_ = new NotificationBar;
+    widget_west_ = new QWidget(this);
+    widget_west_->setObjectName("mainwindow_west_widget");
     stack_browsers_ = new QStackedWidget;
     stack_browsers_->setLineWidth(0);
+    widget_east_ = new QWidget(this);
+    widget_east_->setObjectName("mainwindow_east_widget");
 
-    layout_ = new QVBoxLayout;
-    layout_->addWidget(tab_bar_);
-    layout_->addWidget(navi_bar_);
-    layout_->addWidget(bookmark_bar_);
-    layout_->addWidget(notify_bar_);
-    layout_->addWidget(stack_browsers_);
+    /* 左（西）、中、右（东）*/
+    central_area_layout_ = new QHBoxLayout;
+    central_area_layout_->addWidget(widget_west_);
+    central_area_layout_->addWidget(stack_browsers_);
+    central_area_layout_->addWidget(widget_east_);
 
-    centralWidget()->setLayout(layout_);
-    layout_->setContentsMargins(0,0,0,0);
-    layout_->setSpacing(0);
+    widget_south_ = new QWidget(this);
+    widget_south_->setObjectName("mainwindow_south_widget");
 
+    /*中间区域布局 + 下（南）*/
+    central_widget_layout_ = new QVBoxLayout;
+    central_widget_layout_->setContentsMargins(0,0,0,0);
+    central_widget_layout_->setSpacing(0);
+    central_widget_layout_->addLayout(central_area_layout_);
+    central_widget_layout_->addWidget(widget_south_);
+    centralWidget()->setLayout(central_widget_layout_);
 
     tab_thumbnail_ = new Tab_Thumbnail_Widget(this);
     tab_thumbnail_anime_ = new QPropertyAnimation(this);
@@ -244,7 +279,12 @@ void MainWindow::initUi()
     history_popup_->resize(360, 600);
     history_popup_->installEventFilter(this);
 
-    notify_bar_->hide();
+//    notify_bar_->hide();
+#if 1
+    widget_west_->setMinimumWidth(70);
+    widget_east_->setMinimumWidth(70);
+    widget_south_->setMinimumHeight(50);
+#endif
 }
 
 void MainWindow::setAppearance()
@@ -271,6 +311,43 @@ void MainWindow::initSignalSlot()
     connect(tab_bar_, &TabPagesBar::showDockPage, [this]()
     {
        addNewPage("about:version", true);
+    });
+    connect(tab_bar_, &TabPagesBar::testBtnClicked, [this]()
+    {
+//        auto visible = stack_browsers_->isVisible();
+//        stack_browsers_->setVisible(!visible);
+//        int width = GetSystemMetrics(SM_CXSCREEN);
+//        int height = GetSystemMetrics(SM_CYSCREEN);
+
+//        HWND hwnd = GetDesktopWindow();
+//        HDC display_dc = GetDC(nullptr);
+//        HDC bitmap_dc = CreateCompatibleDC(display_dc);
+//        HBITMAP bitmap = CreateCompatibleBitmap(display_dc, width, height);
+//        HGDIOBJ null_bitmap = SelectObject(bitmap_dc, bitmap);
+
+//        // copy data
+//        HDC window_dc = GetDC(hwnd);
+//        BitBlt(bitmap_dc, 0, 0, width, height, window_dc, 0, 0, SRCCOPY | CAPTUREBLT);
+
+//        // clean up all but bitmap
+//        ReleaseDC(hwnd, window_dc);
+//        SelectObject(bitmap_dc, null_bitmap);
+//        DeleteDC(bitmap_dc);
+
+//        QPixmap screen = QtWin::fromHBITMAP(bitmap);
+
+//        DeleteObject(bitmap);
+//        ReleaseDC(nullptr, display_dc);
+
+        QPixmap pix;
+        auto handle = GetPage(0)->getBrowserWidget()->getBrowserWindowHandle();
+        qInfo()<<handle;
+        client::SaveHwndToBmpFile((HWND)handle, pix);
+
+        static QLabel label;
+        label.setPixmap(pix);
+        label.show();
+
     });
 #ifdef Q_OS_WIN
     connect(this, &MainWindow::dwmColorChanged, tab_bar_, &TabPagesBar::onDwmColorChanged);
@@ -451,6 +528,7 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
     {
         auto index = stack_browsers_->indexOf(page);
         tab_bar_->setTabText(index, para.toString());
+        tab_bar_->update();
     }else if(cmd == PageCmd::StatusMessage)
     {
         onStatusMessage(para.toString());

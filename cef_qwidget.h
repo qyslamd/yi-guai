@@ -23,6 +23,7 @@ public:
     void Refresh();
     void StopLoading();
 
+    CefWindowHandle getBrowserWindowHandle();
 signals:
     void browserClosing();
     void browserNewForgroundPage(CefQWidget *newPage);

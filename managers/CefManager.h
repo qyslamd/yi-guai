@@ -11,7 +11,7 @@ protected:
 public:
     static CefManager& Instance();
     static std::string cefVersion();
-    void populateSettings(CefSettings &settings);
+    void populateSettings(CefSettings &settings, int argc, char *argv[]);
 
     ///
     /// \brief 分离式时，除了浏览器进程之外的进程可执行体路径
