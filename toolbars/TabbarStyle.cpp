@@ -166,8 +166,8 @@ void TabbarStyle::drawTabBarTabShape(const QStyleOption *option,
         if(isInprivate_){
             brush = QBrush(QColor("#3B3B3B"));
         }else{
-            brush = QBrush(QColor("#D3D3D3")); //#F7F7F7
-            if(1){
+            brush = QBrush(QColor("#F7F7F7")); //#D3D3D3
+            if(0){
                 const QStyleOptionTab *tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
                 QRectF rect = tabOption->rect;
                 QLinearGradient linearGrad(QPointF(rect.x() + rect.width() / 2, rect.y()),
@@ -196,23 +196,6 @@ void TabbarStyle::drawTabBarTabShape(const QStyleOption *option,
             auto color = QColor(255,255,255);
             color.setAlphaF(0.7);
             brush = color;
-            if(0){
-                const QStyleOptionTab *tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
-                QRectF rect = tabOption->rect;
-                QLinearGradient linearGrad(QPointF(rect.x() + rect.width() / 2,
-                                                   rect.y()),
-                                           QPointF(rect.x() + rect.width() / 2,
-                                                   rect.y() + rect.height())
-                                           );
-                linearGrad.setColorAt(0, "#FF0000");
-                linearGrad.setColorAt(0.2, "#FF7F00");
-                linearGrad.setColorAt(0.4, "#FFFF00");
-                linearGrad.setColorAt(0.6, "#00FF00");
-                linearGrad.setColorAt(0.72, "#00FFFF");
-                linearGrad.setColorAt(0.86, "#0000FF");
-                linearGrad.setColorAt(1, "#8B00FF");
-                brush = QBrush(linearGrad); // 拷贝赋值
-            }
         }
         drawShape(path, brush);
     }else

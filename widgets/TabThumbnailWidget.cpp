@@ -1,5 +1,5 @@
 #include "TabThumbnailWidget.h"
-#include "ui_Tab_Thumbnail_Widget.h"
+#include "ui_TabThumbnailWidget.h"
 
 #include <QGraphicsDropShadowEffect>
 

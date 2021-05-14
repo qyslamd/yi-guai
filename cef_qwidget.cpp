@@ -62,7 +62,6 @@ CefQWidget::~CefQWidget()
 
 void CefQWidget::Navigate(const QString &url)
 {
-    qInfo()<<__FUNCTION__<<url;
     auto browser = browser_window_->GetBrowser();
     if(browser){
         browser->GetMainFrame()->LoadURL(url.toStdString());

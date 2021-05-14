@@ -60,6 +60,7 @@ SOURCES += \
     utils/util_qt.cpp \
     utils/util_win.cc \
     widgets/TabThumbnailWidget.cpp \
+    widgets/appconfigwidget.cpp \
     widgets/framewidget.cpp
 
 
@@ -101,6 +102,7 @@ HEADERS += \
     utils/util_qt.h \
     utils/util_win.h \
     widgets/TabThumbnailWidget.h \
+    widgets/appconfigwidget.h \
     widgets/framewidget.h
 
 FORMS += \
@@ -111,6 +113,7 @@ FORMS += \
     tests/testwidget.ui \
     toolbars/NotificationBar.ui \
     widgets/TabThumbnailWidget.ui \
+    widgets/appconfigwidget.ui \
     widgets/framewidget.ui
 
 # Default rules for deployment.

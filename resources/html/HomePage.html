@@ -1,15 +1,16 @@
 ﻿<!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>新标签页</title>
-    <link rel="icon" href="./imgs/default.jpg" type="image/x-icon">
+    <link rel="icon" href="../imgs/code_logo_256.png" type="image/x-icon">
     <style type="text/css">
         /** 重置浏览器默认标签样式 */
-        body
-        {
-            background: #6B95C9;
+        body {
+            background: #FFFFFF;
         }
+
         ul,
         li {
             margin: 0;
@@ -17,14 +18,14 @@
         }
 
         .main {
-            width: 100%;
-            height: 100%;
-            margin-top: 60px;
-            margin-left: auto;
-            margin-right: auto;
-            margin-bottom: auto;
-            max-width: 1080px;
-            vertical-align:middle;
+            position: absolute;
+            top: 20%;
+            bottom:20%;
+            left: 20%;
+            right: 20%;
+            /*transform: translate(-50%,-50%);*/
+            margin: auto;
+            vertical-align: middle;
             /* background: blueviolet; */
         }
 
@@ -33,9 +34,10 @@
             margin-left: 5px;
             margin-top: 5px;
             list-style-type: none;
-            background: linear-gradient(45deg,rgba(254,172,94,0.5),rgba(199,121,208,0.5),rgba(75,192,200,0.5));
+            background: linear-gradient(45deg, rgba(254, 172, 94, 0.5), rgba(199, 121, 208, 0.5), rgba(75, 192, 200, 0.5));
             border-radius: 16px;
-            box-shadow:0px 0px 10px #000;/*盒子阴影*/
+            box-shadow: 0px 0px 10px #000;
+            /*盒子阴影*/
         }
 
         .box:after {
@@ -57,18 +59,18 @@
             width: 100%;
             height: 100%;
             border-radius: 8px;
-            box-shadow:0px 0px 5px #000;
+            box-shadow: 0px 0px 5px #000;
             /* min-width: 100%;
-            min-height: 100%; */
+min-height: 100%; */
             /* max-width: 100%; */
             /* max-height: 100%; */
             /* position: absolute; */
-            object-fit:cover;
+            object-fit: cover;
             /* background: coral; */
         }
 
         /*鼠标移入，图片放大*/
-        .img:hover{
+        .img:hover {
             transform: scale(1.2);
             -webkit-transform: scale(1.2);
             -moz-transform: scale(1.2);
@@ -88,7 +90,7 @@
         }
 
         .item_title {
-            color:#f7f7f7;
+            color: #f7f7f7;
             width: 100%;
             height: 40px;
             font-size: 10pt;
@@ -114,15 +116,15 @@
 
         a {
             text-decoration: none;
-            -webkit-tap-highlight-color:rgba(0,0,0,0);
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
             color: black;
             text-align: center;
         }
 
         /* a:hover {
-            background: #00F;
-            color: #FFF
-        } */
+background: #00F;
+color: #FFF
+} */
     </style>
     <script type="text/javascript">
         function onOpenUrl(event) {
@@ -139,41 +141,51 @@
     <div class="main">
         <ul class="box">
             <li>
-                <a class="item"  onclick="onOpenUrl(this);;return false;" href="http://www.yhmdlife.com/">
+                <a class="item" onclick="onOpenUrl(this);;return false;" href="https://www.baidu.com/">
                     <div class="item_imagebox">
-                        <img class="img" src="./himgs/mdLife.png" title = "久远银海MDLIFE社区"/>
+                        <img class="img"
+                            src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fgdown.baidu.com%2Fimg%2F0%2F512_512%2Fa161898e7a3d341f92b7cde0f7202d82.png&refer=http%3A%2F%2Fgdown.baidu.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1623568217&t=60e58885666e2c72578d9a92d6f0a82a"
+                            title="百度一下，你就知道" />
                     </div>
-                    <div class="item_title">MDLIFE社区</div>
+                    <div class="item_title">百度</div>
                 </a>
             </li>
             <li>
-                <a class="item"  onclick="onOpenUrl(this);;return false;" href="http://erp.yinhai.com:9289/yhvision/yhvisionFront/yhvisionIndex.do">
+                <a class="item" onclick="onOpenUrl(this);;return false;" href="https://cn.bing.com/">
                     <div class="item_imagebox">
-                        <img class="img" src="./himgs/vision.gif" title = "久远银海视觉平台"/>
+                        <img class="img"
+                            src="https://th.bing.com/th/id/Re8d3c50bf93aaa8de0f6ecbe28cc6c05?rik=OUixLQntXbr4Cg&riu=http%3a%2f%2f5b0988e595225.cdn.sohucs.com%2fimages%2f20200410%2fcd75a74318624a11a9f66b1334369f83.png&ehk=bhMir3S0%2fWWwBCvquk%2bliqxmgJEIqsVmIFFkjYFrXvk%3d&risl=&pid=ImgRaw"
+                            title="微软必应" />
                     </div>
-                    <div class="item_title">银海视觉平台</div>
+                    <div class="item_title">必应</div>
                 </a>
             </li>
             <li>
-                <a class="item"  onclick="onOpenUrl(this);;return false;" href="http://www.yinhaiyun.com/deepblue/">
+                <a class="item" onclick="onOpenUrl(this);;return false;" href="https://gitee.com/">
                     <div class="item_imagebox">
-                        <img class="img" src="./himgs/deepblue.png" title = "久远银海深蓝浏览器首页"/>
+                        <img class="img"
+                            src="https://tse4-mm.cn.bing.net/th/id/OIP.5zghB5bD80jAyoYDExJHOgHaHa?pid=ImgDet&rs=1"
+                            title="码云Gitee" />
                     </div>
-                    <div class="item_title">深蓝浏览器主页</div>
+                    <div class="item_title">码云Gitee</div>
                 </a>
             </li>
             <li>
-                <a class="item"  onclick="onOpenUrl(this);;return false;" href="https://www.qt.io/">
+                <a class="item" onclick="onOpenUrl(this);;return false;" href="https://www.qt.io/">
                     <div class="item_imagebox">
-                        <img class="img" src="./himgs/qt.jpg" title = "Qt官网"/>
+                        <img class="img"
+                            src="https://tse2-mm.cn.bing.net/th/id/OIP.XRg9DTU_Vs5Axsf8lxcurQAAAA?pid=ImgDet&w=462&h=339&rs=1"
+                            title="Qt官网" />
                     </div>
                     <div class="item_title">Qt官网</div>
                 </a>
             </li>
             <li>
-                <a class="item"  onclick="onOpenUrl(this);;return false;" href="https://bitbucket.org/chromiumembedded/cef/src/master/">
+                <a class="item" onclick="onOpenUrl(this);;return false;"
+                    href="https://bitbucket.org/chromiumembedded/cef/src/master/">
                     <div class="item_imagebox">
-                        <img class="img" src="./himgs/cef.gif" title = "CEF开源官网"/>
+                        <img class="img" src="https://magpcss.org/ceforum/styles/prosilver/imageset/site_logo.gif"
+                            title="CEF开源官网" />
                     </div>
                     <div class="item_title">CEF开源官网</div>
                 </a>
@@ -181,4 +193,5 @@
         </ul>
     </div>
 </body>
+
 </html>

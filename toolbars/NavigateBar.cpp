@@ -2,6 +2,7 @@
 #include "AddressBar.h"
 #include "utils/util_qt.h"
 
+#include <QtDebug>
 #include <QHBoxLayout>
 #include <QToolButton>
 #include <QLabel>
@@ -28,7 +29,7 @@ NaviBar::NaviBar(QWidget *parent)
     , menu_more_tools_(new QMenu)
     , menu_help_(new QMenu)
     , action_new_tab_(new QAction)
-    , action_new_window_(new QAction)
+    , action_new_window_(new QAction(this))
     , action_new_inprivate_window_(new QAction)
     , action_zoom_(new QWidgetAction(this))
     , frame_zoom_(new QFrame)
@@ -63,7 +64,9 @@ NaviBar::NaviBar(QWidget *parent)
     layout_->addWidget(btn_refresh_);
     layout_->addWidget(btn_stop_);
     layout_->addWidget(btn_home_);
+    layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
     layout_->addWidget(address_bar_);
+    layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
     layout_->addWidget(frame_extensions_);
     layout_->addWidget(frame_tools_);
     layout_->addWidget(btn_history_);
@@ -72,6 +75,7 @@ NaviBar::NaviBar(QWidget *parent)
 
     setLayout(layout_);
     layout_->setContentsMargins(4,4,4,5);
+    layout_->setSpacing(0);
 
     action_new_tab_->setText(tr("create new tab page"));
     action_new_tab_->setShortcut(QKeySequence("Ctrl+T"));
@@ -164,10 +168,7 @@ NaviBar::NaviBar(QWidget *parent)
     action_helps_->setMenu(menu_help_);
 
     initSignals();
-
     setAppearance();
-
-    layout_->setSpacing(10);
 }
 
 void NaviBar::setAddress(const QString &url)
@@ -236,6 +237,10 @@ void NaviBar::initSignals()
     {
         emit naviBarCmd(NaviBarCmd::Back, QVariant());
     });
+    connect(btn_home_, &QToolButton::clicked, this, [this]()
+    {
+        emit naviBarCmd(NaviBarCmd::HomePage, QVariant());
+    });
     connect(btn_forward_, &QToolButton::clicked, this, [this]()
     {
         emit naviBarCmd(NaviBarCmd::Forward, QVariant());
@@ -259,11 +264,16 @@ void NaviBar::initSignals()
     });
     connect(action_new_window_, &QAction::triggered, this, [this]()
     {
+        qInfo()<<"new window";
         emit naviBarCmd(NaviBarCmd::NewWindow, QVariant());
     });
     connect(action_new_inprivate_window_, &QAction::triggered, this, [this]()
     {
         emit naviBarCmd(NaviBarCmd::NewInprivateWindow, QVariant());
+    });
+    connect(action_settings_, &QAction::triggered, this, [this]()
+    {
+        emit naviBarCmd(NaviBarCmd::Settings, QVariant());
     });
     connect(action_quit_, &QAction::triggered, this, [this]()
     {
@@ -284,11 +294,13 @@ void NaviBar::setAppearance()
     btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/normal_more.png"));
 
     QSize iconSize(26,26);
+    QSize btnSize(42,30);
     for(auto item : this->children()){
         if(item->isWidgetType() &&
                 item->metaObject()->className() == QString("QToolButton"))
         {
             auto btn = qobject_cast<QToolButton*>(item);
+            btn->setMinimumSize(btnSize);
             btn->setIconSize(iconSize);
         }
     }

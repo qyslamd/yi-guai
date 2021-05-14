@@ -21,6 +21,7 @@ class QStatusBar;
 class Page;
 class Tab_Thumbnail_Widget;
 class HistoryPopup;
+class AppCfgWidget;
 class QPropertyAnimation;
 
 class MainWindow : public QMainWindow
@@ -73,6 +74,7 @@ private:
     QPropertyAnimation *tab_thumbnail_anime_ = nullptr;   /* tab预览窗口移动动画*/
 
     HistoryPopup *history_popup_ = nullptr; /*历史记录 popup*/
+    AppCfgWidget *app_cfg_widget_ = nullptr;
 
     bool window_closing_ = false;  /*窗口是否正在关闭*/
 

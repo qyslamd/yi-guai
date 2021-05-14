@@ -6,7 +6,7 @@
 class QToolButton;
 class TabBar;
 class QHBoxLayout;
-class TabPagesBar : public QFrame
+class TabPagesBar final: public QFrame
 {
     Q_OBJECT
 public:
@@ -27,9 +27,10 @@ signals:
     void showDockPage();
     void testBtnClicked();
 public slots:
-     void setCurrentIndex(int index);
-     void onDwmColorChanged();
+    void setCurrentIndex(int index);
+    void onDwmColorChanged();
 private:
+    bool inprivate_;
     QHBoxLayout *layout_;
     QToolButton *btn_dock_tabs_ = nullptr;
     TabBar *tab_bar_;

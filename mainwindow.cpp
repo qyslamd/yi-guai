@@ -10,6 +10,7 @@
 #include "toolbars/BookmarkBar.h"
 #include "toolbars/NotificationBar.h"
 #include "widgets/TabThumbnailWidget.h"
+#include "widgets/appconfigwidget.h"
 #include "managers/AppCfgManager.h"
 
 #include "popups/HistoryPopup.h"
@@ -194,27 +195,6 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
 
 void MainWindow::initUi()
 {
-#if 0
-    QPalette pl = palette();
-    QColor activeColor("#F08080"), inActiveColor = activeColor;    // CECECE E8E8E8
-    inActiveColor.setAlphaF(0.7);
-    if(created_cfg_.is_inprivate){
-        activeColor = "#2E2F30";
-        inActiveColor = activeColor;
-        inActiveColor.setAlphaF(0.7);
-    }else{
-        if(UtilQt::dwmColorPrevalence()){
-            activeColor = QtWin::realColorizationColor();
-            activeColor.setAlphaF(1);
-            inActiveColor = activeColor;
-            inActiveColor.setAlphaF(0.7);
-        }
-    }
-    pl.setColor(QPalette::Active, QPalette::Window, activeColor);
-    pl.setColor(QPalette::Inactive, QPalette::Window, inActiveColor);
-    setPalette(pl);
-#endif
-
     /*删除QLayout原来的 Menubar */
     auto menuBar = this->layout()->menuBar();
     if(menuBar){
@@ -279,8 +259,10 @@ void MainWindow::initUi()
     history_popup_->resize(360, 600);
     history_popup_->installEventFilter(this);
 
-//    notify_bar_->hide();
-#if 1
+    app_cfg_widget_ = new AppCfgWidget(this);
+
+    notify_bar_->hide();
+#if 0
     widget_west_->setMinimumWidth(70);
     widget_east_->setMinimumWidth(70);
     widget_south_->setMinimumHeight(50);
@@ -314,40 +296,8 @@ void MainWindow::initSignalSlot()
     });
     connect(tab_bar_, &TabPagesBar::testBtnClicked, [this]()
     {
-//        auto visible = stack_browsers_->isVisible();
-//        stack_browsers_->setVisible(!visible);
-//        int width = GetSystemMetrics(SM_CXSCREEN);
-//        int height = GetSystemMetrics(SM_CYSCREEN);
-
-//        HWND hwnd = GetDesktopWindow();
-//        HDC display_dc = GetDC(nullptr);
-//        HDC bitmap_dc = CreateCompatibleDC(display_dc);
-//        HBITMAP bitmap = CreateCompatibleBitmap(display_dc, width, height);
-//        HGDIOBJ null_bitmap = SelectObject(bitmap_dc, bitmap);
-
-//        // copy data
-//        HDC window_dc = GetDC(hwnd);
-//        BitBlt(bitmap_dc, 0, 0, width, height, window_dc, 0, 0, SRCCOPY | CAPTUREBLT);
-
-//        // clean up all but bitmap
-//        ReleaseDC(hwnd, window_dc);
-//        SelectObject(bitmap_dc, null_bitmap);
-//        DeleteDC(bitmap_dc);
-
-//        QPixmap screen = QtWin::fromHBITMAP(bitmap);
-
-//        DeleteObject(bitmap);
-//        ReleaseDC(nullptr, display_dc);
-
-        QPixmap pix;
-        auto handle = GetPage(0)->getBrowserWidget()->getBrowserWindowHandle();
-        qInfo()<<handle;
-        client::SaveHwndToBmpFile((HWND)handle, pix);
-
-        static QLabel label;
-        label.setPixmap(pix);
-        label.show();
-
+        auto visible = stack_browsers_->isVisible();
+        stack_browsers_->setVisible(!visible);
     });
 #ifdef Q_OS_WIN
     connect(this, &MainWindow::dwmColorChanged, tab_bar_, &TabPagesBar::onDwmColorChanged);
@@ -448,7 +398,13 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         if(page){
             page->getBrowserWidget()->GoBack();
         }
-    }else if(cmd == NaviBarCmd::Forward)
+    }else if(cmd == NaviBarCmd::HomePage)
+        {
+            if(page){
+                page->getBrowserWidget()->Navigate(AppCfgMgr::homePageUrl());
+            }
+        }
+    else if(cmd == NaviBarCmd::Forward)
     {
         if(page){
             page->getBrowserWidget()->GoForward();
@@ -491,6 +447,8 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
     {
         MainWndCfg cfg{true, false, false, QRect(), ""};
         MainWndMgr::Instance().createWindow(cfg);
+    }else if(cmd == NaviBarCmd::Settings) {
+        app_cfg_widget_->show();
     }else if(cmd == NaviBarCmd::QuitApp) {
         MainWndMgr::Instance().closeAllWindows();
     }

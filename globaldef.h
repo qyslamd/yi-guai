@@ -21,6 +21,7 @@ enum class NaviBarCmd {
     None = -1,
     Navigate,
     Back,
+    HomePage,
     Forward,
     Refresh,
     StopLoading,
@@ -33,6 +34,7 @@ enum class NaviBarCmd {
     ZoomIn,
     ZoomReset,
     ZoomOut,
+    Settings,
     QuitApp
 };
 

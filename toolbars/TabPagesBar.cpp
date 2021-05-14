@@ -4,9 +4,15 @@
 #include <QToolButton>
 
 #include "TabBar.h"
+#include "utils/util_qt.h"
+
+#ifdef Q_OS_WIN
+#include <QtWin>
+#endif
 
 TabPagesBar::TabPagesBar(bool inprivate, QWidget *parent)
     : QFrame(parent)
+    , inprivate_(inprivate)
     , layout_(new QHBoxLayout)
     , btn_dock_tabs_(new QToolButton)
     , tab_bar_(new TabBar(inprivate))
@@ -65,6 +71,25 @@ void TabPagesBar::onDwmColorChanged()
 
 void TabPagesBar::initUi()
 {
+    QColor activeColor("#CECECE"), inActiveColor = activeColor;    // CECECE E8E8E8
+    inActiveColor.setAlphaF(0.7);
+    if(inprivate_){
+        activeColor = "#2E2F30";
+        inActiveColor = activeColor;
+        inActiveColor.setAlphaF(0.7);
+    }else{
+        if(UtilQt::dwmColorPrevalence()){
+            activeColor = QtWin::realColorizationColor();
+            activeColor.setAlphaF(1);
+            inActiveColor = activeColor;
+            inActiveColor.setAlphaF(0.7);
+        }
+    }
+    setStyleSheet(QString(".TabPagesBar{background-color:%1;}.TabPagesBar:!active{background-color:%2}")
+                  .arg(activeColor.name(QColor::HexArgb))
+                  .arg(inActiveColor.name(QColor::HexArgb))
+                  );
+
     setLayout(layout_);
     layout_->setContentsMargins(6, 6, 0, 0);
     layout_->setSpacing(2);
