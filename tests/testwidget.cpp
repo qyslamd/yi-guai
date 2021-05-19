@@ -10,6 +10,12 @@
 #include <QtMath>
 
 #include "utils/util_qt.h"
+#ifdef Q_OS_WIN
+//#include <windef.h>
+//#include <WinUser.h>
+#include <Windows.h>
+#pragma comment(lib, "User32.lib")
+#endif
 
 TestWidget::TestWidget(QWidget *parent) :
     QWidget(parent),
@@ -88,6 +94,18 @@ void TestWidget::mousePressEvent(QMouseEvent *event)
         }else if(region_ == Region::HT_CloseButton){
             close_button_press_ = true;
         }
+    }else if(event->button() == Qt::RightButton){
+#ifdef Q_OS_WIN
+        if(region_ == Region::HT_Caption){
+            qInfo()<<__FUNCTION__;
+            HWND sysMenuHwnd;
+            ::GetSystemMenu(sysMenuHwnd, false);
+            RECT rect{0};
+            ::GetWindowRect(sysMenuHwnd, &rect);
+            ::MoveWindow(sysMenuHwnd,0,0, rect.right - rect.left,rect.bottom - rect.top, false);
+            ::ShowWindow(sysMenuHwnd, SW_SHOW);
+        }
+#endif
     }
 }
 
