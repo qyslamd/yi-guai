@@ -26,10 +26,11 @@ private:
     const int FrameWidth = 10;
     const int CaptionHeight = 30;
 
-    enum class NineSqure{
-        Left,
+    enum class TenRegion{
+        Left = 1,
         TopLeft,
         Top,
+        TitleBar,
         TopRight,
         Right,
         BottomRight,
@@ -39,11 +40,12 @@ private:
     };
 
     bool mouse_left_btn_pressed_ = false;
-    QPoint press_pos_;
+    QPoint mouse_left_btn_press_pos_;
+    TenRegion region_;
 
-    QRect getNineSqureRect(NineSqure type);
+    // Determine the area and change the shape during the mouse movement
+    void judgeRegionChangeCursor(const QPoint &posInThis);
 
-    NineSqure curRect(const QPoint &windowPos);
 };
 
 #endif // TESTWIDGET_H

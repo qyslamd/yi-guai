@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
     MainWndMgr::Instance().createWindow(cfg);
 
     TestWidget w;
+//    FrameWidget w;
     w.show();
 
     message_loop->Run();

@@ -1,6 +1,7 @@
 #include "testwidget.h"
 #include "ui_testwidget.h"
 
+#include <QtDebug>
 #include <QPalette>
 #include <QLinearGradient>
 #include <QColor>
@@ -10,12 +11,6 @@
 
 #include "utils/util_qt.h"
 
-#ifdef Q_OS_WIN
-#include <Windows.h>
-#include <QtWin>
-#pragma comment(lib, "Gdi32.lib")
-#endif
-
 TestWidget::TestWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::TestWidget)
@@ -24,6 +19,8 @@ TestWidget::TestWidget(QWidget *parent) :
     setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
     setAttribute(Qt::WA_TranslucentBackground);
     setMouseTracking(true);
+
+    setMinimumSize(300,300);
 }
 
 TestWidget::~TestWidget()
@@ -65,9 +62,12 @@ void TestWidget::paintEvent(QPaintEvent *event)
 void TestWidget::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton){
-        mouse_left_btn_pressed_ = true;
-        press_pos_ = QCursor::pos();
+        if(region_ != TenRegion::Middle){
+            mouse_left_btn_pressed_ = true;
+            mouse_left_btn_press_pos_ = QCursor::pos();
+        }
     }
+
     QRect dragRect{FrameWidth,
                 FrameWidth,
                 width() - 2 * FrameWidth,
@@ -75,88 +75,84 @@ void TestWidget::mousePressEvent(QMouseEvent *event)
     if(!dragRect.contains(event->pos())){
         return QWidget::mousePressEvent(event);
     }
-
-    if(::ReleaseCapture()){
-        SendMessage(HWND(this->window()->winId()),
-                    WM_SYSCOMMAND,
-                    SC_MOVE + HTCAPTION,
-                    0);
-        event->ignore();
-    }
 }
 
 void TestWidget::mouseMoveEvent(QMouseEvent *event)
 {
+    if(!mouse_left_btn_pressed_){
+        judgeRegionChangeCursor(event->pos());
+        return QWidget::mouseMoveEvent(event);
+    }
+
+    QPoint gloPoint = event->globalPos();
+    QRect rect = this->rect();
+    QPoint tl = mapToGlobal(rect.topLeft());
+    QPoint rb = mapToGlobal(rect.bottomRight());
+
+    QRect rMove(tl, rb);
+    switch (region_) {
+    case TenRegion::Left:
+    {
+        if(rb.x() - gloPoint.x() <= this->minimumWidth())
+            rMove.setX(tl.x());
+        else
+            rMove.setX(gloPoint.x());
+    }
+        break;
+    case TenRegion::TopLeft:
+    {
+        if(rb.x() - gloPoint.x() <= this->minimumWidth())
+            rMove.setX(tl.x());
+        else
+            rMove.setX(gloPoint.x());
+        if(rb.y() - gloPoint.y() <= this->minimumHeight())
+            rMove.setY(tl.y());
+        else
+            rMove.setY(gloPoint.y());
+    }
+        break;
+    case TenRegion::Top:
+    {
+        if(rb.y() - gloPoint.y() <= this->minimumHeight())
+            rMove.setY(tl.y());
+        else
+            rMove.setY(gloPoint.y());
+    }
+        break;
+    case TenRegion::TopRight:
+    {
+        rMove.setWidth(gloPoint.x() - tl.x());
+        rMove.setY(gloPoint.y());
+    }
+        break;
+    case TenRegion::Right:
+    {
+        rMove.setWidth(gloPoint.x() - tl.x());
+    }
+        break;
+    case TenRegion::BottomRight:
+    {
+        rMove.setWidth(gloPoint.x() - tl.x());
+        rMove.setHeight(gloPoint.y() - tl.y());
+    }
+        break;
+    case TenRegion::Bottom:
+    {
+        rMove.setHeight(gloPoint.y() - tl.y());
+    }
+        break;
+    case TenRegion::BottomLeft:
+    {
+        rMove.setX(gloPoint.x());
+        rMove.setHeight(gloPoint.y() - tl.y());
+    }
+        break;
+    default:
+        break;
+    }
+
+    setGeometry(rMove);
     QWidget::mouseMoveEvent(event);
-
-    auto pos = event->pos();
-    if(getNineSqureRect(NineSqure::Left).contains(pos))
-    {
-        setCursor(Qt::SizeHorCursor);
-    }
-    if(getNineSqureRect(NineSqure::TopLeft).contains(pos))
-    {
-        setCursor(Qt::SizeFDiagCursor);
-    }
-    if(getNineSqureRect(NineSqure::Top).contains(pos))
-    {
-        setCursor(Qt::SizeVerCursor);
-    }
-    if(getNineSqureRect(NineSqure::TopRight).contains(pos))
-    {
-        setCursor(Qt::SizeBDiagCursor);
-    }
-    if(getNineSqureRect(NineSqure::Right).contains(pos))
-    {
-        setCursor(Qt::SizeHorCursor);
-    }
-    if(getNineSqureRect(NineSqure::BottomRight).contains(pos))
-    {
-        setCursor(Qt::SizeFDiagCursor);
-    }
-    if(getNineSqureRect(NineSqure::Bottom).contains(pos))
-    {
-        setCursor(Qt::SizeVerCursor);
-    }
-    if(getNineSqureRect(NineSqure::BottomLeft).contains(pos))
-    {
-        setCursor(Qt::SizeBDiagCursor);
-    }
-    if(getNineSqureRect(NineSqure::Middle).contains(pos))
-    {
-        setCursor(Qt::ArrowCursor);
-    }
-
-//    if(mouse_left_btn_pressed_){
-//        auto cursorPos = QCursor::pos();
-//        auto windowPos = mapFromGlobal(cursorPos);
-//        switch(curRect(windowPos)){
-//        case NineSqure::Left:
-//        {
-//            auto rect = this->geometry();
-//            rect.setX(rect.x() + press_pos_.x() - cursorPos.x());
-//            setGeometry(rect);
-//        }
-//            break;
-//        case NineSqure::TopLeft:
-//            break;
-//        case NineSqure::Top:
-//            break;
-//        case NineSqure::TopRight:
-//            break;
-//        case NineSqure::Right:
-//            break;
-
-//        case NineSqure::BottomRight:
-//            break;
-//        case NineSqure::Bottom:
-//            break;
-//        case NineSqure::BottomLeft:
-//            break;
-//        case NineSqure::Middle:
-//            break;
-//        }
-//    }
 }
 
 void TestWidget::mouseReleaseEvent(QMouseEvent *event)
@@ -164,76 +160,60 @@ void TestWidget::mouseReleaseEvent(QMouseEvent *event)
     QWidget::mouseReleaseEvent(event);
     if(event->button() == Qt::LeftButton){
         mouse_left_btn_pressed_ = false;
-        press_pos_ = QPoint();
+        mouse_left_btn_press_pos_ = QPoint();
     }
 }
 
 void TestWidget::leaveEvent(QEvent *event)
 {
-    mouse_left_btn_pressed_ = false;
-    press_pos_ = QPoint();
+//    mouse_left_btn_pressed_ = false;
+//    press_pos_ = QPoint();
     QWidget::leaveEvent(event);
 }
 
-QRect TestWidget::getNineSqureRect(TestWidget::NineSqure type)
+void TestWidget::judgeRegionChangeCursor(const QPoint &posInThis)
 {
-    switch (type) {
-    case NineSqure::Left:
-        return QRect{0, FrameWidth, FrameWidth, height() - 2 * FrameWidth};
-    case NineSqure::TopLeft:
-        return QRect{0, 0, FrameWidth, FrameWidth};
-    case NineSqure::Top:
-        return QRect{FrameWidth, 0, width() - 2 * FrameWidth, FrameWidth};
-    case NineSqure::TopRight:
-        return QRect{width() - FrameWidth, 0, FrameWidth, FrameWidth};
-    case NineSqure::Right:
-        return QRect{width() - FrameWidth, FrameWidth, FrameWidth, height() - 2 * FrameWidth};
-    case NineSqure::BottomRight:
-        return QRect{width() - FrameWidth, height() - FrameWidth, FrameWidth, FrameWidth};
-    case NineSqure::Bottom:
-        return QRect{FrameWidth, height() - FrameWidth, width() - 2 * FrameWidth, FrameWidth};
-    case NineSqure::BottomLeft:
-        return QRect{0, height() - FrameWidth, FrameWidth, FrameWidth};
-    default:
-        return QRect{FrameWidth, FrameWidth, width() - 2 * FrameWidth, height() - 2 * FrameWidth};
-    }
-}
-
-TestWidget::NineSqure TestWidget::curRect(const QPoint &windowPos)
-{
-    auto pos =windowPos;
-    if(getNineSqureRect(NineSqure::Left).contains(pos))
+    if(QRect{0, FrameWidth, FrameWidth, height() - 2 * FrameWidth}.contains(posInThis))
     {
-        return NineSqure::Left;
-    }
-    if(getNineSqureRect(NineSqure::TopLeft).contains(pos))
+        region_ = TenRegion::Left;
+        setCursor(Qt::SizeHorCursor);
+    }else if(QRect{0, 0, FrameWidth, FrameWidth}.contains(posInThis))
     {
-        return NineSqure::TopLeft;
-    }
-    if(getNineSqureRect(NineSqure::Top).contains(pos))
+        region_ = TenRegion::TopLeft;
+        setCursor(Qt::SizeFDiagCursor);
+    }else if(QRect{FrameWidth, 0, width() - 2 * FrameWidth, FrameWidth}.contains(posInThis))
     {
-        return NineSqure::Top;
+        setCursor(Qt::SizeVerCursor);
     }
-    if(getNineSqureRect(NineSqure::TopRight).contains(pos))
+    else if(QRect{width() - FrameWidth, 0, FrameWidth, FrameWidth}.contains(posInThis))
     {
-        return NineSqure::TopRight;
+        region_ = TenRegion::TopRight;
+        setCursor(Qt::SizeBDiagCursor);
     }
-    if(getNineSqureRect(NineSqure::Right).contains(pos))
+    else if(QRect{width() - FrameWidth, FrameWidth, FrameWidth, height() - 2 * FrameWidth}.contains(posInThis))
     {
-        return NineSqure::Right;
+        region_ = TenRegion::Right;
+        setCursor(Qt::SizeHorCursor);
     }
-    if(getNineSqureRect(NineSqure::BottomRight).contains(pos))
+    else if(QRect{width() - FrameWidth, height() - FrameWidth, FrameWidth, FrameWidth}.contains(posInThis))
     {
-        return NineSqure::BottomRight;
+        region_ = TenRegion::BottomRight;
+        setCursor(Qt::SizeFDiagCursor);
     }
-    if(getNineSqureRect(NineSqure::Bottom).contains(pos))
+    else if(QRect{FrameWidth, height() - FrameWidth, width() - 2 * FrameWidth, FrameWidth}.contains(posInThis))
     {
-        return NineSqure::Bottom;
+        region_ = TenRegion::Bottom;
+        setCursor(Qt::SizeVerCursor);
     }
-    if(getNineSqureRect(NineSqure::BottomLeft).contains(pos))
+    else if(QRect{0, height() - FrameWidth, FrameWidth, FrameWidth}.contains(posInThis))
     {
-        return NineSqure::BottomLeft;
+        region_ = TenRegion::BottomLeft;
+        setCursor(Qt::SizeBDiagCursor);
     }
-    return NineSqure::Middle;
+    else
+    {
+        region_ = TenRegion::Middle;
+        setCursor(Qt::ArrowCursor);
+    }
 }
 
