@@ -37,8 +37,6 @@ CefQWidget::CefQWidget(const QString &url, QWidget *parent)
     newly_created_ = true;
     browser_window_.reset(new BrowserWindow(this, url.toStdString()));
     initUi();
-
-    int a = CSIDL_STARTUP;
 }
 
 CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
@@ -107,6 +105,32 @@ void CefQWidget::StopLoading()
         if(browser->IsLoading()){
             browser->StopLoad();
         }
+    }
+}
+
+void CefQWidget::ZoomOut()
+{
+    auto browser = browser_window_->GetBrowser();
+    if(browser){
+        auto old = browser->GetHost()->GetZoomLevel();
+        browser->GetHost()->SetZoomLevel(old - 1.0);
+    }
+}
+
+void CefQWidget::ZoomIn()
+{
+    auto browser = browser_window_->GetBrowser();
+    if(browser){
+        auto old = browser->GetHost()->GetZoomLevel();
+        browser->GetHost()->SetZoomLevel(old + 1.0);
+    }
+}
+
+void CefQWidget::ZoomReset()
+{
+    auto browser = browser_window_->GetBrowser();
+    if(browser){
+        browser->GetHost()->SetZoomLevel(0.0);
     }
 }
 

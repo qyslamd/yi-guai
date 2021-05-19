@@ -41,7 +41,7 @@ MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
     : QMainWindow(parent)
     , created_cfg_(cfg)
 {
-//    setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowSystemMenuHint);
+    //    setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowSystemMenuHint);
     initUi();
     setAppearance();
     initSignalSlot();
@@ -50,7 +50,7 @@ MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
     if(url.isEmpty()){
         url = AppCfgMgr::homePageUrl();
         if(url.isEmpty()){
-           url = "https://cn.bing.com/";
+            url = "https://cn.bing.com/";
         }
     }
     addNewPage(url);
@@ -102,11 +102,11 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *r
 {
 #ifdef Q_OS_WIN
     //Workaround for known bug -> check Qt forum : https://forum.qt.io/topic/93141/qtablewidget-itemselectionchanged/13
-    #if (QT_VERSION == QT_VERSION_CHECK(5, 11, 1))
+#if (QT_VERSION == QT_VERSION_CHECK(5, 11, 1))
     MSG* msg = *reinterpret_cast<MSG**>(message);
-    #else
+#else
     MSG* msg = reinterpret_cast<MSG*>(message);
-    #endif
+#endif
 
     switch (msg->message)
     {
@@ -147,7 +147,7 @@ void MainWindow::changeEvent(QEvent *event)
     if(event->type() == QEvent::WindowStateChange)
     {
         emit windowStateChanged(windowState(),
-                                        stack_browsers_->currentWidget()->size());
+                                stack_browsers_->currentWidget()->size());
     }
 }
 
@@ -216,7 +216,7 @@ void MainWindow::initUi()
     widget_north_layout_->addWidget(navi_bar_);
     widget_north_layout_->addWidget(bookmark_bar_);
     widget_north_layout_->addWidget(notify_bar_);
-     /*设置成自定义的 MenuBar （其实是QWidget*）*/
+    /*设置成自定义的 MenuBar （其实是QWidget*）*/
     layout()->setMenuBar(widget_north_);
 
 
@@ -288,11 +288,11 @@ void MainWindow::initSignalSlot()
     connect(tab_bar_, &TabPagesBar::showPreview, this, &MainWindow::onShowTabThumnail);
     connect(tab_bar_, &TabPagesBar::addPage, [this]()
     {
-       addNewPage("about:version", true);
+        addNewPage("about:version", true);
     });
     connect(tab_bar_, &TabPagesBar::showDockPage, [this]()
     {
-       addNewPage("about:version", true);
+        addNewPage("about:version", true);
     });
     connect(tab_bar_, &TabPagesBar::testBtnClicked, [this]()
     {
@@ -337,8 +337,8 @@ void MainWindow::onStatusMessage(const QString &msg)
     // if message is url, decode it
     QUrl url(msg);
     QString tempMsg = url.isValid()
-                          ? url.toDisplayString()
-                          : msg;
+            ? url.toDisplayString()
+            : msg;
     // get elide text
     QFontMetrics fontMetrics(QToolTip::font());
     tempMsg = fontMetrics.elidedText(tempMsg, Qt::ElideRight, this->width() / 2);
@@ -399,11 +399,11 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
             page->getBrowserWidget()->GoBack();
         }
     }else if(cmd == NaviBarCmd::HomePage)
-        {
-            if(page){
-                page->getBrowserWidget()->Navigate(AppCfgMgr::homePageUrl());
-            }
+    {
+        if(page){
+            page->getBrowserWidget()->Navigate(AppCfgMgr::homePageUrl());
         }
+    }
     else if(cmd == NaviBarCmd::Forward)
     {
         if(page){
@@ -415,18 +415,21 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         if(page){
             page->getBrowserWidget()->Refresh();
         }
-    }else if(cmd == NaviBarCmd::StopLoading)
+    }
+    else if(cmd == NaviBarCmd::StopLoading)
     {
         if(page){
             page->getBrowserWidget()->StopLoading();
         }
-    } else if(cmd == NaviBarCmd::ViewSiteInfo)
+    }
+    else if(cmd == NaviBarCmd::ViewSiteInfo)
     {
         if(page){
             auto rect = para.toRect();
             page->showSiteInfomation(rect);
         }
-    }else if(cmd == NaviBarCmd::History)
+    }
+    else if(cmd == NaviBarCmd::History)
     {
         auto pos = para.toPoint();
         pos.ry() += 2;
@@ -441,17 +444,34 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
             url = "https://cn.bing.com/";
         }
         addNewPage(url, true);
-    } else if(cmd == NaviBarCmd::NewWindow){
+    }
+    else if(cmd == NaviBarCmd::NewWindow){
         MainWndMgr::Instance().createWindow(MainWndCfg());
-    } else if(cmd == NaviBarCmd::NewInprivateWindow)
+    }
+    else if(cmd == NaviBarCmd::NewInprivateWindow)
     {
         MainWndCfg cfg{true, false, false, QRect(), ""};
         MainWndMgr::Instance().createWindow(cfg);
-    }else if(cmd == NaviBarCmd::Settings) {
+    }
+    else if(cmd == NaviBarCmd::ZoomOut){
+        if(page){
+            page->getBrowserWidget()->ZoomOut();
+        }
+    }
+    else if(cmd == NaviBarCmd::ZoomIn){
+        if(page){
+            page->getBrowserWidget()->ZoomIn();
+        }
+    }
+    else if(cmd == NaviBarCmd::FullScreen){
+//        showFullScreen();
+//        showNormal();
+    }
+    else if(cmd == NaviBarCmd::Settings) {
         app_cfg_widget_->show();
-    }else if(cmd == NaviBarCmd::QuitApp) {
-        MainWndMgr::Instance().setNeedQuitApp();
-        MainWndMgr::Instance().closeAllWindows();
+    }
+    else if(cmd == NaviBarCmd::QuitApp) {
+        MainWndMgr::Instance().quitApplication();
     }
 }
 

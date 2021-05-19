@@ -31,9 +31,9 @@ enum class NaviBarCmd {
     NewTabPage,
     NewWindow,
     NewInprivateWindow,
-    ZoomIn,
-    ZoomReset,
     ZoomOut,
+    ZoomIn,
+    FullScreen,
     Settings,
     QuitApp
 };

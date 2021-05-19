@@ -5,6 +5,7 @@
 #include <QRect>
 #include <QtDebug>
 #include <QSet>
+#include <QSharedPointer>
 
 typedef struct MainWindowConfig{
 
@@ -33,13 +34,15 @@ public:
     ~MainWndMgr();
     void createWindow(const MainWindowConfig &cfg);
     QRect lastWindowGeometry() const;
-    void closeAllWindows();
-    void setNeedQuitApp(bool need = true);
+    void quitApplication();
 signals:
 
 private:
     QSet<MainWindow *> windows_;
-    bool need_quit_app_;
+
+    QMap<int, MainWindow *> wnd_map_;
+
+    bool quit_app_flag_ = false;
 private:
     explicit MainWndMgr(QObject *parent = nullptr);
     MainWndMgr(const MainWndMgr& other);

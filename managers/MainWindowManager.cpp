@@ -9,7 +9,9 @@
 MainWndMgr::MainWndMgr(QObject *parent)
     : QObject(parent)
 {
+
 }
+
 
 MainWndMgr::~MainWndMgr() {
     qInfo()<<__FUNCTION__;
@@ -28,20 +30,27 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
     // otherwise the resource will not be released
     window->setAttribute(Qt::WA_DeleteOnClose, true);
 
-    connect(window, &MainWindow::destroyed, this, [=](){
+    // if window destroyed,remove reference in set and map.
+    connect(window, &MainWindow::destroyed, this, [=](QObject *){
         windows_.remove(window);
-        if(need_quit_app_){
+        wnd_map_.remove( wnd_map_.key(window));
+
+        // if quit application flag is set and window set is empty,quit the application
+        if(quit_app_flag_ && windows_.isEmpty())
+        {
             qApp->quit();
         }
     });
 
+    // calculate window geometry
+    const QRect availableScrnGeometry =  qApp->primaryScreen()->availableGeometry();
     if(windows_.isEmpty()){
         // 首个窗口还原配置中保存的位置大小信息
         auto geo = AppCfgMgr::windowGeometry();
         if(geo.isEmpty() || !window->restoreGeometry(geo)){
-            const QRect availableGeometry =  qApp->primaryScreen()->availableGeometry();
-            const QSize size = (availableGeometry.size() * 4) / 5;
-            auto pos = availableGeometry.center() - QPoint(size.width(), size.height()) / 2;
+
+            const QSize size = (availableScrnGeometry.size() * 4) / 5;
+            auto pos = availableScrnGeometry.center() - QPoint(size.width(), size.height()) / 2;
             window->setGeometry(pos.x(),pos.y(),
                                 size.width(), size.height());
         }
@@ -54,11 +63,15 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
                                       rect.y() + AppCfgMgr::newWndOffsetY,
                                       rect.width(),
                                       rect.height()};
+
         }
         window->setGeometry(targetRect);
     }
 
+    static int wnd_index = 0;
     windows_.insert(window);
+    wnd_map_.insert(wnd_index++, window);
+
     if(!cfg.initially_hidden)
     {
         window->show();
@@ -67,13 +80,11 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
 
 QRect MainWndMgr::lastWindowGeometry() const
 {
-    auto iter = windows_.end();
-    --iter;
-    auto window = *iter;
+    auto window = wnd_map_.last();
     return window->geometry();
 }
 
-void MainWndMgr::closeAllWindows()
+void MainWndMgr::quitApplication()
 {
     auto it = windows_.begin();
     auto end = windows_.end();
@@ -84,9 +95,5 @@ void MainWndMgr::closeAllWindows()
             (*it)->close();
         }
     }
-}
-
-void MainWndMgr::setNeedQuitApp(bool need)
-{
-    need_quit_app_ = need;
+    quit_app_flag_ = true;
 }

@@ -113,8 +113,8 @@ NaviBar::NaviBar(QWidget *parent)
     action_quit_->setText(tr("quit app"));
     action_quit_->setIcon(QIcon());
 
-    btn_zoom_out_->setText("+");
-    btn_zoom_in_->setText("-");
+    btn_zoom_out_->setText("-");
+    btn_zoom_in_->setText("+");
     btn_fullscreen_->setText("x");
     frame_zoom_->setFrameShape(QFrame::NoFrame);
 
@@ -271,6 +271,19 @@ void NaviBar::initSignals()
     connect(action_new_inprivate_window_, &QAction::triggered, this, [this]()
     {
         emit naviBarCmd(NaviBarCmd::NewInprivateWindow, QVariant());
+    });
+    connect(btn_zoom_out_, &QToolButton::clicked, this, [this]()
+    {
+        emit naviBarCmd(NaviBarCmd::ZoomOut, QVariant());
+    });
+    connect(btn_zoom_in_, &QToolButton::clicked, this, [this]()
+    {
+        emit naviBarCmd(NaviBarCmd::ZoomIn, QVariant());
+    });
+    connect(btn_fullscreen_, &QToolButton::clicked, this, [this]()
+    {
+        emit naviBarCmd(NaviBarCmd::FullScreen, QVariant());
+        menu_more_options_->hide();
     });
     connect(action_settings_, &QAction::triggered, this, [this]()
     {

@@ -23,7 +23,9 @@ void CefAppBrowser::OnBeforeCommandLineProcessing(
     command_line->AppendSwitch("enable-media-stream");
     command_line->AppendSwitch("enable-speech-input");
     command_line->AppendSwitch("enable-desktop-notifications");
-    //
+
+    // 合并渲染进程
+    command_line->AppendSwitch("process-per-site");
 
     // Pass additional command-line flags to the browser process.
     if (process_type.empty()) {

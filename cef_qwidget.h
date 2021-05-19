@@ -22,6 +22,9 @@ public:
     void GoForward();
     void Refresh();
     void StopLoading();
+    void ZoomOut();
+    void ZoomIn();
+    void ZoomReset();
 
     CefWindowHandle getBrowserWindowHandle();
 signals:
