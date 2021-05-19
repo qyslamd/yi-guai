@@ -3,6 +3,7 @@
 
 #include <QGraphicsDropShadowEffect>
 #include <QMouseEvent>
+#include <QPainter>
 
 FrameWidget::FrameWidget(QWidget *parent) :
     QWidget(parent),

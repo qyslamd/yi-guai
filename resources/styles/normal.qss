@@ -17,7 +17,7 @@ background-color:#DCDCDC;
 }
 
 QToolButton:open{
-background: #6f8ee9;
+background: #CFCFCF;
 border:none;
 }
 

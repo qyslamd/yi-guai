@@ -88,8 +88,8 @@ int main(int argc, char *argv[])
         QString("https://cn.bing.com/")};
     MainWndMgr::Instance().createWindow(cfg);
 
-//    TestWidget w;
-//    w.show();
+    TestWidget w;
+    w.show();
 
     message_loop->Run();
 

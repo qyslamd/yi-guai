@@ -450,6 +450,7 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
     }else if(cmd == NaviBarCmd::Settings) {
         app_cfg_widget_->show();
     }else if(cmd == NaviBarCmd::QuitApp) {
+        MainWndMgr::Instance().setNeedQuitApp();
         MainWndMgr::Instance().closeAllWindows();
     }
 }

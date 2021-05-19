@@ -251,7 +251,6 @@ void CefClientHandler::NotifyBrowserFavicon(CefRefPtr<CefImage> image,
         delegate_->onBrowserFaviconChange(image, icon_url);
 }
 
-
 void CefClientHandler::OnAddressChange(CefRefPtr<CefBrowser> browser,
                                        CefRefPtr<CefFrame> frame,
                                        const CefString &url)
@@ -337,13 +336,7 @@ bool CefClientHandler::OnJSDialog(CefRefPtr<CefBrowser> browser,
 {
     //普通提示框 询问框
     if(dialog_type == JSDIALOGTYPE_ALERT){
-//        AlertDialog dlg(QString::fromStdWString(origin_url),
-//                        QString::fromStdWString(message_text));
-//        dlg.exec();
-        auto hwnd = browser->GetHost()->GetWindowHandle();
-        ::MessageBox(hwnd, message_text.ToWString().c_str(), L"AAA", MB_OK);
-        suppress_message = true;
-        return false;
+
     }else if(dialog_type == JSDIALOGTYPE_CONFIRM){
 
     }else if(dialog_type == JSDIALOGTYPE_PROMPT){

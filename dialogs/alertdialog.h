@@ -13,7 +13,11 @@ class AlertDialog : public QDialog
 
 public:
     explicit AlertDialog(const QString &title, const QString &msg, QWidget *parent = nullptr);
+    explicit AlertDialog(QWidget *parent = nullptr);
     ~AlertDialog();
+
+    void setTitle(const QString &title);
+    void setMsg(const QString &msg);
 
 private:
     Ui::AlertDialog *ui;

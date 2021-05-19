@@ -17,6 +17,9 @@ public:
 
 private:
     Ui::AppCfgWidget *ui;
+
+private slots:
+    void onNaviButtonClicked();
 };
 
 #endif // APPCONFIGWIDGET_H

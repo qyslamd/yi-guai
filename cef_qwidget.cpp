@@ -2,6 +2,7 @@
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
+#include <SHlObj.h>
 #endif
 
 #include <QtDebug>
@@ -25,6 +26,7 @@
 #include "managers/MainWindowManager.h"
 #include "managers/AppCfgManager.h"
 #include "utils/util_qt.h"
+#include "dialogs/alertdialog.h"
 
 CefQWidget::CefQWidget(const QString &url, QWidget *parent)
     : QWidget(parent)
@@ -35,6 +37,8 @@ CefQWidget::CefQWidget(const QString &url, QWidget *parent)
     newly_created_ = true;
     browser_window_.reset(new BrowserWindow(this, url.toStdString()));
     initUi();
+
+    int a = CSIDL_STARTUP;
 }
 
 CefQWidget::CefQWidget(CefWindowInfo &windowInfo,

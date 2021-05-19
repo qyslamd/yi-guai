@@ -9,6 +9,10 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QPaintDevice>
+#include <QPainter>
+#include <QPainterPath>
+#include <QtMath>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -250,6 +254,37 @@ namespace UtilQt {
         file.close();
 
         return data.size();
+    }
+
+    void drawShadow(QPaintDevice *device)
+    {
+        const int SHADOW_WIDTH = 10;
+        QPainter painter(device);
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        painter.fillRect(QRect(SHADOW_WIDTH, SHADOW_WIDTH,
+                               device->width() - 2 * SHADOW_WIDTH,
+                               device->height() - 2 * SHADOW_WIDTH),
+                         QBrush(Qt::white));
+
+        QColor color(100, 100, 100, 30);   //  50, 50, 50, 30
+        for (int i = 0; i < SHADOW_WIDTH; i++)
+        {
+            color.setAlpha(120 - qSqrt(i) * 40);
+            painter.setPen(color);
+ #if 0
+            painter.drawRect(SHADOW_WIDTH - i,
+                             SHADOW_WIDTH - i,
+                             device->width() - (SHADOW_WIDTH - i) * 2,
+                             device->height() - (SHADOW_WIDTH - i) * 2);
+#else
+            painter.drawRoundedRect(SHADOW_WIDTH - i,
+                                    SHADOW_WIDTH - i,
+                                    device->width() - (SHADOW_WIDTH - i) * 2,
+                                    device->height() - (SHADOW_WIDTH - i) * 2,
+                                    i,
+                                    i);
+#endif
+        }
     }
 
 #endif

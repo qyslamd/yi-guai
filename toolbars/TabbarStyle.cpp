@@ -156,7 +156,6 @@ void TabbarStyle::drawTabBarTabShape(const QStyleOption *option,
         painter->drawPolygon(polygon);
         painter->restore();
     };
-
     const double scale = 1.0 / 3.0; // 圆角占高度的比例
     QStyle::State state =  option->state;
     if(state.testFlag(QStyle::State_Selected))
@@ -184,6 +183,27 @@ void TabbarStyle::drawTabBarTabShape(const QStyleOption *option,
             }
         }
         drawShape(path, brush);
+
+        if(0){
+            auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
+            QRectF rect = tabOption->rect;   // 用于绘制的整个矩形大小
+            QLinearGradient linearGrad(QPointF(rect.x(), rect.y() + rect.height() / 2),
+                                       QPointF(rect.x() + rect.width(),
+                                               rect.y() + rect.height() / 2)
+                                       );
+            QColor color1(0xDCDCDC);
+            color1.setAlphaF(0.8);
+            QColor color2(0xDCDCDC);
+            color2.setAlphaF(0.0);
+
+            linearGrad.setColorAt(0, color1);
+            linearGrad.setColorAt(0.2, color2);
+            linearGrad.setColorAt(0.8, color2);
+            linearGrad.setColorAt(1, color1);
+
+            painter->fillRect(rect, QBrush(linearGrad));
+
+        }
     }else if(state.testFlag(QStyle::State_MouseOver))
     {
         QPainterPath path = getHoveredShape(option, scale);
@@ -234,6 +254,7 @@ QPainterPath TabbarStyle::getSelectedShape(const QStyleOption *option,
 {
     auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
     QRectF rect = tabOption->rect;   // 用于绘制的整个矩形大小
+//    rect.adjust(0, 2, 0, 0);
     qreal len = 1.0 * rect.height() * scale;   // 画弧形的正方形的边长
 
     switch (tabOption->position) {
@@ -308,6 +329,7 @@ QPainterPath TabbarStyle::getHoveredShape(const QStyleOption *option,
 {
     auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
     QRectF rect = tabOption->rect;       // 用于绘制的整个矩形大小
+//    rect.adjust(0, 2, 0, 0);
     qreal len = rect.height() * scale;   // 画弧形的正方形的边长
 
     auto selectPos = tabOption->selectedPosition;

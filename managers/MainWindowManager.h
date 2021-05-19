@@ -28,19 +28,22 @@ class MainWindow;
 class MainWndMgr : public QObject
 {
     Q_OBJECT
-    explicit MainWndMgr(QObject *parent = nullptr);
-    MainWndMgr(const MainWndMgr& other);
-    MainWndMgr& operator=(const MainWndMgr & other);
 public:
     static MainWndMgr& Instance();
     ~MainWndMgr();
     void createWindow(const MainWindowConfig &cfg);
     QRect lastWindowGeometry() const;
     void closeAllWindows();
+    void setNeedQuitApp(bool need = true);
 signals:
 
 private:
     QSet<MainWindow *> windows_;
+    bool need_quit_app_;
+private:
+    explicit MainWndMgr(QObject *parent = nullptr);
+    MainWndMgr(const MainWndMgr& other);
+    MainWndMgr& operator=(const MainWndMgr & other);
 };
 
 #endif // MAINWINDOWMANAGER_H

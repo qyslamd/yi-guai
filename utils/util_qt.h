@@ -3,6 +3,7 @@
 
 #include <QVariant>
 
+class QPaintDevice;
 namespace UtilQt {
     extern bool isValidIpV4(const QString &str);
     extern QString check_url(const QString &str);
@@ -30,6 +31,8 @@ namespace UtilQt {
     extern long long writeStringToFile(const QString &path, const QString &data);
     extern long long writeDataToFile(const QString &path, const QByteArray &data);
     extern QString GetFileNameFromURL(const QString &url);
+
+    extern void drawShadow(QPaintDevice *device);
 }
 
 #endif // UTIL_QT_H

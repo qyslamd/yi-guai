@@ -30,6 +30,9 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
 
     connect(window, &MainWindow::destroyed, this, [=](){
         windows_.remove(window);
+        if(need_quit_app_){
+            qApp->quit();
+        }
     });
 
     if(windows_.isEmpty()){
@@ -81,4 +84,9 @@ void MainWndMgr::closeAllWindows()
             (*it)->close();
         }
     }
+}
+
+void MainWndMgr::setNeedQuitApp(bool need)
+{
+    need_quit_app_ = need;
 }

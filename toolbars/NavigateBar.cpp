@@ -174,6 +174,7 @@ NaviBar::NaviBar(QWidget *parent)
 void NaviBar::setAddress(const QString &url)
 {
     address_bar_->setText(url);
+    address_bar_->setCursorPosition(0);
 }
 
 void NaviBar::setLoadingState(bool isLoading, bool canGoBack, bool canGoForward)

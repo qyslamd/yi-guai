@@ -15,21 +15,53 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QWidget#AppCfgWidget{
-background-color:#F7F7F7;
+background-color:white;
 }
+
 QSplitter::handle:horizontal {
 width: 1px;
-background-color: qlineargradient(spread:pad, x1:0, y1:0.5, x2:1, y2:0.5, stop:0 rgba(0, 0, 0, 30), stop:1 rgba(0, 0, 0, 255), stop:2 rgba(0, 0, 0, 30));
- }
-</string>
+background:#DCDCDC;
+}
+
+QSplitter::handle:vertical {
+width: 1px;
+background:#DCDCDC;
+}</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QSplitter" name="splitter">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
+     <property name="opaqueResize">
+      <bool>false</bool>
+     </property>
+     <property name="childrenCollapsible">
+      <bool>false</bool>
+     </property>
      <widget class="QScrollArea" name="scrollAreaNavi">
+      <property name="minimumSize">
+       <size>
+        <width>250</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="maximumSize">
        <size>
         <width>250</width>
@@ -51,7 +83,7 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0.5, x2:1, y2:0.5, stop:0
          <x>0</x>
          <y>0</y>
          <width>250</width>
-         <height>518</height>
+         <height>536</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -72,14 +104,19 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0.5, x2:1, y2:0.5, stop:0
         </property>
         <item>
          <widget class="QFrame" name="frameSearch">
+          <property name="styleSheet">
+           <string notr="true">QFrame#frameSearch{
+background-color:white;
+}</string>
+          </property>
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="0">
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
             <widget class="QLabel" name="label">
              <property name="styleSheet">
               <string notr="true">font-weight:bold;
@@ -91,21 +128,28 @@ font-size:14pt;
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
+           <item>
+            <widget class="QLineEdit" name="lineEdit">
+             <property name="minimumSize">
               <size>
-               <width>251</width>
-               <height>20</height>
+               <width>0</width>
+               <height>32</height>
               </size>
              </property>
-            </spacer>
-           </item>
-           <item row="1" column="0" colspan="2">
-            <widget class="QLineEdit" name="lineEdit">
+             <property name="styleSheet">
+              <string notr="true">QLineEdit{
+    border:none;
+border:1px solid #cdcdcd;
+    padding-left:4px;
+    border-radius:15px;
+}
+QLineEdit:hover{
+    border:1px solid #00BFFF;
+}
+QLineEdit:focus{
+    border:2px solid #A3CFEC;
+}</string>
+             </property>
              <property name="placeholderText">
               <string>Search in settings</string>
              </property>
@@ -117,13 +161,25 @@ font-size:14pt;
         <item>
          <widget class="QFrame" name="frameNaviBtns">
           <property name="styleSheet">
-           <string notr="true">QPushButton{
+           <string notr="true">QFrame#frameNaviBtns{
 border:none;
+border-top:1px solid #cdcdcd;
+background-color:white;
+}
+
+QPushButton{
+border:none;
+/*border-radius:12px;*/
 text-align:left;
 padding:6px;
+background-color:white;
 }
 QPushButton:hover{
-background-color:#EAEAEA;
+background-color:pink;
+}
+
+QPushButton:checked{
+background-color:#BFFFBF;
 }</string>
           </property>
           <property name="frameShape">
@@ -134,12 +190,25 @@ background-color:#EAEAEA;
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
            <property name="spacing">
-            <number>0</number>
+            <number>8</number>
            </property>
            <item>
             <widget class="QPushButton" name="btnPersonal">
              <property name="text">
               <string>personal information </string>
+             </property>
+             <property name="icon">
+              <iconset resource="../resource.qrc">
+               <normaloff>:/icons/resources/imgs/user2_64px.png</normaloff>:/icons/resources/imgs/user2_64px.png</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -148,12 +217,18 @@ background-color:#EAEAEA;
              <property name="text">
               <string>Privacy Search and service</string>
              </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="btnAppearence">
              <property name="text">
               <string>Appearence</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -162,6 +237,9 @@ background-color:#EAEAEA;
              <property name="text">
               <string>Startup</string>
              </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item>
@@ -169,12 +247,18 @@ background-color:#EAEAEA;
              <property name="text">
               <string>New tab page</string>
              </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="btnDownload">
              <property name="text">
               <string>Download</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -202,12 +286,33 @@ background-color:#EAEAEA;
        <number>0</number>
       </property>
       <widget class="QWidget" name="pageAppearence">
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
         <property name="topMargin">
          <number>0</number>
         </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
-         <widget class="QScrollArea" name="scrollArea">
+         <widget class="QScrollArea" name="scrollAreaPageApprearence">
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
@@ -215,10 +320,13 @@ background-color:#EAEAEA;
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-60</y>
-             <width>528</width>
-             <height>633</height>
+             <y>0</y>
+             <width>588</width>
+             <height>536</height>
             </rect>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_4">
             <property name="topMargin">
@@ -237,7 +345,7 @@ font-size:13pt;
              </widget>
             </item>
             <item>
-             <widget class="QFrame" name="frame">
+             <widget class="QFrame" name="frameAppea_Browser">
               <property name="styleSheet">
                <string notr="true">.QFrame{
 border:1px solid gray;
@@ -273,7 +381,7 @@ border-radius:8px;
                 </spacer>
                </item>
                <item row="0" column="2">
-                <widget class="QComboBox" name="comboBox"/>
+                <widget class="QComboBox" name="comboBrowserTheme"/>
                </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="label_4">
@@ -296,7 +404,7 @@ border-radius:8px;
                 </spacer>
                </item>
                <item row="1" column="2">
-                <widget class="QComboBox" name="comboBox_2"/>
+                <widget class="QComboBox" name="comboZoomLevel"/>
                </item>
               </layout>
              </widget>
@@ -315,12 +423,303 @@ font-size:13pt;
             </item>
             <item>
              <widget class="QFrame" name="frame_2">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>500</height>
-               </size>
+              <property name="styleSheet">
+               <string notr="true">.QFrame{
+border:1px solid gray;
+background-color:white;
+border-radius:8px;
+}
+QCheckBox::indicator:unchecked {
+	image: url(:/icons/resources/imgs/uncheck_switch.png);
+ }
+QCheckBox::indicator:checked {
+	image: url(:/icons/resources/imgs/checked_switch.png);
+ }</string>
               </property>
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_3">
+               <item row="0" column="0" colspan="2">
+                <widget class="QLabel" name="label_6">
+                 <property name="text">
+                  <string>show vertical tabs</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="3" colspan="2">
+                <spacer name="horizontalSpacer_4">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>284</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="0" column="5">
+                <widget class="QCheckBox" name="checkBoxVerticalTab">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0" colspan="4">
+                <widget class="QLabel" name="label_7">
+                 <property name="text">
+                  <string>show homepage button</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="4">
+                <spacer name="horizontalSpacer_5">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>278</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="1" column="5">
+                <widget class="QCheckBox" name="checkBoxHomePageBtn">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_8">
+                 <property name="styleSheet">
+                  <string notr="true">font-weight:bold;
+font-size:10pt;
+</string>
+                 </property>
+                 <property name="text">
+                  <string>set home page</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1" colspan="5">
+                <spacer name="horizontalSpacer_7">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>377</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="3" column="0" colspan="2">
+                <spacer name="horizontalSpacer_6">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>107</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="3" column="4">
+                <widget class="QLineEdit" name="lineEdit_2"/>
+               </item>
+               <item row="3" column="5">
+                <widget class="QPushButton" name="btnSaveHomePage">
+                 <property name="text">
+                  <string>save</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0" colspan="2">
+                <widget class="QLabel" name="label_9">
+                 <property name="text">
+                  <string>show bookmark bar</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="2" colspan="3">
+                <spacer name="horizontalSpacer_8">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>290</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="4" column="5">
+                <widget class="QComboBox" name="comboBoxShowBkmkBar"/>
+               </item>
+               <item row="5" column="0" colspan="4">
+                <widget class="QLabel" name="label_10">
+                 <property name="text">
+                  <string>show bookmark button</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="4">
+                <spacer name="horizontalSpacer_9">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>278</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="5" column="5">
+                <widget class="QCheckBox" name="checkBoxShowBkmkBtn">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="0" colspan="4">
+                <widget class="QLabel" name="label_11">
+                 <property name="text">
+                  <string>show downlaod button</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="4">
+                <spacer name="horizontalSpacer_10">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>278</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="6" column="5">
+                <widget class="QCheckBox" name="checkBoxShowDownloadBtn">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="7" column="0" colspan="3">
+                <widget class="QLabel" name="label_12">
+                 <property name="text">
+                  <string>show history button</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="7" column="4">
+                <spacer name="horizontalSpacer_11">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>278</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="7" column="5">
+                <widget class="QCheckBox" name="checkBoxShowHistoryBtn">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="8" column="0" colspan="3">
+                <widget class="QLabel" name="label_13">
+                 <property name="text">
+                  <string>show capture button</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="8" column="4">
+                <spacer name="horizontalSpacer_12">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>278</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="8" column="5">
+                <widget class="QCheckBox" name="checkBoxShowCaptureBtn">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="9" column="0" colspan="4">
+                <widget class="QLabel" name="label_14">
+                 <property name="text">
+                  <string>show feedback button</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="9" column="4">
+                <spacer name="horizontalSpacer_13">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>278</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="9" column="5">
+                <widget class="QCheckBox" name="checkBoxShowFeedbackBtn">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_15">
+              <property name="styleSheet">
+               <string notr="true">font-weight:bold;
+font-size:13pt;
+</string>
+              </property>
+              <property name="text">
+               <string>Font</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QFrame" name="frame_3">
               <property name="styleSheet">
                <string notr="true">.QFrame{
 border:1px solid gray;
@@ -334,169 +733,70 @@ border-radius:8px;
               <property name="frameShadow">
                <enum>QFrame::Raised</enum>
               </property>
-              <widget class="QCheckBox" name="checkBox">
-               <property name="geometry">
-                <rect>
-                 <x>442</x>
-                 <y>15</y>
-                 <width>16</width>
-                 <height>16</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-              <widget class="QLabel" name="label_6">
-               <property name="geometry">
-                <rect>
-                 <x>10</x>
-                 <y>10</y>
-                 <width>108</width>
-                 <height>16</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>show vertical tabs</string>
-               </property>
-              </widget>
-              <widget class="QLabel" name="label_7">
-               <property name="geometry">
-                <rect>
-                 <x>10</x>
-                 <y>39</y>
-                 <width>120</width>
-                 <height>16</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>show homepage button</string>
-               </property>
-              </widget>
-              <widget class="QCheckBox" name="checkBox_2">
-               <property name="geometry">
-                <rect>
-                 <x>442</x>
-                 <y>44</y>
-                 <width>16</width>
-                 <height>16</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-              <widget class="QLabel" name="label_8">
-               <property name="geometry">
-                <rect>
-                 <x>10</x>
-                 <y>68</y>
-                 <width>78</width>
-                 <height>16</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>set home page</string>
-               </property>
-              </widget>
-              <widget class="QLineEdit" name="lineEdit_2">
-               <property name="geometry">
-                <rect>
-                 <x>110</x>
-                 <y>98</y>
-                 <width>91</width>
-                 <height>20</height>
-                </rect>
-               </property>
-              </widget>
-              <widget class="QPushButton" name="pushButton">
-               <property name="geometry">
-                <rect>
-                 <x>430</x>
-                 <y>97</y>
-                 <width>75</width>
-                 <height>23</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>save</string>
-               </property>
-              </widget>
-              <widget class="QLabel" name="label_9">
-               <property name="geometry">
-                <rect>
-                 <x>8</x>
-                 <y>135</y>
-                 <width>120</width>
-                 <height>16</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>show bookmark bar</string>
-               </property>
-              </widget>
-              <widget class="QComboBox" name="comboBox_3">
-               <property name="geometry">
-                <rect>
-                 <x>440</x>
-                 <y>130</y>
-                 <width>69</width>
-                 <height>20</height>
-                </rect>
-               </property>
-              </widget>
-              <widget class="QCheckBox" name="checkBox_3">
-               <property name="geometry">
-                <rect>
-                 <x>440</x>
-                 <y>170</y>
-                 <width>16</width>
-                 <height>16</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-              <widget class="QLabel" name="label_10">
-               <property name="geometry">
-                <rect>
-                 <x>8</x>
-                 <y>165</y>
-                 <width>120</width>
-                 <height>16</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>show bookmark button</string>
-               </property>
-              </widget>
-              <widget class="QCheckBox" name="checkBox_4">
-               <property name="geometry">
-                <rect>
-                 <x>440</x>
-                 <y>210</y>
-                 <width>16</width>
-                 <height>16</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-              <widget class="QLabel" name="label_11">
-               <property name="geometry">
-                <rect>
-                 <x>8</x>
-                 <y>205</y>
-                 <width>120</width>
-                 <height>16</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>show downlaod button</string>
-               </property>
-              </widget>
+              <layout class="QGridLayout" name="gridLayout_4">
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_16">
+                 <property name="text">
+                  <string>show bookmark bar</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1" colspan="2">
+                <spacer name="horizontalSpacer_14">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>304</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="0" column="3">
+                <widget class="QComboBox" name="comboFontSize"/>
+               </item>
+               <item row="1" column="0" colspan="4">
+                <widget class="QLabel" name="label_17">
+                 <property name="styleSheet">
+                  <string notr="true">color:#717171;
+font-size:14pt;
+</string>
+                 </property>
+                 <property name="text">
+                  <string>中国制造，惠及全球</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0" colspan="2">
+                <widget class="QLabel" name="label_18">
+                 <property name="text">
+                  <string>customize font</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="2">
+                <spacer name="horizontalSpacer_15">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>298</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="2" column="3">
+                <widget class="QToolButton" name="btnCustomizeFont">
+                 <property name="text">
+                  <string>&lt;</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </widget>
             </item>
             <item>
@@ -518,12 +818,18 @@ border-radius:8px;
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="pageStartup"/>
+      <widget class="QWidget" name="pageNewTabPage"/>
+      <widget class="QWidget" name="pageDownload"/>
+      <widget class="QWidget" name="pagePersonal"/>
       <widget class="QWidget" name="pagePrivacy"/>
      </widget>
     </widget>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resource.qrc"/>
+ </resources>
  <connections/>
 </ui>
