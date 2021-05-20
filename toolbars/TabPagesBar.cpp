@@ -109,7 +109,7 @@ void TabPagesBar::initUi()
     btn_add_page_->setIconSize(iconSize);
     btn_test_->setIconSize(iconSize);
     btn_dock_tabs_->setIcon(QIcon(":/icons/resources/imgs/normal_pagelist_hide.png"));
-    btn_add_page_->setIcon(QIcon(":/icons/resources/imgs/addb_30px.png"));
+    btn_add_page_->setIcon(QIcon(":/icons/resources/imgs/plus_64px.png"));
     btn_test_->setIcon(QIcon(":/icons/resources/imgs/view_64px.png"));
 
     connect(tab_bar_, &TabBar::currentChanged, this, &TabPagesBar::currentChanged);

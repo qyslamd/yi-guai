@@ -10,6 +10,7 @@
 #include <QMenu>
 #include <QWidgetAction>
 #include <QShowEvent>
+#include <QStyle>
 
 NaviBar::NaviBar(QWidget *parent)
     : QFrame(parent)
@@ -80,57 +81,72 @@ NaviBar::NaviBar(QWidget *parent)
 
     action_new_tab_->setText(tr("create new tab page"));
     action_new_tab_->setShortcut(QKeySequence("Ctrl+T"));
-    action_new_tab_->setIcon(QIcon(":/icons/resources/imgs/normal_newtab.png"));
+    action_new_tab_->setIcon(QIcon(":/icons/resources/imgs/layout_64px.png"));
     action_new_window_->setText(tr("create new window"));
     action_new_window_->setShortcut(QKeySequence("Ctrl+N"));
-    action_new_window_->setIcon(QIcon(":/icons/resources/imgs/normal_paycard.png"));
+    action_new_window_->setIcon(QIcon(":/icons/resources/imgs/stack_64px.png"));
     action_new_inprivate_window_->setText(tr("create new inprivate window"));
-    action_new_inprivate_window_->setIcon(QIcon());
+    action_new_inprivate_window_->setIcon(QIcon(":/icons/resources/imgs/frame_64px.png"));
+    action_new_inprivate_window_->setShortcut(QKeySequence("Ctrl+Shift+N"));
     action_favorates_->setText(tr("favorates"));
-    action_favorates_->setIcon(QIcon());
+    action_favorates_->setIcon(QIcon(":/icons/resources/imgs/heart_64px.png"));
     action_history_->setText(tr("histories"));
-    action_history_->setIcon(QIcon());
+    action_history_->setIcon(QIcon(":/icons/resources/imgs/time_history_64px.png"));
     action_download_->setText(tr("downloads"));
-    action_download_->setIcon(QIcon());
+    action_download_->setIcon(QIcon(":/icons/resources/imgs/download_64px.png"));
     action_print_->setText(tr("print"));
     action_print_->setShortcut(QKeySequence("Ctrl+P"));
-    action_print_->setIcon(QIcon());
+    action_print_->setIcon(QIcon(":/icons/resources/imgs/printer_64px.png"));
     action_capture_->setText(tr("capture"));
-    action_capture_->setIcon(QIcon());
+    action_capture_->setIcon(QIcon(":/icons/resources/imgs/cut_coupon_64px.png"));
     action_find_->setText(tr("find in this page"));
-    action_find_->setIcon(QIcon());
+    action_find_->setIcon(QIcon(":/icons/resources/imgs/search_64px.png"));
     action_more_tools_->setText(tr("more tools"));
     action_more_tools_->setIcon(QIcon());
     action_task_mgr_->setText(tr("browser task manager"));
     action_dev_tools_->setText(tr("developer tool"));
     action_settings_->setText(tr("settings"));
-    action_settings_->setIcon(QIcon());
+    action_settings_->setIcon(QIcon(":/icons/resources/imgs/settings_64px.png"));
     action_helps_->setText(tr("help and feedback"));
-    action_helps_->setIcon(QIcon());
+    action_helps_->setIcon(QIcon(":/icons/resources/imgs/question_64px.png"));
     action_help_you_->setText(tr("help"));
+    action_help_you_->setIcon(QIcon(":/icons/resources/imgs/question_64px.png"));
     action_feed_back_->setText(tr("send feed back"));
     action_about_->setText(tr("about"));
     action_about_qt_->setText(tr("about qt"));
+    action_about_qt_->setIcon(QIcon(":/icons/resources/imgs/qt_64px.png"));
     action_about_cef_->setText(tr("about cef"));
+    action_about_cef_->setIcon(QIcon(":/icons/resources/imgs/cef.png"));
     action_quit_->setText(tr("quit app"));
     action_quit_->setIcon(QIcon());
 
-    btn_zoom_out_->setText("-");
-    btn_zoom_in_->setText("+");
-    btn_fullscreen_->setText("x");
     frame_zoom_->setFrameShape(QFrame::NoFrame);
+    frame_zoom_->setObjectName("ZoomBarFrame");
+    btn_zoom_out_->setObjectName("ZoomOutToolButton");
+    btn_zoom_out_->setIcon(QIcon(":/icons/resources/imgs/zoom_out_64px.png"));
+    label_zoom_value_->setObjectName("ZoomValueLabel");
+    label_zoom_value_->setAlignment(Qt::AlignCenter);
+    label_zoom_value_->setText("100%");
+    label_zoom_value_->setMaximumWidth(42);
+    btn_zoom_in_->setObjectName("ZoomInToolButton");
+    btn_zoom_in_->setIcon(QIcon(":/icons/resources/imgs/zoom_in_64px.png"));
+    btn_fullscreen_->setObjectName("ZoomBarFullscrnButton");
+    btn_fullscreen_->setIcon(QIcon(":/icons/resources/imgs/arrows_diagonals_64px.png"));
+
+    QSize zoomBtnSize(40,30);
+    btn_zoom_out_->setFixedSize(zoomBtnSize);
+    btn_zoom_in_->setFixedSize(zoomBtnSize);
+    btn_fullscreen_->setFixedSize(zoomBtnSize);
 
     QHBoxLayout *zoom_layout = new QHBoxLayout;
     zoom_layout->setContentsMargins(0,0,0,0);
     zoom_layout->setSpacing(0);
-//    zoom_layout->addSpacerItem(new QSpacerItem(24,5, QSizePolicy::Fixed));
-    zoom_layout->addStretch();
+    zoom_layout->addSpacerItem(new QSpacerItem(26,5, QSizePolicy::Fixed));
     zoom_layout->addWidget(label_zoom_);
     zoom_layout->addWidget(btn_zoom_out_);
     zoom_layout->addWidget(label_zoom_value_);
     zoom_layout->addWidget(btn_zoom_in_);
     zoom_layout->addWidget(btn_fullscreen_);
-    label_zoom_value_->setObjectName("ZoomValueLabel");
     frame_zoom_->setLayout(zoom_layout);
     action_zoom_->setDefaultWidget(frame_zoom_);
 
@@ -138,11 +154,7 @@ NaviBar::NaviBar(QWidget *parent)
     menu_more_options_->addAction(action_new_tab_);
     menu_more_options_->addAction(action_new_window_);
     menu_more_options_->addAction(action_new_inprivate_window_);
-    menu_more_options_->addSeparator();
-
     menu_more_options_->addAction(action_zoom_);
-    menu_more_options_->addSeparator();
-
     menu_more_options_->addAction(action_favorates_);
     menu_more_options_->addAction(action_history_);
     menu_more_options_->addAction(action_download_);
@@ -200,10 +212,18 @@ bool NaviBar::eventFilter(QObject *obj, QEvent *ev)
 {
     if(menu_more_options_ == obj){
         if(ev->type() == QEvent::Show){
-            auto pos = menu_more_options_->pos();
+
+            auto pos = mapToGlobal(btn_more_options_->pos());
+
             pos.setX(pos.x() - menu_more_options_->width());
             pos.setX(pos.x() + btn_more_options_->width());
+            pos.setY(pos.y() + btn_more_options_->height());
             menu_more_options_->move(pos);
+
+            // 顺手
+//            auto rect = menu_more_options_->actionGeometry(action_new_tab_);
+//            int h = rect.height();
+//            frame_zoom_->setMinimumHeight(h + h / 5);
         }
     }
     return QFrame::eventFilter(obj, ev);
@@ -314,14 +334,14 @@ void NaviBar::initSignals()
 
 void NaviBar::setAppearance()
 {
-    btn_back_->setIcon(QIcon(":/icons/resources/imgs/normal_back.png"));
-    btn_refresh_->setIcon(QIcon(":/icons/resources/imgs/normal_refresh.png"));
-    btn_stop_->setIcon(QIcon(":/icons/resources/imgs/window_close_light_2x.png"));
-    btn_forward_->setIcon(QIcon(":/icons/resources/imgs/normal_forward.png"));
-    btn_home_->setIcon(QIcon(":/icons/resources/imgs/home_blabk_64px.png"));
-    btn_history_->setIcon(QIcon(":/icons/resources/imgs/normal_history.png"));
+    btn_back_->setIcon(QIcon(":/icons/resources/imgs/arrow_left_64px.png"));
+    btn_refresh_->setIcon(QIcon(":/icons/resources/imgs/rotate_cw_64px.png"));
+    btn_stop_->setIcon(QIcon(":/icons/resources/imgs/close_64px.png"));
+    btn_forward_->setIcon(QIcon(":/icons/resources/imgs/arrow_right_64px.png"));
+    btn_home_->setIcon(QIcon(":/icons/resources/imgs/home_64px.png"));
+    btn_history_->setIcon(QIcon(":/icons/resources/imgs/time_history_64px.png"));
     btn_user_->setIcon(QIcon(":/icons/resources/imgs/user_64px.png"));
-    btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/normal_more.png"));
+    btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/more_horizontal_64px.png"));
 
     QSize iconSize(26,26);
     QSize btnSize(42,30);

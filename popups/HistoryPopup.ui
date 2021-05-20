@@ -169,7 +169,7 @@ QToolButton::menu-indicator{
             </property>
             <property name="icon">
              <iconset resource="../resource.qrc">
-              <normaloff>:/icons/resources/imgs/normal_search.png</normaloff>:/icons/resources/imgs/normal_search.png</iconset>
+              <normaloff>:/icons/resources/imgs/search_64px.png</normaloff>:/icons/resources/imgs/search_64px.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -192,7 +192,7 @@ QToolButton::menu-indicator{
             </property>
             <property name="icon">
              <iconset resource="../resource.qrc">
-              <normaloff>:/icons/resources/imgs/normal_more.png</normaloff>:/icons/resources/imgs/normal_more.png</iconset>
+              <normaloff>:/icons/resources/imgs/more_horizontal_64px.png</normaloff>:/icons/resources/imgs/more_horizontal_64px.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -211,11 +211,7 @@ QToolButton::menu-indicator{
              </size>
             </property>
             <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="../resource.qrc">
-              <normaloff>:/icons/resources/imgs/normal_pin.png</normaloff>:/icons/resources/imgs/normal_pin.png</iconset>
+             <string>Pin</string>
             </property>
             <property name="iconSize">
              <size>

@@ -21,18 +21,34 @@ background: #CFCFCF;
 border:none;
 }
 
-/*.NaviBar{
-background-color:#FCFCFC;
-}*/
-
 QToolButton#NaviBarOptionBtn::menu-indicator{
 image: none;
 }
 
+QFrame#ZoomBarFrame{
+border:1px solid #CDCDCD;
+border-left:none;
+border-right:none;
+}
+
+QToolButton#ZoomOutToolButton{
+border-radius:0px;
+border:1px solid #CDCDCD;
+border-top:none;
+border-bottom:none;
+}
+QToolButton#ZoomInToolButton{
+border-radius:0px;
+border:1px solid #CDCDCD;
+border-top:none;
+border-bottom:none;
+}
+QToolButton#ZoomBarFullscrnButton{
+border-radius:0px;
+}
+
 QLabel#ZoomValueLabel{
 border:none;
-border-left:1px solid red;
-border-right:1px solid red;
 }
 
 
@@ -59,12 +75,4 @@ border-right:1px solid red;
     background-color:#CFCFCF;
     border-radius:8px;
 }
-
-/*.TabPagesBar{
-    background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(12,123,179, 255), stop:1 rgba(242,186,232, 255));
-}*/
-
-/*.NotificationBar{
-background-color:#FCFCFC;
-}*/
 
