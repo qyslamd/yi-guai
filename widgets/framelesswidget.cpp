@@ -1,5 +1,4 @@
-#include "testwidget.h"
-#include "ui_testwidget.h"
+#include "framelesswidget.h"
 
 #include <QtDebug>
 #include <QPalette>
@@ -8,6 +7,8 @@
 #include <QPaintEvent>
 #include <QPainter>
 #include <QtMath>
+#include <QToolTip>
+#include <QHBoxLayout>
 
 #include "utils/util_qt.h"
 #ifdef Q_OS_WIN
@@ -16,24 +17,86 @@
 #pragma comment(lib, "User32.lib")
 #endif
 
-TestWidget::TestWidget(QWidget *parent) :
+FramelessWidget::FramelessWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::TestWidget)
+    layout_(new QHBoxLayout(this))
 {
-    ui->setupUi(this);
     setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
     setAttribute(Qt::WA_TranslucentBackground);
     setMouseTracking(true);
-
     setMinimumSize(300,300);
+
+    layout_->setContentsMargins(FrameWidth,
+                                FrameWidth + CaptionHeight,
+                                FrameWidth,
+                                FrameWidth);
+    layout_->setSpacing(0);
 }
 
-TestWidget::~TestWidget()
+FramelessWidget::~FramelessWidget()
 {
-    delete ui;
+
 }
 
-bool TestWidget::nativeEvent(const QByteArray &eventType, void *message, long *result)
+bool FramelessWidget::event(QEvent *e)
+{
+    if (e->type() == QEvent::ToolTip)
+    {
+        QHelpEvent *helpEvent = static_cast<QHelpEvent *>(e);
+        auto button = buttonAt(helpEvent->pos());
+        if (button != CaptionButtons::Button_None) {
+            QString str;
+            switch (button) {
+            case CaptionButtons::Button_Mini:
+                str = tr("minimize");
+                break;
+            case CaptionButtons::Button_NormalMax:
+
+                str = this->window()->isMaximized()
+                        ? tr("restore")
+                        : tr("maximize");
+                break;
+            case CaptionButtons::Button_Close:
+                str = tr("close");
+                break;
+            default:
+                Q_UNREACHABLE();
+            }
+            QToolTip::showText(helpEvent->globalPos(), str);
+        } else {
+            QToolTip::hideText();
+            e->ignore();
+        }
+
+        return true;
+    }
+    return QWidget::event(e);
+}
+
+void FramelessWidget::setWidget(QWidget *widget)
+{
+    // 如果有了，移除并删除
+    if(this->widget()){
+        auto item = layout_->takeAt(0);
+        if(item){
+            delete item->widget();
+            delete item;
+        }
+    }
+    // 重新添加
+    layout_->addWidget(widget);
+}
+
+QWidget *FramelessWidget::widget()
+{
+    auto item = layout_->itemAt(0);
+    if(item){
+        return item->widget();
+    }
+    return nullptr;
+}
+
+bool FramelessWidget::nativeEvent(const QByteArray &eventType, void *message, long *result)
 {
 #ifdef Q_OS_WIN
     //Workaround for known bug -> check Qt forum : https://forum.qt.io/topic/93141/qtablewidget-itemselectionchanged/13
@@ -70,11 +133,11 @@ bool TestWidget::nativeEvent(const QByteArray &eventType, void *message, long *r
     default:
         break;
     }
-    return QWidget::nativeEvent(eventType, message, result);
 #endif
+    return QWidget::nativeEvent(eventType, message, result);
 }
 
-void TestWidget::paintEvent(QPaintEvent *event)
+void FramelessWidget::paintEvent(QPaintEvent *event)
 {
     QWidget::paintEvent(event);
     QPainter p(this);
@@ -114,7 +177,7 @@ void TestWidget::paintEvent(QPaintEvent *event)
     drawButtons(&p);
 }
 
-void TestWidget::mousePressEvent(QMouseEvent *event)
+void FramelessWidget::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton)
     {
@@ -146,7 +209,7 @@ void TestWidget::mousePressEvent(QMouseEvent *event)
     }
 }
 
-void TestWidget::mouseMoveEvent(QMouseEvent *event)
+void FramelessWidget::mouseMoveEvent(QMouseEvent *event)
 {
     if(!mouse_left_btn_pressed_){
         judgeRegion(event->pos());
@@ -234,7 +297,7 @@ void TestWidget::mouseMoveEvent(QMouseEvent *event)
     QWidget::mouseMoveEvent(event);
 }
 
-void TestWidget::mouseReleaseEvent(QMouseEvent *event)
+void FramelessWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     QWidget::mouseReleaseEvent(event);
     if(event->button() == Qt::LeftButton)
@@ -270,26 +333,39 @@ void TestWidget::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
-void TestWidget::leaveEvent(QEvent *event)
+void FramelessWidget::leaveEvent(QEvent *event)
 {
     clearButtonHover();
     setCursor(Qt::ArrowCursor);
     QWidget::leaveEvent(event);
 }
 
-void TestWidget::changeEvent(QEvent *event)
+void FramelessWidget::changeEvent(QEvent *event)
 {
     if(event->type() == QEvent::WindowStateChange){
         auto windowState = this->windowState();
         if(windowState == Qt::WindowMaximized || windowState == Qt::WindowFullScreen){
-            FrameWidth = 0;
+            setFrameWidth(0);
         }else{
-            FrameWidth = 10;
+            setFrameWidth(10);
         }
     }
 }
 
-void TestWidget::judgeRegion(const QPoint &windowPos)
+void FramelessWidget::setFrameWidth(int width)
+{
+    if(width < 0){
+        FrameWidth = 0;
+    }
+    FrameWidth = width;
+
+    layout_->setContentsMargins(FrameWidth,
+                                FrameWidth + CaptionHeight,
+                                FrameWidth,
+                                FrameWidth);
+}
+
+void FramelessWidget::judgeRegion(const QPoint &windowPos)
 {
     clearButtonHover();
 
@@ -357,7 +433,7 @@ void TestWidget::judgeRegion(const QPoint &windowPos)
     }
 }
 
-QRectF TestWidget::btnRect(TestWidget::CaptionButtons button)
+QRectF FramelessWidget::btnRect(FramelessWidget::CaptionButtons button)
 {
     int BtnWidth = 45;
     int BtnHeight = 28;
@@ -416,7 +492,7 @@ QRectF TestWidget::btnRect(TestWidget::CaptionButtons button)
 
 }
 
-QPixmap TestWidget::btnPixmap(TestWidget::CaptionButtons button)
+QPixmap FramelessWidget::btnPixmap(FramelessWidget::CaptionButtons button)
 {
     QColor color(Qt::black);
     QSize size(10, 10);
@@ -473,7 +549,19 @@ QPixmap TestWidget::btnPixmap(TestWidget::CaptionButtons button)
     return pix;
 }
 
-void TestWidget::drawShadow(QPainter *p)
+FramelessWidget::CaptionButtons FramelessWidget::buttonAt(const QPoint &pos)
+{
+    if(btnRect(CaptionButtons::Button_Mini).contains(pos)){
+        return CaptionButtons::Button_Mini;
+    }else if(btnRect(CaptionButtons::Button_NormalMax).contains(pos)){
+        return CaptionButtons::Button_NormalMax;
+    }else if(btnRect(CaptionButtons::Button_Close).contains(pos)){
+        return CaptionButtons::Button_Close;
+    }
+    return CaptionButtons::Button_None;
+}
+
+void FramelessWidget::drawShadow(QPainter *p)
 {
     if(FrameWidth == 0){
         return;
@@ -494,7 +582,7 @@ void TestWidget::drawShadow(QPainter *p)
     p->restore();
 }
 
-void TestWidget::drawButtons(QPainter *p)
+void FramelessWidget::drawButtons(QPainter *p)
 {
     p->save();
     QRectF rectMini = btnRect(CaptionButtons::Button_Mini);
@@ -529,7 +617,7 @@ void TestWidget::drawButtons(QPainter *p)
     p->restore();
 }
 
-void TestWidget::clearButtonHover()
+void FramelessWidget::clearButtonHover()
 {
     min_button_hover_ = false;
     max_button_hover_ = false;

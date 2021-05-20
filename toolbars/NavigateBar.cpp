@@ -53,6 +53,7 @@ NaviBar::NaviBar(QWidget *parent)
     , action_feed_back_(new QAction)
     , action_about_(new QAction)
     , action_about_qt_(new QAction)
+    , action_about_cef_(new QAction)
     , action_quit_(new QAction)
 
 {
@@ -110,6 +111,7 @@ NaviBar::NaviBar(QWidget *parent)
     action_feed_back_->setText(tr("send feed back"));
     action_about_->setText(tr("about"));
     action_about_qt_->setText(tr("about qt"));
+    action_about_cef_->setText(tr("about cef"));
     action_quit_->setText(tr("quit app"));
     action_quit_->setIcon(QIcon());
 
@@ -121,7 +123,8 @@ NaviBar::NaviBar(QWidget *parent)
     QHBoxLayout *zoom_layout = new QHBoxLayout;
     zoom_layout->setContentsMargins(0,0,0,0);
     zoom_layout->setSpacing(0);
-    zoom_layout->addSpacerItem(new QSpacerItem(24,5, QSizePolicy::Fixed));
+//    zoom_layout->addSpacerItem(new QSpacerItem(24,5, QSizePolicy::Fixed));
+    zoom_layout->addStretch();
     zoom_layout->addWidget(label_zoom_);
     zoom_layout->addWidget(btn_zoom_out_);
     zoom_layout->addWidget(label_zoom_value_);
@@ -165,6 +168,7 @@ NaviBar::NaviBar(QWidget *parent)
     menu_help_->addAction(action_feed_back_);
     menu_help_->addAction(action_about_);
     menu_help_->addAction(action_about_qt_);
+    menu_help_->addAction(action_about_cef_);
     action_helps_->setMenu(menu_help_);
 
     initSignals();
@@ -288,6 +292,18 @@ void NaviBar::initSignals()
     connect(action_settings_, &QAction::triggered, this, [this]()
     {
         emit naviBarCmd(NaviBarCmd::Settings, QVariant());
+    });
+    connect(action_about_, &QAction::triggered, this, [this]()
+    {
+        emit naviBarCmd(NaviBarCmd::About, QVariant());
+    });
+    connect(action_about_qt_, &QAction::triggered, this, [this]()
+    {
+        emit naviBarCmd(NaviBarCmd::AboutQt, QVariant());
+    });
+    connect(action_about_cef_, &QAction::triggered, this, [this]()
+    {
+        emit naviBarCmd(NaviBarCmd::AboutCef, QVariant());
     });
     connect(action_quit_, &QAction::triggered, this, [this]()
     {

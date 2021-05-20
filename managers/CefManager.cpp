@@ -31,9 +31,9 @@ CefString CefManager::root_cache_path;
 
 CefString CefManager::user_data_path;
 
-int CefManager::persist_session_cookies;
+int CefManager::persist_session_cookies = 1;
 
-int CefManager::persist_user_preferences;
+int CefManager::persist_user_preferences = 1;
 
 CefString CefManager::locale;
 
@@ -95,6 +95,7 @@ void CefManager::populateSettings(CefSettings &settings, int argc, char *argv[])
     settings.log_severity = LOGSEVERITY_WARNING;
     settings.background_color = background_color;
     settings.persist_session_cookies = persist_session_cookies;
+    settings.persist_user_preferences = persist_user_preferences;
 }
 
 CefManager::CefManager()
@@ -113,5 +114,5 @@ CefManager::CefManager()
 
     locale.FromString("zh-CN");
     accept_language_list.FromString("zh-CN");
-//    background_color = CefColorSetARGB(255,135,206,235);
+    background_color = CefColorSetARGB(255,135,206,235);
 }

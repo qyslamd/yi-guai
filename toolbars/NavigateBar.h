@@ -45,15 +45,16 @@ private:
     QFrame *frame_extensions_,
     *frame_tools_;
 
-    decltype (btn_back_) btn_history_;
+    QToolButton *btn_history_;
 
     QMenu *menu_more_options_ = nullptr,
     *menu_more_tools_ = nullptr,
     *menu_help_ = nullptr;
 
     QAction *action_new_tab_ = nullptr;
-    decltype (action_new_tab_) action_new_window_,
-    action_new_inprivate_window_;
+    QAction * action_new_window_,
+    *action_new_inprivate_window_;
+
     QWidgetAction *action_zoom_;
     QFrame *frame_zoom_;
     QLabel *label_zoom_,
@@ -61,6 +62,7 @@ private:
     decltype (btn_back_) btn_zoom_out_,
     btn_zoom_in_,
     btn_fullscreen_;
+
     decltype (action_new_tab_) action_favorates_,
     action_history_,
     action_download_,
@@ -76,6 +78,7 @@ private:
     action_feed_back_,
     action_about_,
     action_about_qt_,
+    action_about_cef_,
     action_quit_;
 
 private:

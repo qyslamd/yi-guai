@@ -35,7 +35,6 @@ SOURCES += \
     popups/HistoryPopup.cpp \
     popups/PopupBase.cpp \
     popups/SiteInfoPopup.cpp \
-    tests/testwidget.cpp \
     toolbars/AddressBar.cpp \
     toolbars/BookmarkBar.cpp \
     toolbars/NavigateBar.cpp \
@@ -43,8 +42,6 @@ SOURCES += \
     toolbars/TabBar.cpp \
     toolbars/TabPagesBar.cpp \
     toolbars/TabbarStyle.cpp \
-    widgets/Dp_Widget_Caption.cpp \
-    widgets/FramelessWindow.cpp \
     dialogs/alertdialog.cpp \
     browser/browser_window.cpp \
     browser/cef_app_browser.cpp \
@@ -61,7 +58,7 @@ SOURCES += \
     utils/util_win.cc \
     widgets/TabThumbnailWidget.cpp \
     widgets/appconfigwidget.cpp \
-    widgets/framewidget.cpp
+    widgets/framelesswidget.cpp
 
 
 HEADERS += \
@@ -78,7 +75,6 @@ HEADERS += \
     popups/HistoryPopup.h \
     popups/PopupBase.h \
     popups/SiteInfoPopup.h \
-    tests/testwidget.h \
     toolbars/AddressBar.h \
     toolbars/BookmarkBar.h \
     toolbars/NavigateBar.h \
@@ -86,8 +82,6 @@ HEADERS += \
     toolbars/TabBar.h \
     toolbars/TabPagesBar.h \
     toolbars/TabbarStyle.h \
-    widgets/Dp_Widget_Caption.h \
-    widgets/FramelessWindow.h \
     dialogs/alertdialog.h \
     browser/browser_window.h \
     browser/cef_app_browser.h \
@@ -103,18 +97,16 @@ HEADERS += \
     utils/util_win.h \
     widgets/TabThumbnailWidget.h \
     widgets/appconfigwidget.h \
-    widgets/framewidget.h
+    widgets/framelesswidget.h
 
 FORMS += \
     dialogs/alertdialog.ui \
     popup.ui \
     popups/HistoryPopup.ui \
     popups/PopupBase.ui \
-    tests/testwidget.ui \
     toolbars/NotificationBar.ui \
     widgets/TabThumbnailWidget.ui \
-    widgets/appconfigwidget.ui \
-    widgets/framewidget.ui
+    widgets/appconfigwidget.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

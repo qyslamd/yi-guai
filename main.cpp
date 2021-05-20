@@ -10,6 +10,7 @@
 #include <QTranslator>
 #include <QMessageBox>
 #include <QScreen>
+#include <QCalendarWidget>
 
 #include <include/base/cef_scoped_ptr.h>
 #include <include/cef_command_line.h>
@@ -25,9 +26,8 @@
 #include "browser/message_loop/main_message_loop_external_pump.h"
 
 #include "cef_qwidget.h"
-#include "widgets/framewidget.h"
 #include "utils/util_qt.h"
-#include "tests/testwidget.h"
+#include "widgets/framelesswidget.h"
 
 #if defined(CEF_USE_SANDBOX)
 // The cef_sandbox.lib static library may not link successfully with all VS
@@ -88,9 +88,10 @@ int main(int argc, char *argv[])
         QString("https://cn.bing.com/")};
     MainWndMgr::Instance().createWindow(cfg);
 
-    TestWidget w;
-//    FrameWidget w;
-    w.show();
+//    FramelessWidget w;
+//    MainWindow widget(MainWindowConfig{});
+//    w.setWidget(&widget);
+//    w.show();
 
     message_loop->Run();
 

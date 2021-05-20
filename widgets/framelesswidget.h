@@ -1,29 +1,35 @@
-#ifndef TESTWIDGET_H
-#define TESTWIDGET_H
+#ifndef FRAMELESSWIDGET_H
+#define FRAMELESSWIDGET_H
 
 #include <QWidget>
 
-namespace Ui {
-class TestWidget;
-}
-
-class TestWidget : public QWidget
+class QHBoxLayout;
+class FramelessWidget : public QWidget
 {
     Q_OBJECT
-
 public:
-    explicit TestWidget(QWidget *parent = nullptr);
-    ~TestWidget();    
+    explicit FramelessWidget(QWidget *parent = nullptr);
+    ~FramelessWidget();
+    bool event(QEvent *ev) override;
+
+    ///
+    /// \brief set main widget,the widget will become the child of this,
+    /// Any previously set widget will be hidden.
+    /// \param widget
+    ///
+    void setWidget(QWidget *widget);
+
+    QWidget *widget();
+
 protected:
-    bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
-    void paintEvent(QPaintEvent *event) override;
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
-    void leaveEvent(QEvent *event) override;
-    void changeEvent(QEvent *event) override;
+    virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
+    virtual void paintEvent(QPaintEvent *event) override;
+    virtual void mousePressEvent(QMouseEvent *event) override;
+    virtual void mouseMoveEvent(QMouseEvent *event) override;
+    virtual void mouseReleaseEvent(QMouseEvent *event) override;
+    virtual void leaveEvent(QEvent *event) override;
+    virtual void changeEvent(QEvent *event) override;
 private:
-    Ui::TestWidget *ui;
     int FrameWidth = 10;
     const int CaptionHeight = 30;
 
@@ -69,9 +75,14 @@ private:
     max_buttton_press_ = false,
     close_button_press_ = false;
 
+    QHBoxLayout *layout_ = nullptr;
+
+    void setFrameWidth(int width);
+
     // Get rectangle of caption buttons
     QRectF btnRect(CaptionButtons button);
     QPixmap btnPixmap(CaptionButtons button);
+    CaptionButtons buttonAt(const QPoint &pos);
 
     void drawShadow(QPainter *p);
     void drawButtons(QPainter *p);
@@ -80,4 +91,4 @@ private:
 
 };
 
-#endif // TESTWIDGET_H
+#endif // FRAMELESSWIDGET_H

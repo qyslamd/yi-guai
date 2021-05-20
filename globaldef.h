@@ -35,6 +35,9 @@ enum class NaviBarCmd {
     ZoomIn,
     FullScreen,
     Settings,
+    About,
+    AboutQt,
+    AboutCef,
     QuitApp
 };
 

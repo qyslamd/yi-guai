@@ -30,6 +30,7 @@
 #include <QPropertyAnimation>
 #include <QToolTip>
 #include <QLabel>
+#include <QMessageBox>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -161,43 +162,11 @@ void MainWindow::changeEvent(QEvent *event)
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
-    if(this->isFullScreen()){
-        return QMainWindow::mousePressEvent(event);
-    }
-#ifdef Q_OS_WIN
-
-    QRect dragRect(0, 0, width(), tab_bar_->height());
-    if(dragRect.contains(event->pos())){
-        if(::ReleaseCapture()){
-            SendMessage(HWND(this->winId()), WM_SYSCOMMAND, SC_MOVE + HTCAPTION, 0);
-            event->ignore();
-        }
-    }
-#endif
     QMainWindow::mousePressEvent(event);
 }
 
 void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    return QMainWindow::mouseDoubleClickEvent(event);
-    if(this->isFullScreen()){
-    }
-#ifdef Q_OS_WIN
-
-    QRect dragRect(0, 0, width(), tab_bar_->height());
-    if(!dragRect.contains(event->pos())){
-        return QMainWindow::mouseDoubleClickEvent(event);
-    }
-    auto state = windowState();
-    if(state.testFlag(Qt::WindowNoState)){
-        showMaximized();
-    }else{
-        if(this->isMaximized()){
-            showNormal();
-        }
-    }
-
-#endif
     QMainWindow::mouseDoubleClickEvent(event);
 }
 
@@ -477,6 +446,15 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
     }
     else if(cmd == NaviBarCmd::Settings) {
         app_cfg_widget_->show();
+    }
+    else if(cmd == NaviBarCmd::About) {
+
+    }
+    else if(cmd == NaviBarCmd::AboutQt) {
+        QMessageBox::aboutQt(this, tr("About Qt"));
+    }
+    else if(cmd == NaviBarCmd::AboutCef) {
+        addNewPage("about:version", true);
     }
     else if(cmd == NaviBarCmd::QuitApp) {
         MainWndMgr::Instance().quitApplication();
