@@ -108,6 +108,7 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *r
     MSG* msg = reinterpret_cast<MSG*>(message);
 #endif
 
+#define LOG_MACRO(x) #x
     switch (msg->message)
     {
     case WM_DWMCOLORIZATIONCOLORCHANGED:
@@ -117,6 +118,13 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *r
         return false;
     case WM_NCPAINT:
 
+        return false;
+    case WM_NCRBUTTONDOWN:
+        qInfo()<<__FUNCTION__<<LOG_MACRO(WM_NCRBUTTONDOWN);
+        qInfo()<<msg->wParam;
+        return false;
+    case WM_NCRBUTTONUP:
+        qInfo()<<__FUNCTION__<<LOG_MACRO(WM_NCRBUTTONUP);
         return false;
     default:
         break;
@@ -464,8 +472,8 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         }
     }
     else if(cmd == NaviBarCmd::FullScreen){
-//        showFullScreen();
-//        showNormal();
+        //        showFullScreen();
+        //        showNormal();
     }
     else if(cmd == NaviBarCmd::Settings) {
         app_cfg_widget_->show();

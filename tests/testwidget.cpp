@@ -11,9 +11,8 @@
 
 #include "utils/util_qt.h"
 #ifdef Q_OS_WIN
-//#include <windef.h>
-//#include <WinUser.h>
 #include <Windows.h>
+#include <Windowsx.h>
 #pragma comment(lib, "User32.lib")
 #endif
 
@@ -32,6 +31,47 @@ TestWidget::TestWidget(QWidget *parent) :
 TestWidget::~TestWidget()
 {
     delete ui;
+}
+
+bool TestWidget::nativeEvent(const QByteArray &eventType, void *message, long *result)
+{
+#ifdef Q_OS_WIN
+    //Workaround for known bug -> check Qt forum : https://forum.qt.io/topic/93141/qtablewidget-itemselectionchanged/13
+#if (QT_VERSION == QT_VERSION_CHECK(5, 11, 1))
+    MSG* msg = *reinterpret_cast<MSG**>(message);
+#else
+    MSG* msg = reinterpret_cast<MSG*>(message);
+#endif
+
+#define LOG_MACRO(x) #x
+    switch (msg->message)
+    {
+    case WM_DWMCOLORIZATIONCOLORCHANGED:
+        return false;
+    case WM_DPICHANGED:
+        return false;
+    case WM_NCPAINT:
+        return false;
+    case WM_NCRBUTTONDOWN:
+    {
+        qInfo()<<__FUNCTION__<<LOG_MACRO(WM_NCRBUTTONDOWN);
+        auto xPos = GET_X_LPARAM(msg->lParam);
+        auto yPos = GET_Y_LPARAM(msg->lParam);
+        HMENU sysMenu = ::GetSystemMenu((HWND)winId(), FALSE);
+        ::TrackPopupMenu(sysMenu,0, xPos, yPos, NULL, (HWND)winId(), NULL);
+    }
+        return false;
+    case WM_NCRBUTTONUP:
+
+        return false;
+    case WM_SYSKEYDOWN:
+
+        return false;
+    default:
+        break;
+    }
+    return QWidget::nativeEvent(eventType, message, result);
+#endif
 }
 
 void TestWidget::paintEvent(QPaintEvent *event)
@@ -94,16 +134,13 @@ void TestWidget::mousePressEvent(QMouseEvent *event)
         }else if(region_ == Region::HT_CloseButton){
             close_button_press_ = true;
         }
-    }else if(event->button() == Qt::RightButton){
+    }
+    else if(event->button() == Qt::RightButton)
+    {
 #ifdef Q_OS_WIN
         if(region_ == Region::HT_Caption){
-            qInfo()<<__FUNCTION__;
-            HWND sysMenuHwnd;
-            ::GetSystemMenu(sysMenuHwnd, false);
-            RECT rect{0};
-            ::GetWindowRect(sysMenuHwnd, &rect);
-            ::MoveWindow(sysMenuHwnd,0,0, rect.right - rect.left,rect.bottom - rect.top, false);
-            ::ShowWindow(sysMenuHwnd, SW_SHOW);
+            ::SendMessage((HWND)winId(), WM_NCRBUTTONDOWN, HTCAPTION,
+                          MAKELPARAM(event->globalX(), event->globalY()));
         }
 #endif
     }
@@ -200,7 +237,8 @@ void TestWidget::mouseMoveEvent(QMouseEvent *event)
 void TestWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     QWidget::mouseReleaseEvent(event);
-    if(event->button() == Qt::LeftButton){
+    if(event->button() == Qt::LeftButton)
+    {
         mouse_left_btn_pressed_ = false;
         mouse_left_btn_press_pos_ = QPoint();
 

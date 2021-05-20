@@ -15,6 +15,7 @@ public:
     explicit TestWidget(QWidget *parent = nullptr);
     ~TestWidget();    
 protected:
+    bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
     void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
