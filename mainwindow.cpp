@@ -448,7 +448,13 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         app_cfg_widget_->show();
     }
     else if(cmd == NaviBarCmd::About) {
-
+        addNewPage("https://gitee.com/slamdd/yi-guai", true);
+    }
+    else if(cmd == NaviBarCmd::Feedback) {
+        addNewPage("https://gitee.com/slamdd/yi-guai", true);
+    }
+    else if(cmd == NaviBarCmd::Like) {
+        addNewPage("https://gitee.com/slamdd/yi-guai", true);
     }
     else if(cmd == NaviBarCmd::AboutQt) {
         QMessageBox::aboutQt(this, tr("About Qt"));

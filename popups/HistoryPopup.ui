@@ -56,8 +56,36 @@ border-bottom:1px solid #D2D2D2;
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
            <widget class="QToolButton" name="buttonSearchBack">
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">.QFrame{
+border:none;
+border-bottom:1px solid #D2D2D2;
+background-color:white;
+}
+
+QToolButton{
+border:none;
+}
+QToolButton:hover{
+border-radius:15px;
+background-color:rgba(192,192,192,80%);
+}
+QToolButton::menu-indicator{
+    image:none;
+}</string>
+            </property>
             <property name="text">
-             <string>&lt;</string>
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../resource.qrc">
+              <normaloff>:/icons/resources/imgs/arrow_back_left_64px.png</normaloff>:/icons/resources/imgs/arrow_back_left_64px.png</iconset>
             </property>
            </widget>
           </item>
@@ -211,7 +239,11 @@ QToolButton::menu-indicator{
              </size>
             </property>
             <property name="text">
-             <string>Pin</string>
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../resource.qrc">
+              <normaloff>:/icons/resources/imgs/pin_64px.png</normaloff>:/icons/resources/imgs/pin_64px.png</iconset>
             </property>
             <property name="iconSize">
              <size>

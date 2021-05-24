@@ -104,7 +104,7 @@ void TabPagesBar::initUi()
     btn_dock_tabs_->setToolTip(tr("open vertical tabs"));
     btn_add_page_->setToolTip(tr("Add a tab page"));
 
-    QSize iconSize(24,24);
+    QSize iconSize(18,18);
     btn_dock_tabs_->setIconSize(iconSize);
     btn_add_page_->setIconSize(iconSize);
     btn_test_->setIconSize(iconSize);

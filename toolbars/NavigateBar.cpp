@@ -52,7 +52,7 @@ NaviBar::NaviBar(QWidget *parent)
     , action_helps_(new QAction)
     , action_help_you_(new QAction)
     , action_feed_back_(new QAction)
-    , action_about_(new QAction)
+    , action_like_(new QAction)
     , action_about_qt_(new QAction)
     , action_about_cef_(new QAction)
     , action_quit_(new QAction)
@@ -92,8 +92,10 @@ NaviBar::NaviBar(QWidget *parent)
     action_favorates_->setIcon(QIcon(":/icons/resources/imgs/heart_64px.png"));
     action_history_->setText(tr("histories"));
     action_history_->setIcon(QIcon(":/icons/resources/imgs/time_history_64px.png"));
+    action_history_->setShortcut(QKeySequence("Ctrl+H"));
     action_download_->setText(tr("downloads"));
     action_download_->setIcon(QIcon(":/icons/resources/imgs/download_64px.png"));
+    action_download_->setShortcut(QKeySequence("Ctrl+J"));
     action_print_->setText(tr("print"));
     action_print_->setShortcut(QKeySequence("Ctrl+P"));
     action_print_->setIcon(QIcon(":/icons/resources/imgs/printer_64px.png"));
@@ -101,10 +103,13 @@ NaviBar::NaviBar(QWidget *parent)
     action_capture_->setIcon(QIcon(":/icons/resources/imgs/cut_coupon_64px.png"));
     action_find_->setText(tr("find in this page"));
     action_find_->setIcon(QIcon(":/icons/resources/imgs/search_64px.png"));
+    action_find_->setShortcut(QKeySequence("Ctrl+F"));
     action_more_tools_->setText(tr("more tools"));
     action_more_tools_->setIcon(QIcon());
     action_task_mgr_->setText(tr("browser task manager"));
+    action_task_mgr_->setIcon(QIcon(":/icons/resources/imgs/statistics_64px.png"));
     action_dev_tools_->setText(tr("developer tool"));
+    action_dev_tools_->setIcon(QIcon(":/icons/resources/imgs/hammer_64px.png"));
     action_settings_->setText(tr("settings"));
     action_settings_->setIcon(QIcon(":/icons/resources/imgs/settings_64px.png"));
     action_helps_->setText(tr("help and feedback"));
@@ -112,7 +117,9 @@ NaviBar::NaviBar(QWidget *parent)
     action_help_you_->setText(tr("help"));
     action_help_you_->setIcon(QIcon(":/icons/resources/imgs/question_64px.png"));
     action_feed_back_->setText(tr("send feed back"));
-    action_about_->setText(tr("about"));
+    action_feed_back_->setIcon(QIcon(":/icons/resources/imgs/bug_64px.png"));
+    action_like_->setText(tr("give a like"));
+    action_like_->setIcon(QIcon(":/icons/resources/imgs/good_64px.png"));
     action_about_qt_->setText(tr("about qt"));
     action_about_qt_->setIcon(QIcon(":/icons/resources/imgs/qt_64px.png"));
     action_about_cef_->setText(tr("about cef"));
@@ -178,7 +185,7 @@ NaviBar::NaviBar(QWidget *parent)
 
     menu_help_->addAction(action_help_you_);
     menu_help_->addAction(action_feed_back_);
-    menu_help_->addAction(action_about_);
+    menu_help_->addAction(action_like_);
     menu_help_->addAction(action_about_qt_);
     menu_help_->addAction(action_about_cef_);
     action_helps_->setMenu(menu_help_);
@@ -313,9 +320,17 @@ void NaviBar::initSignals()
     {
         emit naviBarCmd(NaviBarCmd::Settings, QVariant());
     });
-    connect(action_about_, &QAction::triggered, this, [this]()
+    connect(action_help_you_, &QAction::triggered, this, [this]()
     {
         emit naviBarCmd(NaviBarCmd::About, QVariant());
+    });
+    connect(action_feed_back_, &QAction::triggered, this, [this]()
+    {
+        emit naviBarCmd(NaviBarCmd::Feedback, QVariant());
+    });
+    connect(action_like_, &QAction::triggered, this, [this]()
+    {
+        emit naviBarCmd(NaviBarCmd::Like, QVariant());
     });
     connect(action_about_qt_, &QAction::triggered, this, [this]()
     {
@@ -343,7 +358,7 @@ void NaviBar::setAppearance()
     btn_user_->setIcon(QIcon(":/icons/resources/imgs/user_64px.png"));
     btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/more_horizontal_64px.png"));
 
-    QSize iconSize(26,26);
+    QSize iconSize(24,24);
     QSize btnSize(42,30);
     for(auto item : this->children()){
         if(item->isWidgetType() &&

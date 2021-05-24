@@ -76,7 +76,7 @@ private:
     action_helps_,
     action_help_you_,
     action_feed_back_,
-    action_about_,
+    action_like_,
     action_about_qt_,
     action_about_cef_,
     action_quit_;

@@ -6,8 +6,6 @@
         <file>resources/imgs/user_64px.png</file>
         <file>resources/imgs/general_close.png</file>
         <file>resources/imgs/th.jpg</file>
-        <file>resources/imgs/checked_64px.png</file>
-        <file>resources/imgs/checked_switch.png</file>
         <file>resources/imgs/arrows_diagonals_64px.png</file>
         <file>resources/imgs/download_64px.png</file>
         <file>resources/imgs/maximize_64px.png</file>
@@ -40,11 +38,19 @@
         <file>resources/imgs/alert_circle_64px.png</file>
         <file>resources/imgs/alert_triangle_64px.png</file>
         <file>resources/imgs/close_64px_2.png</file>
-        <file>resources/imgs/close_64px_3.png</file>
         <file>resources/imgs/star_64px.png</file>
         <file>resources/imgs/cef.png</file>
         <file>resources/imgs/laughing_64px.png</file>
         <file>resources/imgs/qt_64px.png</file>
+        <file>resources/imgs/switch_off_64px.png</file>
+        <file>resources/imgs/switch_on_64px.png</file>
+        <file>resources/imgs/pin_64px.png</file>
+        <file>resources/imgs/arrow_back_left_64px.png</file>
+        <file>resources/imgs/bug_64px.png</file>
+        <file>resources/imgs/good_64px.png</file>
+        <file>resources/imgs/feedback_64px.png</file>
+        <file>resources/imgs/hammer_64px.png</file>
+        <file>resources/imgs/statistics_64px.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file>resources/styles/normal.qss</file>

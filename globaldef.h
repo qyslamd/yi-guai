@@ -36,6 +36,8 @@ enum class NaviBarCmd {
     FullScreen,
     Settings,
     About,
+    Feedback,
+    Like,
     AboutQt,
     AboutCef,
     QuitApp
