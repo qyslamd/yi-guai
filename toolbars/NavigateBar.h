@@ -28,6 +28,7 @@ signals:
     void naviBarCmd(NaviBarCmd cmd, const QVariant &para);
 public slots:
     void onHistoryPopupVisibleChange(bool visible);
+    void onUserInfoPopupVisibleChange(bool visible);
 protected:
     void paintEvent(QPaintEvent *event) override;
 private:
@@ -45,7 +46,10 @@ private:
     QFrame *frame_extensions_,
     *frame_tools_;
 
-    QToolButton *btn_history_;
+    QToolButton *btn_bookmarks_,
+    *btn_history_,
+    *btn_download_,
+    *btn_capture_;
 
     QMenu *menu_more_options_ = nullptr,
     *menu_more_tools_ = nullptr,

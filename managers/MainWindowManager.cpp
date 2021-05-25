@@ -3,6 +3,7 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QScreen>
+#include <QElapsedTimer>
 
 #include "AppCfgManager.h"
 
@@ -24,6 +25,9 @@ MainWndMgr& MainWndMgr::Instance(){
 
 void MainWndMgr::createWindow(const MainWindowConfig &cfg)
 {
+    QElapsedTimer timer;
+    timer.start();
+
     MainWindow *window = new MainWindow(cfg);
 
     // The Qt::WA_DeleteOnClose attribute must be set,
@@ -76,6 +80,8 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
     {
         window->show();
     }
+
+    qInfo() << "The slow operation took" << timer.elapsed() << "milliseconds";
 }
 
 QRect MainWndMgr::lastWindowGeometry() const

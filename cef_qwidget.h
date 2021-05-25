@@ -25,6 +25,7 @@ public:
     void ZoomOut();
     void ZoomIn();
     void ZoomReset();
+    void ShowDevTool(const QPoint &pos);
 
     CefWindowHandle getBrowserWindowHandle();
 signals:
@@ -38,15 +39,22 @@ signals:
     void browserLoadEnd(int httpStatusCode);
     void browserLoadingStateChange(bool isLoading, bool canGoBack, bool canGoForward);
     void browserFocusChange(bool getfucos);
+    void browserDevTool(CefQWidget *devTool);
 
 public slots:
     void onTopLevelWindowStateChanged(Qt::WindowStates state, const QVariant &data);
     // BrowserWindow::Delegate interface
 protected:
-    void onBrowserWindowNewForgroundPage(CefWindowInfo &windowInfo, CefRefPtr<CefClient> &client, CefBrowserSettings &settings) override;
-    void onBrowserWndPopupWnd(const CefPopupFeatures &popupFeatures, CefWindowInfo &windowInfo,
+    void onBrowserWindowNewForgroundPage(CefWindowInfo &windowInfo,
+                                         CefRefPtr<CefClient> &client,
+                                         CefBrowserSettings &settings) override;
+    void onBrowserWndPopupWnd(const CefPopupFeatures &popupFeatures,
+                              CefWindowInfo &windowInfo,
                               CefRefPtr<CefClient> &client,
                               CefBrowserSettings &settings) override;
+    void onBrowserWindowDeveTools(CefWindowInfo& windowInfo,
+                                  CefRefPtr<CefClient>& client,
+                                  CefBrowserSettings& settings) override;
     void OnBrowserCreated() override;
     void OnBrowserWindowClosing() override;
     void onBrowserWindowAddressChange(const std::string &url) override;

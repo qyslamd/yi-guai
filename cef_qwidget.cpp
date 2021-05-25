@@ -134,6 +134,12 @@ void CefQWidget::ZoomReset()
     }
 }
 
+void CefQWidget::ShowDevTool(const QPoint &pos)
+{
+    browser_window_->GetHandler()->ShowDevTools(browser_window_->GetBrowser(),
+                                                CefPoint(pos.x(), pos.y()));
+}
+
 CefWindowHandle CefQWidget::getBrowserWindowHandle()
 {
     auto browser = browser_window_->GetBrowser();
@@ -206,6 +212,14 @@ void CefQWidget::onBrowserWndPopupWnd(const CefPopupFeatures &popupFeatures,
 
     popupBrowser->setGeometry(x, y, w, h);
     popupBrowser->show();
+}
+
+void CefQWidget::onBrowserWindowDeveTools(CefWindowInfo &windowInfo,
+                                          CefRefPtr<CefClient> &client,
+                                          CefBrowserSettings &settings)
+{
+    CefQWidget *window = new CefQWidget(windowInfo, client, settings);
+    emit browserDevTool(window);
 }
 
 void CefQWidget::OnBrowserCreated()

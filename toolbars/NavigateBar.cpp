@@ -25,7 +25,10 @@ NaviBar::NaviBar(QWidget *parent)
     , address_bar_(new AddressBar)
     , frame_extensions_(new QFrame)
     , frame_tools_(new QFrame)
+    , btn_bookmarks_(new QToolButton)
     , btn_history_(new QToolButton)
+    , btn_download_(new QToolButton)
+    , btn_capture_(new QToolButton)
     , menu_more_options_(new QMenu(this))
     , menu_more_tools_(new QMenu)
     , menu_help_(new QMenu)
@@ -58,8 +61,16 @@ NaviBar::NaviBar(QWidget *parent)
     , action_quit_(new QAction)
 
 {
+    btn_bookmarks_->setCheckable(true);
+    btn_bookmarks_->setToolTip(tr("bookmarks"));
     btn_history_->setCheckable(true);
     btn_history_->setToolTip(tr("histories"));
+    btn_download_->setCheckable(true);
+    btn_download_->setToolTip(tr("downlaods"));
+    btn_capture_->setCheckable(true);
+    btn_capture_->setToolTip(tr("screen shot"));
+    btn_user_->setCheckable(true);
+    btn_user_->setToolTip(tr("show user information"));
 
     layout_->addWidget(btn_back_);
     layout_->addWidget(btn_forward_);
@@ -71,7 +82,10 @@ NaviBar::NaviBar(QWidget *parent)
     layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
     layout_->addWidget(frame_extensions_);
     layout_->addWidget(frame_tools_);
+    layout_->addWidget(btn_bookmarks_);
     layout_->addWidget(btn_history_);
+    layout_->addWidget(btn_download_);
+    layout_->addWidget(btn_capture_);
     layout_->addWidget(btn_user_);
     layout_->addWidget(btn_more_options_);
 
@@ -241,6 +255,11 @@ void NaviBar::onHistoryPopupVisibleChange(bool visible)
     btn_history_->setChecked(visible);
 }
 
+void NaviBar::onUserInfoPopupVisibleChange(bool visible)
+{
+    btn_user_->setChecked(visible);
+}
+
 void NaviBar::paintEvent(QPaintEvent *event)
 {
     QFrame::paintEvent(event);
@@ -285,10 +304,30 @@ void NaviBar::initSignals()
     {
         emit naviBarCmd(NaviBarCmd::StopLoading, QVariant());
     });
+    connect(btn_bookmarks_, &QToolButton::clicked, this, [this]()
+    {
+        auto pos = mapToGlobal(btn_bookmarks_->geometry().bottomRight());
+        emit naviBarCmd(NaviBarCmd::Favorite, pos);
+    });
     connect(btn_history_, &QToolButton::clicked, this, [this]()
     {
         auto pos = mapToGlobal(btn_history_->geometry().bottomRight());
         emit naviBarCmd(NaviBarCmd::History, pos);
+    });
+    connect(btn_download_, &QToolButton::clicked, this, [this]()
+    {
+        auto pos = mapToGlobal(btn_download_->geometry().bottomRight());
+        emit naviBarCmd(NaviBarCmd::Download, pos);
+    });
+    connect(btn_capture_, &QToolButton::clicked, this, [this]()
+    {
+        auto pos = mapToGlobal(btn_capture_->geometry().bottomRight());
+        emit naviBarCmd(NaviBarCmd::Capture, pos);
+    });
+    connect(btn_user_, &QToolButton::clicked, this, [this]()
+    {
+        auto pos = mapToGlobal(btn_user_->geometry().bottomRight());
+        emit naviBarCmd(NaviBarCmd::User, pos);
     });
     connect(action_new_tab_, &QAction::triggered, this, [this]()
     {
@@ -315,6 +354,38 @@ void NaviBar::initSignals()
     {
         emit naviBarCmd(NaviBarCmd::FullScreen, QVariant());
         menu_more_options_->hide();
+    });
+    connect(action_favorates_, &QAction::triggered, this, [this]()
+    {
+        emit naviBarCmd(NaviBarCmd::Favorite, QVariant());
+    });
+    connect(action_history_, &QAction::triggered, this, [this]()
+    {
+        emit naviBarCmd(NaviBarCmd::History, QVariant());
+    });
+    connect(action_download_, &QAction::triggered, this, [this]()
+    {
+        emit naviBarCmd(NaviBarCmd::Download, QVariant());
+    });
+    connect(action_print_, &QAction::triggered, this, [this]()
+    {
+        emit naviBarCmd(NaviBarCmd::Print, QVariant());
+    });
+    connect(action_capture_, &QAction::triggered, this, [this]()
+    {
+        emit naviBarCmd(NaviBarCmd::Capture, QVariant());
+    });
+    connect(action_find_, &QAction::triggered, this, [this]()
+    {
+        emit naviBarCmd(NaviBarCmd::Find, QVariant());
+    });
+    connect(action_task_mgr_, &QAction::triggered, this, [this]()
+    {
+        emit naviBarCmd(NaviBarCmd::TaskMgr, QVariant());
+    });
+    connect(action_dev_tools_, &QAction::triggered, this, [this]()
+    {
+        emit naviBarCmd(NaviBarCmd::DevTool, QVariant());
     });
     connect(action_settings_, &QAction::triggered, this, [this]()
     {
@@ -364,7 +435,10 @@ void NaviBar::setAppearance()
     btn_stop_->setIcon(QIcon(":/icons/resources/newIcons/delete_64px_1128279_easyicon.net.png"));
     btn_forward_->setIcon(QIcon(":/icons/resources/newIcons/forward_64px_1128288_easyicon.net.png"));
     btn_home_->setIcon(QIcon(":/icons/resources/newIcons/home_80px.png"));
-    btn_history_->setIcon(QIcon(":/icons/resources/newIcons/history.png"));
+    btn_bookmarks_->setIcon(QIcon(":/icons/resources/newIcons/mark_as_favorite_128px.png"));
+    btn_history_->setIcon(QIcon(":/icons/resources/newIcons/history2.png"));
+    btn_download_->setIcon(QIcon(":/icons/resources/newIcons/downloads_48px.png"));
+    btn_capture_->setIcon(QIcon(":/icons/resources/newIcons/screenshot_64px.png"));
     btn_user_->setIcon(QIcon(":/icons/resources/newIcons/male_64px.png"));
     btn_more_options_->setIcon(QIcon(":/icons/resources/newIcons/more_260.95774647887px_1201158_easyicon.net.png"));
 #endif

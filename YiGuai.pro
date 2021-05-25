@@ -35,6 +35,8 @@ SOURCES += \
     popups/HistoryPopup.cpp \
     popups/PopupBase.cpp \
     popups/SiteInfoPopup.cpp \
+    popups/UserInfoPopup.cpp \
+    test/test.cpp \
     toolbars/AddressBar.cpp \
     toolbars/BookmarkBar.cpp \
     toolbars/NavigateBar.cpp \
@@ -75,6 +77,8 @@ HEADERS += \
     popups/HistoryPopup.h \
     popups/PopupBase.h \
     popups/SiteInfoPopup.h \
+    popups/UserInfoPopup.h \
+    test/test.h \
     toolbars/AddressBar.h \
     toolbars/BookmarkBar.h \
     toolbars/NavigateBar.h \
@@ -104,6 +108,8 @@ FORMS += \
     popup.ui \
     popups/HistoryPopup.ui \
     popups/PopupBase.ui \
+    popups/UserInfoPopup.ui \
+    test/test.ui \
     toolbars/NotificationBar.ui \
     widgets/TabThumbnailWidget.ui \
     widgets/appconfigwidget.ui

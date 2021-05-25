@@ -11,6 +11,7 @@
 #include <QMessageBox>
 #include <QScreen>
 #include <QCalendarWidget>
+#include <QElapsedTimer>
 
 #include <include/base/cef_scoped_ptr.h>
 #include <include/cef_command_line.h>

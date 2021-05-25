@@ -6,6 +6,7 @@
 #include <QAction>
 #include <QContextMenuEvent>
 #include <QToolButton>
+#include <QGraphicsBlurEffect>
 
 TabBar::TabBar(bool inprivate, QWidget *parent)
     : QTabBar(parent)
@@ -18,7 +19,11 @@ TabBar::TabBar(bool inprivate, QWidget *parent)
     menu_->setWindowFlag(Qt::NoDropShadowWindowHint);
     menu_->setWindowFlag(Qt::FramelessWindowHint);
     menu_->setAttribute(Qt::WA_TranslucentBackground);
+    menu_->setAutoFillBackground(true);
     menu_->setObjectName("TabBarTabMenu");
+//    QGraphicsBlurEffect *effect = new QGraphicsBlurEffect(this);
+//    menu_->setGraphicsEffect(effect);
+
     act_new_tab = new QAction( tr("Create a new tab page"),this);
     act_new_tab->setShortcut(QKeySequence(tr("Ctrl+T")));
     act_reload_  = new QAction( tr("Reload"),this);

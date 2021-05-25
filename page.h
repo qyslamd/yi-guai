@@ -19,6 +19,8 @@ class Page : public QMainWindow
 public:
     explicit Page(const QString &url, QWidget *parent = nullptr);
     Page(CefQWidget *browser, QWidget *parent = nullptr);
+    ~Page();
+    bool eventFilter(QObject *obj, QEvent *ev) override;
 
     CefQWidget* getBrowserWidget();
 
@@ -31,6 +33,7 @@ public:
 
 
     void showSiteInfomation(const QRect &rect);
+    void openDevTool();
 
 signals:
     void pageCmd(PageCmd cmd, const QVariant &data);
@@ -51,6 +54,10 @@ private:
     bool canGoForward_;
 private:
     void initBrowser();
+private slots:
+    void onBrowserDevTool(CefQWidget *devTool);
+    void onDockDevToolTopLevelChanged(bool isFloating);
+    void onDockDevToolLocChanged(Qt::DockWidgetArea area);
 };
 
 #endif // PAGE_H

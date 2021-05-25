@@ -8,6 +8,18 @@
 int AppCfgMgr::newWndOffsetX = 22;
 int AppCfgMgr::newWndOffsetY = 30;
 
+namespace {
+    const char *SectionGeneral = "General";
+    const char *KeyWindowGeo = "WindowGeo";
+    const char *KeyHomePage = "HomePage";
+    const char *KeyNewPageUrl = "HomePage";
+
+
+    const char *SectionDevTool = "DevTool";
+    const char *KeyDevToolGeo = "DevToolGeo";
+
+}
+
 AppCfgMgr::AppCfgMgr(QObject *parent)
     : QObject(parent)
 {
@@ -23,32 +35,44 @@ AppCfgMgr::AppCfgMgr(QObject *parent)
 
 QByteArray AppCfgMgr::windowGeometry()
 {
-    return instance().value("General","WindowPos", "").toByteArray();
+    return instance().value(SectionGeneral, KeyWindowGeo, "").toByteArray();
 }
 
 void AppCfgMgr::setWindowGeometry(const QByteArray &data)
 {
-    instance().setValue("General","WindowPos", data);
+    instance().setValue(SectionGeneral, KeyWindowGeo, data);
 }
 
 QString AppCfgMgr::homePageUrl()
 {
-    return instance().value("General","HomePage", "").toString();
+    return instance().value(SectionGeneral, KeyHomePage, "").toString();
 }
 
 void AppCfgMgr::setHomePageUrl(const QString &data)
 {
-    instance().setValue("General","HomePage", data);
+    instance().setValue(SectionGeneral, KeyHomePage, data);
 }
 
 QString AppCfgMgr::newTabPageUrl()
 {
-    return instance().value("General","NewPageUrl", "").toString();
+    return instance().value(SectionGeneral, KeyNewPageUrl, "").toString();
 }
 
 void AppCfgMgr::setNewTabPageUrl(const QString &data)
 {
-    instance().setValue("General","NewPageUrl", data);
+    instance().setValue(SectionGeneral, KeyNewPageUrl, data);
+}
+
+QByteArray AppCfgMgr::devToolGeometry()
+{
+    return instance()
+            .value(SectionDevTool, KeyDevToolGeo, "")
+            .toByteArray();
+}
+
+void AppCfgMgr::setDevToolGeometry(const QByteArray &data)
+{
+    instance().setValue(SectionDevTool, KeyDevToolGeo, data);
 }
 
 QVariant AppCfgMgr::value(const QString &group,

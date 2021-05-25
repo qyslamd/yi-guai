@@ -422,6 +422,47 @@ void CefClientHandler::OnGotFocus(CefRefPtr<CefBrowser> browser)
     }
 }
 
+void CefClientHandler::ShowDevTools(CefRefPtr<CefBrowser> browser,
+                                    const CefPoint &inspect_element_at)
+{
+    if (!CefCurrentlyOn(TID_UI)) {
+      // Execute this method on the UI thread.
+      CefPostTask(TID_UI, base::Bind(&CefClientHandler::ShowDevTools,
+                                     this, browser,
+                                     inspect_element_at));
+      return;
+    }
+
+    CefWindowInfo windowInfo;
+    CefRefPtr<CefClient> client;
+    CefBrowserSettings settings;
+
+    //    MainContext::Get()->PopulateBrowserSettings(&settings);
+
+    CefRefPtr<CefBrowserHost> host = browser->GetHost();
+    // Test if the DevTools browser already exists.
+    bool has_devtools = host->HasDevTools();
+    if (!has_devtools) {
+        // Create a new RootWindow for the DevTools browser that will be created
+        // by ShowDevTools().
+        NotifyCreateDevTool(windowInfo, client, settings);
+
+        has_devtools = true;
+    }
+
+    if (has_devtools) {
+      // Create the DevTools browser if it doesn't already exist.
+      // Otherwise, focus the existing DevTools browser and inspect the element
+      // at |inspect_element_at| if non-empty.
+      host->ShowDevTools(windowInfo, client, settings, inspect_element_at);
+    }
+}
+
+void CefClientHandler::CloseDevTools(CefRefPtr<CefBrowser> browser)
+{
+    browser->GetHost()->CloseDevTools();
+}
+
 void CefClientHandler::NotifyForgroundTab(CefWindowInfo &windowInfo,
                                           CefRefPtr<CefClient> &client,
                                           CefBrowserSettings &settings)
@@ -464,4 +505,14 @@ void CefClientHandler::NotifyPopupWindow(const CefPopupFeatures &popupFeatures,
                                      windowInfo,
                                      client,
                                      settings);
+}
+
+void CefClientHandler::NotifyCreateDevTool(CefWindowInfo &windowInfo,
+                                           CefRefPtr<CefClient> &client,
+                                           CefBrowserSettings &settings)
+{
+    CEF_REQUIRE_UI_THREAD();
+    delegate_->onBrowserDeveTools(windowInfo,
+                                  client,
+                                  settings);
 }

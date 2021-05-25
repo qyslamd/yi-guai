@@ -79,9 +79,10 @@ border:none;
 QMenu#TabBarTabMenu{
 padding-top:2px;
 padding-bottom:2px;
-    background-color: #DB87CEEB;
-border: 2px solid #e8e8e8;
-    border-radius: 6px;
+background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:1, y2:0, stop:0 rgba(170,204,238,0.8), stop:1 rgba(0,193,222,0.7));
+border: px solid #e8e8e8;
+border-radius: 6px;
+color:#000000;
 }
 
 QMenu#TabBarTabMenu::item:selected:enabled {

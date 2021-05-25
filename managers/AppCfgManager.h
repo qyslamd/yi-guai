@@ -19,9 +19,11 @@ public:
     static QString newTabPageUrl();
     static void setNewTabPageUrl(const QString &data);
 
+    static QByteArray devToolGeometry();
+    static void setDevToolGeometry(const QByteArray &data);
+
     static int newWndOffsetX;
     static int newWndOffsetY;
-
 
 public:
     static AppCfgMgr& instance(){

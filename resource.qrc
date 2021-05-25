@@ -68,10 +68,8 @@
         <file>resources/newIcons/copy_64px_1128277_easyicon.net.png</file>
         <file>resources/newIcons/delete_64px_1128279_easyicon.net.png</file>
         <file>resources/newIcons/forward_64px_1128288_easyicon.net.png</file>
-        <file>resources/newIcons/Home_64px.png</file>
         <file>resources/newIcons/male_64px.png</file>
         <file>resources/newIcons/Refresh_64px.png</file>
-        <file>resources/newIcons/history_64px_1175600_easyicon.net.png</file>
         <file>resources/newIcons/more_260.95774647887px_1201158_easyicon.net.png</file>
         <file>resources/newIcons/alarm.png</file>
         <file>resources/newIcons/like.png</file>
@@ -79,10 +77,8 @@
         <file>resources/newIcons/question.png</file>
         <file>resources/newIcons/sound.png</file>
         <file>resources/newIcons/star.png</file>
-        <file>resources/newIcons/stopwatch.png</file>
         <file>resources/newIcons/zoom_in.png</file>
         <file>resources/newIcons/zoom_out.png</file>
-        <file>resources/newIcons/history.png</file>
         <file>resources/newIcons/home_80px.png</file>
         <file>resources/newIcons/add_60px.png</file>
         <file>resources/newIcons/delete_100px.png</file>
@@ -92,6 +88,13 @@
         <file>resources/newIcons/mute_dark_100px.png</file>
         <file>resources/newIcons/new_window_dark_100px.png</file>
         <file>resources/newIcons/reload_drak_100px.png</file>
+        <file>resources/newIcons/add_to_favorites_52px.png</file>
+        <file>resources/newIcons/danger_52px.png</file>
+        <file>resources/newIcons/downloads_48px.png</file>
+        <file>resources/newIcons/mark_as_favorite_128px.png</file>
+        <file>resources/newIcons/screenshot_64px.png</file>
+        <file>resources/newIcons/history.png</file>
+        <file>resources/newIcons/history2.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file>resources/styles/normal.qss</file>

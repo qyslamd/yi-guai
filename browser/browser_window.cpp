@@ -80,6 +80,11 @@ CefRefPtr<CefBrowser> BrowserWindow::GetBrowser() const
     return browser_;
 }
 
+CefRefPtr<CefClientHandler> BrowserWindow::GetHandler()
+{
+    return client_handler_;
+}
+
 bool BrowserWindow::IsClosing() const
 {
     REQUIRE_MAIN_THREAD();
@@ -111,6 +116,15 @@ void BrowserWindow::onBrowserPopupWnd(const CefPopupFeatures &popupFeatures,
                                     windowInfo,
                                     client,
                                     settings);
+}
+
+void BrowserWindow::onBrowserDeveTools(CefWindowInfo &windowInfo,
+                                       CefRefPtr<CefClient> &client,
+                                       CefBrowserSettings &settings)
+{
+    delegate_->onBrowserWindowDeveTools(windowInfo,
+                                        client,
+                                        settings);
 }
 
 void BrowserWindow::OnBrowserCreated(CefRefPtr<CefBrowser> browser)

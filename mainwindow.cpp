@@ -14,6 +14,7 @@
 #include "managers/AppCfgManager.h"
 
 #include "popups/HistoryPopup.h"
+#include "popups/UserInfoPopup.h"
 
 #include <QVBoxLayout>
 #include <QStackedWidget>
@@ -94,6 +95,10 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     if(obj == history_popup_){
         if(type == QEvent::Show || type == QEvent::Hide){
             emit historyPopupVisibleChange(history_popup_->isVisible());
+        }
+    }else if(obj == userinfo_popup_){
+        if(type == QEvent::Show || type == QEvent::Hide){
+            emit userInfoPopupVisibleChange(userinfo_popup_->isVisible());
         }
     }
     return QMainWindow::eventFilter(obj, event);
@@ -236,6 +241,10 @@ void MainWindow::initUi()
     history_popup_->resize(360, 600);
     history_popup_->installEventFilter(this);
 
+    userinfo_popup_ = new UserInfoPopup(this);
+    userinfo_popup_->resize(320, 280);
+    userinfo_popup_->installEventFilter(this);
+
     app_cfg_widget_ = new AppCfgWidget(this);
 
     notify_bar_->hide();
@@ -281,6 +290,7 @@ void MainWindow::initSignalSlot()
 #endif
     connect(navi_bar_, &NaviBar::naviBarCmd, this, &MainWindow::onNaviBarCmd);
     connect(this, &MainWindow::historyPopupVisibleChange, navi_bar_, &NaviBar::onHistoryPopupVisibleChange);
+    connect(this, &MainWindow::userInfoPopupVisibleChange, navi_bar_, &NaviBar::onUserInfoPopupVisibleChange);
 }
 
 void MainWindow::initPage(Page *page)
@@ -363,50 +373,59 @@ void MainWindow::onTabBarTabMoved(int from, int to)
 void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
 {
     auto page = GetActivePage();
-    if(cmd == NaviBarCmd::Navigate)
+    switch (cmd) {
+    case NaviBarCmd::Navigate:
     {
         auto url = UtilQt::check_url(para.toString());
         url = para.toString();
         if(page){
             page->getBrowserWidget()->Navigate(url);
         }
-    } else if(cmd == NaviBarCmd::Back)
+    }
+        break;
+    case NaviBarCmd::Back:
     {
         if(page){
             page->getBrowserWidget()->GoBack();
         }
-    }else if(cmd == NaviBarCmd::HomePage)
+    }
+        break;
+    case NaviBarCmd::HomePage:
     {
         if(page){
             page->getBrowserWidget()->Navigate(AppCfgMgr::homePageUrl());
         }
     }
-    else if(cmd == NaviBarCmd::Forward)
+        break;
+    case NaviBarCmd::Forward:
     {
         if(page){
             page->getBrowserWidget()->GoForward();
         }
     }
-    else if(cmd == NaviBarCmd::Refresh)
+        break;
+    case NaviBarCmd::Refresh:
     {
         if(page){
             page->getBrowserWidget()->Refresh();
         }
     }
-    else if(cmd == NaviBarCmd::StopLoading)
+   case NaviBarCmd::StopLoading:
     {
         if(page){
             page->getBrowserWidget()->StopLoading();
         }
     }
-    else if(cmd == NaviBarCmd::ViewSiteInfo)
+        break;
+    case NaviBarCmd::ViewSiteInfo:
     {
         if(page){
             auto rect = para.toRect();
             page->showSiteInfomation(rect);
         }
     }
-    else if(cmd == NaviBarCmd::History)
+        break;
+    case NaviBarCmd::Favorite:
     {
         auto pos = para.toPoint();
         pos.ry() += 2;
@@ -415,55 +434,141 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         history_popup_->move(pos);
         history_popup_->show();
     }
-    else if(cmd == NaviBarCmd::NewTabPage){
+        break;
+    case NaviBarCmd::History:
+    {
+        auto pos = para.toPoint();
+        pos.ry() += 2;
+        pos.rx() -= history_popup_->width();
+        pos.rx() += history_popup_->shadowRightWidth();
+        history_popup_->move(pos);
+        history_popup_->show();
+    }
+        break;
+    case NaviBarCmd::Download:
+    {
+        auto pos = para.toPoint();
+        pos.ry() += 2;
+        pos.rx() -= history_popup_->width();
+        pos.rx() += history_popup_->shadowRightWidth();
+        history_popup_->move(pos);
+        history_popup_->show();
+    }
+        break;
+    case NaviBarCmd::User:
+    {
+        auto pos = para.toPoint();
+        pos.ry() += 2;
+        pos.rx() -= userinfo_popup_->width();
+        pos.rx() += userinfo_popup_->shadowRightWidth();
+        userinfo_popup_->move(pos);
+        userinfo_popup_->show();
+    }
+        break;
+    case NaviBarCmd::NewTabPage:
+    {
         auto url = para.toString();
         if(url.isEmpty()){
             url = "https://cn.bing.com/";
         }
         addNewPage(url, true);
     }
-    else if(cmd == NaviBarCmd::NewWindow){
+        break;
+    case NaviBarCmd::NewWindow:
+    {
         MainWndMgr::Instance().createWindow(MainWndCfg());
     }
-    else if(cmd == NaviBarCmd::NewInprivateWindow)
+        break;
+    case NaviBarCmd::NewInprivateWindow:
     {
         MainWndCfg cfg{true, false, false, QRect(), ""};
         MainWndMgr::Instance().createWindow(cfg);
     }
-    else if(cmd == NaviBarCmd::ZoomOut){
+        break;
+    case NaviBarCmd::ZoomOut:
+    {
         if(page){
             page->getBrowserWidget()->ZoomOut();
         }
     }
-    else if(cmd == NaviBarCmd::ZoomIn){
+        break;
+    case NaviBarCmd::ZoomIn:
+    {
         if(page){
             page->getBrowserWidget()->ZoomIn();
         }
     }
-    else if(cmd == NaviBarCmd::FullScreen){
+        break;
+    case NaviBarCmd::FullScreen:
+    {
         //        showFullScreen();
         //        showNormal();
     }
-    else if(cmd == NaviBarCmd::Settings) {
+        break;
+    case NaviBarCmd::Print:
+    {
+
+    }
+        break;
+    case NaviBarCmd::Capture:
+    {
+
+    }
+        break;
+    case NaviBarCmd::Find:
+    {
+
+    }
+        break;
+    case NaviBarCmd::TaskMgr:
+    {
+
+    }
+        break;
+    case NaviBarCmd::DevTool:
+    {
+        if(page){
+            page->openDevTool();
+        }
+    }
+        break;
+    case NaviBarCmd::Settings:
+    {
         app_cfg_widget_->show();
     }
-    else if(cmd == NaviBarCmd::About) {
+        break;
+    case NaviBarCmd::About:
+    {
         addNewPage("https://gitee.com/slamdd/yi-guai", true);
     }
-    else if(cmd == NaviBarCmd::Feedback) {
+        break;
+    case NaviBarCmd::Feedback:
+    {
         addNewPage("https://gitee.com/slamdd/yi-guai", true);
     }
-    else if(cmd == NaviBarCmd::Like) {
+        break;
+    case  NaviBarCmd::Like:
+    {
         addNewPage("https://gitee.com/slamdd/yi-guai", true);
     }
-    else if(cmd == NaviBarCmd::AboutQt) {
+        break;
+    case NaviBarCmd::AboutQt:
+    {
         QMessageBox::aboutQt(this, tr("About Qt"));
     }
-    else if(cmd == NaviBarCmd::AboutCef) {
+        break;
+    case NaviBarCmd::AboutCef:
+    {
         addNewPage("about:version", true);
     }
-    else if(cmd == NaviBarCmd::QuitApp) {
+        break;
+    case NaviBarCmd::QuitApp:
+    {
         MainWndMgr::Instance().quitApplication();
+    }
+        break;
+    default:
+        break;
     }
 }
 

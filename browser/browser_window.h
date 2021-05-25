@@ -21,6 +21,9 @@ public:
                                           CefWindowInfo &windowInfo,
                                           CefRefPtr<CefClient> &client,
                                           CefBrowserSettings &settings) = 0;
+        virtual void onBrowserWindowDeveTools(CefWindowInfo& windowInfo,
+                                              CefRefPtr<CefClient>& client,
+                                              CefBrowserSettings& settings) = 0;
         // Called when the browser has been created.
         virtual void OnBrowserCreated() = 0;
 
@@ -72,6 +75,7 @@ public:
                    size_t height);
 
     CefRefPtr<CefBrowser> GetBrowser() const;
+    CefRefPtr<CefClientHandler> GetHandler();
     bool IsClosing() const;
 
     void onBrowserComfirmClose();
@@ -87,6 +91,9 @@ protected:
                            CefWindowInfo& windowInfo,
                            CefRefPtr<CefClient>& client,
                            CefBrowserSettings& settings) override;
+    void onBrowserDeveTools(CefWindowInfo& windowInfo,
+                            CefRefPtr<CefClient>& client,
+                            CefBrowserSettings& settings) override;
     void OnBrowserCreated(CefRefPtr<CefBrowser> browser) override;
     void OnBrowserClosing(CefRefPtr<CefBrowser> browser) override;
     void onBrowserAddressChange(const std::string &url)  override;

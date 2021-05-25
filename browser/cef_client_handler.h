@@ -26,6 +26,9 @@ public:
                                        CefWindowInfo& windowInfo,
                                        CefRefPtr<CefClient>& client,
                                        CefBrowserSettings& settings) = 0;
+        virtual void onBrowserDeveTools(CefWindowInfo& windowInfo,
+                                        CefRefPtr<CefClient>& client,
+                                        CefBrowserSettings& settings) = 0;
         // Called when the browser is created.
         virtual void OnBrowserCreated(CefRefPtr<CefBrowser> browser) = 0;
 
@@ -178,6 +181,9 @@ private:
                            CefWindowInfo &windowInfo,
                            CefRefPtr<CefClient> &client,
                            CefBrowserSettings &settings);
+    void NotifyCreateDevTool(CefWindowInfo& windowInfo,
+                             CefRefPtr<CefClient>& client,
+                             CefBrowserSettings& settings);
     void NotifyBrowserCreated(CefRefPtr<CefBrowser> browser);
     void NotifyBrowserClosing(CefRefPtr<CefBrowser> browser);
     void NotifyBrowserClosed(CefRefPtr<CefBrowser> browser);
