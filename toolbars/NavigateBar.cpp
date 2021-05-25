@@ -349,15 +349,25 @@ void NaviBar::initSignals()
 
 void NaviBar::setAppearance()
 {
-    btn_back_->setIcon(QIcon(":/icons/resources/imgs/arrow_left_64px.png"));
-    btn_refresh_->setIcon(QIcon(":/icons/resources/imgs/rotate_cw_64px.png"));
-    btn_stop_->setIcon(QIcon(":/icons/resources/imgs/close_64px.png"));
-    btn_forward_->setIcon(QIcon(":/icons/resources/imgs/arrow_right_64px.png"));
+#if 0
+    btn_back_->setIcon(QIcon(":/icons/resources/imgs/arrow_left2_64px.png"));
+    btn_refresh_->setIcon(QIcon(":/icons/resources/imgs/reload_64px.png"));
+    btn_stop_->setIcon(QIcon(":/icons/resources/imgs/CLOSE3_64px.png"));
+    btn_forward_->setIcon(QIcon(":/icons/resources/imgs/arrow_right2_64px.png"));
     btn_home_->setIcon(QIcon(":/icons/resources/imgs/home_64px.png"));
     btn_history_->setIcon(QIcon(":/icons/resources/imgs/time_history_64px.png"));
     btn_user_->setIcon(QIcon(":/icons/resources/imgs/user_64px.png"));
     btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/more_horizontal_64px.png"));
-
+#else
+    btn_back_->setIcon(QIcon(":/icons/resources/newIcons/back_64px_1128270_easyicon.net.png"));
+    btn_refresh_->setIcon(QIcon(":/icons/resources/newIcons/Refresh_64px.png"));
+    btn_stop_->setIcon(QIcon(":/icons/resources/newIcons/delete_64px_1128279_easyicon.net.png"));
+    btn_forward_->setIcon(QIcon(":/icons/resources/newIcons/forward_64px_1128288_easyicon.net.png"));
+    btn_home_->setIcon(QIcon(":/icons/resources/newIcons/home_80px.png"));
+    btn_history_->setIcon(QIcon(":/icons/resources/newIcons/history.png"));
+    btn_user_->setIcon(QIcon(":/icons/resources/newIcons/male_64px.png"));
+    btn_more_options_->setIcon(QIcon(":/icons/resources/newIcons/more_260.95774647887px_1201158_easyicon.net.png"));
+#endif
     QSize iconSize(24,24);
     QSize btnSize(42,30);
     for(auto item : this->children()){

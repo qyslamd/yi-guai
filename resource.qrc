@@ -30,10 +30,8 @@
         <file>resources/imgs/arrow_right_64px.png</file>
         <file>resources/imgs/cut_coupon_64px.png</file>
         <file>resources/imgs/frame_64px.png</file>
-        <file>resources/imgs/image_64px.png</file>
         <file>resources/imgs/question_64px.png</file>
         <file>resources/imgs/rotate_cw_64px.png</file>
-        <file>resources/imgs/volume_64px.png</file>
         <file>resources/imgs/close_64px.png</file>
         <file>resources/imgs/alert_circle_64px.png</file>
         <file>resources/imgs/alert_triangle_64px.png</file>
@@ -51,6 +49,49 @@
         <file>resources/imgs/feedback_64px.png</file>
         <file>resources/imgs/hammer_64px.png</file>
         <file>resources/imgs/statistics_64px.png</file>
+        <file>resources/imgs/arrow_back_left2_64px.png</file>
+        <file>resources/imgs/arrow_left2_64px.png</file>
+        <file>resources/imgs/arrow_right2_64px.png</file>
+        <file>resources/imgs/CLOSE3_64px.png</file>
+        <file>resources/imgs/copy2_64px.png</file>
+        <file>resources/imgs/high_volume_64px.png</file>
+        <file>resources/imgs/medium_volume_64px.png</file>
+        <file>resources/imgs/mute_64px.png</file>
+        <file>resources/imgs/printer2_64px.png</file>
+        <file>resources/imgs/reload_64px.png</file>
+        <file>resources/imgs/search2_64px.png</file>
+        <file>resources/imgs/sound_64px.png</file>
+        <file>resources/imgs/zoom_in2_64px.png</file>
+        <file>resources/imgs/zoom_out2_64px.png</file>
+        <file>resources/newIcons/add_64px.png</file>
+        <file>resources/newIcons/back_64px_1128270_easyicon.net.png</file>
+        <file>resources/newIcons/copy_64px_1128277_easyicon.net.png</file>
+        <file>resources/newIcons/delete_64px_1128279_easyicon.net.png</file>
+        <file>resources/newIcons/forward_64px_1128288_easyicon.net.png</file>
+        <file>resources/newIcons/Home_64px.png</file>
+        <file>resources/newIcons/male_64px.png</file>
+        <file>resources/newIcons/Refresh_64px.png</file>
+        <file>resources/newIcons/history_64px_1175600_easyicon.net.png</file>
+        <file>resources/newIcons/more_260.95774647887px_1201158_easyicon.net.png</file>
+        <file>resources/newIcons/alarm.png</file>
+        <file>resources/newIcons/like.png</file>
+        <file>resources/newIcons/photos.png</file>
+        <file>resources/newIcons/question.png</file>
+        <file>resources/newIcons/sound.png</file>
+        <file>resources/newIcons/star.png</file>
+        <file>resources/newIcons/stopwatch.png</file>
+        <file>resources/newIcons/zoom_in.png</file>
+        <file>resources/newIcons/zoom_out.png</file>
+        <file>resources/newIcons/history.png</file>
+        <file>resources/newIcons/home_80px.png</file>
+        <file>resources/newIcons/add_60px.png</file>
+        <file>resources/newIcons/delete_100px.png</file>
+        <file>resources/newIcons/mute_100px.png</file>
+        <file>resources/newIcons/new_tab_128px.png</file>
+        <file>resources/newIcons/delete_dark_64px.png</file>
+        <file>resources/newIcons/mute_dark_100px.png</file>
+        <file>resources/newIcons/new_window_dark_100px.png</file>
+        <file>resources/newIcons/reload_drak_100px.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file>resources/styles/normal.qss</file>

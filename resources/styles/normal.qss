@@ -76,3 +76,16 @@ border:none;
     border-radius:8px;
 }
 
+QMenu#TabBarTabMenu{
+padding-top:2px;
+padding-bottom:2px;
+    background-color: #DB87CEEB;
+border: 2px solid #e8e8e8;
+    border-radius: 6px;
+}
+
+QMenu#TabBarTabMenu::item:selected:enabled {
+    background-color: #52B8EB;
+    color:white;
+}
+

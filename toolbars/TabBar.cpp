@@ -15,6 +15,10 @@ TabBar::TabBar(bool inprivate, QWidget *parent)
     setStyle(new TabbarStyle(inprivate));
 
     menu_ = new QMenu(this);
+    menu_->setWindowFlag(Qt::NoDropShadowWindowHint);
+    menu_->setWindowFlag(Qt::FramelessWindowHint);
+    menu_->setAttribute(Qt::WA_TranslucentBackground);
+    menu_->setObjectName("TabBarTabMenu");
     act_new_tab = new QAction( tr("Create a new tab page"),this);
     act_new_tab->setShortcut(QKeySequence(tr("Ctrl+T")));
     act_reload_  = new QAction( tr("Reload"),this);
@@ -43,6 +47,8 @@ TabBar::TabBar(bool inprivate, QWidget *parent)
     menu_->addAction(act_vertical_tab_mode_);
     menu_->addAction(act_reopen_closed_);
     menu_->addAction(act_add_all_favorates_);
+
+    setIcons();
 
     connect(act_new_tab, &QAction::triggered, this, [this](){
         emit menuTriggered(TabBarCmd::NewTabPage, "");
@@ -90,10 +96,10 @@ bool TabBar::event(QEvent *e)
 int TabBar::insertTab(int index, const QString &text)
 {
     int ret = QTabBar::insertTab(index, text);
-    QToolButton *btn = new QToolButton;
-    btn->setToolTip(tr("mute this page"));
-    btn->setIcon(QIcon(":/icons/resources/imgs/normal_opensound.png"));
-    setTabButton(ret, QTabBar::LeftSide, btn);
+//    QToolButton *btn = new QToolButton;
+//    btn->setToolTip(tr("mute this page"));
+//    btn->setIcon(QIcon(":/icons/resources/newIcons/sound.png"));
+//    setTabButton(ret, QTabBar::LeftSide, btn);
     return ret;
 }
 
@@ -106,6 +112,14 @@ void TabBar::timerEvent(QTimerEvent *event)
         if(tabAt(pos) == -1)
             emit showPreview(QPoint(), -1);
     }
+}
+
+void TabBar::setIcons()
+{
+    act_new_tab->setIcon(QIcon(":/icons/resources/newIcons/new_window_dark_100px.png"));
+    act_reload_->setIcon(QIcon(":/icons/resources/newIcons/reload_drak_100px.png"));
+    act_mute_->setIcon(QIcon(":/icons/resources/newIcons/mute_dark_100px.png"));
+    act_close_this_->setIcon(QIcon(":/icons/resources/newIcons/delete_dark_64px.png"));
 }
 
 void TabBar::mousePressEvent(QMouseEvent *event)

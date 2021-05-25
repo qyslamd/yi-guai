@@ -36,8 +36,6 @@ private:
     TabBar *tab_bar_;
     QToolButton *btn_add_page_;
 
-    QToolButton *btn_test_ = nullptr;
-
 private:
     void initUi();
 };

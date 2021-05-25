@@ -492,8 +492,7 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
     } else if(cmd == PageCmd::Address)
     {
         if(page && page == GetActivePage()){
-            QUrl url(para.toString());
-            navi_bar_->setAddress(url.toDisplayString());
+            navi_bar_->setAddress(QUrl(page->url()).toDisplayString());
         }
     } else if(cmd == PageCmd::Title)
     {

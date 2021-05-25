@@ -17,7 +17,6 @@ TabPagesBar::TabPagesBar(bool inprivate, QWidget *parent)
     , btn_dock_tabs_(new QToolButton)
     , tab_bar_(new TabBar(inprivate))
     , btn_add_page_(new QToolButton)
-    , btn_test_(new QToolButton)
 {
     initUi();
 }
@@ -98,19 +97,16 @@ void TabPagesBar::initUi()
     layout_->addWidget(tab_bar_);
     layout_->addWidget(btn_add_page_);
     layout_->addStretch();
-    layout_->addWidget(btn_test_);
     layout_->addSpacerItem(new QSpacerItem(180,10,QSizePolicy::Fixed));
 
     btn_dock_tabs_->setToolTip(tr("open vertical tabs"));
     btn_add_page_->setToolTip(tr("Add a tab page"));
 
-    QSize iconSize(18,18);
+    QSize iconSize(20,20);
     btn_dock_tabs_->setIconSize(iconSize);
     btn_add_page_->setIconSize(iconSize);
-    btn_test_->setIconSize(iconSize);
     btn_dock_tabs_->setIcon(QIcon(":/icons/resources/imgs/normal_pagelist_hide.png"));
-    btn_add_page_->setIcon(QIcon(":/icons/resources/imgs/plus_64px.png"));
-    btn_test_->setIcon(QIcon(":/icons/resources/imgs/view_64px.png"));
+    btn_add_page_->setIcon(QIcon(":/icons/resources/newIcons/add_60px.png"));
 
     connect(tab_bar_, &TabBar::currentChanged, this, &TabPagesBar::currentChanged);
     connect(tab_bar_, &TabBar::tabCloseRequested, this, &TabPagesBar::tabCloseRequested);
@@ -119,5 +115,4 @@ void TabPagesBar::initUi()
 
     connect(btn_add_page_, &QToolButton::clicked, this, &TabPagesBar::addPage);
     connect(btn_dock_tabs_, &QToolButton::clicked, this, &TabPagesBar::showDockPage);
-    connect(btn_test_, &QToolButton::clicked, this, &TabPagesBar::testBtnClicked);
 }
