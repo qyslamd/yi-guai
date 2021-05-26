@@ -16,6 +16,11 @@ public:
     explicit UserInfoPopup(QWidget *parent = nullptr);
     ~UserInfoPopup();
 
+    bool eventFilter(QObject *obj, QEvent *ve) override;
+
+protected:
+    void showEvent(QShowEvent *event) override;
+
 private:
     Ui::UserInfoPopup *ui;
 };

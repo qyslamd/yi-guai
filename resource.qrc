@@ -95,6 +95,8 @@
         <file>resources/newIcons/screenshot_64px.png</file>
         <file>resources/newIcons/history.png</file>
         <file>resources/newIcons/history2.png</file>
+        <file>resources/newIcons/quill_pen_48px.png</file>
+        <file>resources/newIcons/dragon_face_96px.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file>resources/styles/normal.qss</file>

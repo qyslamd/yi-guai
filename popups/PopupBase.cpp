@@ -13,8 +13,8 @@ PopupBase::PopupBase(QWidget *parent) :
     setWindowFlags(Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
 
     QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
-    shadow->setOffset(0, 0);
-    shadow->setColor(QColor(38, 78, 119, 127));
+    shadow->setOffset(0, 4);
+    shadow->setColor(QColor(38, 78, 119, 100));
     shadow->setBlurRadius(9);
     ui->frameShadow->setGraphicsEffect(shadow);
 }

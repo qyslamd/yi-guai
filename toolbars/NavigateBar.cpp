@@ -233,18 +233,12 @@ bool NaviBar::eventFilter(QObject *obj, QEvent *ev)
 {
     if(menu_more_options_ == obj){
         if(ev->type() == QEvent::Show){
-
             auto pos = mapToGlobal(btn_more_options_->pos());
 
             pos.setX(pos.x() - menu_more_options_->width());
             pos.setX(pos.x() + btn_more_options_->width());
             pos.setY(pos.y() + btn_more_options_->height());
             menu_more_options_->move(pos);
-
-            // 顺手
-//            auto rect = menu_more_options_->actionGeometry(action_new_tab_);
-//            int h = rect.height();
-//            frame_zoom_->setMinimumHeight(h + h / 5);
         }
     }
     return QFrame::eventFilter(obj, ev);

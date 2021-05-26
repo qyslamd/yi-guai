@@ -242,7 +242,7 @@ void MainWindow::initUi()
     history_popup_->installEventFilter(this);
 
     userinfo_popup_ = new UserInfoPopup(this);
-    userinfo_popup_->resize(320, 280);
+    userinfo_popup_->resize(320, 360);
     userinfo_popup_->installEventFilter(this);
 
     app_cfg_widget_ = new AppCfgWidget(this);
