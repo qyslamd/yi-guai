@@ -21,6 +21,7 @@ public:
     void GoBack();
     void GoForward();
     void Refresh();
+    void MuteAudio();
     void StopLoading();
     void ZoomOut();
     void ZoomIn();
@@ -33,6 +34,7 @@ signals:
     void browserNewForgroundPage(CefQWidget *newPage);
     void browserAddressChange(const QString &url);
     void browserTitleChange(const QString &title);
+    void browserFullScnChange(bool fullscreen);
     void browserStatusMessage(const QString &msg);
     void browserFaviconChange(const QPixmap &pix);
     void browserLoadStart(CefLoadHandler::TransitionType transition_type);
@@ -59,6 +61,7 @@ protected:
     void OnBrowserWindowClosing() override;
     void onBrowserWindowAddressChange(const std::string &url) override;
     void onBrowserWindowTitleChange(const std::string &title) override;
+    void onBrowserWndFullscreenChange(bool fullscreen) override;
     void onBrowserWindowStatusMessage(const std::string &meg) override;
     void onBrowserWindowFaviconChange(CefRefPtr<CefImage> image, const std::string &url) override;
     void onBrowerWindowLoadStart(CefLoadHandler::TransitionType transition_type) override;

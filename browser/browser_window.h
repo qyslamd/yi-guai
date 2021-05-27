@@ -32,6 +32,7 @@ public:
 
         virtual void onBrowserWindowAddressChange(const std::string& url) = 0;
         virtual void onBrowserWindowTitleChange(const std::string& title) = 0;
+        virtual void onBrowserWndFullscreenChange(bool fullscreen) = 0;
         virtual void onBrowserWindowStatusMessage(const std::string &meg) = 0;
         virtual void onBrowserWindowFaviconChange(CefRefPtr<CefImage> image,
                                                   const std::string &url) = 0;
@@ -98,6 +99,7 @@ protected:
     void OnBrowserClosing(CefRefPtr<CefBrowser> browser) override;
     void onBrowserAddressChange(const std::string &url)  override;
     void onBrowserTitleChange(const std::string &title)  override;
+    void onBrowserFullscreenChange(bool fullscreen) override;
     void onBrowserStatusMessage(const std::string &msg)  override;
     void onBrowserFaviconChange(CefRefPtr<CefImage> image,
                                 const std::string &url) override;

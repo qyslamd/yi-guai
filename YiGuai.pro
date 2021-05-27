@@ -28,6 +28,7 @@ SOURCES += \
     managers/AddrInputManager.cpp \
     managers/AppCfgManager.cpp \
     managers/CefManager.cpp \
+    managers/EventManager.cpp \
     managers/FaviconManager.cpp \
     managers/MainWindowManager.cpp \
     page.cpp \
@@ -70,6 +71,7 @@ HEADERS += \
     managers/AddrInputManager.h \
     managers/AppCfgManager.h \
     managers/CefManager.h \
+    managers/EventManager.h \
     managers/FaviconManager.h \
     managers/MainWindowManager.h \
     page.h \

@@ -95,6 +95,7 @@ private slots:
     void onTabBarCurrentChanged(int index);
     void onTabBarCloseRequested(int index);
     void onTabBarTabMoved(int from, int to);
+    void onTabbarMenuTriggered(TabBarCmd cmd, const QVariant &para);
     void onNaviBarCmd(NaviBarCmd cmd, const QVariant &para);
     void onPageCmd(PageCmd cmd, const QVariant &para);
     void onShowTabThumnail(const QPoint &g_pos, const int index);

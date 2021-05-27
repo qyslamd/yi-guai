@@ -98,6 +98,16 @@ void CefQWidget::Refresh()
     }
 }
 
+void CefQWidget::MuteAudio()
+{
+    auto browser = browser_window_->GetBrowser();
+    if(browser){
+        auto host = browser->GetHost();
+        bool ismuted = host->IsAudioMuted();
+        browser->GetHost()->SetAudioMuted(!ismuted);
+    }
+}
+
 void CefQWidget::StopLoading()
 {
     auto browser = browser_window_->GetBrowser();
@@ -242,6 +252,11 @@ void CefQWidget::onBrowserWindowAddressChange(const std::string &url)
 void CefQWidget::onBrowserWindowTitleChange(const std::string &title)
 {
     emit browserTitleChange(QString::fromStdString(title));
+}
+
+void CefQWidget::onBrowserWndFullscreenChange(bool fullscreen)
+{
+    emit browserFullScnChange(fullscreen);
 }
 
 void CefQWidget::onBrowserWindowStatusMessage(const std::string &msg)

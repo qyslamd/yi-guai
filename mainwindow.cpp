@@ -285,6 +285,7 @@ void MainWindow::initSignalSlot()
         auto visible = stack_browsers_->isVisible();
         stack_browsers_->setVisible(!visible);
     });
+    connect(tab_bar_, &TabPagesBar::tabbarMenuTriggered, this, &MainWindow::onTabbarMenuTriggered);
 #ifdef Q_OS_WIN
     connect(this, &MainWindow::dwmColorChanged, tab_bar_, &TabPagesBar::onDwmColorChanged);
 #endif
@@ -368,6 +369,30 @@ void MainWindow::onTabBarTabMoved(int from, int to)
     QWidget *w = stack_browsers_->widget(from);
     stack_browsers_->removeWidget(w);
     stack_browsers_->insertWidget(to, w);
+}
+
+void MainWindow::onTabbarMenuTriggered(TabBarCmd cmd, const QVariant &para)
+{
+    switch (cmd) {
+    case TabBarCmd::NewTabPage:
+        onNaviBarCmd(NaviBarCmd::NewTabPage, para);
+        break;
+    case TabBarCmd::Reload:
+        if(auto page = GetActivePage()){
+            page->getBrowserWidget()->Refresh();
+        }
+        break;
+    case TabBarCmd::Mute:
+        if(auto page = GetPage(para.toInt())){
+            page->getBrowserWidget()->MuteAudio();
+        }
+        break;
+    case TabBarCmd::CloseTab:
+        onTabBarCloseRequested(para.toInt());
+        break;
+    default:
+        break;
+    }
 }
 
 void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
@@ -580,7 +605,8 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
         page = qobject_cast<Page *>(sender);
     }
 
-    if(cmd == PageCmd::Closing)
+    switch(cmd){
+    case PageCmd::Closing:
     {
         if(page){
             tab_bar_->removeTab(stack_browsers_->indexOf(page));
@@ -593,39 +619,65 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
                 QTimer::singleShot(0, this, &MainWindow::close);
             }
         }
+    }
+        break;
 
-    } else if(cmd == PageCmd::Address)
+    case PageCmd::Address:
     {
         if(page && page == GetActivePage()){
             navi_bar_->setAddress(QUrl(page->url()).toDisplayString());
         }
-    } else if(cmd == PageCmd::Title)
+    }
+        break;
+    case PageCmd::Title:
     {
         auto index = stack_browsers_->indexOf(page);
         tab_bar_->setTabText(index, para.toString());
         tab_bar_->update();
-    }else if(cmd == PageCmd::StatusMessage)
+    }
+        break;
+    case PageCmd::FullScreen:
+    {
+        qInfo()<<__FUNCTION__;
+    }
+        break;
+    case PageCmd::StatusMessage:
     {
         onStatusMessage(para.toString());
-    }else if(cmd == PageCmd::Favicon)
+    }
+        break;
+    case PageCmd::Favicon:
     {
         auto index = stack_browsers_->indexOf(page);
         tab_bar_->setTabIcon(index, QIcon(para.value<QPixmap>()));
-    } else if(cmd == PageCmd::LoadStart)
+    }
+        break;
+    case PageCmd::LoadStart:
     {
 
-    } else if(cmd == PageCmd::LoadEnd)
+    }
+        break;
+    case PageCmd::LoadEnd:
     {
 
-    }else if(cmd == PageCmd::LoadingState)
+    }
+        break;
+    case PageCmd::LoadingState:
     {
         if(page && page == GetActivePage()){
             QUrl url(para.toString());
             navi_bar_->setLoadingState(page->isLoading(),page->canGoBack(), page->canGoForward());
         }
-    } else if(cmd == PageCmd::FocusChange){
+    }
+        break;
+    case PageCmd::FocusChange:
+    {
         auto focus = para.toBool();
         navi_bar_->setFocus(focus);
+    }
+        break;
+    default:
+        break;
     }
 }
 

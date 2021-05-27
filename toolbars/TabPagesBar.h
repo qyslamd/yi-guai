@@ -2,6 +2,7 @@
 #define TABPAGESBAR_H
 
 #include <QFrame>
+#include "globaldef.h"
 
 class QToolButton;
 class TabBar;
@@ -25,6 +26,7 @@ signals:
     void showPreview(const QPoint &g_pos, const int index);
     void addPage();
     void showDockPage();
+    void tabbarMenuTriggered(TabBarCmd cmd, const QVariant &data);
     void testBtnClicked();
 public slots:
     void setCurrentIndex(int index);

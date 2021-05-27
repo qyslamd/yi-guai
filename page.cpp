@@ -130,6 +130,10 @@ void Page::initBrowser()
         title_ = title;
         emit pageCmd(PageCmd::Title, title);
     });
+    connect(browser_widget_, &CefQWidget::browserFullScnChange, [this](bool fullscreen)
+    {
+        emit pageCmd(PageCmd::FullScreen, fullscreen);
+    });
     connect(browser_widget_, &CefQWidget::browserStatusMessage, [this](const QString &msg)
     {
         emit pageCmd(PageCmd::StatusMessage, msg);

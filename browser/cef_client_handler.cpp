@@ -219,6 +219,23 @@ void CefClientHandler::NotifyBrowserTitleChange(CefRefPtr<CefBrowser> browser,
         delegate_->onBrowserTitleChange(title.ToString());
 }
 
+void CefClientHandler::NotifyFullscreenModeChange(CefRefPtr<CefBrowser> browser,
+                                                  bool fullscreen)
+{
+    if (!CURRENTLY_ON_MAIN_THREAD()) {
+        // Execute this method on the main thread.
+        MAIN_POST_CLOSURE(
+                    base::Bind(&CefClientHandler::NotifyFullscreenModeChange,
+                               this,
+                               browser,
+                               fullscreen));
+        return;
+    }
+
+    if (delegate_)
+        delegate_->onBrowserFullscreenChange(fullscreen);
+}
+
 void CefClientHandler::NotifyStatusMessage(const CefString &msg)
 {
     if (!CURRENTLY_ON_MAIN_THREAD()) {
@@ -276,12 +293,7 @@ void CefClientHandler::OnFaviconURLChange(CefRefPtr<CefBrowser> browser,
     {
         for( size_t i = 0; i<icon_urls.size(); i++ )
         {
-            std::string fileExtension = UtilQt::GetFileExtension(icon_urls[i]);
-            browser->GetHost()->DownloadImage(icon_urls[i], true, 48, true, new ClientDownloadImageCallback(this));
-            //            if(fileExtension.compare("ico")==0||fileExtension.compare("ICO")==0)
-            //            {
-            //                 break;
-            //            }
+            browser->GetHost()->DownloadImage(icon_urls[i], true, 0, true, new ClientDownloadImageCallback(this));
         }
     }
 }
@@ -289,11 +301,15 @@ void CefClientHandler::OnFaviconURLChange(CefRefPtr<CefBrowser> browser,
 void CefClientHandler::OnFullscreenModeChange(CefRefPtr<CefBrowser> browser,
                                               bool fullscreen)
 {
+    CEF_REQUIRE_UI_THREAD();
+
+    NotifyFullscreenModeChange(browser, fullscreen);
 }
 
 bool CefClientHandler::OnTooltip(CefRefPtr<CefBrowser> browser,
                                  CefString &text)
 {
+
     return false;
 }
 

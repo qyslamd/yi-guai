@@ -64,16 +64,16 @@ TabBar::TabBar(bool inprivate, QWidget *parent)
     });
     connect(act_mute_, &QAction::triggered, this,[this](){
 
-        emit menuTriggered(TabBarCmd::Mute, "");
+        emit menuTriggered(TabBarCmd::Mute, menu_triggered_index_);
     });
     connect(act_close_this_, &QAction::triggered, this,[this](){
-        emit menuTriggered(TabBarCmd::CloseTab, "");
+        emit menuTriggered(TabBarCmd::CloseTab, menu_triggered_index_);
     });
     connect(act_close_right_, &QAction::triggered, this,[this](){
-        emit menuTriggered(TabBarCmd::CloseRight, "");
+        emit menuTriggered(TabBarCmd::CloseRight, menu_triggered_index_);
     });
     connect(act_close_others_, &QAction::triggered, this,[this](){
-        emit menuTriggered(TabBarCmd::CloseOther, "");
+        emit menuTriggered(TabBarCmd::CloseOther, menu_triggered_index_);
     });
 
 
@@ -167,6 +167,7 @@ void TabBar::contextMenuEvent(QContextMenuEvent *event)
                         act_close_others_->setEnabled(false);
 
     int index = this->tabAt(event->pos());
+    menu_triggered_index_ = index;
 
     this->count() - 1 > index ? act_close_right_->setEnabled(true):
                             act_close_right_->setEnabled(false);

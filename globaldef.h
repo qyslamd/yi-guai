@@ -58,6 +58,7 @@ enum class PageCmd{
     Closing,
     Address,
     Title,
+    FullScreen,
     StatusMessage,
     Favicon,
     LoadStart,

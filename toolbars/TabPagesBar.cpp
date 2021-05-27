@@ -112,6 +112,7 @@ void TabPagesBar::initUi()
     connect(tab_bar_, &TabBar::tabCloseRequested, this, &TabPagesBar::tabCloseRequested);
     connect(tab_bar_, &TabBar::tabMoved, this, &TabPagesBar::tabMoved);
     connect(tab_bar_, &TabBar::showPreview, this, &TabPagesBar::showPreview);
+    connect(tab_bar_, &TabBar::menuTriggered, this, &TabPagesBar::tabbarMenuTriggered);
 
     connect(btn_add_page_, &QToolButton::clicked, this, &TabPagesBar::addPage);
     connect(btn_dock_tabs_, &QToolButton::clicked, this, &TabPagesBar::showDockPage);

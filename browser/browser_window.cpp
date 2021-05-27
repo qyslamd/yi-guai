@@ -162,6 +162,13 @@ void BrowserWindow::onBrowserTitleChange(const std::string &title)
      delegate_->onBrowserWindowTitleChange(title);
 }
 
+void BrowserWindow::onBrowserFullscreenChange(bool fullscreen)
+{
+    REQUIRE_MAIN_THREAD();
+
+    delegate_->onBrowserWndFullscreenChange(fullscreen);
+}
+
 void BrowserWindow::onBrowserStatusMessage(const std::string &msg)
 {
     REQUIRE_MAIN_THREAD();
