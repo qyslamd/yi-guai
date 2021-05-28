@@ -3,6 +3,7 @@
 #ifdef Q_OS_WIN
 #include <Windows.h>
 #include <SHlObj.h>
+#include <WinUser.h>
 #endif
 
 #include <QtDebug>
@@ -27,6 +28,7 @@
 #include "managers/AppCfgManager.h"
 #include "utils/util_qt.h"
 #include "dialogs/alertdialog.h"
+
 
 CefQWidget::CefQWidget(const QString &url, QWidget *parent)
     : QWidget(parent)
@@ -362,6 +364,102 @@ void CefQWidget::onBrowserWindowLoadingStateChange(bool isLoading,
 void CefQWidget::OnBrowserGotFocus()
 {
     emit browserFocusChange(true);
+}
+
+bool CefQWidget::onBrowserWndPreKeyEvent(const CefKeyEvent &event,
+                                         CefEventHandle os_event,
+                                         bool *is_keyboard_shortcut)
+{
+#if 1
+    qInfo()<<__FUNCTION__
+          <<"type:"<<event.type
+         <<"modifiers:"<<QString::number(event.modifiers,2)
+        <<"windows_key_code:"<<QString::number(event.windows_key_code,16).toUpper().prepend("0x")
+       <<"native_key_code:"<<QString::number(event.native_key_code,16).toUpper().prepend("0x");
+#endif
+    dealCefKeyEvent(event, os_event, is_keyboard_shortcut);
+
+    return false;
+}
+
+bool CefQWidget::onBrowserWndKeyEvent(const CefKeyEvent &event,
+                                      CefEventHandle os_event)
+{
+    // return true represent you deal the event, otherwise return false
+
+    dealCefKeyEvent(event, os_event, nullptr, false);
+
+    return false;
+}
+
+void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
+                                 CefEventHandle os_event,
+                                 bool *is_keyboard_shortcut,
+                                 bool isPre)
+{
+    bool is_shortcut_and_need_to_be_done = false;
+    // F11
+    if (event.modifiers == EVENTFLAG_NONE
+            && event.windows_key_code == VK_F11
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
+    // Ctrl + -(- 位于 数字键盘 0 右侧)
+    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == VK_OEM_MINUS
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
+    // Ctrl + -(- 位于 小键盘 )
+    if (event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
+            && event.windows_key_code == VK_SUBTRACT
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
+    // Ctrl + 0(0 位于 数字键盘)
+    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == '0'
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
+    // Ctrl + 0(0 位于 小键盘 )
+    if (event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
+            && event.windows_key_code == VK_NUMPAD0
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
+    // Ctrl + +(+ 位于 backspace 左侧)
+    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == VK_OEM_PLUS
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
+    // Ctrl + +(+ 位于 小键盘 )
+    if (event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
+            && event.windows_key_code == VK_ADD
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
+
+
+
+
+    // 统一处理，不写多份儿
+    if(is_shortcut_and_need_to_be_done)
+    {
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(event, os_event);
+        }
+    }
 }
 
 void CefQWidget::resizeEvent(QResizeEvent *event)

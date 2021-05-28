@@ -15,6 +15,7 @@ public:
     ~TabPagesBar();
     int insertTab(int index, const QString &text);
     int count()const;
+    void moveTab(int from, int to);
     void removeTab(int index);
     void setTabIcon(int index, const QIcon &icon);
     void setTabText(int index, const QString &text);

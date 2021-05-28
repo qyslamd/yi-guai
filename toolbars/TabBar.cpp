@@ -13,6 +13,7 @@ TabBar::TabBar(bool inprivate, QWidget *parent)
 {
     setDrawBase(false);
     setTabsClosable(true);
+    setMovable(true);
     setStyle(new TabbarStyle(inprivate));
 
     menu_ = new QMenu(this);
@@ -56,11 +57,11 @@ TabBar::TabBar(bool inprivate, QWidget *parent)
     setIcons();
 
     connect(act_new_tab, &QAction::triggered, this, [this](){
-        emit menuTriggered(TabBarCmd::NewTabPage, "");
+        emit menuTriggered(TabBarCmd::NewTabPage, menu_triggered_index_);
     });
     connect(act_reload_, &QAction::triggered, this,[this](){
 
-        emit menuTriggered(TabBarCmd::Reload, "");
+        emit menuTriggered(TabBarCmd::Reload, menu_triggered_index_);
     });
     connect(act_mute_, &QAction::triggered, this,[this](){
 
@@ -100,7 +101,7 @@ bool TabBar::event(QEvent *e)
 
 int TabBar::insertTab(int index, const QString &text)
 {
-    int ret = QTabBar::insertTab(index, text);
+    int ret = QTabBar::insertTab(index, style()->standardIcon(QStyle::SP_FileIcon), text);
 //    QToolButton *btn = new QToolButton;
 //    btn->setToolTip(tr("mute this page"));
 //    btn->setIcon(QIcon(":/icons/resources/newIcons/sound.png"));
@@ -168,6 +169,7 @@ void TabBar::contextMenuEvent(QContextMenuEvent *event)
 
     int index = this->tabAt(event->pos());
     menu_triggered_index_ = index;
+    qInfo()<<__FUNCTION__<<index;
 
     this->count() - 1 > index ? act_close_right_->setEnabled(true):
                             act_close_right_->setEnabled(false);

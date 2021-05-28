@@ -208,4 +208,23 @@ void BrowserWindow::onBrowserGotFocus(CefRefPtr<CefBrowser> browser)
 {
     REQUIRE_MAIN_THREAD();
     delegate_->OnBrowserGotFocus();
+
+    Q_UNUSED(browser);
+}
+
+bool BrowserWindow::onBrowserPreKeyEvent(const CefKeyEvent &event,
+                                         CefEventHandle os_event,
+                                         bool *is_keyboard_shortcut)
+{
+    REQUIRE_MAIN_THREAD();
+    return delegate_->onBrowserWndPreKeyEvent(event,
+                                              os_event,
+                                              is_keyboard_shortcut);
+}
+
+bool BrowserWindow::onBrowserKeyEvent(const CefKeyEvent &event,
+                                      CefEventHandle os_event)
+{
+    REQUIRE_MAIN_THREAD();
+    return delegate_->onBrowserWndKeyEvent(event, os_event);
 }

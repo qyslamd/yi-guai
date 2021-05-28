@@ -1,5 +1,4 @@
 #include "page.h"
-#include "cef_qwidget.h"
 #include "popups/SiteInfoPopup.h"
 
 #include <QtDebug>
@@ -174,6 +173,8 @@ void Page::initBrowser()
         favicon_ = pix;
         emit pageCmd(PageCmd::Favicon, pix);
     });
+
+    connect(browser_widget_, &CefQWidget::browserShortcut, this, &Page::browserShortcut);
 }
 
 void Page::onBrowserDevTool(CefQWidget *devTool)

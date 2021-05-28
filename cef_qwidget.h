@@ -5,6 +5,7 @@
 #include <QWindow>
 #include <memory>
 #include "browser/browser_window.h"
+#include "globaldef.h"
 
 class QHBoxLayout;
 
@@ -42,6 +43,8 @@ signals:
     void browserLoadingStateChange(bool isLoading, bool canGoBack, bool canGoForward);
     void browserFocusChange(bool getfucos);
     void browserDevTool(CefQWidget *devTool);
+    void browserShortcut(const CefKeyEvent &event,
+                         CefEventHandle os_event);
 
 public slots:
     void onTopLevelWindowStateChanged(Qt::WindowStates state, const QVariant &data);
@@ -68,6 +71,12 @@ protected:
     void onBrowerWindowLoadEnd(int httpStatusCode) override;
     void onBrowserWindowLoadingStateChange(bool isLoading, bool canGoBack, bool canGoForward) override;
     void OnBrowserGotFocus() override;
+    bool onBrowserWndPreKeyEvent(const CefKeyEvent &event,
+                                 CefEventHandle os_event,
+                                 bool *is_keyboard_shortcut) override;
+    bool onBrowserWndKeyEvent(const CefKeyEvent &event,
+                              CefEventHandle os_event) override;
+
     // QWidget interface
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -91,6 +100,11 @@ private:
 private:
     void initUi();
     void resizeBorser(const QSize &size = QSize());
+
+    void dealCefKeyEvent(const CefKeyEvent &event,
+                         CefEventHandle os_event,
+                         bool *is_keyboard_shortcut,
+                         bool isPre = true);
 
 };
 

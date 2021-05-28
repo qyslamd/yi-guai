@@ -41,8 +41,12 @@ public:
         virtual void onBrowserWindowLoadingStateChange(bool isLoading,
                                                        bool canGoBack,
                                                        bool canGoForward) = 0;
-
         virtual void OnBrowserGotFocus() {};
+        virtual bool onBrowserWndPreKeyEvent(const CefKeyEvent &event,
+                                             CefEventHandle os_event,
+                                             bool *is_keyboard_shortcut) = 0;
+        virtual bool onBrowserWndKeyEvent(const CefKeyEvent &event,
+                                          CefEventHandle os_event) = 0;
     protected:
         virtual ~Delegate() {}
     };
@@ -109,6 +113,11 @@ protected:
                                      bool canGoBack,
                                      bool canGoForward) override;
     void onBrowserGotFocus(CefRefPtr<CefBrowser> browser) override;
+    bool onBrowserPreKeyEvent(const CefKeyEvent &event,
+                              CefEventHandle os_event,
+                              bool *is_keyboard_shortcut) override;
+    bool onBrowserKeyEvent(const CefKeyEvent &event,
+                           CefEventHandle os_event) override;
 
 private:
     Delegate* delegate_;

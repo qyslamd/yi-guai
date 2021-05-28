@@ -15,6 +15,7 @@ class CefClientHandler
         , public CefContextMenuHandler
         , public CefLoadHandler
         , public CefFocusHandler
+        , public CefKeyboardHandler
 {
 public:
     class Delegate{
@@ -48,6 +49,11 @@ public:
         virtual void onBrowerLoadEnd(int httpStatusCode) = 0;
 
         virtual void onBrowserGotFocus(CefRefPtr<CefBrowser> ) {}
+        virtual bool onBrowserPreKeyEvent(const CefKeyEvent &event,
+                                          CefEventHandle os_event,
+                                          bool *is_keyboard_shortcut) = 0;
+        virtual bool onBrowserKeyEvent(const CefKeyEvent &event,
+                                       CefEventHandle os_event) = 0;
     protected:
         virtual ~Delegate() {}
     };
@@ -66,6 +72,7 @@ public:
     CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() override {return this;}
     CefRefPtr<CefLoadHandler> GetLoadHandler() override {return this;}
     //    CefRefPtr<CefFocusHandler> GetFocusHandler() override{ return this; }
+    CefRefPtr<CefKeyboardHandler> GetKeyboardHandler() override { return this; }
 
     static int gBrowserCount;
 
@@ -142,6 +149,16 @@ public:
     void OnTakeFocus(CefRefPtr<CefBrowser> browser, bool next) override;
     bool OnSetFocus(CefRefPtr<CefBrowser> browser, FocusSource source) override;
     void OnGotFocus(CefRefPtr<CefBrowser> browser) override;
+
+    // CefKeyboardHandler interface
+public:
+    bool OnPreKeyEvent(CefRefPtr<CefBrowser> browser,
+                       const CefKeyEvent &event,
+                       CefEventHandle os_event,
+                       bool *is_keyboard_shortcut) override;
+    bool OnKeyEvent(CefRefPtr<CefBrowser> browser,
+                    const CefKeyEvent &event,
+                    CefEventHandle os_event) override;
 
 
     // Returns the number of browsers currently using this handler. Can only be

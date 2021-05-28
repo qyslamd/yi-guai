@@ -36,6 +36,11 @@ int TabPagesBar::count() const
     return tab_bar_->count();
 }
 
+void TabPagesBar::moveTab(int from, int to)
+{
+    tab_bar_->moveTab(from, to);
+}
+
 void TabPagesBar::removeTab(int index)
 {
     tab_bar_->removeTab(index);

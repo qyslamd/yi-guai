@@ -16,6 +16,7 @@
 #include "popups/HistoryPopup.h"
 #include "popups/UserInfoPopup.h"
 
+#include <QAction>
 #include <QVBoxLayout>
 #include <QStackedWidget>
 #include <QStatusBar>
@@ -44,6 +45,7 @@ MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
     , created_cfg_(cfg)
 {
     //    setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowSystemMenuHint);
+    initQtShortcut();
     initUi();
     setAppearance();
     initSignalSlot();
@@ -175,6 +177,42 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
     QMainWindow::mouseDoubleClickEvent(event);
 }
 
+void MainWindow::initQtShortcut()
+{
+    // The shortcut is active when its parent widget has focus
+//    ac_shortcut_zoomout_->setShortcutContext(Qt::WidgetShortcut);
+
+    ac_shortcut_zoomout_ = new QAction(this);
+    ac_shortcut_zoomout_->setShortcut(QKeySequence::ZoomOut);
+    connect(ac_shortcut_zoomout_, &QAction::triggered, this, &MainWindow::onShortcutZoomOut);
+
+    // QKeySequence("Ctrl+-")
+//    qInfo()<< QKeySequence::keyBindings(QKeySequence::ZoomOut);
+
+    ac_shortcut_resetzoom_ = new QAction(this);
+    ac_shortcut_resetzoom_->setShortcut(QKeySequence(Qt::CTRL, Qt::Key_0));
+    connect(ac_shortcut_resetzoom_, &QAction::triggered, this, &MainWindow::onShortcutZoomReset);
+
+    ac_shortcut_zoomin_ = new QAction(this);
+    ac_shortcut_zoomin_->setShortcut(QKeySequence::ZoomIn);
+    connect(ac_shortcut_zoomin_, &QAction::triggered, this, &MainWindow::onShortcutZoomIn);
+
+    // QKeySequence("Ctrl++")
+//    qInfo()<< QKeySequence::keyBindings(QKeySequence::ZoomIn);
+
+    ac_shortcut_fullscn_ = new QAction(this);
+    ac_shortcut_fullscn_->setShortcut(QKeySequence::FullScreen);
+    connect(ac_shortcut_fullscn_, &QAction::triggered, this, &MainWindow::onShortcutFullscn);
+
+    //QKeySequence("F11"), QKeySequence("Alt+Enter")
+//    qInfo()<< QKeySequence::keyBindings(QKeySequence::FullScreen);
+
+    addAction(ac_shortcut_zoomout_);
+    addAction(ac_shortcut_resetzoom_);
+    addAction(ac_shortcut_zoomin_);
+    addAction(ac_shortcut_fullscn_);
+}
+
 void MainWindow::initUi()
 {
     /*删除QLayout原来的 Menubar */
@@ -304,6 +342,7 @@ void MainWindow::initPage(Page *page)
         page->getBrowserWidget()->onTopLevelWindowStateChanged(state, data);
     });
 
+    connect(page, &Page::browserShortcut, this, &MainWindow::onBrowserShortcut);
 }
 
 Page *MainWindow::GetActivePage()
@@ -389,6 +428,26 @@ void MainWindow::onTabbarMenuTriggered(TabBarCmd cmd, const QVariant &para)
         break;
     case TabBarCmd::CloseTab:
         onTabBarCloseRequested(para.toInt());
+        break;
+    case TabBarCmd::CloseRight:
+    {
+        auto index = para.toInt();
+        if(index >= 0 && index + 1 <= tab_bar_->count() - 1){
+            right_closing_ = true;
+            onTabBarCloseRequested(index + 1);
+        }else{
+            right_closing_ = false;
+        }
+    }
+        break;
+    case TabBarCmd::CloseOther:
+    {
+        auto index = para.toInt();
+        if(index > 0 && index <= tab_bar_->count() - 1){
+            tab_bar_->moveTab(index, 0);
+        }
+        onTabbarMenuTriggered(TabBarCmd::CloseRight, 0);
+    }
         break;
     default:
         break;
@@ -511,24 +570,13 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
     }
         break;
     case NaviBarCmd::ZoomOut:
-    {
-        if(page){
-            page->getBrowserWidget()->ZoomOut();
-        }
-    }
+        onShortcutZoomOut();
         break;
     case NaviBarCmd::ZoomIn:
-    {
-        if(page){
-            page->getBrowserWidget()->ZoomIn();
-        }
-    }
+        onShortcutZoomIn();
         break;
     case NaviBarCmd::FullScreen:
-    {
-        //        showFullScreen();
-        //        showNormal();
-    }
+        onShortcutFullscn();
         break;
     case NaviBarCmd::Print:
     {
@@ -609,12 +657,20 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
     case PageCmd::Closing:
     {
         if(page){
-            tab_bar_->removeTab(stack_browsers_->indexOf(page));
+            int index = stack_browsers_->indexOf(page);
+            tab_bar_->removeTab(index);
             stack_browsers_->removeWidget(page);
             // 必须要删除才能真正的释放cef的browser
             page->deleteLater();
 
-            // 关掉一个以后，紧接着判断是不是用户在关闭整个窗口
+            // 关掉一个以后，根据标志位，进行下一步操作
+            // 1.是否处于关闭右侧标签的状态
+            if(right_closing_){
+                QTimer::singleShot(0,[index, this](){
+                    onTabbarMenuTriggered(TabBarCmd::CloseRight, index - 1);
+                });
+            }
+            // 2.是否处于用户要求关闭窗口的状态
             if(window_closing_){
                 QTimer::singleShot(0, this, &MainWindow::close);
             }
@@ -720,5 +776,60 @@ void MainWindow::onShowTabThumnail(const QPoint &g_pos, const int index)
         }
     }else{
         w->hide();
+    }
+}
+
+void MainWindow::onBrowserShortcut(const CefKeyEvent &event,
+                                   CefEventHandle os_event)
+{
+    if(event.windows_key_code == VK_F11){
+        onShortcutFullscn();
+    }
+    if(event.windows_key_code == VK_SUBTRACT ||
+            event.windows_key_code == VK_OEM_MINUS){
+        onShortcutZoomOut();
+    }
+    // ASCII of '0'
+    if(event.windows_key_code == '0' ||
+            event.windows_key_code == VK_NUMPAD0){
+        onShortcutZoomReset();
+    }
+    if(event.windows_key_code == VK_ADD ||
+            event.windows_key_code == VK_OEM_PLUS){
+        onShortcutZoomIn();
+    }
+}
+
+void MainWindow::onShortcutZoomOut()
+{
+    auto page = GetActivePage();
+    if(page){
+        page->getBrowserWidget()->ZoomOut();
+    }
+}
+
+void MainWindow::onShortcutZoomReset()
+{
+    auto page = GetActivePage();
+    if(page){
+        page->getBrowserWidget()->ZoomReset();
+    }
+}
+
+void MainWindow::onShortcutZoomIn()
+{
+    auto page = GetActivePage();
+    if(page){
+        page->getBrowserWidget()->ZoomIn();
+    }
+}
+
+void MainWindow::onShortcutFullscn()
+{
+    bool isFull = isFullScreen();
+    if(isFull){
+        showNormal();
+    }else{
+        showFullScreen();
     }
 }

@@ -438,6 +438,34 @@ void CefClientHandler::OnGotFocus(CefRefPtr<CefBrowser> browser)
     }
 }
 
+bool CefClientHandler::OnPreKeyEvent(CefRefPtr<CefBrowser> browser,
+                                     const CefKeyEvent &event,
+                                     CefEventHandle os_event,
+                                     bool *is_keyboard_shortcut)
+{
+    CEF_REQUIRE_UI_THREAD();
+
+    if(delegate_){
+        return delegate_->onBrowserPreKeyEvent(event, os_event, is_keyboard_shortcut);
+    }
+    return false;
+
+    Q_UNUSED(browser);
+}
+
+bool CefClientHandler::OnKeyEvent(CefRefPtr<CefBrowser> browser,
+                                  const CefKeyEvent &event,
+                                  CefEventHandle os_event)
+{
+    CEF_REQUIRE_UI_THREAD();
+
+    if(delegate_){
+        return delegate_->onBrowserKeyEvent(event, os_event);
+    }
+    return false;
+    Q_UNUSED(browser);
+}
+
 void CefClientHandler::ShowDevTools(CefRefPtr<CefBrowser> browser,
                                     const CefPoint &inspect_element_at)
 {

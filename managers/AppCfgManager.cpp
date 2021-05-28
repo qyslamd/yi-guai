@@ -45,7 +45,7 @@ void AppCfgMgr::setWindowGeometry(const QByteArray &data)
 
 QString AppCfgMgr::homePageUrl()
 {
-    return instance().value(SectionGeneral, KeyHomePage, "").toString();
+    return instance().value(SectionGeneral, KeyHomePage, "https://cn.bing.com/").toString();
 }
 
 void AppCfgMgr::setHomePageUrl(const QString &data)

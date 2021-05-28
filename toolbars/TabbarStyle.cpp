@@ -99,14 +99,7 @@ void TabbarStyle::drawTabBarTabLabel(const QStyleOption *option,
              iconSize.width() / dpi_,
              iconSize.height() / dpi_);
 #endif
-    if(pixmap.isNull())
-    {
-        painter->drawPixmap(pR, w->style()->standardPixmap(QStyle::SP_FileIcon));
-    }
-    else
-    {
-        painter->drawPixmap(pR, pixmap);
-    }
+    painter->drawPixmap(pR, pixmap);
 
     auto drawLabel = [=](const QLinearGradient &grident){
         painter->save();

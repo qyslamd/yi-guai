@@ -2,6 +2,7 @@
 #define PAGE_H
 
 #include <QMainWindow>
+#include "cef_qwidget.h"
 #include "globaldef.h"
 
 class QHBoxLayout;
@@ -38,6 +39,8 @@ public:
 signals:
     void pageCmd(PageCmd cmd, const QVariant &data);
     void newPage(Page *page);
+    void browserShortcut(const CefKeyEvent &event,
+                         CefEventHandle os_event);
 protected:
     void closeEvent(QCloseEvent *event) override;
 private:

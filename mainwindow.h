@@ -53,6 +53,11 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
 private:
+    QAction *ac_shortcut_zoomout_;
+    QAction *ac_shortcut_resetzoom_;
+    QAction *ac_shortcut_zoomin_ ;
+    QAction *ac_shortcut_fullscn_;
+
     MainWindowConfig created_cfg_{false, false, false, QRect(), ""};
 
     /*参见：QLayout::setMenuBar(QWidget *menuBar)，*/
@@ -80,8 +85,10 @@ private:
     AppCfgWidget *app_cfg_widget_ = nullptr;
 
     bool window_closing_ = false;  /*窗口是否正在关闭*/
+    bool right_closing_ = false;    /*窗口是否正在关闭右侧*/
 
 private:
+    void initQtShortcut();
     void initUi();
     void setAppearance();
 
@@ -99,5 +106,13 @@ private slots:
     void onNaviBarCmd(NaviBarCmd cmd, const QVariant &para);
     void onPageCmd(PageCmd cmd, const QVariant &para);
     void onShowTabThumnail(const QPoint &g_pos, const int index);
+    void onBrowserShortcut(const CefKeyEvent &event,
+                           CefEventHandle os_event);
+
+private:
+    void onShortcutZoomOut();
+    void onShortcutZoomReset();
+    void onShortcutZoomIn();
+    void onShortcutFullscn();
 };
 #endif // MAINWINDOW_H
