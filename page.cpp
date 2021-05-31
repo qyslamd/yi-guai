@@ -94,7 +94,13 @@ void Page::showSiteInfomation(const QRect &rect)
 
 void Page::openDevTool()
 {
-    browser_widget_->ShowDevTool(QPoint());
+    auto cef_qwidget = qobject_cast<CefQWidget *>(dock_dev_tool_->widget());
+    if(cef_qwidget && cef_qwidget->isDevTool())
+    {
+        dock_dev_tool_->close();
+    }else{
+        browser_widget_->ShowDevTool(QPoint());
+    }
 }
 
 void Page::closeEvent(QCloseEvent *event)
@@ -179,6 +185,18 @@ void Page::initBrowser()
 
 void Page::onBrowserDevTool(CefQWidget *devTool)
 {
+    connect(devTool, &CefQWidget::browserShortcut, this,
+            [devTool, this](const CefKeyEvent &event,
+            CefEventHandle)
+    {
+        // 开发者工具 browser中的快捷键处理，这里按下了 F12，表明关闭开发者工具
+        if(event.windows_key_code == VK_F12){
+            if(devTool == dock_dev_tool_->widget())
+            {
+                dock_dev_tool_->close();
+            }
+        }
+    });
     dock_dev_tool_->setAllowedAreas(Qt::AllDockWidgetAreas);
     dock_dev_tool_->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable);
     dock_dev_tool_->setWidget(devTool);

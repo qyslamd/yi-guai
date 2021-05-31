@@ -18,6 +18,7 @@ public:
     bool event(QEvent *ev) override;
 
     QRect gGeometryBtnSiteInfo() const;
+    void setInprivate(bool inprivate);
 signals:
     void viewSiteInfo();
 

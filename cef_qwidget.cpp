@@ -64,6 +64,11 @@ CefQWidget::~CefQWidget()
     qInfo()<<__FUNCTION__;
 }
 
+QSize CefQWidget::sizeHint() const
+{
+    return QSize(300, 300);
+}
+
 void CefQWidget::Navigate(const QString &url)
 {
     auto browser = browser_window_->GetBrowser();
@@ -146,13 +151,21 @@ void CefQWidget::ZoomReset()
     }
 }
 
+void CefQWidget::Print()
+{
+    auto browser = browser_window_->GetBrowser();
+    if(browser){
+        browser->GetHost()->Print();
+    }
+}
+
 void CefQWidget::ShowDevTool(const QPoint &pos)
 {
     browser_window_->GetHandler()->ShowDevTools(browser_window_->GetBrowser(),
                                                 CefPoint(pos.x(), pos.y()));
 }
 
-CefWindowHandle CefQWidget::getBrowserWindowHandle()
+CefWindowHandle CefQWidget::BrowserWindowHandle()
 {
     auto browser = browser_window_->GetBrowser();
     if(browser){
@@ -168,7 +181,7 @@ void CefQWidget::onTopLevelWindowStateChanged(Qt::WindowStates state, const QVar
     }
 }
 
-void CefQWidget::onBrowserWindowNewForgroundPage(CefWindowInfo &windowInfo,
+void CefQWidget::onBrowserWndNewForgroundPage(CefWindowInfo &windowInfo,
                                                  CefRefPtr<CefClient> &client,
                                                  CefBrowserSettings &settings)
 {
@@ -211,8 +224,8 @@ void CefQWidget::onBrowserWndPopupWnd(const CefPopupFeatures &popupFeatures,
     int h = popupFeatures.height;
 
    if(x == 0 && y == 0 && w == 0 && h == 0){
-       x = rect.x() + AppCfgMgr::newWndOffsetX;
-       y = rect.y() + AppCfgMgr::newWndOffsetY;
+       x = rect.x() + MainWndMgr::newWndOffsetX;
+       y = rect.y() + MainWndMgr::newWndOffsetY;
        w = rect.width();
        h = rect.height();
    }else{
@@ -226,11 +239,12 @@ void CefQWidget::onBrowserWndPopupWnd(const CefPopupFeatures &popupFeatures,
     popupBrowser->show();
 }
 
-void CefQWidget::onBrowserWindowDeveTools(CefWindowInfo &windowInfo,
+void CefQWidget::onBrowserWndDevTools(CefWindowInfo &windowInfo,
                                           CefRefPtr<CefClient> &client,
                                           CefBrowserSettings &settings)
 {
     CefQWidget *window = new CefQWidget(windowInfo, client, settings);
+    window->is_dev_tool_ = true;
     emit browserDevTool(window);
 }
 
@@ -370,6 +384,7 @@ bool CefQWidget::onBrowserWndPreKeyEvent(const CefKeyEvent &event,
                                          CefEventHandle os_event,
                                          bool *is_keyboard_shortcut)
 {
+
 #if 1
     qInfo()<<__FUNCTION__
           <<"type:"<<event.type
@@ -401,6 +416,13 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
     // F11
     if (event.modifiers == EVENTFLAG_NONE
             && event.windows_key_code == VK_F11
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
+    // F12
+    if (event.modifiers == EVENTFLAG_NONE
+            && event.windows_key_code == VK_F12
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
         is_shortcut_and_need_to_be_done = true;
@@ -447,8 +469,41 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
     {
         is_shortcut_and_need_to_be_done = true;
     }
-
-
+    // Ctrl + P
+    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == 'P'
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
+    // Ctrl + T
+    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == 'T'
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
+    // Ctrl + N
+    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == 'N'
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
+    // Ctrl + Shift + N
+    if (event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_SHIFT_DOWN)
+            && event.windows_key_code == 'N'
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
+    // Ctrl + H
+    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == 'H'
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
 
 
     // 统一处理，不写多份儿

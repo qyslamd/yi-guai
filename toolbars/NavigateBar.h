@@ -6,6 +6,7 @@
 
 class QHBoxLayout;
 class QToolButton;
+class QPushButton;
 class AddressBar;
 class QMenu;
 class QAction;
@@ -21,9 +22,12 @@ public:
     void setAddress(const QString &url);
     void setLoadingState(bool isLoading, bool canGoBack, bool canGoForward);
     void setFocus(bool focus);
-
     bool eventFilter(QObject *obj, QEvent *ev) override;
 
+    QPoint hisrotyBtnPos() const;
+    QPoint inprivateBtnPos() const;
+    void setInprivate(bool inprivate);
+    void inpWndCntChanged();
 signals:
     void naviBarCmd(NaviBarCmd cmd, const QVariant &para);
 public slots:
@@ -39,17 +43,17 @@ private:
     *btn_stop_,
     *btn_forward_,
     *btn_home_,
-    *btn_user_,
-    *btn_more_options_;
+    *btn_bookmarks_,
+    *btn_history_,
+    *btn_download_,
+    *btn_capture_;
+    QPushButton *btn_inprivate_;
+    QToolButton *btn_user_;
+    QToolButton *btn_more_options_;
 
     AddressBar *address_bar_;
     QFrame *frame_extensions_,
     *frame_tools_;
-
-    QToolButton *btn_bookmarks_,
-    *btn_history_,
-    *btn_download_,
-    *btn_capture_;
 
     QMenu *menu_more_options_ = nullptr,
     *menu_more_tools_ = nullptr,
@@ -84,6 +88,9 @@ private:
     action_about_qt_,
     action_about_cef_,
     action_quit_;
+
+private:
+    bool inprivate_ = false;
 
 private:
     void initSignals();

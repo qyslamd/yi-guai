@@ -14,14 +14,14 @@ public:
     // methods of this class will be called on the main thread.
     class Delegate {
     public:
-        virtual void onBrowserWindowNewForgroundPage(CefWindowInfo &windowInfo,
+        virtual void onBrowserWndNewForgroundPage(CefWindowInfo &windowInfo,
                                                      CefRefPtr<CefClient> &client,
                                                      CefBrowserSettings &settings) = 0;
         virtual void onBrowserWndPopupWnd(const CefPopupFeatures &popupFeatures,
                                           CefWindowInfo &windowInfo,
                                           CefRefPtr<CefClient> &client,
                                           CefBrowserSettings &settings) = 0;
-        virtual void onBrowserWindowDeveTools(CefWindowInfo& windowInfo,
+        virtual void onBrowserWndDevTools(CefWindowInfo& windowInfo,
                                               CefRefPtr<CefClient>& client,
                                               CefBrowserSettings& settings) = 0;
         // Called when the browser has been created.

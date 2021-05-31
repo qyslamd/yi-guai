@@ -14,6 +14,7 @@
 #include "managers/AppCfgManager.h"
 
 #include "popups/HistoryPopup.h"
+#include "popups/InprivatePopup.h"
 #include "popups/UserInfoPopup.h"
 
 #include <QAction>
@@ -40,6 +41,8 @@
 #pragma comment(lib, "Gdi32.lib")
 #endif
 
+InprivatePopup* MainWindow::gInprivatePopup = nullptr;
+
 MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
     : QMainWindow(parent)
     , created_cfg_(cfg)
@@ -50,14 +53,14 @@ MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
     setAppearance();
     initSignalSlot();
 
-    auto url = cfg.url;
+    auto url = cfg.url_;
     if(url.isEmpty()){
         url = AppCfgMgr::homePageUrl();
         if(url.isEmpty()){
             url = "https://cn.bing.com/";
         }
     }
-    addNewPage(url);
+    AddNewPage(url);
 }
 
 MainWindow::~MainWindow()
@@ -65,9 +68,13 @@ MainWindow::~MainWindow()
     qInfo()<<__FUNCTION__;
 }
 
-int MainWindow::addNewPage(const QString &url, bool switchTo)
+int MainWindow::AddNewPage(const QString &url, bool switchTo)
 {
-    Page *page = new Page(url, this);
+    auto url1 = url;
+    if(url1.isEmpty()){
+        url1 = "https://cn.bing.com/";
+    }
+    Page *page = new Page(url1, this);
     initPage(page);
     auto index = stack_browsers_->addWidget(page);
     tab_bar_->insertTab(index, url);
@@ -78,13 +85,33 @@ int MainWindow::addNewPage(const QString &url, bool switchTo)
     return index;
 }
 
-int MainWindow::addNewPage(Page *page)
+int MainWindow::AddNewPage(Page *page)
 {
     initPage(page);
     auto index = stack_browsers_->addWidget(page);
     tab_bar_->insertTab(index, "");
     tab_bar_->setCurrentIndex(index);
     return index;
+}
+
+void MainWindow::NavigateInCurPage(const QString &url)
+{
+    auto page = CurrentPage();
+    auto url1 = UtilQt::check_url(url);
+    url1 = url;
+    if(page){
+        page->getBrowserWidget()->Navigate(url1);
+    }
+}
+
+void MainWindow::updateInprivateCount()
+{
+    if(!gInprivatePopup){
+        gInprivatePopup = new InprivatePopup;
+    }
+    auto cnt = MainWndMgr::Instance().inprivateCount();
+    gInprivatePopup->setHintText(tr(" %1 inprivate window%2 opened")
+                                 .arg(cnt).arg(cnt > 1 ? "s" : ""));
 }
 
 bool MainWindow::event(QEvent *e)
@@ -104,6 +131,13 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         }
     }
     return QMainWindow::eventFilter(obj, event);
+}
+
+void MainWindow::onInpWndCntChanged()
+{
+    if(created_cfg_.is_inprivate_){
+        navi_bar_->inpWndCntChanged();
+    }
 }
 
 bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result)
@@ -162,8 +196,7 @@ void MainWindow::changeEvent(QEvent *event)
 {
     if(event->type() == QEvent::WindowStateChange)
     {
-        emit windowStateChanged(windowState(),
-                                stack_browsers_->currentWidget()->size());
+        onWindowStateChanged();
     }
 }
 
@@ -184,33 +217,38 @@ void MainWindow::initQtShortcut()
 
     ac_shortcut_zoomout_ = new QAction(this);
     ac_shortcut_zoomout_->setShortcut(QKeySequence::ZoomOut);
-    connect(ac_shortcut_zoomout_, &QAction::triggered, this, &MainWindow::onShortcutZoomOut);
+    connect(ac_shortcut_zoomout_, &QAction::triggered, this, &MainWindow::onZoomOut);
 
     // QKeySequence("Ctrl+-")
 //    qInfo()<< QKeySequence::keyBindings(QKeySequence::ZoomOut);
 
     ac_shortcut_resetzoom_ = new QAction(this);
     ac_shortcut_resetzoom_->setShortcut(QKeySequence(Qt::CTRL, Qt::Key_0));
-    connect(ac_shortcut_resetzoom_, &QAction::triggered, this, &MainWindow::onShortcutZoomReset);
+    connect(ac_shortcut_resetzoom_, &QAction::triggered, this, &MainWindow::onZoomReset);
 
     ac_shortcut_zoomin_ = new QAction(this);
     ac_shortcut_zoomin_->setShortcut(QKeySequence::ZoomIn);
-    connect(ac_shortcut_zoomin_, &QAction::triggered, this, &MainWindow::onShortcutZoomIn);
+    connect(ac_shortcut_zoomin_, &QAction::triggered, this, &MainWindow::onZoomIn);
 
     // QKeySequence("Ctrl++")
 //    qInfo()<< QKeySequence::keyBindings(QKeySequence::ZoomIn);
 
     ac_shortcut_fullscn_ = new QAction(this);
     ac_shortcut_fullscn_->setShortcut(QKeySequence::FullScreen);
-    connect(ac_shortcut_fullscn_, &QAction::triggered, this, &MainWindow::onShortcutFullscn);
+    connect(ac_shortcut_fullscn_, &QAction::triggered, this, &MainWindow::onFullScreen);
 
     //QKeySequence("F11"), QKeySequence("Alt+Enter")
 //    qInfo()<< QKeySequence::keyBindings(QKeySequence::FullScreen);
+
+    ac_shortcut_devtool_ = new QAction(this);
+    ac_shortcut_devtool_->setShortcut(QKeySequence(Qt::Key_F12));
+    connect(ac_shortcut_devtool_, &QAction::triggered, this, &MainWindow::onDevTool);
 
     addAction(ac_shortcut_zoomout_);
     addAction(ac_shortcut_resetzoom_);
     addAction(ac_shortcut_zoomin_);
     addAction(ac_shortcut_fullscn_);
+    addAction(ac_shortcut_devtool_);
 }
 
 void MainWindow::initUi()
@@ -227,8 +265,9 @@ void MainWindow::initUi()
     widget_north_layout_->setContentsMargins(0,0,0,0);
     widget_north_layout_->setSpacing(0);
 
-    tab_bar_ = new TabPagesBar(created_cfg_.is_inprivate, this);
+    tab_bar_ = new TabPagesBar(created_cfg_.is_inprivate_, this);
     navi_bar_ = new NaviBar;
+    navi_bar_->setInprivate(created_cfg_.is_inprivate_);
     bookmark_bar_ = new BookmarkBar;
     notify_bar_ = new NotificationBar;
 
@@ -295,7 +334,7 @@ void MainWindow::initUi()
 
 void MainWindow::setAppearance()
 {
-    if(created_cfg_.is_inprivate){
+    if(created_cfg_.is_inprivate_){
         QFile file(":/styles/resources/styles/inprivate.qss");
         if(file.open(QIODevice::ReadOnly)){
             auto all = file.readAll();
@@ -312,18 +351,18 @@ void MainWindow::initSignalSlot()
     connect(tab_bar_, &TabPagesBar::showPreview, this, &MainWindow::onShowTabThumnail);
     connect(tab_bar_, &TabPagesBar::addPage, [this]()
     {
-        addNewPage("about:version", true);
+        AddNewPage("about:version", true);
     });
     connect(tab_bar_, &TabPagesBar::showDockPage, [this]()
     {
-        addNewPage("about:version", true);
+        AddNewPage("about:version", true);
     });
     connect(tab_bar_, &TabPagesBar::testBtnClicked, [this]()
     {
         auto visible = stack_browsers_->isVisible();
         stack_browsers_->setVisible(!visible);
     });
-    connect(tab_bar_, &TabPagesBar::tabbarMenuTriggered, this, &MainWindow::onTabbarMenuTriggered);
+    connect(tab_bar_, &TabPagesBar::tabbarMenuTriggered, this, &MainWindow::onTabBarMenuTriggered);
 #ifdef Q_OS_WIN
     connect(this, &MainWindow::dwmColorChanged, tab_bar_, &TabPagesBar::onDwmColorChanged);
 #endif
@@ -335,7 +374,7 @@ void MainWindow::initSignalSlot()
 void MainWindow::initPage(Page *page)
 {
     connect(page, &Page::pageCmd, this, &MainWindow::onPageCmd);
-    connect(page, &Page::newPage, [this](Page *page){addNewPage(page);});
+    connect(page, &Page::newPage, [this](Page *page){AddNewPage(page);});
     // 顶层窗口的窗口状态改变应该通知到page去，
     connect(this, &MainWindow::windowStateChanged, [page](Qt::WindowStates state, const QVariant &data)
     {
@@ -345,7 +384,7 @@ void MainWindow::initPage(Page *page)
     connect(page, &Page::browserShortcut, this, &MainWindow::onBrowserShortcut);
 }
 
-Page *MainWindow::GetActivePage()
+Page *MainWindow::CurrentPage()
 {
     auto widget = stack_browsers_->currentWidget();
     if(widget){
@@ -410,14 +449,14 @@ void MainWindow::onTabBarTabMoved(int from, int to)
     stack_browsers_->insertWidget(to, w);
 }
 
-void MainWindow::onTabbarMenuTriggered(TabBarCmd cmd, const QVariant &para)
+void MainWindow::onTabBarMenuTriggered(TabBarCmd cmd, const QVariant &para)
 {
     switch (cmd) {
     case TabBarCmd::NewTabPage:
         onNaviBarCmd(NaviBarCmd::NewTabPage, para);
         break;
     case TabBarCmd::Reload:
-        if(auto page = GetActivePage()){
+        if(auto page = CurrentPage()){
             page->getBrowserWidget()->Refresh();
         }
         break;
@@ -446,7 +485,7 @@ void MainWindow::onTabbarMenuTriggered(TabBarCmd cmd, const QVariant &para)
         if(index > 0 && index <= tab_bar_->count() - 1){
             tab_bar_->moveTab(index, 0);
         }
-        onTabbarMenuTriggered(TabBarCmd::CloseRight, 0);
+        onTabBarMenuTriggered(TabBarCmd::CloseRight, 0);
     }
         break;
     default:
@@ -456,44 +495,22 @@ void MainWindow::onTabbarMenuTriggered(TabBarCmd cmd, const QVariant &para)
 
 void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
 {
-    auto page = GetActivePage();
+    auto page = CurrentPage();
     switch (cmd) {
     case NaviBarCmd::Navigate:
-    {
-        auto url = UtilQt::check_url(para.toString());
-        url = para.toString();
-        if(page){
-            page->getBrowserWidget()->Navigate(url);
-        }
-    }
+        NavigateInCurPage(para.toString());
         break;
     case NaviBarCmd::Back:
-    {
-        if(page){
-            page->getBrowserWidget()->GoBack();
-        }
-    }
+        onGoBack();
         break;
     case NaviBarCmd::HomePage:
-    {
-        if(page){
-            page->getBrowserWidget()->Navigate(AppCfgMgr::homePageUrl());
-        }
-    }
+        onHomepage();
         break;
     case NaviBarCmd::Forward:
-    {
-        if(page){
-            page->getBrowserWidget()->GoForward();
-        }
-    }
+        onGoForward();
         break;
     case NaviBarCmd::Refresh:
-    {
-        if(page){
-            page->getBrowserWidget()->Refresh();
-        }
-    }
+        onRefresh();
    case NaviBarCmd::StopLoading:
     {
         if(page){
@@ -520,14 +537,7 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
     }
         break;
     case NaviBarCmd::History:
-    {
-        auto pos = para.toPoint();
-        pos.ry() += 2;
-        pos.rx() -= history_popup_->width();
-        pos.rx() += history_popup_->shadowRightWidth();
-        history_popup_->move(pos);
-        history_popup_->show();
-    }
+        onShowHistory();
         break;
     case NaviBarCmd::Download:
     {
@@ -538,6 +548,9 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         history_popup_->move(pos);
         history_popup_->show();
     }
+        break;
+    case NaviBarCmd::Inprivate:
+        onShowInprivate();
         break;
     case NaviBarCmd::User:
     {
@@ -550,38 +563,25 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
     }
         break;
     case NaviBarCmd::NewTabPage:
-    {
-        auto url = para.toString();
-        if(url.isEmpty()){
-            url = "https://cn.bing.com/";
-        }
-        addNewPage(url, true);
-    }
+        AddNewPage(para.toString(), true);
         break;
     case NaviBarCmd::NewWindow:
-    {
         MainWndMgr::Instance().createWindow(MainWndCfg());
-    }
         break;
     case NaviBarCmd::NewInprivateWindow:
-    {
-        MainWndCfg cfg{true, false, false, QRect(), ""};
-        MainWndMgr::Instance().createWindow(cfg);
-    }
+        MainWndMgr::Instance().createWindow(MainWndCfg(true));
         break;
     case NaviBarCmd::ZoomOut:
-        onShortcutZoomOut();
+        onZoomOut();
         break;
     case NaviBarCmd::ZoomIn:
-        onShortcutZoomIn();
+        onZoomIn();
         break;
     case NaviBarCmd::FullScreen:
-        onShortcutFullscn();
+        onFullScreen();
         break;
     case NaviBarCmd::Print:
-    {
-
-    }
+        onPrint();
         break;
     case NaviBarCmd::Capture:
     {
@@ -599,11 +599,7 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
     }
         break;
     case NaviBarCmd::DevTool:
-    {
-        if(page){
-            page->openDevTool();
-        }
-    }
+        onDevTool();
         break;
     case NaviBarCmd::Settings:
     {
@@ -611,34 +607,20 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
     }
         break;
     case NaviBarCmd::About:
-    {
-        addNewPage("https://gitee.com/slamdd/yi-guai", true);
-    }
-        break;
+        AddNewPage("https://gitee.com/slamdd/yi-guai", true);
     case NaviBarCmd::Feedback:
-    {
-        addNewPage("https://gitee.com/slamdd/yi-guai", true);
-    }
-        break;
+        AddNewPage("https://gitee.com/slamdd/yi-guai", true);
     case  NaviBarCmd::Like:
-    {
-        addNewPage("https://gitee.com/slamdd/yi-guai", true);
-    }
+        AddNewPage("https://gitee.com/slamdd/yi-guai", true);
         break;
     case NaviBarCmd::AboutQt:
-    {
         QMessageBox::aboutQt(this, tr("About Qt"));
-    }
         break;
     case NaviBarCmd::AboutCef:
-    {
-        addNewPage("about:version", true);
-    }
+        AddNewPage("about:version", true);
         break;
     case NaviBarCmd::QuitApp:
-    {
         MainWndMgr::Instance().quitApplication();
-    }
         break;
     default:
         break;
@@ -651,6 +633,9 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
     Page *page = nullptr;
     if(sender){
         page = qobject_cast<Page *>(sender);
+    }else{
+        qInfo()<<__FUNCTION__<<"fatal error!";
+        return;
     }
 
     switch(cmd){
@@ -667,7 +652,7 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
             // 1.是否处于关闭右侧标签的状态
             if(right_closing_){
                 QTimer::singleShot(0,[index, this](){
-                    onTabbarMenuTriggered(TabBarCmd::CloseRight, index - 1);
+                    onTabBarMenuTriggered(TabBarCmd::CloseRight, index - 1);
                 });
             }
             // 2.是否处于用户要求关闭窗口的状态
@@ -680,7 +665,7 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
 
     case PageCmd::Address:
     {
-        if(page && page == GetActivePage()){
+        if(page && page == CurrentPage()){
             navi_bar_->setAddress(QUrl(page->url()).toDisplayString());
         }
     }
@@ -693,9 +678,7 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
     }
         break;
     case PageCmd::FullScreen:
-    {
-        qInfo()<<__FUNCTION__;
-    }
+        onFullScreen();
         break;
     case PageCmd::StatusMessage:
     {
@@ -720,7 +703,7 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
         break;
     case PageCmd::LoadingState:
     {
-        if(page && page == GetActivePage()){
+        if(page && page == CurrentPage()){
             QUrl url(para.toString());
             navi_bar_->setLoadingState(page->isLoading(),page->canGoBack(), page->canGoForward());
         }
@@ -782,54 +765,185 @@ void MainWindow::onShowTabThumnail(const QPoint &g_pos, const int index)
 void MainWindow::onBrowserShortcut(const CefKeyEvent &event,
                                    CefEventHandle os_event)
 {
-    if(event.windows_key_code == VK_F11){
-        onShortcutFullscn();
+    Q_UNUSED(os_event);
+
+    if(event.modifiers == EVENTFLAG_NONE
+            && event.windows_key_code == VK_F11){
+        onFullScreen();
     }
-    if(event.windows_key_code == VK_SUBTRACT ||
-            event.windows_key_code == VK_OEM_MINUS){
-        onShortcutZoomOut();
+
+    if(event.modifiers == EVENTFLAG_NONE
+            && event.windows_key_code == VK_F12){
+        onDevTool();
     }
-    // ASCII of '0'
-    if(event.windows_key_code == '0' ||
-            event.windows_key_code == VK_NUMPAD0){
-        onShortcutZoomReset();
+    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
+            && event.windows_key_code == VK_SUBTRACT ){
+        onZoomOut();
     }
-    if(event.windows_key_code == VK_ADD ||
-            event.windows_key_code == VK_OEM_PLUS){
-        onShortcutZoomIn();
+    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == VK_OEM_MINUS)
+    {
+            onZoomOut();
+    }
+    /* from WinUser.h
+     * VK_0 - VK_9 are the same as ASCII '0' - '9' (0x30 - 0x39)
+     * 0x3A - 0x40 : unassigned
+     * VK_A - VK_Z are the same as ASCII 'A' - 'Z' (0x41 - 0x5A)
+     */
+    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == '0'){
+        onZoomReset();
+    }
+    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
+            && event.windows_key_code == VK_NUMPAD0)
+    {
+        onZoomReset();
+    }
+
+    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
+            && event.windows_key_code == VK_ADD){
+        onZoomIn();
+    }
+    if( event.modifiers == EVENTFLAG_CONTROL_DOWN
+           && event.windows_key_code == VK_OEM_PLUS)
+    {
+        onZoomIn();
+    }
+    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == 'P'){
+        onPrint();
+    }
+    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == 'T'){
+        AddNewPage("", true);
+    }
+    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == 'N'){
+        MainWndMgr::Instance().createWindow(MainWndCfg());
+    }
+    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_SHIFT_DOWN)
+            && event.windows_key_code == 'N'){
+        MainWndMgr::Instance().createWindow(MainWndCfg(true));
+    }
+    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == 'H'){
+        onShowHistory();
     }
 }
 
-void MainWindow::onShortcutZoomOut()
+void MainWindow::onGoBack()
 {
-    auto page = GetActivePage();
+    auto page = CurrentPage();
+    if(page){
+        page->getBrowserWidget()->GoBack();
+    }
+}
+
+void MainWindow::onGoForward()
+{
+    auto page = CurrentPage();
+    if(page){
+        page->getBrowserWidget()->GoForward();
+    }
+}
+
+void MainWindow::onHomepage()
+{
+    auto page = CurrentPage();
+    if(page){
+        page->getBrowserWidget()->Navigate(AppCfgMgr::homePageUrl());
+    }
+}
+
+void MainWindow::onRefresh()
+{
+    auto page = CurrentPage();
+    if(page){
+        page->getBrowserWidget()->Refresh();
+    }
+}
+
+void MainWindow::onZoomOut()
+{
+    auto page = CurrentPage();
     if(page){
         page->getBrowserWidget()->ZoomOut();
     }
 }
 
-void MainWindow::onShortcutZoomReset()
+void MainWindow::onZoomReset()
 {
-    auto page = GetActivePage();
+    auto page = CurrentPage();
     if(page){
         page->getBrowserWidget()->ZoomReset();
     }
 }
 
-void MainWindow::onShortcutZoomIn()
+void MainWindow::onZoomIn()
 {
-    auto page = GetActivePage();
+    auto page = CurrentPage();
     if(page){
         page->getBrowserWidget()->ZoomIn();
     }
 }
 
-void MainWindow::onShortcutFullscn()
+void MainWindow::onFullScreen()
 {
     bool isFull = isFullScreen();
     if(isFull){
         showNormal();
     }else{
         showFullScreen();
+    }
+}
+
+void MainWindow::onDevTool()
+{
+    auto page = CurrentPage();
+    if(page){
+        page->openDevTool();
+    }
+}
+
+void MainWindow::onShowHistory()
+{
+    auto pos = navi_bar_->hisrotyBtnPos();
+    pos.ry() += 2;
+    pos.rx() -= history_popup_->width();
+    pos.rx() += history_popup_->shadowRightWidth();
+    history_popup_->move(pos);
+    history_popup_->setVisible(!history_popup_->isVisible());
+}
+
+void MainWindow::onShowInprivate()
+{
+    if(!gInprivatePopup){
+        gInprivatePopup = new InprivatePopup;
+    }
+
+    auto pos = navi_bar_->inprivateBtnPos();
+    pos.ry() += 2;
+    pos.rx() -= gInprivatePopup->width();
+    pos.rx() += gInprivatePopup->shadowRightWidth();
+    gInprivatePopup->move(pos);
+    gInprivatePopup->setVisible(!gInprivatePopup->isVisible());
+}
+
+void MainWindow::onPrint()
+{
+    auto page = CurrentPage();
+    if(page){
+        page->getBrowserWidget()->Print();
+    }
+}
+
+void MainWindow::onWindowStateChanged()
+{
+    emit windowStateChanged(windowState(),
+                            stack_browsers_->currentWidget()->size());
+    if(windowState() & Qt::WindowFullScreen){
+        widget_north_->hide();
+    }else{
+        widget_north_->show();
     }
 }

@@ -38,6 +38,7 @@ enum class NaviBarCmd {
     FullScreen,
     Print,
     Capture,
+    Inprivate,
     Find,
     TaskMgr,
     DevTool,

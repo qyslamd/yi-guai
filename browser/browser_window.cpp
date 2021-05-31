@@ -101,7 +101,7 @@ void BrowserWindow::onBrowserForgroundTab(CefWindowInfo &windowInfo,
                                               CefBrowserSettings &settings)
 {
     REQUIRE_MAIN_THREAD();
-    delegate_->onBrowserWindowNewForgroundPage(windowInfo,
+    delegate_->onBrowserWndNewForgroundPage(windowInfo,
                                                client,
                                                settings);
 }
@@ -122,7 +122,7 @@ void BrowserWindow::onBrowserDeveTools(CefWindowInfo &windowInfo,
                                        CefRefPtr<CefClient> &client,
                                        CefBrowserSettings &settings)
 {
-    delegate_->onBrowserWindowDeveTools(windowInfo,
+    delegate_->onBrowserWndDevTools(windowInfo,
                                         client,
                                         settings);
 }

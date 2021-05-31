@@ -22,6 +22,7 @@ class Page;
 class Tab_Thumbnail_Widget;
 class HistoryPopup;
 class UserInfoPopup;
+class InprivatePopup;
 class AppCfgWidget;
 class QPropertyAnimation;
 
@@ -33,8 +34,13 @@ public:
     MainWindow(const MainWindowConfig &cfg, QWidget *parent = nullptr);
     ~MainWindow();
 
-    int addNewPage(const QString &url, bool switchTo = false);
-    int addNewPage(Page *page);
+    int AddNewPage(const QString &url, bool switchTo = false);
+    int AddNewPage(Page *page);
+    void NavigateInCurPage(const QString &url);
+    bool isInprivate() const {return created_cfg_.is_inprivate_;}
+
+    static void updateInprivateCount();
+
 signals:
     void windowStateChanged(Qt::WindowStates state, const QVariant &data);
     void historyPopupVisibleChange(bool visible);
@@ -46,6 +52,8 @@ public:
     // QObject interface
     bool event(QEvent *e) override;
     bool eventFilter(QObject *obj, QEvent *event) override;
+public slots:
+    void onInpWndCntChanged();
 protected:
     bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
     void closeEvent(QCloseEvent *evnet) override;
@@ -57,6 +65,7 @@ private:
     QAction *ac_shortcut_resetzoom_;
     QAction *ac_shortcut_zoomin_ ;
     QAction *ac_shortcut_fullscn_;
+    QAction *ac_shortcut_devtool_;
 
     MainWindowConfig created_cfg_{false, false, false, QRect(), ""};
 
@@ -81,11 +90,12 @@ private:
     QPropertyAnimation *tab_thumbnail_anime_ = nullptr;   /* tab预览窗口移动动画*/
 
     HistoryPopup *history_popup_ = nullptr; /*历史记录 popup*/
+    static InprivatePopup *gInprivatePopup; /*隐私窗口 popup*/
     UserInfoPopup *userinfo_popup_ = nullptr; /*用户信息 popup*/
     AppCfgWidget *app_cfg_widget_ = nullptr;
 
-    bool window_closing_ = false;  /*窗口是否正在关闭*/
-    bool right_closing_ = false;    /*窗口是否正在关闭右侧*/
+    bool window_closing_ = false;  /*窗口正在关闭标志*/
+    bool right_closing_ = false;    /*窗口正在关闭右侧标签页标志*/
 
 private:
     void initQtShortcut();
@@ -94,7 +104,7 @@ private:
 
     void initSignalSlot();
     void initPage(Page *page);
-    Page *GetActivePage();
+    Page *CurrentPage();
     Page *GetPage(int index);
     void onStatusMessage(const QString &msg);
 
@@ -102,7 +112,7 @@ private slots:
     void onTabBarCurrentChanged(int index);
     void onTabBarCloseRequested(int index);
     void onTabBarTabMoved(int from, int to);
-    void onTabbarMenuTriggered(TabBarCmd cmd, const QVariant &para);
+    void onTabBarMenuTriggered(TabBarCmd cmd, const QVariant &para);
     void onNaviBarCmd(NaviBarCmd cmd, const QVariant &para);
     void onPageCmd(PageCmd cmd, const QVariant &para);
     void onShowTabThumnail(const QPoint &g_pos, const int index);
@@ -110,9 +120,18 @@ private slots:
                            CefEventHandle os_event);
 
 private:
-    void onShortcutZoomOut();
-    void onShortcutZoomReset();
-    void onShortcutZoomIn();
-    void onShortcutFullscn();
+    void onGoBack();
+    void onGoForward();
+    void onHomepage();
+    void onRefresh();
+    void onZoomOut();
+    void onZoomReset();
+    void onZoomIn();
+    void onFullScreen();
+    void onDevTool();
+    void onShowHistory();
+    void onShowInprivate();
+    void onPrint();
+    void onWindowStateChanged();
 };
 #endif // MAINWINDOW_H

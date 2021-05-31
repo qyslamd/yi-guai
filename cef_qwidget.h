@@ -18,6 +18,9 @@ public:
     CefQWidget(CefWindowInfo &windowInfo, CefRefPtr<CefClient> &client, CefBrowserSettings &settings, QWidget *parent = nullptr);
     ~CefQWidget();
 
+    // QWidget interface
+    QSize sizeHint() const override;
+
     void Navigate(const QString &url);
     void GoBack();
     void GoForward();
@@ -27,9 +30,11 @@ public:
     void ZoomOut();
     void ZoomIn();
     void ZoomReset();
+    void Print();
     void ShowDevTool(const QPoint &pos);
 
-    CefWindowHandle getBrowserWindowHandle();
+    CefWindowHandle BrowserWindowHandle();
+    bool isDevTool() const { return is_dev_tool_; }
 signals:
     void browserClosing();
     void browserNewForgroundPage(CefQWidget *newPage);
@@ -50,14 +55,14 @@ public slots:
     void onTopLevelWindowStateChanged(Qt::WindowStates state, const QVariant &data);
     // BrowserWindow::Delegate interface
 protected:
-    void onBrowserWindowNewForgroundPage(CefWindowInfo &windowInfo,
+    void onBrowserWndNewForgroundPage(CefWindowInfo &windowInfo,
                                          CefRefPtr<CefClient> &client,
                                          CefBrowserSettings &settings) override;
     void onBrowserWndPopupWnd(const CefPopupFeatures &popupFeatures,
                               CefWindowInfo &windowInfo,
                               CefRefPtr<CefClient> &client,
                               CefBrowserSettings &settings) override;
-    void onBrowserWindowDeveTools(CefWindowInfo& windowInfo,
+    void onBrowserWndDevTools(CefWindowInfo& windowInfo,
                                   CefRefPtr<CefClient>& client,
                                   CefBrowserSettings& settings) override;
     void OnBrowserCreated() override;
@@ -71,6 +76,7 @@ protected:
     void onBrowerWindowLoadEnd(int httpStatusCode) override;
     void onBrowserWindowLoadingStateChange(bool isLoading, bool canGoBack, bool canGoForward) override;
     void OnBrowserGotFocus() override;
+    // browser keyboard event
     bool onBrowserWndPreKeyEvent(const CefKeyEvent &event,
                                  CefEventHandle os_event,
                                  bool *is_keyboard_shortcut) override;
@@ -89,6 +95,7 @@ private:
         Created
     };
     bool newly_created_ = true;
+    bool is_dev_tool_ = false;
     BrowserState browser_state_ = Empty;
 
     QString url_;

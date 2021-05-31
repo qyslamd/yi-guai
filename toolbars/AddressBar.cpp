@@ -77,6 +77,17 @@ QRect AddressBar::gGeometryBtnSiteInfo() const
     return QRect();
 }
 
+void AddressBar::setInprivate(bool inprivate)
+{
+    if(!inprivate){
+        btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/alert_circle_64px.png"));
+        btn_mark_site_->setIcon(QIcon(":/icons/resources/imgs/star_64px.png"));
+    }else{
+        btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/info_white_48px.png"));
+        btn_mark_site_->setIcon(QIcon(":/icons/resources/imgs/star_white_48px.png"));
+    }
+}
+
 void AddressBar::mousePressEvent(QMouseEvent *event)
 {
     QLineEdit::mousePressEvent(event);

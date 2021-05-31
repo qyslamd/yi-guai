@@ -7,6 +7,9 @@
 
 #include "AppCfgManager.h"
 
+int MainWndMgr::newWndOffsetX = 22;
+int MainWndMgr::newWndOffsetY = 30;
+
 MainWndMgr::MainWndMgr(QObject *parent)
     : QObject(parent)
 {
@@ -29,6 +32,7 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
     timer.start();
 
     MainWindow *window = new MainWindow(cfg);
+    connect(this, &MainWndMgr::onInprivateWindow, window, &MainWindow::onInpWndCntChanged);
 
     // The Qt::WA_DeleteOnClose attribute must be set,
     // otherwise the resource will not be released
@@ -45,8 +49,7 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
             qApp->quit();
         }
     });
-
-    // calculate window geometry
+    // 先改变位置，再记录，不然获取到的记录是空的
     const QRect availableScrnGeometry =  qApp->primaryScreen()->availableGeometry();
     if(windows_.isEmpty()){
         // 首个窗口还原配置中保存的位置大小信息
@@ -59,12 +62,12 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
                                 size.width(), size.height());
         }
     }else{
-        QRect targetRect = cfg.bounds;
-        if(cfg.bounds.isEmpty())
+        QRect targetRect = cfg.bounds_;
+        if(cfg.bounds_.isEmpty())
         {
             auto rect = MainWndMgr::Instance().lastWindowGeometry();
-            targetRect = QRect{rect.x() + AppCfgMgr::newWndOffsetX,
-                                      rect.y() + AppCfgMgr::newWndOffsetY,
+            targetRect = QRect{rect.x() + newWndOffsetX,
+                                      rect.y() + newWndOffsetY,
                                       rect.width(),
                                       rect.height()};
 
@@ -72,16 +75,23 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
         window->setGeometry(targetRect);
     }
 
+    //
     static int wnd_index = 0;
     windows_.insert(window);
     wnd_map_.insert(wnd_index++, window);
+    if(cfg.is_inprivate_){
+        MainWindow::updateInprivateCount();
+        emit onInprivateWindow();
+    }
 
-    if(!cfg.initially_hidden)
+    if(!cfg.initially_hidden_)
     {
         window->show();
     }
 
-    qInfo() << "The slow operation took" << timer.elapsed() << "milliseconds";
+    qInfo() << "The creation of mainwindow took:"
+ << timer.elapsed() << "milliseconds";
+
 }
 
 QRect MainWndMgr::lastWindowGeometry() const
@@ -102,4 +112,33 @@ void MainWndMgr::quitApplication()
         }
     }
     quit_app_flag_ = true;
+}
+
+void MainWndMgr::closeAllInprivate()
+{
+    auto it = windows_.begin();
+    auto end = windows_.end();
+    for(; it != end; ++it)
+    {
+        if( *it && (*it)->isInprivate())
+        {
+            (*it)->close();
+        }
+    }
+    quit_app_flag_ = true;
+}
+
+size_t MainWndMgr::inprivateCount() const
+{
+    auto it = windows_.begin();
+    auto end = windows_.end();
+    size_t count = 0;
+    for(; it != end; ++it)
+    {
+        if( *it && (*it)->isInprivate())
+        {
+            ++count;
+        }
+    }
+    return count;
 }

@@ -34,6 +34,7 @@ SOURCES += \
     page.cpp \
     popup.cpp \
     popups/HistoryPopup.cpp \
+    popups/InprivatePopup.cpp \
     popups/PopupBase.cpp \
     popups/SiteInfoPopup.cpp \
     popups/UserInfoPopup.cpp \
@@ -77,6 +78,7 @@ HEADERS += \
     page.h \
     popup.h \
     popups/HistoryPopup.h \
+    popups/InprivatePopup.h \
     popups/PopupBase.h \
     popups/SiteInfoPopup.h \
     popups/UserInfoPopup.h \
@@ -108,6 +110,7 @@ HEADERS += \
 FORMS += \
     dialogs/alertdialog.ui \
     popup.ui \
+    popups/InprivatePopup.ui \
     popups/HistoryPopup.ui \
     popups/PopupBase.ui \
     popups/UserInfoPopup.ui \

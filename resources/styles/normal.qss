@@ -89,4 +89,22 @@ QMenu#TabBarTabMenu::item:selected:enabled {
     background-color: #52B8EB;
     color:white;
 }
+/*
+QMenu#NaviBarMoreOptionMenu::separator {
+height: 1px;
+background: lightblue;
+margin-left: 10px;
+margin-right: 5px;
+}
+ */
 
+QPushButton#InprivateCloseBtn{
+border:none;
+border-radius:4px;
+background-color:#006CBE;
+color:white;
+padding:6px;
+}
+QPushButton#InprivateCloseBtn:hover{
+background-color:#1C7CC5;
+}

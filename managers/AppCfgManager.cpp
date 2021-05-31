@@ -5,9 +5,6 @@
 #include <QDir>
 #include <QRect>
 
-int AppCfgMgr::newWndOffsetX = 22;
-int AppCfgMgr::newWndOffsetY = 30;
-
 namespace {
     const char *SectionGeneral = "General";
     const char *KeyWindowGeo = "WindowGeo";

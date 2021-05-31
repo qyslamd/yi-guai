@@ -39,3 +39,16 @@ QMenu::item:selected { /* when user selects item using mouse or keyboard */
     background-color: #654321;
 }
 
+QPushButton#NaviBarInprivateBtn{
+border:none;
+border-radius:8px;
+background-color:#006CBE;
+color:white;
+padding:3px;
+}
+QPushButton#NaviBarInprivateBtn:hover{
+background-color:#1C7CC5;
+}
+.TabBar::close-button{
+    image: url(:/icons/resources/imgs/close_white_16px.png);
+}

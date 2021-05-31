@@ -8,21 +8,47 @@
 #include <QSharedPointer>
 
 typedef struct MainWindowConfig{
+    MainWindowConfig(bool inprivate,
+                     bool always_on_top,
+                     bool init_hidden,
+                     const QRect &bounds,
+                     const QString &url)
+        : is_inprivate_(inprivate)
+        , always_on_top_(always_on_top)
+        , initially_hidden_(init_hidden)
+        , bounds_(bounds)
+        , url_(url)
+    {}
+
+    MainWindowConfig()
+        : is_inprivate_(false)
+        , always_on_top_(false)
+        , initially_hidden_(false)
+        , bounds_(QRect())
+        , url_("")
+    {}
+    MainWindowConfig(bool is_inprivate)
+        : is_inprivate_(is_inprivate)
+        , always_on_top_(false)
+        , initially_hidden_(false)
+        , bounds_(QRect())
+        , url_("")
+    {}
 
     // If true the window will be marked as inprivate window.
-    bool is_inprivate{false};
+    bool is_inprivate_;
 
     // If true the window will always display above other windows.
-    bool always_on_top;
+    bool always_on_top_;
 
     // If true the window will be created initially hidden.
-    bool initially_hidden;
+    bool initially_hidden_;
 
     // intially geometry
-    QRect bounds;
+    QRect bounds_;
 
     // Initial URL to load.
-    QString url{""};
+    QString url_;
 }MainWndCfg;
 
 class MainWindow;
@@ -35,8 +61,13 @@ public:
     void createWindow(const MainWindowConfig &cfg);
     QRect lastWindowGeometry() const;
     void quitApplication();
-signals:
+    void closeAllInprivate();
+    size_t inprivateCount() const;
 
+    static int newWndOffsetX;
+    static int newWndOffsetY;
+signals:
+    void onInprivateWindow();
 private:
     QSet<MainWindow *> windows_;
 

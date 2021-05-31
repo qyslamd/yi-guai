@@ -97,6 +97,10 @@
         <file>resources/newIcons/history2.png</file>
         <file>resources/newIcons/quill_pen_48px.png</file>
         <file>resources/newIcons/dragon_face_96px.png</file>
+        <file>resources/newIcons/hacker_128px.png</file>
+        <file>resources/imgs/close_white_16px.png</file>
+        <file>resources/imgs/info_white_48px.png</file>
+        <file>resources/imgs/star_white_48px.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file>resources/styles/normal.qss</file>
