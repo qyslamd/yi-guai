@@ -30,6 +30,7 @@ public:
     void ZoomOut();
     void ZoomIn();
     void ZoomReset();
+    double ZoomLevel();
     void Print();
     void ShowDevTool(const QPoint &pos);
 

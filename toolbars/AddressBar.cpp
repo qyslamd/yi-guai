@@ -49,6 +49,22 @@ bool AddressBar::eventFilter(QObject *obj, QEvent *ev)
             }
         }
     }
+    else if(internal_btn_zoom_ == obj){
+        auto w = internal_btn_zoom_;
+        if(ev->type() == QEvent::Paint){
+            auto cursorPos = QCursor::pos();
+            auto pos = mapFromGlobal(cursorPos);
+            if( w->geometry().contains(pos)){
+                QPainter p( w);
+                p.save();
+                p.setRenderHint(QPainter::Antialiasing);
+                QPainterPath path;
+                path.addRoundedRect(QRectF(0,0,w->width(), w->height()),4,4);
+                p.fillPath(path,QColor(220,220,220));
+                p.restore();
+            }
+        }
+    }
 
     return QLineEdit::eventFilter(obj, ev);
 }
@@ -77,15 +93,34 @@ QRect AddressBar::gGeometryBtnSiteInfo() const
     return QRect();
 }
 
+QRect AddressBar::gGeometryBtnZoom() const
+{
+    if(internal_btn_zoom_){
+        auto pos = mapToGlobal(internal_btn_zoom_->pos());
+        return QRect(pos.x(),
+                     pos.y(),
+                     internal_btn_zoom_->width(),
+                     internal_btn_zoom_->height());
+    }
+    return QRect();
+}
+
 void AddressBar::setInprivate(bool inprivate)
 {
     if(!inprivate){
         btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/alert_circle_64px.png"));
         btn_mark_site_->setIcon(QIcon(":/icons/resources/imgs/star_64px.png"));
+        btn_zoom_hint_->setIcon(QIcon(":/icons/resources/imgs/zoom_out_64px.png"));
     }else{
         btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/info_white_48px.png"));
         btn_mark_site_->setIcon(QIcon(":/icons/resources/imgs/star_white_48px.png"));
+        btn_zoom_hint_->setIcon(QIcon(":/icons/resources/imgs/zoom_in_white_48px.png"));
     }
+}
+
+void AddressBar::setZoomLevelValue(double value)
+{
+    btn_zoom_hint_->setVisible(value != 0.0);
 }
 
 void AddressBar::mousePressEvent(QMouseEvent *event)
@@ -113,9 +148,10 @@ void AddressBar::initUi()
     addAction(btn_mark_site_, QLineEdit::TrailingPosition);
 
 //    addAction(btn_find_hint_, QLineEdit::TrailingPosition);
-//    addAction(btn_zoom_hint_, QLineEdit::TrailingPosition);
+    addAction(btn_zoom_hint_, QLineEdit::TrailingPosition);
 
     connect(btn_site_info_, &QAction::triggered, this, &AddressBar::viewSiteInfo);
+    connect(btn_zoom_hint_, &QAction::triggered, this, &AddressBar::onBtnZoomHintClicked);
 }
 
 void AddressBar::setAppearance()
@@ -136,6 +172,16 @@ void AddressBar::fuckButton()
             }
         }
     }
+
+    foreach(auto w , btn_zoom_hint_->associatedWidgets()){
+        if(w->metaObject()->superClass()->className() == QString("QToolButton"))
+        {
+            internal_btn_zoom_ = qobject_cast<QToolButton *>(w);
+            if(internal_btn_zoom_){
+                internal_btn_zoom_->installEventFilter(this);
+            }
+        }
+    }
 }
 
 void AddressBar::onEditingFinishsed()
@@ -150,4 +196,10 @@ void AddressBar::onEditingFinishsed()
             model_->setStringList(AddrInputMgr::Instance().inputList());
         }
     }
+}
+
+void AddressBar::onBtnZoomHintClicked()
+{
+    clearFocus();
+    emit showZoomBar();
 }

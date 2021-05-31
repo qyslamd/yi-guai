@@ -18,10 +18,12 @@ public:
     bool event(QEvent *ev) override;
 
     QRect gGeometryBtnSiteInfo() const;
+    QRect gGeometryBtnZoom() const;
     void setInprivate(bool inprivate);
+    void setZoomLevelValue(double str);
 signals:
     void viewSiteInfo();
-
+    void showZoomBar();
 protected:
     void mousePressEvent(QMouseEvent *event) override;
 private:
@@ -34,6 +36,7 @@ private:
     btn_mark_site_;
 
     QToolButton *internal_btn_siteInfo_ = nullptr;
+    QToolButton *internal_btn_zoom_ = nullptr;
 
 private:
     void initUi();
@@ -42,6 +45,7 @@ private:
 
 private slots:
     void onEditingFinishsed();
+    void onBtnZoomHintClicked();
 
 };
 

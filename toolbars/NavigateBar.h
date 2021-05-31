@@ -12,6 +12,7 @@ class QMenu;
 class QAction;
 class QLabel;
 class QWidgetAction;
+class ZoomPopup;
 
 class NaviBar final: public QFrame
 {
@@ -21,11 +22,13 @@ public:
 
     void setAddress(const QString &url);
     void setLoadingState(bool isLoading, bool canGoBack, bool canGoForward);
+    void setZoomLevelValue(double value);
     void setFocus(bool focus);
     bool eventFilter(QObject *obj, QEvent *ev) override;
 
     QPoint hisrotyBtnPos() const;
     QPoint inprivateBtnPos() const;
+    QPoint zoomBtnPos() const;
     void setInprivate(bool inprivate);
     void inpWndCntChanged();
 signals:

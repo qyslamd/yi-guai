@@ -101,6 +101,8 @@
         <file>resources/imgs/close_white_16px.png</file>
         <file>resources/imgs/info_white_48px.png</file>
         <file>resources/imgs/star_white_48px.png</file>
+        <file>resources/imgs/zoom_in_white_48px.png</file>
+        <file>resources/imgs/zoom_out_white_48px.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file>resources/styles/normal.qss</file>

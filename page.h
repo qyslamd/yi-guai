@@ -10,7 +10,6 @@ class QVBoxLayout;
 class CefQWidget;
 class QDockWidget;
 class SiteInfoPopup;
-
 ///
 /// \brief The Page class
 /// 每一个独立的标签页

@@ -130,7 +130,8 @@ void CefQWidget::ZoomOut()
     auto browser = browser_window_->GetBrowser();
     if(browser){
         auto old = browser->GetHost()->GetZoomLevel();
-        browser->GetHost()->SetZoomLevel(old - 1.0);
+        double delta = old <= -7.0 ? 0.0 : -1.0;
+        browser->GetHost()->SetZoomLevel(old + delta);
     }
 }
 
@@ -139,7 +140,8 @@ void CefQWidget::ZoomIn()
     auto browser = browser_window_->GetBrowser();
     if(browser){
         auto old = browser->GetHost()->GetZoomLevel();
-        browser->GetHost()->SetZoomLevel(old + 1.0);
+        double delta = old >= 9.0 ? 0.0 : 1.0;
+        browser->GetHost()->SetZoomLevel(old + delta);
     }
 }
 
@@ -149,6 +151,15 @@ void CefQWidget::ZoomReset()
     if(browser){
         browser->GetHost()->SetZoomLevel(0.0);
     }
+}
+
+double CefQWidget::ZoomLevel()
+{
+    auto browser = browser_window_->GetBrowser();
+    if(browser){
+        return browser->GetHost()->GetZoomLevel();
+    }
+    return 0.0;
 }
 
 void CefQWidget::Print()

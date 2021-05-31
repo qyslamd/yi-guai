@@ -12,10 +12,12 @@
 #include "widgets/TabThumbnailWidget.h"
 #include "widgets/appconfigwidget.h"
 #include "managers/AppCfgManager.h"
+#include "managers/CefManager.h"
 
 #include "popups/HistoryPopup.h"
 #include "popups/InprivatePopup.h"
 #include "popups/UserInfoPopup.h"
+#include "popups/ZoomPopup.h"
 
 #include <QAction>
 #include <QVBoxLayout>
@@ -42,6 +44,7 @@
 #endif
 
 InprivatePopup* MainWindow::gInprivatePopup = nullptr;
+ZoomPopup* MainWindow::gZoomPopup = nullptr;
 
 MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
     : QMainWindow(parent)
@@ -213,14 +216,14 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
 void MainWindow::initQtShortcut()
 {
     // The shortcut is active when its parent widget has focus
-//    ac_shortcut_zoomout_->setShortcutContext(Qt::WidgetShortcut);
+    //    ac_shortcut_zoomout_->setShortcutContext(Qt::WidgetShortcut);
 
     ac_shortcut_zoomout_ = new QAction(this);
     ac_shortcut_zoomout_->setShortcut(QKeySequence::ZoomOut);
     connect(ac_shortcut_zoomout_, &QAction::triggered, this, &MainWindow::onZoomOut);
 
     // QKeySequence("Ctrl+-")
-//    qInfo()<< QKeySequence::keyBindings(QKeySequence::ZoomOut);
+    //    qInfo()<< QKeySequence::keyBindings(QKeySequence::ZoomOut);
 
     ac_shortcut_resetzoom_ = new QAction(this);
     ac_shortcut_resetzoom_->setShortcut(QKeySequence(Qt::CTRL, Qt::Key_0));
@@ -231,14 +234,14 @@ void MainWindow::initQtShortcut()
     connect(ac_shortcut_zoomin_, &QAction::triggered, this, &MainWindow::onZoomIn);
 
     // QKeySequence("Ctrl++")
-//    qInfo()<< QKeySequence::keyBindings(QKeySequence::ZoomIn);
+    //    qInfo()<< QKeySequence::keyBindings(QKeySequence::ZoomIn);
 
     ac_shortcut_fullscn_ = new QAction(this);
     ac_shortcut_fullscn_->setShortcut(QKeySequence::FullScreen);
     connect(ac_shortcut_fullscn_, &QAction::triggered, this, &MainWindow::onFullScreen);
 
     //QKeySequence("F11"), QKeySequence("Alt+Enter")
-//    qInfo()<< QKeySequence::keyBindings(QKeySequence::FullScreen);
+    //    qInfo()<< QKeySequence::keyBindings(QKeySequence::FullScreen);
 
     ac_shortcut_devtool_ = new QAction(this);
     ac_shortcut_devtool_->setShortcut(QKeySequence(Qt::Key_F12));
@@ -414,6 +417,27 @@ void MainWindow::onStatusMessage(const QString &msg)
     QToolTip::showText(QPoint(x, y), tempMsg, this);
 }
 
+void MainWindow::pageZoomLevelChanged()
+{
+    auto page = CurrentPage();
+    if(!page){
+        return;
+    }
+    auto zoomLevel = page->getBrowserWidget()->ZoomLevel();
+    navi_bar_->setZoomLevelValue(zoomLevel);
+
+    if(!gZoomPopup){
+        gZoomPopup = new ZoomPopup;
+    }
+    gZoomPopup->setZoomLevelStr(CefManager::Instance().zoom_map.value(static_cast<int>(zoomLevel)));
+    auto pos = navi_bar_->zoomBtnPos();
+    pos.rx() += 10;
+    pos.rx() -= gZoomPopup->width();
+    pos.ry() += 2;
+    gZoomPopup->move(pos);
+    gZoomPopup->setVisible(zoomLevel != 0.0);
+}
+
 void MainWindow::onTabBarCurrentChanged(int index)
 {
     // 控制stacked切换到对应的窗口
@@ -427,6 +451,7 @@ void MainWindow::onTabBarCurrentChanged(int index)
         navi_bar_->setLoadingState(page->isLoading(),
                                    page->canGoBack(),
                                    page->canGoForward());
+        navi_bar_->setZoomLevelValue(page->getBrowserWidget()->ZoomLevel());
     }
 }
 
@@ -511,7 +536,7 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         break;
     case NaviBarCmd::Refresh:
         onRefresh();
-   case NaviBarCmd::StopLoading:
+    case NaviBarCmd::StopLoading:
     {
         if(page){
             page->getBrowserWidget()->StopLoading();
@@ -525,6 +550,9 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
             page->showSiteInfomation(rect);
         }
     }
+        break;
+    case NaviBarCmd::ShowZoomBar:
+        pageZoomLevelChanged();
         break;
     case NaviBarCmd::Favorite:
     {
@@ -767,64 +795,97 @@ void MainWindow::onBrowserShortcut(const CefKeyEvent &event,
 {
     Q_UNUSED(os_event);
 
+    // F11
+    // 改变浏览器的全屏模式
     if(event.modifiers == EVENTFLAG_NONE
             && event.windows_key_code == VK_F11){
         onFullScreen();
     }
 
+    // F12
+    // 打开/关闭开发者工具
     if(event.modifiers == EVENTFLAG_NONE
             && event.windows_key_code == VK_F12){
         onDevTool();
     }
-    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
-            && event.windows_key_code == VK_SUBTRACT ){
-        onZoomOut();
-    }
+
+    // Ctrl + -(- 位于 数字键盘 0 右侧)
+    // 缩小
     if(event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == VK_OEM_MINUS)
     {
-            onZoomOut();
+        onZoomOut();
+    }
+    // Ctrl + -(- 位于 小键盘 )
+    // 缩小
+    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
+            && event.windows_key_code == VK_SUBTRACT ){
+        onZoomOut();
     }
     /* from WinUser.h
      * VK_0 - VK_9 are the same as ASCII '0' - '9' (0x30 - 0x39)
      * 0x3A - 0x40 : unassigned
      * VK_A - VK_Z are the same as ASCII 'A' - 'Z' (0x41 - 0x5A)
      */
+    // Ctrl + 0(0 位于 数字键盘)
+    // 恢复缩放比例
     if(event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == '0'){
         onZoomReset();
     }
+
+    // Ctrl + 0(0 位于 小键盘 )
+    // 恢复缩放比例
     if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
             && event.windows_key_code == VK_NUMPAD0)
     {
         onZoomReset();
     }
 
+    // Ctrl + +(+ 位于 backspace 左侧)
+    // 放大
+    if( event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == VK_OEM_PLUS)
+    {
+        onZoomIn();
+    }
+    // Ctrl + +(+ 位于 小键盘 )
+    // 放大
     if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
             && event.windows_key_code == VK_ADD){
         onZoomIn();
     }
-    if( event.modifiers == EVENTFLAG_CONTROL_DOWN
-           && event.windows_key_code == VK_OEM_PLUS)
-    {
-        onZoomIn();
-    }
+
+    // Ctrl + P
+    // 打印
     if(event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'P'){
         onPrint();
     }
+
+    // Ctrl + T
+    // 新建标签页
     if(event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'T'){
         AddNewPage("", true);
     }
+
+    // Ctrl + N
+    // 新建浏览器窗口
     if(event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'N'){
         MainWndMgr::Instance().createWindow(MainWndCfg());
     }
+
+    // Ctrl + Shift + N
+    // 新建InPrivate浏览器窗口
     if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_SHIFT_DOWN)
             && event.windows_key_code == 'N'){
         MainWndMgr::Instance().createWindow(MainWndCfg(true));
     }
+
+    // Ctrl + H
+    // 查看历史记录
     if(event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'H'){
         onShowHistory();
@@ -869,6 +930,7 @@ void MainWindow::onZoomOut()
     if(page){
         page->getBrowserWidget()->ZoomOut();
     }
+    pageZoomLevelChanged();
 }
 
 void MainWindow::onZoomReset()
@@ -877,6 +939,7 @@ void MainWindow::onZoomReset()
     if(page){
         page->getBrowserWidget()->ZoomReset();
     }
+    pageZoomLevelChanged();
 }
 
 void MainWindow::onZoomIn()
@@ -885,6 +948,7 @@ void MainWindow::onZoomIn()
     if(page){
         page->getBrowserWidget()->ZoomIn();
     }
+    pageZoomLevelChanged();
 }
 
 void MainWindow::onFullScreen()

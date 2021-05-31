@@ -43,6 +43,8 @@ cef_color_t CefManager::background_color;
 
 CefString CefManager::accept_language_list;
 
+QMap<int, QString> CefManager::zoom_map;
+
 CefManager& CefManager::Instance()
 {
     static CefManager s_instance;
@@ -115,4 +117,23 @@ CefManager::CefManager()
     locale.FromString("zh-CN");
     accept_language_list.FromString("zh-CN");
 //    background_color = CefColorSetARGB(255,135,206,235);
+
+    // cef 缩放对照表
+    zoom_map.insert(-7, "25%");
+    zoom_map.insert(-6, "33%");
+    zoom_map.insert(-5, "50%");
+    zoom_map.insert(-4, "67%");
+    zoom_map.insert(-3, "75%");
+    zoom_map.insert(-2, "80%");
+    zoom_map.insert(-1, "90%");
+    zoom_map.insert(0, "100%");
+    zoom_map.insert(1, "110%");
+    zoom_map.insert(2, "125%");
+    zoom_map.insert(3, "150%");
+    zoom_map.insert(4, "175%");
+    zoom_map.insert(5, "200%");
+    zoom_map.insert(6, "250%");
+    zoom_map.insert(7, "300%");
+    zoom_map.insert(8, "400%");
+    zoom_map.insert(9, "500%");
 }

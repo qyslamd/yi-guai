@@ -3,6 +3,7 @@
 #pragma once
 
 #include <include/cef_base.h>
+#include <QString>
 
 class CefManager
 {
@@ -41,6 +42,7 @@ public:
 	static int remote_debugging_port;
 	static cef_color_t background_color;
 	static CefString accept_language_list;
+    static QMap<int, QString> zoom_map;
 };
 
 #endif  // CEF_MANAGER_H

@@ -2,6 +2,8 @@
 #include "AddressBar.h"
 #include "utils/util_qt.h"
 #include "managers/MainWindowManager.h"
+#include "managers/CefManager.h"
+#include "popups/ZoomPopup.h"
 
 #include <QtDebug>
 #include <QHBoxLayout>
@@ -243,6 +245,13 @@ void NaviBar::setLoadingState(bool isLoading, bool canGoBack, bool canGoForward)
     btn_stop_->setVisible(isLoading);
 }
 
+void NaviBar::setZoomLevelValue(double value)
+{
+    auto zoomStr = CefManager::Instance().zoom_map.value(static_cast<int>(value));
+    label_zoom_value_->setText(zoomStr);
+    address_bar_->setZoomLevelValue(value);
+}
+
 void NaviBar::setFocus(bool focus)
 {
     if(focus){
@@ -278,6 +287,11 @@ QPoint NaviBar::hisrotyBtnPos() const
 QPoint NaviBar::inprivateBtnPos() const
 {
     return mapToGlobal(btn_inprivate_->geometry().bottomRight());
+}
+
+QPoint NaviBar::zoomBtnPos() const
+{
+    return address_bar_->gGeometryBtnZoom().bottomRight();
 }
 
 void NaviBar::setInprivate(bool inprivate)
@@ -336,6 +350,11 @@ void NaviBar::initSignals()
     {
         auto rect = address_bar_->gGeometryBtnSiteInfo();
         emit naviBarCmd(NaviBarCmd::ViewSiteInfo, rect);
+    });
+    connect(address_bar_, &AddressBar::showZoomBar, this, [this]()
+    {
+        auto rect = address_bar_->gGeometryBtnZoom();
+        emit naviBarCmd(NaviBarCmd::ShowZoomBar, rect);
     });
     connect(btn_back_, &QToolButton::clicked, this, [this]()
     {

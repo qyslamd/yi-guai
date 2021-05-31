@@ -25,6 +25,7 @@ class UserInfoPopup;
 class InprivatePopup;
 class AppCfgWidget;
 class QPropertyAnimation;
+class ZoomPopup;
 
 class MainWindow : public QMainWindow
 {
@@ -91,6 +92,7 @@ private:
 
     HistoryPopup *history_popup_ = nullptr; /*历史记录 popup*/
     static InprivatePopup *gInprivatePopup; /*隐私窗口 popup*/
+    static ZoomPopup *gZoomPopup;   /*缩放 popup*/
     UserInfoPopup *userinfo_popup_ = nullptr; /*用户信息 popup*/
     AppCfgWidget *app_cfg_widget_ = nullptr;
 
@@ -107,6 +109,7 @@ private:
     Page *CurrentPage();
     Page *GetPage(int index);
     void onStatusMessage(const QString &msg);
+    void pageZoomLevelChanged();
 
 private slots:
     void onTabBarCurrentChanged(int index);

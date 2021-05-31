@@ -26,6 +26,7 @@ enum class NaviBarCmd {
     Refresh,
     StopLoading,
     ViewSiteInfo,
+    ShowZoomBar,
     Favorite,
     History,
     Download,
