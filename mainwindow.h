@@ -112,6 +112,9 @@ private:
     void pageZoomLevelChanged();
 
 private slots:
+    void onZoomPopupZoomOut();
+    void onZoomPopupZoomIn();
+    void onZoomPopupZoomReset();
     void onTabBarCurrentChanged(int index);
     void onTabBarCloseRequested(int index);
     void onTabBarTabMoved(int from, int to);

@@ -9,16 +9,20 @@ Scope:Class NavigationBar and it's children
 Scope:Class AddressBar and it's children
 */
 .AddressBar{
-background: #242424;
-    color:white;
+border:none;
+border-radius:6px;
+background-color: #242424;
 }
 .AddressBar:hover{
     border:1px solid #DCDCDC;
-    color:white;
 }
-
 .AddressBar:focus{
     border:2px solid #DCDCDC;
+}
+.AddressBar > QLineEdit{
+color:white;
+border:none;
+background: #242424;
 }
 
 /******************************************

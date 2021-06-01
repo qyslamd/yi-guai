@@ -67,7 +67,7 @@ public:
     static int newWndOffsetX;
     static int newWndOffsetY;
 signals:
-    void onInprivateWindow();
+    void inprivateWndCntChanged();
 private:
     QSet<MainWindow *> windows_;
 

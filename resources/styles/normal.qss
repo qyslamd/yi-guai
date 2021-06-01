@@ -51,19 +51,46 @@ QLabel#ZoomValueLabel{
 border:none;
 }
 
-
 .AddressBar{
-    border:none;
-    padding-left:4px;
-    border-radius:6px;
+border:none;
+border-radius:6px;
+background-color:white;
 }
 .AddressBar:hover{
-    border:1px solid #CCCCCC;
-/*    border-left:none;
-    border-right:none;*/
+border:1px solid #D2D2D2;
 }
 .AddressBar:focus{
-    border:2px solid #A3CFEC;
+/*border:1px solid SkyBlue;*/
+border:2px solid #A3CFEC;
+}
+.AddressBar > QLineEdit{border:none;}
+
+.AddressBar > QPushButton{
+border:none;
+border-radius:4px;
+padding:4px;
+}
+.AddressBar > QPushButton:hover{
+background-color:#DCDCDC;
+}
+
+.AddressBar > QPushButton:open{
+background: #CFCFCF;
+border:none;
+}
+
+.AddressBar > QToolButton{
+border:none;
+border-radius:4px;
+padding:4px;
+}
+.AddressBar > QToolButton:hover{
+background-color:#DCDCDC;
+}
+
+.AddressBar > QToolButton:open{
+background: #CFCFCF;
+border:none;
 }
 
 

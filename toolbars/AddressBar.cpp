@@ -1,116 +1,67 @@
 #include "AddressBar.h"
 
-#include <QCompleter>
-#include <QHBoxLayout>
+#include <QFocusEvent>
+#include <QBoxLayout>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QLineEdit>
 #include <QToolButton>
-#include <QAction>
-#include <QtDebug>
-#include <QEvent>
-#include <QPainter>
-#include <QPainterPath>
-#include <QCursor>
-#include <QMouseEvent>
-#include <QTimer>
 #include <QGraphicsDropShadowEffect>
 #include <QStringListModel>
+#include <QCompleter>
+#include <QTimer>
 
 #include "utils/util_qt.h"
 #include "managers/AddrInputManager.h"
+#include "managers/CefManager.h"
 
 AddressBar::AddressBar(QWidget *parent)
-    : QLineEdit(parent)
-    , completer_(new QCompleter(QStringList(), this))
-    , model_(new QStringListModel(this))
-    , btn_site_info_(new QAction)
-    , btn_find_hint_(new QAction)
-    , btn_zoom_hint_(new QAction)
-    , btn_mark_site_(new QAction)
-{   
+    : QFrame(parent)
+{
     initUi();
-    setAppearance();
-    fuckButton();
 }
 
 bool AddressBar::eventFilter(QObject *obj, QEvent *ev)
 {
-    if(obj == internal_btn_siteInfo_){
-        auto w = internal_btn_siteInfo_;
-        if(ev->type() == QEvent::Paint){
-            auto cursorPos = QCursor::pos();
-            auto pos = mapFromGlobal(cursorPos);
-            if( w->geometry().contains(pos)){
-                QPainter p( w);
-                p.save();
-                p.setRenderHint(QPainter::Antialiasing);
-                QPainterPath path;
-                path.addRoundedRect(QRectF(0,0,w->width(), w->height()),4,4);
-                p.fillPath(path,QColor(220,220,220));
-                p.restore();
+    if(obj == line_edit_addr_){
+        auto type = ev->type();
+        if(type == QEvent::FocusIn || type == QEvent::FocusOut){
+            auto focusEvent = static_cast<QFocusEvent *>(ev);
+            if(focusEvent->reason() == Qt::MouseFocusReason){
+                QTimer::singleShot(0, line_edit_addr_, &QLineEdit::selectAll);
             }
+            update();
+        }else if(type == QEvent::FocusOut){
+            update();
         }
     }
-    else if(internal_btn_zoom_ == obj){
-        auto w = internal_btn_zoom_;
-        if(ev->type() == QEvent::Paint){
-            auto cursorPos = QCursor::pos();
-            auto pos = mapFromGlobal(cursorPos);
-            if( w->geometry().contains(pos)){
-                QPainter p( w);
-                p.save();
-                p.setRenderHint(QPainter::Antialiasing);
-                QPainterPath path;
-                path.addRoundedRect(QRectF(0,0,w->width(), w->height()),4,4);
-                p.fillPath(path,QColor(220,220,220));
-                p.restore();
-            }
-        }
-    }
-
-    return QLineEdit::eventFilter(obj, ev);
-}
-
-bool AddressBar::event(QEvent *ev)
-{
-    if(ev->type()== QEvent::FocusIn)
-    {
-        auto focusEvent = static_cast<QFocusEvent *>(ev);
-        if(focusEvent->reason() == Qt::MouseFocusReason){
-            QTimer::singleShot(0, this, &QLineEdit::selectAll);
-        }
-    }
-    return QLineEdit::event(ev);
+    return QFrame::eventFilter(obj, ev);
 }
 
 QRect AddressBar::gGeometryBtnSiteInfo() const
 {
-    if(internal_btn_siteInfo_){
-        auto pos = mapToGlobal(internal_btn_siteInfo_->pos());
-        return QRect(pos.x(),
-                     pos.y(),
-                     internal_btn_siteInfo_->width(),
-                     internal_btn_siteInfo_->height());
-    }
-    return QRect();
+    auto pos = mapToGlobal(btn_site_info_->pos());
+    return QRect(pos.x(),
+                 pos.y(),
+                 btn_site_info_->width(),
+                 btn_site_info_->height());
 }
 
 QRect AddressBar::gGeometryBtnZoom() const
 {
-    if(internal_btn_zoom_){
-        auto pos = mapToGlobal(internal_btn_zoom_->pos());
-        return QRect(pos.x(),
-                     pos.y(),
-                     internal_btn_zoom_->width(),
-                     internal_btn_zoom_->height());
-    }
-    return QRect();
+    auto pos = mapToGlobal(btn_zoom_hint_->pos());
+    return QRect(pos.x(),
+                 pos.y(),
+                 btn_zoom_hint_->width(),
+                 btn_zoom_hint_->height());
 }
 
 void AddressBar::setInprivate(bool inprivate)
 {
+    inprivate_ = inprivate;
     if(!inprivate){
         btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/alert_circle_64px.png"));
         btn_mark_site_->setIcon(QIcon(":/icons/resources/imgs/star_64px.png"));
-        btn_zoom_hint_->setIcon(QIcon(":/icons/resources/imgs/zoom_out_64px.png"));
     }else{
         btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/info_white_48px.png"));
         btn_mark_site_->setIcon(QIcon(":/icons/resources/imgs/star_white_48px.png"));
@@ -118,75 +69,92 @@ void AddressBar::setInprivate(bool inprivate)
     }
 }
 
+void AddressBar::initUi()
+{
+    using ShaowEffect = QGraphicsDropShadowEffect;
+    ShaowEffect *shadow = new ShaowEffect(this);
+    shadow->setOffset(0, 0);
+    shadow->setColor(Qt::gray);
+    shadow->setBlurRadius(10);
+    setGraphicsEffect(shadow);
+
+    layout_ = new QHBoxLayout;
+    layout_->setContentsMargins(8,2,8,2);
+    layout_->setSpacing(1);
+    btn_site_info_ = new QPushButton;
+    btn_site_info_->setToolTip(tr("view website infomation"));
+    btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/alert_circle_64px.png"));
+    connect(btn_site_info_, &QPushButton::clicked, this, &AddressBar::viewSiteInfo);
+
+    line_edit_addr_ = new QLineEdit;
+    line_edit_addr_->setMinimumHeight(30);
+    line_edit_addr_->installEventFilter(this);
+    line_edit_addr_->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    connect(line_edit_addr_, &QLineEdit::returnPressed, this, &AddressBar::returnPressed);
+
+    btn_zoom_hint_ = new QToolButton;
+    connect(btn_zoom_hint_, &QToolButton::clicked, this, &AddressBar::showZoomBar);
+    btn_mark_site_ = new QToolButton;
+    btn_mark_site_->setToolTip(tr("mark to favorite"));
+    btn_mark_site_->setIcon(QIcon(":/icons/resources/imgs/star_64px.png"));
+
+    layout_->addWidget(btn_site_info_);
+    layout_->addWidget(line_edit_addr_);
+    layout_->addWidget(btn_zoom_hint_);
+    layout_->addWidget(btn_mark_site_);
+    setLayout(layout_);
+
+    setFocusProxy(line_edit_addr_);
+
+
+    model_ = new QStringListModel(this);
+    completer_ = new QCompleter(QStringList(), this);
+    completer_->setModel(model_);
+    model_->setStringList(AddrInputMgr::Instance().inputList());
+    line_edit_addr_->setCompleter(completer_);
+    connect(line_edit_addr_, &QLineEdit::editingFinished,
+            this, &AddressBar::onEditingFinished);
+
+}
+
 void AddressBar::setZoomLevelValue(double value)
 {
     btn_zoom_hint_->setVisible(value != 0.0);
-}
-
-void AddressBar::mousePressEvent(QMouseEvent *event)
-{
-    QLineEdit::mousePressEvent(event);
-}
-
-void AddressBar::initUi()
-{
-    setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-
-    QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
-    shadow->setOffset(0, 0);
-    shadow->setColor(QColor(38, 78, 119, 127));
-    shadow->setBlurRadius(3);
-    setGraphicsEffect(shadow);
-
-    completer_->setModel(model_);
-    model_->setStringList(AddrInputMgr::Instance().inputList());
-    setCompleter(completer_);
-    connect(this, &QLineEdit::editingFinished, this, &AddressBar::onEditingFinishsed);
-
-    btn_site_info_->setToolTip(tr("view website infomation"));
-    addAction(btn_site_info_, QLineEdit::LeadingPosition);
-    addAction(btn_mark_site_, QLineEdit::TrailingPosition);
-
-//    addAction(btn_find_hint_, QLineEdit::TrailingPosition);
-    addAction(btn_zoom_hint_, QLineEdit::TrailingPosition);
-
-    connect(btn_site_info_, &QAction::triggered, this, &AddressBar::viewSiteInfo);
-    connect(btn_zoom_hint_, &QAction::triggered, this, &AddressBar::onBtnZoomHintClicked);
-}
-
-void AddressBar::setAppearance()
-{
-    setMinimumHeight(30);
-    btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/alert_circle_64px.png"));
-    btn_mark_site_->setIcon(QIcon(":/icons/resources/imgs/star_64px.png"));
-}
-
-void AddressBar::fuckButton()
-{
-    foreach(auto w , btn_site_info_->associatedWidgets()){
-        if(w->metaObject()->superClass()->className() == QString("QToolButton"))
-        {
-            internal_btn_siteInfo_ = qobject_cast<QToolButton *>(w);
-            if(internal_btn_siteInfo_){
-                internal_btn_siteInfo_->installEventFilter(this);
-            }
+    if(value > 0.0){
+        if(inprivate_){
+            btn_zoom_hint_->setIcon(QIcon(":/icons/resources/imgs/zoom_in_white_48px.png"));
+        }else{
+            btn_zoom_hint_->setIcon(QIcon(":/icons/resources/imgs/zoom_in2_64px.png"));
+        }
+    }else{
+        if(inprivate_){
+            btn_zoom_hint_->setIcon(QIcon(":/icons/resources/imgs/zoom_out_white_48px.png"));
+        }else{
+            btn_zoom_hint_->setIcon(QIcon(":/icons/resources/imgs/zoom_out2_64px.png"));
         }
     }
-
-    foreach(auto w , btn_zoom_hint_->associatedWidgets()){
-        if(w->metaObject()->superClass()->className() == QString("QToolButton"))
-        {
-            internal_btn_zoom_ = qobject_cast<QToolButton *>(w);
-            if(internal_btn_zoom_){
-                internal_btn_zoom_->installEventFilter(this);
-            }
-        }
-    }
+    auto zoomLevel = CefManager::Instance().zoom_map.value(static_cast<int>(value));
+    btn_zoom_hint_->setToolTip(tr("zoomlevel:%1").arg(zoomLevel));
 }
 
-void AddressBar::onEditingFinishsed()
+void AddressBar::setText(const QString &text)
 {
-    auto text = this->text();
+    line_edit_addr_->setText(text);
+}
+
+void AddressBar::setCursorPosition(int pos)
+{
+    line_edit_addr_->setCursorPosition(pos);
+}
+
+QString AddressBar::text()
+{
+    return line_edit_addr_->text();
+}
+
+void AddressBar::onEditingFinished()
+{
+    auto text = line_edit_addr_->text();
     if(QString::compare(text, QString("")) != 0)
     {
         const auto list = AddrInputMgr::Instance().inputList();
@@ -196,10 +164,4 @@ void AddressBar::onEditingFinishsed()
             model_->setStringList(AddrInputMgr::Instance().inputList());
         }
     }
-}
-
-void AddressBar::onBtnZoomHintClicked()
-{
-    clearFocus();
-    emit showZoomBar();
 }

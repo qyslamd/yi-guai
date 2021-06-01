@@ -138,6 +138,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
 void MainWindow::onInpWndCntChanged()
 {
+    MainWindow::updateInprivateCount();
     if(created_cfg_.is_inprivate_){
         navi_bar_->inpWndCntChanged();
     }
@@ -428,6 +429,9 @@ void MainWindow::pageZoomLevelChanged()
 
     if(!gZoomPopup){
         gZoomPopup = new ZoomPopup;
+        connect(gZoomPopup, &ZoomPopup::zoomOut, this, &MainWindow::onZoomPopupZoomOut);
+        connect(gZoomPopup, &ZoomPopup::zoomIn, this, &MainWindow::onZoomPopupZoomIn);
+        connect(gZoomPopup, &ZoomPopup::zoomReset, this, &MainWindow::onZoomPopupZoomReset);
     }
     gZoomPopup->setZoomLevelStr(CefManager::Instance().zoom_map.value(static_cast<int>(zoomLevel)));
     auto pos = navi_bar_->zoomBtnPos();
@@ -436,6 +440,27 @@ void MainWindow::pageZoomLevelChanged()
     pos.ry() += 2;
     gZoomPopup->move(pos);
     gZoomPopup->setVisible(zoomLevel != 0.0);
+}
+
+void MainWindow::onZoomPopupZoomOut()
+{
+    if(isActiveWindow()){
+        onZoomOut();
+    }
+}
+
+void MainWindow::onZoomPopupZoomIn()
+{
+    if(isActiveWindow()){
+        onZoomIn();
+    }
+}
+
+void MainWindow::onZoomPopupZoomReset()
+{
+    if(isActiveWindow()){
+        onZoomReset();
+    }
 }
 
 void MainWindow::onTabBarCurrentChanged(int index)

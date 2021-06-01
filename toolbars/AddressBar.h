@@ -1,21 +1,25 @@
-#ifndef ADDRESSBAR_H
-#define ADDRESSBAR_H
+#ifndef ADDRESSBAR2_H
+#define ADDRESSBAR2_H
 
-#include <QLineEdit>
+#include <QFrame>
 
 class QHBoxLayout;
+class QPushButton;
+class QLineEdit;
 class QToolButton;
-class QAction;
 class QCompleter;
 class QStringListModel;
 
-class AddressBar final: public QLineEdit
+class AddressBar final: public QFrame
 {
     Q_OBJECT
 public:
     AddressBar(QWidget *parent = nullptr);
     bool eventFilter(QObject *obj, QEvent *ev) override;
-    bool event(QEvent *ev) override;
+
+    void setText(const QString &text);
+    void setCursorPosition(int pos);
+    QString text();
 
     QRect gGeometryBtnSiteInfo() const;
     QRect gGeometryBtnZoom() const;
@@ -24,29 +28,24 @@ public:
 signals:
     void viewSiteInfo();
     void showZoomBar();
-protected:
-    void mousePressEvent(QMouseEvent *event) override;
+    void markSite();
+    void returnPressed();
 private:
-    QCompleter *completer_;
-    QStringListModel *model_;
-    QAction *btn_site_info_;
-    decltype (btn_site_info_)
-    btn_find_hint_,
-    btn_zoom_hint_,
-    btn_mark_site_;
+    QCompleter *completer_ = nullptr;
+    QStringListModel *model_ = nullptr;
+    QHBoxLayout *layout_ = nullptr;
+    QPushButton *btn_site_info_ = nullptr;    /*use pushbutton to show text and icon*/
+    QLineEdit *line_edit_addr_ = nullptr;
+    QToolButton *btn_zoom_hint_ = nullptr;
+    QToolButton *btn_find_hint_ = nullptr;
+    QToolButton *btn_mark_site_ = nullptr;
 
-    QToolButton *internal_btn_siteInfo_ = nullptr;
-    QToolButton *internal_btn_zoom_ = nullptr;
+    bool inprivate_ = false;
 
-private:
     void initUi();
-    void setAppearance();
-    void fuckButton();
 
 private slots:
-    void onEditingFinishsed();
-    void onBtnZoomHintClicked();
-
+    void onEditingFinished();
 };
 
-#endif // ADDRESSBAR_H
+#endif // ADDRESSBAR2_H

@@ -11,6 +11,10 @@ ZoomPopup::ZoomPopup(QWidget *parent) :
     ui->btnZoomOut->setMinimumSize(size);
     ui->btnZoomIn->setMinimumSize(size);
     ui->btnReset->setMinimumWidth(65);
+
+    connect(ui->btnZoomOut, &QToolButton::clicked, this, &ZoomPopup::zoomOut);
+    connect(ui->btnZoomIn, &QToolButton::clicked, this, &ZoomPopup::zoomIn);
+    connect(ui->btnReset, &QToolButton::clicked, this, &ZoomPopup::zoomReset);
 }
 
 ZoomPopup::~ZoomPopup()

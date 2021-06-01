@@ -13,7 +13,6 @@ int MainWndMgr::newWndOffsetY = 30;
 MainWndMgr::MainWndMgr(QObject *parent)
     : QObject(parent)
 {
-
 }
 
 
@@ -32,7 +31,7 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
     timer.start();
 
     MainWindow *window = new MainWindow(cfg);
-    connect(this, &MainWndMgr::onInprivateWindow, window, &MainWindow::onInpWndCntChanged);
+    connect(this, &MainWndMgr::inprivateWndCntChanged, window, &MainWindow::onInpWndCntChanged);
 
     // The Qt::WA_DeleteOnClose attribute must be set,
     // otherwise the resource will not be released
@@ -42,6 +41,7 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
     connect(window, &MainWindow::destroyed, this, [=](QObject *){
         windows_.remove(window);
         wnd_map_.remove( wnd_map_.key(window));
+        emit inprivateWndCntChanged();
 
         // if quit application flag is set and window set is empty,quit the application
         if(quit_app_flag_ && windows_.isEmpty())
@@ -80,8 +80,7 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
     windows_.insert(window);
     wnd_map_.insert(wnd_index++, window);
     if(cfg.is_inprivate_){
-        MainWindow::updateInprivateCount();
-        emit onInprivateWindow();
+        emit inprivateWndCntChanged();
     }
 
     if(!cfg.initially_hidden_)
