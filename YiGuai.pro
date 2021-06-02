@@ -61,9 +61,11 @@ SOURCES += \
     mainwindow.cpp \
     utils/util_qt.cpp \
     utils/util_win.cc \
-    widgets/TabThumbnailWidget.cpp \
-    widgets/appconfigwidget.cpp \
-    widgets/framelesswidget.cpp
+    widgets/AppConfigWidget.cpp \
+    widgets/FramelessWidget.cpp \
+    widgets/FullscnHint.cpp \
+    widgets/QtWinFrameless.cpp \
+    widgets/TabThumbnailWidget.cpp
 
 
 HEADERS += \
@@ -105,8 +107,10 @@ HEADERS += \
     mainwindow.h \
     utils/util_qt.h \
     utils/util_win.h \
+    widgets/FullscnHint.h \
+    widgets/QtWinFrameless.h \
     widgets/TabThumbnailWidget.h \
-    widgets/appconfigwidget.h \
+    widgets/AppConfigWidget.h \
     widgets/framelesswidget.h
 
 FORMS += \
@@ -119,8 +123,9 @@ FORMS += \
     popups/ZoomPopup.ui \
     test/test.ui \
     toolbars/NotificationBar.ui \
+    widgets/FullscnHint.ui \
     widgets/TabThumbnailWidget.ui \
-    widgets/appconfigwidget.ui
+    widgets/AppConfigWidget.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

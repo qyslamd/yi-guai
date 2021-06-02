@@ -7,8 +7,10 @@
 
 #include "browser/cef_client_handler.h"
 #include "managers/MainWindowManager.h"
+#include "widgets/QtWinFrameless.h"
 #include "globaldef.h"
 
+class QFrame;
 class QVBoxLayout;
 class QHBoxLayout;
 class QToolButton;
@@ -26,8 +28,9 @@ class InprivatePopup;
 class AppCfgWidget;
 class QPropertyAnimation;
 class ZoomPopup;
+class FullscnHint;
 
-class MainWindow : public QMainWindow
+class MainWindow : public QtWinFramelessWindow
 {
     Q_OBJECT
 public:
@@ -56,7 +59,6 @@ public:
 public slots:
     void onInpWndCntChanged();
 protected:
-    bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
     void closeEvent(QCloseEvent *evnet) override;
     void changeEvent(QEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
@@ -94,7 +96,8 @@ private:
     static InprivatePopup *gInprivatePopup; /*隐私窗口 popup*/
     static ZoomPopup *gZoomPopup;   /*缩放 popup*/
     UserInfoPopup *userinfo_popup_ = nullptr; /*用户信息 popup*/
-    AppCfgWidget *app_cfg_widget_ = nullptr;
+    static AppCfgWidget *gAppCfgWidget;
+    static FullscnHint *gFullscnWidget;
 
     bool window_closing_ = false;  /*窗口正在关闭标志*/
     bool right_closing_ = false;    /*窗口正在关闭右侧标签页标志*/
@@ -108,7 +111,6 @@ private:
     void initPage(Page *page);
     Page *CurrentPage();
     Page *GetPage(int index);
-    void onStatusMessage(const QString &msg);
     void pageZoomLevelChanged();
 
 private slots:
@@ -137,7 +139,11 @@ private:
     void onDevTool();
     void onShowHistory();
     void onShowInprivate();
+    void onShowUser();
     void onPrint();
+    void onSettings();
+    void onStatusMessage(const QString &msg);
     void onWindowStateChanged();
+    void onNormalMax();
 };
 #endif // MAINWINDOW_H

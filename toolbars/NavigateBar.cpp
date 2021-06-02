@@ -191,7 +191,7 @@ NaviBar::NaviBar(QWidget *parent)
     action_zoom_->setDefaultWidget(frame_zoom_);
 
     menu_more_options_->setObjectName("NaviBarMoreOptionMenu");
-    menu_more_options_->setMinimumSize(280,350);
+//    menu_more_options_->setMinimumSize(280,350);
     menu_more_options_->installEventFilter(this);
     menu_more_options_->addAction(action_new_tab_);
     menu_more_options_->addAction(action_new_window_);
@@ -289,6 +289,11 @@ QPoint NaviBar::inprivateBtnPos() const
     return mapToGlobal(btn_inprivate_->geometry().bottomRight());
 }
 
+QPoint NaviBar::userBtnPos() const
+{
+    return mapToGlobal(btn_user_->geometry().bottomRight());
+}
+
 QPoint NaviBar::zoomBtnPos() const
 {
     return address_bar_->gGeometryBtnZoom().bottomRight();
@@ -329,7 +334,7 @@ void NaviBar::onUserInfoPopupVisibleChange(bool visible)
 
 void NaviBar::paintEvent(QPaintEvent *event)
 {
-    QFrame::paintEvent(event);
+    return QFrame::paintEvent(event);
 
     QPainter p(this);
     p.save();

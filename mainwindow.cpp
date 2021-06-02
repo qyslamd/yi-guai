@@ -10,7 +10,8 @@
 #include "toolbars/BookmarkBar.h"
 #include "toolbars/NotificationBar.h"
 #include "widgets/TabThumbnailWidget.h"
-#include "widgets/appconfigwidget.h"
+#include "widgets/AppConfigWidget.h"
+#include "widgets/FullscnHint.h"
 #include "managers/AppCfgManager.h"
 #include "managers/CefManager.h"
 
@@ -45,16 +46,21 @@
 
 InprivatePopup* MainWindow::gInprivatePopup = nullptr;
 ZoomPopup* MainWindow::gZoomPopup = nullptr;
+AppCfgWidget *MainWindow::gAppCfgWidget = nullptr;
+FullscnHint *MainWindow::gFullscnWidget = nullptr;
 
 MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
-    : QMainWindow(parent)
+    : QtWinFramelessWindow(parent)
     , created_cfg_(cfg)
 {
-    //    setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowSystemMenuHint);
     initQtShortcut();
     initUi();
     setAppearance();
     initSignalSlot();
+
+#ifdef Q_OS_WIN
+    setContentsMargins(1,0,1,1);
+#endif
 
     auto url = cfg.url_;
     if(url.isEmpty()){
@@ -63,7 +69,10 @@ MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
             url = "https://cn.bing.com/";
         }
     }
-    AddNewPage(url);
+    // 如果立即创建浏览器的话，此时窗口的大小是不确定的
+    QTimer::singleShot(0, this, [=]{
+        AddNewPage(url);
+    });
 }
 
 MainWindow::~MainWindow()
@@ -119,7 +128,7 @@ void MainWindow::updateInprivateCount()
 
 bool MainWindow::event(QEvent *e)
 {
-    return QMainWindow::event(e);
+    return QtWinFramelessWindow::event(e);
 }
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
@@ -133,7 +142,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             emit userInfoPopupVisibleChange(userinfo_popup_->isVisible());
         }
     }
-    return QMainWindow::eventFilter(obj, event);
+    return QtWinFramelessWindow::eventFilter(obj, event);
 }
 
 void MainWindow::onInpWndCntChanged()
@@ -142,41 +151,6 @@ void MainWindow::onInpWndCntChanged()
     if(created_cfg_.is_inprivate_){
         navi_bar_->inpWndCntChanged();
     }
-}
-
-bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result)
-{
-#ifdef Q_OS_WIN
-    //Workaround for known bug -> check Qt forum : https://forum.qt.io/topic/93141/qtablewidget-itemselectionchanged/13
-#if (QT_VERSION == QT_VERSION_CHECK(5, 11, 1))
-    MSG* msg = *reinterpret_cast<MSG**>(message);
-#else
-    MSG* msg = reinterpret_cast<MSG*>(message);
-#endif
-
-#define LOG_MACRO(x) #x
-    switch (msg->message)
-    {
-    case WM_DWMCOLORIZATIONCOLORCHANGED:
-        emit dwmColorChanged();
-        return false;
-    case WM_DPICHANGED:
-        return false;
-    case WM_NCPAINT:
-
-        return false;
-    case WM_NCRBUTTONDOWN:
-        qInfo()<<__FUNCTION__<<LOG_MACRO(WM_NCRBUTTONDOWN);
-        qInfo()<<msg->wParam;
-        return false;
-    case WM_NCRBUTTONUP:
-        qInfo()<<__FUNCTION__<<LOG_MACRO(WM_NCRBUTTONUP);
-        return false;
-    default:
-        break;
-    }
-    return QMainWindow::nativeEvent(eventType, message, result);
-#endif
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -206,12 +180,33 @@ void MainWindow::changeEvent(QEvent *event)
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
-    QMainWindow::mousePressEvent(event);
+#ifdef Q_OS_WIN
+    QRect dragRecet(tab_bar_->rect().x(),
+                   tab_bar_->rect().y(),
+                   tab_bar_->rect().width() - tab_bar_->reservedWidth(),
+                   tab_bar_->rect().height());
+    if(dragRecet.contains(event->pos())){
+        if(::ReleaseCapture()){
+            SendMessage(HWND(this->winId()), WM_SYSCOMMAND, SC_MOVE + HTCAPTION, 0);
+            event->ignore();
+        }
+    }
+#endif
+    QtWinFramelessWindow::mousePressEvent(event);
 }
 
 void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    QMainWindow::mouseDoubleClickEvent(event);
+#ifdef Q_OS_WIN
+    QRect dragRecet(tab_bar_->rect().x(),
+                   tab_bar_->rect().y(),
+                   tab_bar_->rect().width() - tab_bar_->reservedWidth(),
+                   tab_bar_->rect().height());
+    if(dragRecet.contains(event->pos())){
+        QTimer::singleShot(0, this, &MainWindow::onNormalMax);
+    }
+#endif
+    QtWinFramelessWindow::mouseDoubleClickEvent(event);
 }
 
 void MainWindow::initQtShortcut()
@@ -326,8 +321,6 @@ void MainWindow::initUi()
     userinfo_popup_->resize(320, 360);
     userinfo_popup_->installEventFilter(this);
 
-    app_cfg_widget_ = new AppCfgWidget(this);
-
     notify_bar_->hide();
 #if 0
     widget_west_->setMinimumWidth(70);
@@ -349,6 +342,9 @@ void MainWindow::setAppearance()
 
 void MainWindow::initSignalSlot()
 {
+    connect(tab_bar_, &TabPagesBar::minBtnClicked, this, &MainWindow::showMinimized);
+    connect(tab_bar_, &TabPagesBar::normalMaxBtnClicked, this, &MainWindow::onNormalMax);
+    connect(tab_bar_, &TabPagesBar::closeBtnClicked, this, &MainWindow::close);
     connect(tab_bar_, &TabPagesBar::currentChanged, this, &MainWindow::onTabBarCurrentChanged);
     connect(tab_bar_, &TabPagesBar::tabCloseRequested,this, &MainWindow::onTabBarCloseRequested);
     connect(tab_bar_, &TabPagesBar::tabMoved, this, &MainWindow::onTabBarTabMoved);
@@ -414,7 +410,7 @@ void MainWindow::onStatusMessage(const QString &msg)
     tempMsg = fontMetrics.elidedText(tempMsg, Qt::ElideRight, this->width() / 2);
 
     int x = this->x();
-    int y = this->y() + this->height();
+    int y = this->y() + this->height() - fontMetrics.height() / 2;
     QToolTip::showText(QPoint(x, y), tempMsg, this);
 }
 
@@ -580,40 +576,19 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         pageZoomLevelChanged();
         break;
     case NaviBarCmd::Favorite:
-    {
-        auto pos = para.toPoint();
-        pos.ry() += 2;
-        pos.rx() -= history_popup_->width();
-        pos.rx() += history_popup_->shadowRightWidth();
-        history_popup_->move(pos);
-        history_popup_->show();
-    }
+
         break;
     case NaviBarCmd::History:
         onShowHistory();
         break;
     case NaviBarCmd::Download:
-    {
-        auto pos = para.toPoint();
-        pos.ry() += 2;
-        pos.rx() -= history_popup_->width();
-        pos.rx() += history_popup_->shadowRightWidth();
-        history_popup_->move(pos);
-        history_popup_->show();
-    }
+
         break;
     case NaviBarCmd::Inprivate:
         onShowInprivate();
         break;
     case NaviBarCmd::User:
-    {
-        auto pos = para.toPoint();
-        pos.ry() += 2;
-        pos.rx() -= userinfo_popup_->width();
-        pos.rx() += userinfo_popup_->shadowRightWidth();
-        userinfo_popup_->move(pos);
-        userinfo_popup_->show();
-    }
+        onShowUser();
         break;
     case NaviBarCmd::NewTabPage:
         AddNewPage(para.toString(), true);
@@ -655,9 +630,7 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         onDevTool();
         break;
     case NaviBarCmd::Settings:
-    {
-        app_cfg_widget_->show();
-    }
+        onSettings();
         break;
     case NaviBarCmd::About:
         AddNewPage("https://gitee.com/slamdd/yi-guai", true);
@@ -1018,6 +991,16 @@ void MainWindow::onShowInprivate()
     gInprivatePopup->setVisible(!gInprivatePopup->isVisible());
 }
 
+void MainWindow::onShowUser()
+{
+    auto pos = navi_bar_->userBtnPos();
+    pos.ry() += 2;
+    pos.rx() -= userinfo_popup_->width();
+    pos.rx() += userinfo_popup_->shadowRightWidth();
+    userinfo_popup_->move(pos);
+    userinfo_popup_->show();
+}
+
 void MainWindow::onPrint()
 {
     auto page = CurrentPage();
@@ -1026,13 +1009,43 @@ void MainWindow::onPrint()
     }
 }
 
+void MainWindow::onSettings()
+{
+    if(!gAppCfgWidget){
+        gAppCfgWidget = new AppCfgWidget(this);
+    }
+    gAppCfgWidget->show();
+}
+
 void MainWindow::onWindowStateChanged()
 {
     emit windowStateChanged(windowState(),
                             stack_browsers_->currentWidget()->size());
     if(windowState() & Qt::WindowFullScreen){
         widget_north_->hide();
+        if(!gFullscnWidget){
+            gFullscnWidget = new FullscnHint;
+        }
+        gFullscnWidget->setKeyStr("F11");
+        int x = this->x() + (this->width() - gFullscnWidget->width()) / 2;
+        int y = this->y() + 50;
+        gFullscnWidget->move(x, y);
+        gFullscnWidget->show();
+        QTimer::singleShot(5000, [=](){
+           gFullscnWidget->hide();
+        });
     }else{
         widget_north_->show();
+    }
+}
+
+void MainWindow::onNormalMax()
+{
+    if(this->windowState() == Qt::WindowNoState){
+        showMaximized();
+    }else{
+        if(isMaximized()){
+            showNormal();
+        }
     }
 }

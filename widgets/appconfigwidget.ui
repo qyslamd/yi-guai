@@ -99,10 +99,29 @@ background:#DCDCDC;
          <number>0</number>
         </property>
         <item>
-         <widget class="QFrame" name="frameSearch">
+         <widget class="QFrame" name="frameNaviBtns">
           <property name="styleSheet">
-           <string notr="true">QFrame#frameSearch{
-background-color:white;
+           <string notr="true">QFrame#frameNaviBtns{
+border:none;
+border-right:1px solid #cdcdcd;
+border-top:1px solid #cdcdcd;
+background-color:#F7F7F7;
+}
+
+QPushButton{
+border:none;
+/*border-radius:12px;*/
+text-align:left;
+padding:8px;
+background:transparent;
+}
+QPushButton:hover{
+background-color:#EAEAEA;
+}
+
+QPushButton:checked{
+background-color:#E5E5E5;
+border-left:3px solid #0072C9;
 }</string>
           </property>
           <property name="frameShape">
@@ -111,7 +130,13 @@ background-color:white;
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_5">
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>12</number>
+           </property>
            <item>
             <widget class="QLabel" name="label">
              <property name="styleSheet">
@@ -125,103 +150,43 @@ font-size:14pt;
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit">
-             <property name="minimumSize">
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
               <size>
-               <width>0</width>
-               <height>32</height>
+               <width>20</width>
+               <height>10</height>
               </size>
              </property>
-             <property name="styleSheet">
-              <string notr="true">QLineEdit{
-    border:none;
-border:1px solid #cdcdcd;
-    padding-left:4px;
-    border-radius:15px;
-}
-QLineEdit:hover{
-    border:1px solid #00BFFF;
-}
-QLineEdit:focus{
-    border:2px solid #A3CFEC;
-}</string>
-             </property>
-             <property name="placeholderText">
-              <string>Search in settings</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QFrame" name="frameNaviBtns">
-          <property name="styleSheet">
-           <string notr="true">QFrame#frameNaviBtns{
-border:none;
-border-top:1px solid #cdcdcd;
-background-color:white;
-}
-
-QPushButton{
-border:none;
-/*border-radius:12px;*/
-text-align:left;
-padding:6px;
-background-color:white;
-}
-QPushButton:hover{
-background-color:pink;
-}
-
-QPushButton:checked{
-background-color:#BFFFBF;
-}</string>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout">
-           <property name="spacing">
-            <number>8</number>
-           </property>
-           <item>
-            <widget class="QPushButton" name="btnPersonal">
-             <property name="text">
-              <string>personal information </string>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/icons/resources/imgs/user2_64px.png</normaloff>:/icons/resources/imgs/user2_64px.png</iconset>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>24</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="btnPrivacy">
-             <property name="text">
-              <string>Privacy Search and service</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-            </widget>
+            </spacer>
            </item>
            <item>
             <widget class="QPushButton" name="btnAppearence">
              <property name="text">
               <string>Appearence</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../resource.qrc">
+               <normaloff>:/icons/resources/imgs/paint_palette_48px.png</normaloff>:/icons/resources/imgs/paint_palette_48px.png</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnSearch">
+             <property name="text">
+              <string>Search</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../resource.qrc">
+               <normaloff>:/icons/resources/imgs/search2_64px.png</normaloff>:/icons/resources/imgs/search2_64px.png</iconset>
              </property>
              <property name="checkable">
               <bool>true</bool>
@@ -233,6 +198,10 @@ background-color:#BFFFBF;
              <property name="text">
               <string>Startup</string>
              </property>
+             <property name="icon">
+              <iconset resource="../resource.qrc">
+               <normaloff>:/icons/resources/imgs/shutdown_64px.png</normaloff>:/icons/resources/imgs/shutdown_64px.png</iconset>
+             </property>
              <property name="checkable">
               <bool>true</bool>
              </property>
@@ -243,6 +212,10 @@ background-color:#BFFFBF;
              <property name="text">
               <string>New tab page</string>
              </property>
+             <property name="icon">
+              <iconset resource="../resource.qrc">
+               <normaloff>:/icons/resources/imgs/tab_48px.png</normaloff>:/icons/resources/imgs/tab_48px.png</iconset>
+             </property>
              <property name="checkable">
               <bool>true</bool>
              </property>
@@ -252,6 +225,10 @@ background-color:#BFFFBF;
             <widget class="QPushButton" name="btnDownload">
              <property name="text">
               <string>Download</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../resource.qrc">
+               <normaloff>:/icons/resources/imgs/download_64px.png</normaloff>:/icons/resources/imgs/download_64px.png</iconset>
              </property>
              <property name="checkable">
               <bool>true</bool>
@@ -281,7 +258,7 @@ background-color:#BFFFBF;
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="pageAppearence">
+      <widget class="QWidget" name="pageAppearance">
        <property name="styleSheet">
         <string notr="true"/>
        </property>
@@ -317,8 +294,8 @@ background-color:#BFFFBF;
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>571</width>
-             <height>619</height>
+             <width>588</width>
+             <height>536</height>
             </rect>
            </property>
            <property name="styleSheet">
@@ -842,99 +819,6 @@ font-size:10pt;
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_15">
-              <property name="styleSheet">
-               <string notr="true">font-weight:bold;
-font-size:13pt;
-</string>
-              </property>
-              <property name="text">
-               <string>Font</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QFrame" name="frame_3">
-              <property name="styleSheet">
-               <string notr="true">.QFrame{
-border:1px solid gray;
-background-color:white;
-border-radius:8px;
-}</string>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::StyledPanel</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Raised</enum>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_4">
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_16">
-                 <property name="text">
-                  <string>show bookmark bar</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1" colspan="2">
-                <spacer name="horizontalSpacer_14">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>304</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="0" column="3">
-                <widget class="QComboBox" name="comboFontSize"/>
-               </item>
-               <item row="1" column="0" colspan="4">
-                <widget class="QLabel" name="label_17">
-                 <property name="styleSheet">
-                  <string notr="true">color:#717171;
-font-size:14pt;
-</string>
-                 </property>
-                 <property name="text">
-                  <string>中国制造，惠及全球</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0" colspan="2">
-                <widget class="QLabel" name="label_18">
-                 <property name="text">
-                  <string>customize font</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="2">
-                <spacer name="horizontalSpacer_15">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>298</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="2" column="3">
-                <widget class="QToolButton" name="btnCustomizeFont">
-                 <property name="text">
-                  <string>&lt;</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
              <spacer name="verticalSpacer_2">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -955,14 +839,15 @@ font-size:14pt;
       </widget>
       <widget class="QWidget" name="pageStartup"/>
       <widget class="QWidget" name="pageNewTabPage"/>
+      <widget class="QWidget" name="pageSearch"/>
       <widget class="QWidget" name="pageDownload"/>
-      <widget class="QWidget" name="pagePersonal"/>
-      <widget class="QWidget" name="pagePrivacy"/>
      </widget>
     </widget>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resource.qrc"/>
+ </resources>
  <connections/>
 </ui>

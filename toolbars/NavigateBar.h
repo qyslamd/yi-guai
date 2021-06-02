@@ -28,6 +28,7 @@ public:
 
     QPoint hisrotyBtnPos() const;
     QPoint inprivateBtnPos() const;
+    QPoint userBtnPos() const;
     QPoint zoomBtnPos() const;
     void setInprivate(bool inprivate);
     void inpWndCntChanged();

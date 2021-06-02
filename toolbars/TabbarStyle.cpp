@@ -158,7 +158,7 @@ void TabbarStyle::drawTabBarTabShape(const QStyleOption *option,
         if(isInprivate_){
             brush = QBrush(QColor("#3B3B3B"));
         }else{
-            brush = QBrush(QColor("#F7F7F7")); //#D3D3D3
+            brush = QBrush(QColor(0xA3C6DA)); //0xD3D3D3 0xA3C6DA 0xF7F7F7
             if(0){
                 const QStyleOptionTab *tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
                 QRectF rect = tabOption->rect;
@@ -176,27 +176,6 @@ void TabbarStyle::drawTabBarTabShape(const QStyleOption *option,
             }
         }
         drawShape(path, brush);
-
-        if(0){
-            auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
-            QRectF rect = tabOption->rect;   // 用于绘制的整个矩形大小
-            QLinearGradient linearGrad(QPointF(rect.x(), rect.y() + rect.height() / 2),
-                                       QPointF(rect.x() + rect.width(),
-                                               rect.y() + rect.height() / 2)
-                                       );
-            QColor color1(0xDCDCDC);
-            color1.setAlphaF(0.8);
-            QColor color2(0xDCDCDC);
-            color2.setAlphaF(0.0);
-
-            linearGrad.setColorAt(0, color1);
-            linearGrad.setColorAt(0.2, color2);
-            linearGrad.setColorAt(0.8, color2);
-            linearGrad.setColorAt(1, color1);
-
-            painter->fillRect(rect, QBrush(linearGrad));
-
-        }
     }else if(state.testFlag(QStyle::State_MouseOver))
     {
         QPainterPath path = getHoveredShape(option, scale);

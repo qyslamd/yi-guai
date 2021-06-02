@@ -4,7 +4,7 @@ font-family:"Microsoft Yahei";
 }
 
 QWidget#mainwindow_north_widget{
-background-color:#F7F7F7;
+background-color:#A3C6DA;
 }
 
 QToolButton{
@@ -111,19 +111,25 @@ border: px solid #e8e8e8;
 border-radius: 6px;
 color:#000000;
 }
-
 QMenu#TabBarTabMenu::item:selected:enabled {
-    background-color: #52B8EB;
-    color:white;
+background-color: #52B8EB;
+color:white;
 }
-/*
-QMenu#NaviBarMoreOptionMenu::separator {
-height: 1px;
-background: lightblue;
-margin-left: 10px;
-margin-right: 5px;
+
+QMenu#NaviBarMoreOptionMenu{
+background-color: white;
+border-radius: 6px;
+padding:4px;
 }
- */
+QMenu#NaviBarMoreOptionMenu::item {
+background-color: transparent;
+padding:6px;
+}
+QMenu#NaviBarMoreOptionMenu::item:selected:enabled  {
+color:black;
+background-color: #EEEEEE;
+}
+
 
 QPushButton#InprivateCloseBtn{
 border:none;
