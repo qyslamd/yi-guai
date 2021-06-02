@@ -18,7 +18,6 @@
 #include "popups/HistoryPopup.h"
 #include "popups/InprivatePopup.h"
 #include "popups/UserInfoPopup.h"
-#include "popups/ZoomPopup.h"
 
 #include <QAction>
 #include <QVBoxLayout>
@@ -38,6 +37,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPainter>
+#include <QStyle>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -46,7 +46,6 @@
 #endif
 
 InprivatePopup* MainWindow::gInprivatePopup = nullptr;
-ZoomPopup* MainWindow::gZoomPopup = nullptr;
 AppCfgWidget *MainWindow::gAppCfgWidget = nullptr;
 FullscnHint *MainWindow::gFullscnWidget = nullptr;
 
@@ -212,7 +211,7 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
 
 void MainWindow::paintEvent(QPaintEvent *event)
 {
-     QtWinFramelessWindow::paintEvent(event);
+    QtWinFramelessWindow::paintEvent(event);
     QPainter p(this);
     p.save();
     p.setRenderHint(QPainter::Antialiasing);
@@ -291,6 +290,8 @@ void MainWindow::initUi()
     widget_north_layout_->addWidget(navi_bar_);
     widget_north_layout_->addWidget(bookmark_bar_);
     widget_north_layout_->addWidget(notify_bar_);
+
+    bookmark_bar_->hide();
     /*设置成自定义的 MenuBar （其实是QWidget*）*/
     layout()->setMenuBar(widget_north_);
 
@@ -426,12 +427,16 @@ void MainWindow::onStatusMessage(const QString &msg)
     QFontMetrics fontMetrics(QToolTip::font());
     tempMsg = fontMetrics.elidedText(tempMsg, Qt::ElideRight, this->width() / 2);
 
-    int x = this->x();
-    int y = this->y() + this->height() - fontMetrics.height() / 2;
-    QToolTip::showText(QPoint(x, y), tempMsg, this);
+    auto pos = mapToGlobal(centralWidget()->pos());
+    pos.rx() -= contentsMargins().left();
+    pos.ry() += centralWidget()->height();
+    pos.ry() -= fontMetrics.height() / 2;
+    pos.ry() -= style()->pixelMetric(QStyle::PM_TitleBarHeight);
+    pos.ry() -= contentsMargins().bottom();
+    QToolTip::showText(pos, tempMsg, this);
 }
 
-void MainWindow::pageZoomLevelChanged()
+void MainWindow::pageZoomChanged()
 {
     auto page = CurrentPage();
     if(!page){
@@ -439,41 +444,7 @@ void MainWindow::pageZoomLevelChanged()
     }
     auto zoomLevel = page->getBrowserWidget()->ZoomLevel();
     navi_bar_->setZoomLevelValue(zoomLevel);
-
-    if(!gZoomPopup){
-        gZoomPopup = new ZoomPopup;
-        connect(gZoomPopup, &ZoomPopup::zoomOut, this, &MainWindow::onZoomPopupZoomOut);
-        connect(gZoomPopup, &ZoomPopup::zoomIn, this, &MainWindow::onZoomPopupZoomIn);
-        connect(gZoomPopup, &ZoomPopup::zoomReset, this, &MainWindow::onZoomPopupZoomReset);
-    }
-    gZoomPopup->setZoomLevelStr(CefManager::Instance().zoom_map.value(static_cast<int>(zoomLevel)));
-    auto pos = navi_bar_->zoomBtnPos();
-    pos.rx() += 10;
-    pos.rx() -= gZoomPopup->width();
-    pos.ry() += 2;
-    gZoomPopup->move(pos);
-    gZoomPopup->setVisible(zoomLevel != 0.0);
-}
-
-void MainWindow::onZoomPopupZoomOut()
-{
-    if(isActiveWindow()){
-        onZoomOut();
-    }
-}
-
-void MainWindow::onZoomPopupZoomIn()
-{
-    if(isActiveWindow()){
-        onZoomIn();
-    }
-}
-
-void MainWindow::onZoomPopupZoomReset()
-{
-    if(isActiveWindow()){
-        onZoomReset();
-    }
+    page->showZoomBar(navi_bar_->zoomBtnPos());
 }
 
 void MainWindow::onTabBarCurrentChanged(int index)
@@ -582,15 +553,14 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
     }
         break;
     case NaviBarCmd::ViewSiteInfo:
-    {
         if(page){
-            auto rect = para.toRect();
-            page->showSiteInfomation(rect);
+            page->showSiteInfomation(para.toPoint());
         }
-    }
         break;
     case NaviBarCmd::ShowZoomBar:
-        pageZoomLevelChanged();
+        if(page){
+            page->showZoomBar(para.toPoint());
+        }
         break;
     case NaviBarCmd::Favorite:
 
@@ -757,6 +727,15 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
         auto focus = para.toBool();
         navi_bar_->setFocus(focus);
     }
+        break;
+    case PageCmd::ZoomOut:
+        onZoomOut();
+        break;
+    case PageCmd::ZoomIn:
+        onZoomIn();
+        break;
+    case PageCmd::ZoomReset:
+        onZoomReset();
         break;
     default:
         break;
@@ -945,7 +924,7 @@ void MainWindow::onZoomOut()
     if(page){
         page->getBrowserWidget()->ZoomOut();
     }
-    pageZoomLevelChanged();
+    pageZoomChanged();
 }
 
 void MainWindow::onZoomReset()
@@ -954,7 +933,7 @@ void MainWindow::onZoomReset()
     if(page){
         page->getBrowserWidget()->ZoomReset();
     }
-    pageZoomLevelChanged();
+    pageZoomChanged();
 }
 
 void MainWindow::onZoomIn()
@@ -963,7 +942,7 @@ void MainWindow::onZoomIn()
     if(page){
         page->getBrowserWidget()->ZoomIn();
     }
-    pageZoomLevelChanged();
+    pageZoomChanged();
 }
 
 void MainWindow::onFullScreen()

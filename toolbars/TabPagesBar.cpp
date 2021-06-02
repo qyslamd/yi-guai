@@ -1,10 +1,12 @@
 #include "TabPagesBar.h"
 
-#include <QTdebug>
+#include <QtDebug>
 #include <QHBoxLayout>
 #include <QToolButton>
 #include <QPainter>
 #include <QMouseEvent>
+#include <QHelpEvent>
+#include <QToolTip>
 
 #include "TabBar.h"
 #include "utils/util_qt.h"
@@ -137,9 +139,44 @@ int CaptionFrame::reservedWidth() const
     return 3 * BtnWidth+ 2 * BtnSpacing;
 }
 
+bool CaptionFrame::event(QEvent *ev)
+{
+    if(ev->type() == QEvent::ToolTip){
+        QHelpEvent *helpEvent = static_cast<QHelpEvent *>(ev);
+        auto button = buttonAt(helpEvent->pos());
+        if (button != CaptionButtons::Button_None) {
+            QString str;
+            switch (button) {
+            case CaptionButtons::Button_Mini:
+                str = tr("minimize");
+                break;
+            case CaptionButtons::Button_NormalMax:
+
+                str = this->window()->isMaximized()
+                        ? tr("restore")
+                        : tr("maximize");
+                break;
+            case CaptionButtons::Button_Close:
+                str = tr("close");
+                break;
+            default:
+                Q_UNREACHABLE();
+            }
+            QToolTip::showText(helpEvent->globalPos(), str);
+        } else {
+            QToolTip::hideText();
+            ev->ignore();
+        }
+
+        return true;
+    }
+
+    return QFrame::event(ev);
+}
+
 void CaptionFrame::paintEvent(QPaintEvent *event)
 {
-    QWidget::paintEvent(event);
+    QFrame::paintEvent(event);
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing, true);
     drawButtons(&p);
@@ -216,7 +253,7 @@ void CaptionFrame::leaveEvent(QEvent *event)
 
 QRectF CaptionFrame::btnRect(CaptionFrame::CaptionButtons button)
 {
-    QRect captionRect{0, 0, width(), height()};
+    QRect captionRect{0, 1, width(), height()};
     int y = captionRect.y();
     QRectF rectClose(captionRect.x() + captionRect.width() - BtnWidth,
                      y,

@@ -354,12 +354,12 @@ void NaviBar::initSignals()
     connect(address_bar_, &AddressBar::viewSiteInfo, this, [this]()
     {
         auto rect = address_bar_->gGeometryBtnSiteInfo();
-        emit naviBarCmd(NaviBarCmd::ViewSiteInfo, rect);
+        emit naviBarCmd(NaviBarCmd::ViewSiteInfo, rect.bottomLeft());
     });
     connect(address_bar_, &AddressBar::showZoomBar, this, [this]()
     {
         auto rect = address_bar_->gGeometryBtnZoom();
-        emit naviBarCmd(NaviBarCmd::ShowZoomBar, rect);
+        emit naviBarCmd(NaviBarCmd::ShowZoomBar, rect.bottomRight());
     });
     connect(btn_back_, &QToolButton::clicked, this, [this]()
     {

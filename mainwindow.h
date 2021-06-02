@@ -27,7 +27,6 @@ class UserInfoPopup;
 class InprivatePopup;
 class AppCfgWidget;
 class QPropertyAnimation;
-class ZoomPopup;
 class FullscnHint;
 
 class MainWindow : public QtWinFramelessWindow
@@ -95,7 +94,6 @@ private:
 
     HistoryPopup *history_popup_ = nullptr; /*历史记录 popup*/
     static InprivatePopup *gInprivatePopup; /*隐私窗口 popup*/
-    static ZoomPopup *gZoomPopup;   /*缩放 popup*/
     UserInfoPopup *userinfo_popup_ = nullptr; /*用户信息 popup*/
     static AppCfgWidget *gAppCfgWidget;
     static FullscnHint *gFullscnWidget;
@@ -107,17 +105,13 @@ private:
     void initQtShortcut();
     void initUi();
     void setAppearance();
-
     void initSignalSlot();
+
     void initPage(Page *page);
     Page *CurrentPage();
     Page *GetPage(int index);
-    void pageZoomLevelChanged();
 
 private slots:
-    void onZoomPopupZoomOut();
-    void onZoomPopupZoomIn();
-    void onZoomPopupZoomReset();
     void onTabBarCurrentChanged(int index);
     void onTabBarCloseRequested(int index);
     void onTabBarTabMoved(int from, int to);
@@ -136,6 +130,7 @@ private:
     void onZoomOut();
     void onZoomReset();
     void onZoomIn();
+    void pageZoomChanged();
     void onFullScreen();
     void onDevTool();
     void onShowHistory();

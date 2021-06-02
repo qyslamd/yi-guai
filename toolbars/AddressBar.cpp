@@ -119,8 +119,7 @@ void AddressBar::initUi()
 
 void AddressBar::setZoomLevelValue(double value)
 {
-    btn_zoom_hint_->setVisible(value != 0.0);
-    if(value > 0.0){
+    if(value >= 0.0){
         if(inprivate_){
             btn_zoom_hint_->setIcon(QIcon(":/icons/resources/imgs/zoom_in_white_48px.png"));
         }else{
@@ -135,6 +134,11 @@ void AddressBar::setZoomLevelValue(double value)
     }
     auto zoomLevel = CefManager::Instance().zoom_map.value(static_cast<int>(value));
     btn_zoom_hint_->setToolTip(tr("zoomlevel:%1").arg(zoomLevel));
+
+    btn_zoom_hint_->show();
+    if(value == 0.0){
+        QTimer::singleShot(2000, [this](){btn_zoom_hint_->hide();});
+    }
 }
 
 void AddressBar::setText(const QString &text)

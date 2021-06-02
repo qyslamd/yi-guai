@@ -10,6 +10,8 @@ class QVBoxLayout;
 class CefQWidget;
 class QDockWidget;
 class SiteInfoPopup;
+class ZoomPopup;
+
 ///
 /// \brief The Page class
 /// 每一个独立的标签页
@@ -32,7 +34,8 @@ public:
     bool canGoForward() const {return canGoForward_;}
 
 
-    void showSiteInfomation(const QRect &rect);
+    void showSiteInfomation(const QPoint &pos);
+    void showZoomBar(const QPoint &pos);
     void openDevTool();
 
 signals:
@@ -47,6 +50,7 @@ private:
     CefQWidget *browser_widget_ = nullptr;    /*浏览器QWidget*/
     QDockWidget *dock_dev_tool_ = nullptr;    /*开发者工具停靠窗口*/
     SiteInfoPopup *site_info_popup_ = nullptr;  /*站点信息查看*/
+    ZoomPopup *zoom_popup_ = nullptr;   /*缩放比例调整 popup*/
 
     QString url_;
     QString title_;
@@ -56,6 +60,7 @@ private:
     bool canGoForward_;
 private:
     void initBrowser();
+    void initOthers();
 private slots:
     void onBrowserDevTool(CefQWidget *devTool);
     void onDockDevToolTopLevelChanged(bool isFloating);

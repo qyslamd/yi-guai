@@ -1,5 +1,6 @@
 #include "page.h"
 #include "popups/SiteInfoPopup.h"
+#include "popups/ZoomPopup.h"
 
 #include <QtDebug>
 #include <QVBoxLayout>
@@ -9,14 +10,17 @@
 #include <QVariant>
 #include <QUrl>
 #include <QStyle>
+#include <QTimer>
 
 #include "managers/AppCfgManager.h"
+#include "managers/CefManager.h"
 
 Page::Page(const QString &url, QWidget *parent)
     : QMainWindow(parent)
     , main_layout_(new QVBoxLayout)
     , dock_dev_tool_(new QDockWidget)
     , site_info_popup_(new SiteInfoPopup(this))
+    , zoom_popup_(new ZoomPopup(this))
 {
     setMinimumHeight(100);
     if(!centralWidget()){
@@ -31,6 +35,7 @@ Page::Page(const QString &url, QWidget *parent)
     main_layout_->setSpacing(0);
 
     initBrowser();
+    initOthers();
 }
 
 Page::Page(CefQWidget*browser, QWidget *parent)
@@ -39,6 +44,7 @@ Page::Page(CefQWidget*browser, QWidget *parent)
     , browser_widget_(browser)
     , dock_dev_tool_(new QDockWidget)
     , site_info_popup_(new SiteInfoPopup(this))
+    , zoom_popup_(new ZoomPopup(this))
 {
     setMinimumHeight(100);
     if(!centralWidget()){
@@ -51,6 +57,7 @@ Page::Page(CefQWidget*browser, QWidget *parent)
     main_layout_->setSpacing(0);
 
     initBrowser();
+    initOthers();
 }
 
 Page::~Page()
@@ -82,15 +89,27 @@ CefQWidget* Page::getBrowserWidget()
     return browser_widget_;
 }
 
-void Page::showSiteInfomation(const QRect &rect)
+void Page::showSiteInfomation(const QPoint &pos)
 {
     /*设置必要的信息*/
     site_info_popup_->setTitle(tr("View ") + QUrl(url_).host());
-
-    auto pos = rect.topLeft();
-    pos.ry() += rect.height();
     site_info_popup_->move(pos);
     site_info_popup_->show();
+}
+
+void Page::showZoomBar(const QPoint &pos)
+{
+    auto pos1 = pos;
+    pos1.rx() -= zoom_popup_->width();
+    zoom_popup_->move(pos1);
+    auto zoomLevel = browser_widget_->ZoomLevel();
+    zoom_popup_->setZoomLevelStr(CefManager::Instance().zoom_map.value(static_cast<int>(zoomLevel)));
+    zoom_popup_->show();
+    if(zoomLevel == 0.0){
+        QTimer::singleShot(2000, [this](){
+           zoom_popup_->hide();
+        });
+    }
 }
 
 void Page::openDevTool()
@@ -112,10 +131,6 @@ void Page::closeEvent(QCloseEvent *event)
 
 void Page::initBrowser()
 {
-    dock_dev_tool_->installEventFilter(this);
-    connect(dock_dev_tool_, &QDockWidget::topLevelChanged,
-            this, &Page::onDockDevToolTopLevelChanged);
-    connect(dock_dev_tool_, &QDockWidget::dockLocationChanged, this, &Page::onDockDevToolLocChanged);
     connect(browser_widget_, &CefQWidget::browserClosing, [this]()
     {
         emit pageCmd(PageCmd::Closing, QVariant());
@@ -182,6 +197,24 @@ void Page::initBrowser()
     });
 
     connect(browser_widget_, &CefQWidget::browserShortcut, this, &Page::browserShortcut);
+}
+
+void Page::initOthers()
+{
+    dock_dev_tool_->installEventFilter(this);
+    connect(dock_dev_tool_, &QDockWidget::topLevelChanged,
+            this, &Page::onDockDevToolTopLevelChanged);
+    connect(dock_dev_tool_, &QDockWidget::dockLocationChanged, this, &Page::onDockDevToolLocChanged);
+
+    connect(zoom_popup_, &ZoomPopup::zoomOut, this, [this](){
+        emit pageCmd(PageCmd::ZoomOut, "");
+    });
+    connect(zoom_popup_, &ZoomPopup::zoomIn, this, [this](){
+        emit pageCmd(PageCmd::ZoomIn, "");
+    });
+    connect(zoom_popup_, &ZoomPopup::zoomReset, this, [this](){
+        emit pageCmd(PageCmd::ZoomReset, "");
+    });
 }
 
 void Page::onBrowserDevTool(CefQWidget *devTool)

@@ -67,6 +67,9 @@ enum class PageCmd{
     LoadEnd,
     LoadingState,
     FocusChange,
+    ZoomOut,
+    ZoomIn,
+    ZoomReset
 };
 
 #endif // GLOBALDEF_H

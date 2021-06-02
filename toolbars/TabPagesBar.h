@@ -10,6 +10,7 @@ class CaptionFrame : public QFrame
 public:
     CaptionFrame(QWidget *parent = nullptr);
     int reservedWidth() const;
+    virtual bool event(QEvent *ev) override;
 signals:
     void minBtnClicked();
     void normalMaxBtnClicked();
