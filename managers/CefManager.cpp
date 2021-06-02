@@ -116,7 +116,7 @@ CefManager::CefManager()
 
     locale.FromString("zh-CN");
     accept_language_list.FromString("zh-CN");
-//    background_color = CefColorSetARGB(255,135,206,235);
+    background_color = CefColorSetARGB(255,163,198,218);
 
     // cef 缩放对照表
     zoom_map.insert(-7, "25%");

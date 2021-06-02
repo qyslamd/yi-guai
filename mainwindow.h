@@ -63,6 +63,7 @@ protected:
     void changeEvent(QEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
 private:
     QAction *ac_shortcut_zoomout_;
     QAction *ac_shortcut_resetzoom_;

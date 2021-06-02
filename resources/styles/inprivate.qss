@@ -4,6 +4,9 @@ Scope:Class NavigationBar and it's children
 .NaviBar{
     background-color:#404244;
 }
+.BookmarkBar{
+    background-color:#404244;
+}
 
 /******************************************
 Scope:Class AddressBar and it's children

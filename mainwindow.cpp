@@ -37,6 +37,7 @@
 #include <QToolTip>
 #include <QLabel>
 #include <QMessageBox>
+#include <QPainter>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -59,7 +60,7 @@ MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
     initSignalSlot();
 
 #ifdef Q_OS_WIN
-    setContentsMargins(1,0,1,1);
+    setContentsMargins(2,0,2,2);
 #endif
 
     auto url = cfg.url_;
@@ -207,6 +208,22 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
     }
 #endif
     QtWinFramelessWindow::mouseDoubleClickEvent(event);
+}
+
+void MainWindow::paintEvent(QPaintEvent *event)
+{
+     QtWinFramelessWindow::paintEvent(event);
+    QPainter p(this);
+    p.save();
+    p.setRenderHint(QPainter::Antialiasing);
+
+    if(isInprivate()){
+        p.fillRect(rect(), QColor(0x404244));
+    }else{
+        p.fillRect(rect(), QColor(0x609DBF));
+    }
+
+    p.restore();
 }
 
 void MainWindow::initQtShortcut()
