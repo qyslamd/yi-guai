@@ -49,6 +49,9 @@ InprivatePopup* MainWindow::gInprivatePopup = nullptr;
 AppCfgWidget *MainWindow::gAppCfgWidget = nullptr;
 FullscnHint *MainWindow::gFullscnWidget = nullptr;
 
+const char default_url[] = "https://cn.bing.com/";
+const char gitee_url[] = "https://gitee.com/slamdd/yi-guai";
+
 MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
     : QtWinFramelessWindow(parent)
     , created_cfg_(cfg)
@@ -59,14 +62,14 @@ MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
     initSignalSlot();
 
 #ifdef Q_OS_WIN
-    setContentsMargins(2,0,2,2);
+//    setContentsMargins(2,2,2,2);
 #endif
 
     auto url = cfg.url_;
     if(url.isEmpty()){
         url = AppCfgMgr::homePageUrl();
         if(url.isEmpty()){
-            url = "https://cn.bing.com/";
+            url = default_url;
         }
     }
     // 如果立即创建浏览器的话，此时窗口的大小是不确定的
@@ -84,7 +87,7 @@ int MainWindow::AddNewPage(const QString &url, bool switchTo)
 {
     auto url1 = url;
     if(url1.isEmpty()){
-        url1 = "https://cn.bing.com/";
+        url1 =default_url;
     }
     Page *page = new Page(url1, this);
     initPage(page);
@@ -180,12 +183,14 @@ void MainWindow::changeEvent(QEvent *event)
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
+//    return QtWinFramelessWindow::mousePressEvent(event);
 #ifdef Q_OS_WIN
     QRect dragRecet(tab_bar_->rect().x(),
                    tab_bar_->rect().y(),
                    tab_bar_->rect().width() - tab_bar_->reservedWidth(),
                    tab_bar_->rect().height());
-    if(dragRecet.contains(event->pos())){
+    if(dragRecet.contains(event->pos()) && event->button() == Qt::LeftButton)
+    {
         if(::ReleaseCapture()){
             SendMessage(HWND(this->winId()), WM_SYSCOMMAND, SC_MOVE + HTCAPTION, 0);
             event->ignore();
@@ -197,12 +202,14 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
 
 void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
 {
+//    return QtWinFramelessWindow::mouseDoubleClickEvent(event);
 #ifdef Q_OS_WIN
     QRect dragRecet(tab_bar_->rect().x(),
                    tab_bar_->rect().y(),
                    tab_bar_->rect().width() - tab_bar_->reservedWidth(),
                    tab_bar_->rect().height());
-    if(dragRecet.contains(event->pos())){
+    if(dragRecet.contains(event->pos()) && event->button() == Qt::LeftButton)
+    {
         QTimer::singleShot(0, this, &MainWindow::onNormalMax);
     }
 #endif
@@ -213,16 +220,20 @@ void MainWindow::paintEvent(QPaintEvent *event)
 {
     QtWinFramelessWindow::paintEvent(event);
     QPainter p(this);
-    p.save();
     p.setRenderHint(QPainter::Antialiasing);
 
-    if(isInprivate()){
-        p.fillRect(rect(), QColor(0x404244));
-    }else{
-        p.fillRect(rect(), QColor(0x609DBF));
-    }
+//    p.save();
+//    if(isInprivate()){
+//        p.fillRect(rect(), QColor(0x404244));
+//    }else{
+//        p.fillRect(rect(), QColor(0x609DBF));
+//    }
+    //    p.restore();
+}
 
-    p.restore();
+bool MainWindow::hitTestCaption(const QPoint &gPos)
+{
+    return tab_bar_->hitTestCaption(gPos);
 }
 
 void MainWindow::initQtShortcut()
@@ -620,11 +631,11 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         onSettings();
         break;
     case NaviBarCmd::About:
-        AddNewPage("https://gitee.com/slamdd/yi-guai", true);
+        AddNewPage(gitee_url, true);
     case NaviBarCmd::Feedback:
-        AddNewPage("https://gitee.com/slamdd/yi-guai", true);
+        AddNewPage(gitee_url, true);
     case  NaviBarCmd::Like:
-        AddNewPage("https://gitee.com/slamdd/yi-guai", true);
+        AddNewPage(gitee_url, true);
         break;
     case NaviBarCmd::AboutQt:
         QMessageBox::aboutQt(this, tr("About Qt"));

@@ -1,11 +1,8 @@
 ﻿#include "QtWinFrameless.h"
 #include <QApplication>
-#include <QPoint>
-#include <QSize>
-#include <QSysInfo>
 #include <QtDebug>
-#ifdef Q_OS_WIN
 
+#ifdef Q_OS_WIN
 #include <windows.h>
 #include <WinUser.h>
 #include <windowsx.h>
@@ -17,76 +14,25 @@
 #pragma comment (lib,"user32.lib")
 
 QtWinFramelessWindow::QtWinFramelessWindow(QWidget *parent)
-    : QMainWindow(parent),
-      m_titlebar(Q_NULLPTR),
-      m_borderWidth(5),
-      m_bJustMaximized(false),
-      m_bResizeable(true)
+    : QMainWindow(parent)
+    , m_bJustMaximized(false)
 {
+    // 好像不用这么复杂吧？？？
+#if 0
+    // 首先设置无边框和携带系统菜单的属性
     setWindowFlags(windowFlags() | Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
 
-    setResizeable(m_bResizeable);
-}
-
-void QtWinFramelessWindow::setResizeable(bool resizeable)
-{
     bool visible = isVisible();
-    m_bResizeable = resizeable;
-    if (m_bResizeable){
-        setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint);
-//        setWindowFlag(Qt::WindowMaximizeButtonHint);
+    setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint);
 
-        //此行代码可以带回Aero效果，同时也带回了标题栏和边框,在nativeEvent()会再次去掉标题栏
-        //
-        //this line will get titlebar/thick frame/Aero back, which is exactly what we want
-        //we will get rid of titlebar and thick frame again in nativeEvent() later
-        HWND hwnd = (HWND)this->winId();
-        DWORD style = ::GetWindowLong(hwnd, GWL_STYLE);
-        ::SetWindowLong(hwnd, GWL_STYLE, style | WS_MAXIMIZEBOX | WS_THICKFRAME | WS_CAPTION);
-    }else{
-        setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
-//        setWindowFlag(Qt::WindowMaximizeButtonHint,false);
-
-        HWND hwnd = (HWND)this->winId();
-        DWORD style = ::GetWindowLong(hwnd, GWL_STYLE);
-        ::SetWindowLong(hwnd, GWL_STYLE, style & ~WS_MAXIMIZEBOX & ~WS_CAPTION);
-    }
-
-    //保留一个像素的边框宽度，否则系统不会绘制边框阴影
-    //
-    //we better left 1 piexl width of border untouch, so OS can draw nice shadow around it
-    const MARGINS shadow = { 1, 1, 1, 1 };
-    DwmExtendFrameIntoClientArea(HWND(winId()), &shadow);
-
+    // this line will get titlebar/thick frame/Aero back, which is exactly what we want
+    // we will get rid of titlebar and thick frame again in nativeEvent() later
+    // 此行代码可以带回Aero效果，同时也带回了标题栏和边框,在nativeEvent()会再次去掉标题栏
+    HWND hwnd = (HWND)this->winId();
+    DWORD style = ::GetWindowLong(hwnd, GWL_STYLE);
+    ::SetWindowLong(hwnd, GWL_STYLE, style | WS_MAXIMIZEBOX | WS_THICKFRAME | WS_CAPTION);
     setVisible(visible);
-}
-
-void QtWinFramelessWindow::setResizeableAreaWidth(int width)
-{
-    if (1 > width) width = 1;
-    m_borderWidth = width;
-}
-
-void QtWinFramelessWindow::setTitleBar(QWidget* titlebar)
-{
-    m_titlebar = titlebar;
-    if (!titlebar) return;
-    connect(titlebar, SIGNAL(destroyed(QObject*)), this, SLOT(onTitleBarDestroyed()));
-}
-
-void QtWinFramelessWindow::onTitleBarDestroyed()
-{
-    if (m_titlebar == QObject::sender())
-    {
-        m_titlebar = Q_NULLPTR;
-    }
-}
-
-void QtWinFramelessWindow::addIgnoreWidget(QWidget* widget)
-{
-    if (!widget) return;
-    if (m_whiteList.contains(widget)) return;
-    m_whiteList.append(widget);
+#endif
 }
 
 bool QtWinFramelessWindow::nativeEvent(const QByteArray &eventType, void *message, long *result)
@@ -102,149 +48,146 @@ bool QtWinFramelessWindow::nativeEvent(const QByteArray &eventType, void *messag
     {
     case WM_DWMCOLORIZATIONCOLORCHANGED:
     {
-        // 只是获取颜色改变通知，不处理，返回false
+        // 发出颜色改变通知
         emit DwmCompsitionChanged();
+        // 不处理，返回false
         return false;
     }
     case WM_DPICHANGED:
     {
-        auto dpi = HIWORD(msg->wParam);
-        emit dpiChanged(dpi);
+        // 发出DPI改变通知
+        emit dpiChanged(HIWORD(msg->wParam));
+        // 不处理，返回false
         return false;
     }
-    case WM_NCMOUSELEAVE:
-        *result = 0;
-        return true;
-    /*WM_NCCALCSIZE消息在需要计算窗口客户区的大小和位置时发送。通过处理这个消息，应用程序可以在窗口大小或位置改变时控制客户区的内容*/
     case WM_NCCALCSIZE:
     {
-        if(msg->wParam){
-            NCCALCSIZE_PARAMS* pncsp = reinterpret_cast<NCCALCSIZE_PARAMS*>(msg->lParam);
-#if 0   /* 使用此部分代码已知问题：很明显，底部存在大小改变，会导致多出来1个像素的边框*/
-            if (pncsp->rgrc[0].top != 0){
-//                params.rgrc[0].top -= 1;  // previous
-                static bool flag = false;
-                if(flag){
-                    pncsp->rgrc[0].bottom -= 1;
-                }else{
-                    pncsp->rgrc[0].bottom += 1;
-                }
-                flag = !flag;
-            }
-
-#else   /* 使用此部分代码已知问题：改变窗口大小的时候会闪烁*/
-            int offset = 0;
-            if(this->isFullScreen() || this->isMaximized()){
-               offset = 0;
-            }
-            pncsp->rgrc[0].left = pncsp->rgrc[0].left + 0;
-            pncsp->rgrc[0].top = pncsp->rgrc[0].top + 0;
-            pncsp->rgrc[0].right = pncsp->rgrc[0].right + offset;
-            pncsp->rgrc[0].bottom = pncsp->rgrc[0].bottom + offset;
-#endif
-            *result = WVR_VALIDRECTS;
-            return true;
-        }
-    }
-    case WM_NCHITTEST:
-    {
         *result = 0;
 
-        const LONG border_width = m_borderWidth;
-        RECT winrect;
-        GetWindowRect(HWND(winId()), &winrect);
+        /*
+         * WM_NCCALCSIZE 消息在当必须计算窗口客户区的大小和位置时发送。
+         * 通过处理这个消息，当窗口的大小或位置发生变化的时，应用程序可以控制窗口
+         * 客户区的内容
+         * wParam
+         *      如果为TRUE，则它指定应用程序应该指示客户区哪一部分包含有效信息。
+         *      系统将有效信息复制到新客户区域内的指定区域。此时的lParam指向NCCALCSIZE_PARAMS
+         *      结构。
+         *
+         *      如果为FALSE，应用程序不需要指定客户区的有效区域
+         *
+         * typedef struct tagNCCALCSIZE_PARAMS {
+         *     RECT       rgrc[3];
+         *     PWINDOWPOS lppos;
+         *   } NCCALCSIZE_PARAMS, *LPNCCALCSIZE_PARAMS;
+         *
+         *   此结构包含了三个矩形，当 WM_NCCALCSIZE 消息触发的时候：
+         *   rgrc[0]包含了被移动或改变大小后的窗口坐标。即建议的窗口新坐标
+         *   rgrc[1]包含了移动或改变大小之前的窗口坐标
+         *   rgrc[2]包含了窗口移动或调整大小之前窗口客户区的坐标（如果窗口是子窗口，坐标相对于父窗口客户区，如果是顶层窗口，坐标相对于屏幕原点）
+         *
+         *   如果你处理了 WM_NCCALCSIZE，那么
+         *    rgrc[0]代表包含由移动或调整大小产生的新客户区矩形的坐标。
+         *    rgrc[1]包含了有效的目标矩形
+         *    rgrc[2]包含了有效的源矩形
+         *    最后两个矩形与 WM_NCCALCSIZE 消息的返回值结合使用，以确定要保留的窗口区域。
+         *
+         * 所以处理流程是：
+         *      wParam 为 TRUE
+         *      获取 NCCALCSIZE_PARAMS
+         *      按照规则重新设置NACCALCSIZE_PARAMS
+         *      返回
+         *
+    */
+        if(msg->wParam){
+            NCCALCSIZE_PARAMS* pncsp = reinterpret_cast<NCCALCSIZE_PARAMS*>(msg->lParam);
 
+            RECT aRect;  // 获取改变前窗口 RECT
+            CopyRect(&aRect, &pncsp->rgrc[1]);
+
+            RECT bRect;  // 获取改变后窗口 RECT
+            CopyRect(&bRect, &pncsp->rgrc[0]);
+
+            // 改变后客户区大小
+            RECT bcRect;
+            if(this->isFullScreen() || this->isMaximized()){
+                bcRect.left = bRect.left;
+                bcRect.top = bRect.top;
+                bcRect.right = bRect.right;
+                bcRect.bottom = bRect.bottom;
+            }else{
+                bcRect.left = bRect.left + FrameWidth;
+                bcRect.top = bRect.top;
+                bcRect.right = bRect.right - FrameWidth;
+                bcRect.bottom = bRect.bottom - FrameWidth;
+            }
+
+            CopyRect(&pncsp->rgrc[0], &bcRect); // 设置改变后客户区大小
+            CopyRect(&pncsp->rgrc[1], &bRect);  // 设置改变后窗口大小
+            CopyRect(&pncsp->rgrc[2], &aRect);  // 设置改变后源矩形大小
+
+            /*
+             * WM_NCCALCSIZE message return value
+             * WVR_ALIGNTOP
+             * WVR_ALIGNRIGHT
+             * WVR_ALIGNLEFT
+             * WVR_ALIGNBOTTOM
+             * WVR_HREDRAW
+             * WVR_VREDRAW
+             * WVR_REDRAW
+             * WVR_VALIDRECTS
+            */
+            *result = WVR_REDRAW;
+        }
+    }
+        return true;
+    case WM_NCHITTEST:
+    {
+        RECT clientRect;
+        GetWindowRect(HWND(winId()), &clientRect);
         long x = GET_X_LPARAM(msg->lParam);
         long y = GET_Y_LPARAM(msg->lParam);
 
-        if(m_bResizeable)
+        // 左上
+        if(x >= clientRect.left && x < clientRect.left + FrameWidth
+                && y >= clientRect.top && y < clientRect.top + FrameWidth)
         {
-
-            bool resizeWidth = minimumWidth() != maximumWidth();
-            bool resizeHeight = minimumHeight() != maximumHeight();
-
-            if(resizeWidth)
-            {
-                *result = HTCLIENT;
-                //left border
-                if (x >= winrect.left && x < winrect.left + border_width)
-                {
-                    *result = HTLEFT;
-                }
-                //right border
-                if (x < winrect.right && x >= winrect.right - border_width)
-                {
-                    *result = HTRIGHT;
-                }
-            }
-            if(resizeHeight)
-            {
-                //bottom border
-                if (y < winrect.bottom && y >= winrect.bottom - border_width)
-                {
-                    *result = HTBOTTOM;
-                }
-                //top border
-                if (y >= winrect.top && y < winrect.top + border_width)
-                {
-                    *result = HTTOP;
-                }
-            }
-            if(resizeWidth && resizeHeight)
-            {
-                //bottom left corner
-                if (x >= winrect.left && x < winrect.left + border_width &&
-                        y < winrect.bottom && y >= winrect.bottom - border_width)
-                {
-                    *result = HTBOTTOMLEFT;
-                }
-                //bottom right corner
-                if (x < winrect.right && x >= winrect.right - border_width &&
-                        y < winrect.bottom && y >= winrect.bottom - border_width)
-                {
-                    *result = HTBOTTOMRIGHT;
-                }
-                //top left corner
-                if (x >= winrect.left && x < winrect.left + border_width &&
-                        y >= winrect.top && y < winrect.top + border_width)
-                {
-                    *result = HTTOPLEFT;
-                }
-                //top right corner
-                if (x < winrect.right && x >= winrect.right - border_width &&
-                        y >= winrect.top && y < winrect.top + border_width)
-                {
-                    *result = HTTOPRIGHT;
-                }
-            }
+            *result = HTTOPLEFT;
+             return true;
         }
-        if (0!=*result) return true;
-
-        //*result still equals 0, that means the cursor locate OUTSIDE the frame area
-        //but it may locate in titlebar area
-        if (!m_titlebar) return false;
-
-        //support highdpi
-        double dpr = this->devicePixelRatioF();
-        QPoint pos = m_titlebar->mapFromGlobal(QPoint(x/dpr,y/dpr));
-
-        if (!m_titlebar->rect().contains(pos)) return false;
-        QWidget* child = m_titlebar->childAt(pos);
-        if (!child)
+        //上
+        if (x >= clientRect.left + FrameWidth && x <= clientRect.right - FrameWidth
+                && y >= clientRect.top && y < clientRect.top + FrameWidth)
         {
-            *result = HTCAPTION;
+            *result = HTTOP;
             return true;
-        }else{
-            if (m_whiteList.contains(child))
-            {
-                *result = HTCAPTION;
-                return true;
-            }
         }
-        return false;
-    } //end case WM_NCHITTEST
+        //右上
+        if(x > clientRect.right - FrameWidth && x <= clientRect.right
+                && y >= clientRect.top && y < clientRect.top + FrameWidth)
+        {
+            *result = HTTOPRIGHT;
+            return true;
+        }
 
+//        if(hitTestCaption(QPoint(x, y))){
+//            *result = HTCAPTION;
+//            return true;
+//        }
+        // 其它的由窗口默认的边框处理
+        return false;
+    }
+    case WM_NCRBUTTONDOWN:
+    {
+#define LOG_MACRO(x) #x
+        qInfo()<<__FUNCTION__<<LOG_MACRO(WM_NCRBUTTONDOWN);
+        auto xPos = GET_X_LPARAM(msg->lParam);
+        auto yPos = GET_Y_LPARAM(msg->lParam);
+        HMENU sysMenu = ::GetSystemMenu((HWND)winId(), FALSE);
+        ::TrackPopupMenu(sysMenu,0, xPos, yPos, NULL, (HWND)winId(), NULL);
+    }
+        break;
     case WM_GETMINMAXINFO:
+        return false;
     {
         if (::IsZoomed(msg->hwnd)) {
             RECT frame = { 0, 0, 0, 0 };
@@ -258,9 +201,9 @@ bool QtWinFramelessWindow::nativeEvent(const QByteArray &eventType, void *messag
             m_frames.setRight(abs(frame.right)/dpr+0.5);
             m_frames.setBottom(abs(frame.bottom)/dpr+0.5);
 
-            QMainWindow::setContentsMargins(m_frames.left()+m_margins.left(), \
-                                            m_frames.top()+m_margins.top(), \
-                                            m_frames.right()+m_margins.right(), \
+            QMainWindow::setContentsMargins(m_frames.left()+m_margins.left(),
+                                            m_frames.top()+m_margins.top(),
+                                            m_frames.right()+m_margins.right(),
                                             m_frames.bottom()+m_margins.bottom());
             m_bJustMaximized = true;
         }else {
@@ -277,6 +220,11 @@ bool QtWinFramelessWindow::nativeEvent(const QByteArray &eventType, void *messag
         break;
     }
     return QMainWindow::nativeEvent(eventType, message, result);
+}
+
+void QtWinFramelessWindow::showEvent(QShowEvent *event)
+{
+    QMainWindow::showEvent(event);
 }
 
 void QtWinFramelessWindow::setContentsMargins(const QMargins &margins)

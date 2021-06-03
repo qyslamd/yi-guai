@@ -219,18 +219,8 @@ void Page::initOthers()
 
 void Page::onBrowserDevTool(CefQWidget *devTool)
 {
-    connect(devTool, &CefQWidget::browserShortcut, this,
-            [devTool, this](const CefKeyEvent &event,
-            CefEventHandle)
-    {
-        // 开发者工具 browser中的快捷键处理，这里按下了 F12，表明关闭开发者工具
-        if(event.windows_key_code == VK_F12){
-            if(devTool == dock_dev_tool_->widget())
-            {
-                dock_dev_tool_->close();
-            }
-        }
-    });
+//    connect(devTool, &CefQWidget::browserShortcut, this, &Page::onDevToolShortcut);
+    qInfo()<<__FUNCTION__<<devTool;
     dock_dev_tool_->setAllowedAreas(Qt::AllDockWidgetAreas);
     dock_dev_tool_->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable);
     dock_dev_tool_->setWidget(devTool);
@@ -274,5 +264,21 @@ void Page::onDockDevToolLocChanged(Qt::DockWidgetArea area)
         break;
     default:
         break;
+    }
+}
+
+void Page::onDevToolShortcut(const CefKeyEvent &event, MSG *)
+{
+    auto sender = QObject::sender();
+    auto devTool = qobject_cast<CefQWidget*>(sender);
+    // 开发者工具 browser中的快捷键处理，这里按下了 F12，表明关闭开发者工具
+    if(event.modifiers == EVENTFLAG_NONE
+            && event.windows_key_code == VK_F12
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        if(devTool && devTool == dock_dev_tool_->widget())
+        {
+            dock_dev_tool_->close();
+        }
     }
 }

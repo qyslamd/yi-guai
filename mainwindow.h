@@ -63,6 +63,10 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
+#ifdef Q_OS_WIN
+    // QtWinFrameless interface
+    bool hitTestCaption(const QPoint &gPos) override;
+#endif
 private:
     QAction *ac_shortcut_zoomout_;
     QAction *ac_shortcut_resetzoom_;

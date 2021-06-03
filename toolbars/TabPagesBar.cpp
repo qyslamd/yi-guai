@@ -66,6 +66,19 @@ QString TabPagesBar::tabText(int index) const
     return tab_bar_->tabText(index);
 }
 
+bool TabPagesBar::hitTestCaption(const QPoint &gPos)
+{
+    // 映射全局坐标当前区域中
+    auto pos = mapFromGlobal(gPos);
+    // 如果映射过来的坐标不在当前范围内，不能处理 HITCAPTION
+    if(!this->rect().contains(pos))
+    {
+        return false;
+    }
+    // 如果在，且没有子窗口且不在绘制的按钮范围内，就是 HITCAPTION
+    return !childAt(pos) && !windowBtnRect().contains(pos);
+}
+
 void TabPagesBar::setCurrentIndex(int index)
 {
     tab_bar_->setCurrentIndex(index);
@@ -94,7 +107,14 @@ void TabPagesBar::initUi()
             inActiveColor.setAlphaF(0.7);
         }
     }
-    setStyleSheet(QString(".TabPagesBar{background-color:%1;}.TabPagesBar:!active{background-color:%2}")
+    setStyleSheet(QString(
+                ".TabPagesBar{"
+                "border-top:1px solid #404142;"
+                "background-color:%1;"
+                "}"
+                ".TabPagesBar:!active{"
+                "background-color:%2"
+                "}")
                   .arg(activeColor.name(QColor::HexArgb))
                   .arg(inActiveColor.name(QColor::HexArgb))
                   );
@@ -137,6 +157,15 @@ CaptionFrame::CaptionFrame(QWidget *parent)
 int CaptionFrame::reservedWidth() const
 {
     return 3 * BtnWidth+ 2 * BtnSpacing;
+}
+
+QRect CaptionFrame::windowBtnRect()
+{
+    auto rect1 = btnRect(CaptionButtons::Button_Mini);
+    auto rect3 = btnRect(CaptionButtons::Button_Close);
+
+    return QRect(rect1.topLeft().toPoint(),
+                 rect3.bottomRight().toPoint());
 }
 
 bool CaptionFrame::event(QEvent *ev)

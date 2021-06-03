@@ -54,16 +54,19 @@ border:none;
 .AddressBar{
 border:none;
 border-radius:6px;
-background-color:white;
+background-color:#CADEEA;
 }
 .AddressBar:hover{
 border:1px solid #D2D2D2;
 }
 .AddressBar:focus{
-/*border:1px solid SkyBlue;*/
+background-color:white;
 border:2px solid #A3CFEC;
 }
-.AddressBar > QLineEdit{border:none;}
+.AddressBar > QLineEdit{
+border:none;
+background-color:transparent;
+}
 
 .AddressBar > QPushButton{
 border:none;

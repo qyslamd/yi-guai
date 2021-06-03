@@ -9,7 +9,10 @@ class CaptionFrame : public QFrame
     Q_OBJECT
 public:
     CaptionFrame(QWidget *parent = nullptr);
+
     int reservedWidth() const;
+    QRect windowBtnRect();
+
     virtual bool event(QEvent *ev) override;
 signals:
     void minBtnClicked();
@@ -71,6 +74,8 @@ public:
     void setTabIcon(int index, const QIcon &icon);
     void setTabText(int index, const QString &text);
     QString tabText(int index) const;
+
+    bool hitTestCaption(const QPoint &gPos);
 
     const int rightReserved = 180;
 signals:

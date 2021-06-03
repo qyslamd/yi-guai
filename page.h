@@ -65,6 +65,8 @@ private slots:
     void onBrowserDevTool(CefQWidget *devTool);
     void onDockDevToolTopLevelChanged(bool isFloating);
     void onDockDevToolLocChanged(Qt::DockWidgetArea area);
+    void onDevToolShortcut(const CefKeyEvent &event,
+                           CefEventHandle);
 };
 
 #endif // PAGE_H

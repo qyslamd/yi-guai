@@ -187,9 +187,9 @@ CefWindowHandle CefQWidget::BrowserWindowHandle()
 
 void CefQWidget::onTopLevelWindowStateChanged(Qt::WindowStates state, const QVariant &data)
 {
-    if(state.testFlag(Qt::WindowMaximized) || state.testFlag(Qt::WindowNoState)){
-        resizeBorser(data.toSize());
-    }
+    resizeBorser(data.toSize());
+//    if(state.testFlag(Qt::WindowMaximized) || state.testFlag(Qt::WindowNoState)){
+//    }
 }
 
 void CefQWidget::onBrowserWndNewForgroundPage(CefWindowInfo &windowInfo,
@@ -398,10 +398,11 @@ bool CefQWidget::onBrowserWndPreKeyEvent(const CefKeyEvent &event,
 
 #if 1
     qInfo()<<__FUNCTION__
-          <<"type:"<<event.type
-         <<"modifiers:"<<QString::number(event.modifiers,2)
-        <<"windows_key_code:"<<QString::number(event.windows_key_code,16).toUpper().prepend("0x")
-       <<"native_key_code:"<<QString::number(event.native_key_code,16).toUpper().prepend("0x");
+          <<"this:"<<this
+         <<"type:"<<event.type
+        <<"modifiers:"<<QString::number(event.modifiers,2)
+       <<"windows_key_code:"<<QString::number(event.windows_key_code,16).toUpper().prepend("0x")
+      <<"native_key_code:"<<QString::number(event.native_key_code,16).toUpper().prepend("0x");
 #endif
     dealCefKeyEvent(event, os_event, is_keyboard_shortcut);
 

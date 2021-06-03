@@ -41,6 +41,7 @@ private:
     QToolButton *btn_mark_site_ = nullptr;
 
     bool inprivate_ = false;
+    double zoom_value_ = 0.0;
 
     void initUi();
 
