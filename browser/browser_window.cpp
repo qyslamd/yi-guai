@@ -134,7 +134,7 @@ void BrowserWindow::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
 
     browser_ = browser;
 
-    delegate_->OnBrowserCreated();
+    delegate_->OnBrowserCreated(browser);
 }
 
 void BrowserWindow::OnBrowserClosing(CefRefPtr<CefBrowser> browser)

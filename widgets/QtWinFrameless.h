@@ -36,8 +36,6 @@ protected:
 public slots:
     void showFullScreen();
 private:
-    const int FrameWidth = 4;
-
     QMargins m_margins;
     QMargins m_frames;
     bool m_bJustMaximized;

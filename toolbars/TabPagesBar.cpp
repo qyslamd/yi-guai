@@ -120,7 +120,7 @@ void TabPagesBar::initUi()
                   );
 
     setLayout(layout_);
-    layout_->setContentsMargins(6, 6, 0, 0);
+    layout_->setContentsMargins(6, 8, 0, 0);
     layout_->setSpacing(2);
     layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
     layout_->addWidget(btn_dock_tabs_);

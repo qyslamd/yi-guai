@@ -106,6 +106,7 @@
         <file>resources/imgs/paint_palette_48px.png</file>
         <file>resources/imgs/shutdown_64px.png</file>
         <file>resources/imgs/tab_48px.png</file>
+        <file>resources/imgs/meinv.jpg</file>
     </qresource>
     <qresource prefix="/styles">
         <file>resources/styles/normal.qss</file>

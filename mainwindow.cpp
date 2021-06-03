@@ -60,11 +60,6 @@ MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
     initUi();
     setAppearance();
     initSignalSlot();
-
-#ifdef Q_OS_WIN
-//    setContentsMargins(2,2,2,2);
-#endif
-
     auto url = cfg.url_;
     if(url.isEmpty()){
         url = AppCfgMgr::homePageUrl();
@@ -183,7 +178,7 @@ void MainWindow::changeEvent(QEvent *event)
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
-//    return QtWinFramelessWindow::mousePressEvent(event);
+    return QtWinFramelessWindow::mousePressEvent(event);
 #ifdef Q_OS_WIN
     QRect dragRecet(tab_bar_->rect().x(),
                    tab_bar_->rect().y(),
@@ -202,7 +197,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
 
 void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
 {
-//    return QtWinFramelessWindow::mouseDoubleClickEvent(event);
+    return QtWinFramelessWindow::mouseDoubleClickEvent(event);
 #ifdef Q_OS_WIN
     QRect dragRecet(tab_bar_->rect().x(),
                    tab_bar_->rect().y(),
@@ -290,6 +285,7 @@ void MainWindow::initUi()
     widget_north_layout_ = new QVBoxLayout(widget_north_);
     widget_north_layout_->setContentsMargins(0,0,0,0);
     widget_north_layout_->setSpacing(0);
+    widget_north_->setLayout(widget_north_layout_);
 
     tab_bar_ = new TabPagesBar(created_cfg_.is_inprivate_, this);
     navi_bar_ = new NaviBar;
@@ -814,7 +810,7 @@ void MainWindow::onBrowserShortcut(const CefKeyEvent &event,
         onDevTool();
     }
 
-    // Ctrl + -(- 位于 数字键盘 0 右侧)
+    // Ctrl + -(- 位于 主键盘 按键 0 右侧)
     // 缩小
     if(event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == VK_OEM_MINUS)
@@ -832,7 +828,7 @@ void MainWindow::onBrowserShortcut(const CefKeyEvent &event,
      * 0x3A - 0x40 : unassigned
      * VK_A - VK_Z are the same as ASCII 'A' - 'Z' (0x41 - 0x5A)
      */
-    // Ctrl + 0(0 位于 数字键盘)
+    // Ctrl + 0(0 位于 主键盘)
     // 恢复缩放比例
     if(event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == '0'){

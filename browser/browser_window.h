@@ -25,7 +25,7 @@ public:
                                               CefRefPtr<CefClient>& client,
                                               CefBrowserSettings& settings) = 0;
         // Called when the browser has been created.
-        virtual void OnBrowserCreated() = 0;
+        virtual void OnBrowserCreated(CefRefPtr<CefBrowser> browser) = 0;
 
         // Called when the BrowserWindow is closing.
         virtual void OnBrowserWindowClosing() {};

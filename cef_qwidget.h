@@ -8,6 +8,7 @@
 #include "globaldef.h"
 
 class QHBoxLayout;
+class QVBoxLayout;
 
 class Page;
 class CefQWidget : public QWidget, public BrowserWindow::Delegate
@@ -51,6 +52,8 @@ signals:
     void browserDevTool(CefQWidget *devTool);
     void browserShortcut(const CefKeyEvent &event,
                          CefEventHandle os_event);
+    void devToolShortcut(const CefKeyEvent &event,
+                         CefEventHandle os_event);
 
 public slots:
     void onTopLevelWindowStateChanged(Qt::WindowStates state, const QVariant &data);
@@ -66,7 +69,7 @@ protected:
     void onBrowserWndDevTools(CefWindowInfo& windowInfo,
                                   CefRefPtr<CefClient>& client,
                                   CefBrowserSettings& settings) override;
-    void OnBrowserCreated() override;
+    void OnBrowserCreated(CefRefPtr<CefBrowser> browser) override;
     void OnBrowserWindowClosing() override;
     void onBrowserWindowAddressChange(const std::string &url) override;
     void onBrowserWindowTitleChange(const std::string &title) override;
@@ -98,12 +101,13 @@ private:
     bool newly_created_ = true;
     bool is_dev_tool_ = false;
     BrowserState browser_state_ = Empty;
+    CefRefPtr<CefBrowser> browser_;
 
     QString url_;
     QWindow *window_;
     scoped_ptr<BrowserWindow> browser_window_;
     QWidget *qwindow_containter_;
-    QHBoxLayout *layout_;
+    QVBoxLayout *layout_;
 
 private:
     void initUi();
@@ -113,7 +117,6 @@ private:
                          CefEventHandle os_event,
                          bool *is_keyboard_shortcut,
                          bool isPre = true);
-
 };
 
 #endif // CEF_QWIDGET_H

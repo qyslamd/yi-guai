@@ -9,6 +9,7 @@
 #include <QtDebug>
 #include <QThread>
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QCloseEvent>
 #include <QTimer>
 #include <QDateTime>
@@ -17,6 +18,7 @@
 #include <QStyle>
 #include <QDir>
 #include <QMessageBox>
+#include <QPushButton>
 
 #include <include/base/cef_logging.h>
 #include "mainwindow.h"
@@ -34,7 +36,7 @@ CefQWidget::CefQWidget(const QString &url, QWidget *parent)
     : QWidget(parent)
     , window_(new QWindow)
     , qwindow_containter_(nullptr)
-    , layout_(new QHBoxLayout(this))
+    , layout_(new QVBoxLayout(this))
 {
     newly_created_ = true;
     browser_window_.reset(new BrowserWindow(this, url.toStdString()));
@@ -48,7 +50,7 @@ CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
     : QWidget(parent)
     , window_(new QWindow)
     , qwindow_containter_(nullptr)
-    , layout_(new QHBoxLayout(this))
+    , layout_(new QVBoxLayout(this))
 {
     newly_created_ = false;
     browser_window_.reset(new BrowserWindow(this, ""));
@@ -259,8 +261,9 @@ void CefQWidget::onBrowserWndDevTools(CefWindowInfo &windowInfo,
     emit browserDevTool(window);
 }
 
-void CefQWidget::OnBrowserCreated()
+void CefQWidget::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
 {
+    browser_ = browser;
     browser_state_ = Created;
     resizeBorser();
 }
@@ -398,23 +401,27 @@ bool CefQWidget::onBrowserWndPreKeyEvent(const CefKeyEvent &event,
 
 #if 1
     qInfo()<<__FUNCTION__
-          <<"this:"<<this
          <<"type:"<<event.type
         <<"modifiers:"<<QString::number(event.modifiers,2)
        <<"windows_key_code:"<<QString::number(event.windows_key_code,16).toUpper().prepend("0x")
       <<"native_key_code:"<<QString::number(event.native_key_code,16).toUpper().prepend("0x");
 #endif
-    dealCefKeyEvent(event, os_event, is_keyboard_shortcut);
-
+    if(!is_dev_tool_){
+        dealCefKeyEvent(event, os_event, is_keyboard_shortcut);
+    }
     return false;
 }
 
 bool CefQWidget::onBrowserWndKeyEvent(const CefKeyEvent &event,
                                       CefEventHandle os_event)
 {
-    // return true represent you deal the event, otherwise return false
 
-    dealCefKeyEvent(event, os_event, nullptr, false);
+    if(is_dev_tool_){
+        emit devToolShortcut(event, os_event);
+    }else{
+        // return true represent you deal the event, otherwise return false
+        dealCefKeyEvent(event, os_event, nullptr, false);
+    }
 
     return false;
 }
@@ -439,7 +446,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
     {
         is_shortcut_and_need_to_be_done = true;
     }
-    // Ctrl + -(- 位于 数字键盘 0 右侧)
+    // Ctrl + -(- 位于 主键盘 0 右侧)
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == VK_OEM_MINUS
             && event.type == KEYEVENT_RAWKEYDOWN)
@@ -453,7 +460,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
     {
         is_shortcut_and_need_to_be_done = true;
     }
-    // Ctrl + 0(0 位于 数字键盘)
+    // Ctrl + 0(0 位于 主键盘)
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == '0'
             && event.type == KEYEVENT_RAWKEYDOWN)
@@ -581,6 +588,16 @@ void CefQWidget::initUi()
 
     layout_->setContentsMargins(0,0,0,0);
     layout_->setSpacing(0);
+
+#if 0
+    QPushButton *button = new QPushButton("zoomIn",this);
+    connect(button, &QPushButton::clicked, this, [this]()
+    {
+        browser_->GetHost()->SetZoomLevel(-3.0);
+    });
+    layout_->addWidget(button);
+#endif
+
     layout_->addWidget(qwindow_containter_);
     setLayout(layout_);
 }

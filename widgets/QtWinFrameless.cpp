@@ -115,10 +115,10 @@ bool QtWinFramelessWindow::nativeEvent(const QByteArray &eventType, void *messag
                 bcRect.right = bRect.right;
                 bcRect.bottom = bRect.bottom;
             }else{
-                bcRect.left = bRect.left + FrameWidth;
+                bcRect.left = bRect.left + 8;
                 bcRect.top = bRect.top;
-                bcRect.right = bRect.right - FrameWidth;
-                bcRect.bottom = bRect.bottom - FrameWidth;
+                bcRect.right = bRect.right - 8;
+                bcRect.bottom = bRect.bottom - 8;
             }
 
             CopyRect(&pncsp->rgrc[0], &bcRect); // 设置改变后客户区大小
@@ -142,38 +142,39 @@ bool QtWinFramelessWindow::nativeEvent(const QByteArray &eventType, void *messag
         return true;
     case WM_NCHITTEST:
     {
+        const int offset = 4;
         RECT clientRect;
         GetWindowRect(HWND(winId()), &clientRect);
         long x = GET_X_LPARAM(msg->lParam);
         long y = GET_Y_LPARAM(msg->lParam);
 
         // 左上
-        if(x >= clientRect.left && x < clientRect.left + FrameWidth
-                && y >= clientRect.top && y < clientRect.top + FrameWidth)
+        if(x >= clientRect.left && x < clientRect.left + offset
+                && y >= clientRect.top && y < clientRect.top + offset)
         {
             *result = HTTOPLEFT;
              return true;
         }
         //上
-        if (x >= clientRect.left + FrameWidth && x <= clientRect.right - FrameWidth
-                && y >= clientRect.top && y < clientRect.top + FrameWidth)
+        if (x >= clientRect.left + offset && x <= clientRect.right - offset
+                && y >= clientRect.top && y < clientRect.top + offset)
         {
             *result = HTTOP;
             return true;
         }
         //右上
-        if(x > clientRect.right - FrameWidth && x <= clientRect.right
-                && y >= clientRect.top && y < clientRect.top + FrameWidth)
+        if(x > clientRect.right - offset && x <= clientRect.right
+                && y >= clientRect.top && y < clientRect.top + offset)
         {
             *result = HTTOPRIGHT;
             return true;
         }
 
-//        if(hitTestCaption(QPoint(x, y))){
-//            *result = HTCAPTION;
-//            return true;
-//        }
-        // 其它的由窗口默认的边框处理
+        if(hitTestCaption(QPoint(x, y))){
+            *result = HTCAPTION;
+            return true;
+        }
+        // 其它位置默认处理
         return false;
     }
     case WM_NCRBUTTONDOWN:

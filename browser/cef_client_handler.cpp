@@ -478,7 +478,7 @@ void CefClientHandler::ShowDevTools(CefRefPtr<CefBrowser> browser,
     }
 
     CefWindowInfo windowInfo;
-    CefRefPtr<CefClient> client;
+    CefRefPtr<CefClient> clien;
     CefBrowserSettings settings;
 
     //    MainContext::Get()->PopulateBrowserSettings(&settings);
