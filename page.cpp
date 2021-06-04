@@ -92,7 +92,8 @@ CefQWidget* Page::getBrowserWidget()
 void Page::showSiteInfomation(const QPoint &pos)
 {
     /*设置必要的信息*/
-    site_info_popup_->setTitle(tr("View ") + QUrl(url_).host());
+    site_info_popup_->setDomain(QUrl(url_).host());
+    site_info_popup_->setLevel(SecurityLevel::Https);
     site_info_popup_->move(pos);
     site_info_popup_->show();
 }
@@ -215,6 +216,12 @@ void Page::initOthers()
     });
     connect(zoom_popup_, &ZoomPopup::zoomReset, this, [this](){
         emit pageCmd(PageCmd::ZoomReset, "");
+    });
+
+
+    connect(site_info_popup_, &SiteInfoPopup::openUrl, this,[this](const QUrl &url)
+    {
+        emit pageCmd(PageCmd::OpenUrl, url);
     });
 }
 

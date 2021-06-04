@@ -28,24 +28,6 @@ border:none;
 background: #242424;
 }
 
-/******************************************
-Scope:Class AddressBar and it's children
-*/
-QMenu {
-    background-color: #ABABAB; /* sets background of the menu */
-    border: 1px solid black;
-}
-
-QMenu::item {
-    /* sets background of menu item. set this to something non-transparent
-        if you want menu color and menu item color to be different */
-    background-color: transparent;
-}
-
-QMenu::item:selected { /* when user selects item using mouse or keyboard */
-    background-color: #654321;
-}
-
 QPushButton#NaviBarInprivateBtn{
 border:none;
 border-radius:8px;

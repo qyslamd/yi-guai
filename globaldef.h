@@ -69,7 +69,16 @@ enum class PageCmd{
     FocusChange,
     ZoomOut,
     ZoomIn,
-    ZoomReset
+    ZoomReset,
+    OpenUrl,
 };
+
+typedef enum class SiteSecurityLevel{
+    None,
+    Http,
+    Https,
+    File,
+    LocalScheme
+}SecurityLevel;
 
 #endif // GLOBALDEF_H

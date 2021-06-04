@@ -311,9 +311,8 @@ QRectF CaptionFrame::btnRect(CaptionFrame::CaptionButtons button)
 
 }
 
-QPixmap CaptionFrame::btnPixmap(CaptionFrame::CaptionButtons button)
+QPixmap CaptionFrame::btnPixmap(CaptionFrame::CaptionButtons button, const QColor &color)
 {
-    QColor color(Qt::black);
     QSize size(10, 10);
     QPixmap pix(size);
     pix.fill(Qt::transparent);
@@ -335,13 +334,54 @@ QPixmap CaptionFrame::btnPixmap(CaptionFrame::CaptionButtons button)
     case CaptionButtons::Button_NormalMax:
     {
         // max
-        p.save();
-        QPen pen(QBrush(color), 1.0);
-        p.setPen(pen);
+        if(!window()->isMaximized()){
+            p.save();
+            QPen pen(QBrush(color), 1.0);
+            p.setPen(pen);
 
-        p.drawRect(QRectF(0.0, 0.0, sizeF.width() - 1.0, sizeF.height() - 1.0));
+            p.drawRect(QRectF(0.0, 0.0, sizeF.width() - 1.0, sizeF.height() - 1.0));
 
-        p.restore();
+            p.restore();
+        }else
+            // restore
+        {
+            p.save();
+            p.setRenderHint(QPainter::Antialiasing);
+            QPen pen(QBrush(color), 1.0);
+            p.setPen(pen);
+
+            QRectF rect(0,0,size.width(), size.height());
+            QRectF r1(rect.x(),
+                      rect.y() + rect.height() / 4,
+                      rect.width() * 3 / 4,
+                      rect.width() * 3 / 4);
+
+            p.drawRect(r1);
+
+            QVector<QLineF> lines;
+            QLineF line1(QPointF(rect.x() + rect.width() * 1 / 4, rect.y() + rect.width() * 1 / 4),
+                         QPointF(rect.x() + rect.width() * 1 / 4, rect.y())
+                         );
+            QLineF line2(QPointF(rect.x() + rect.width() * 1 / 4, rect.y()),
+                         QPointF(rect.x() + rect.width(), rect.y())
+                         );
+            QLineF line3(QPointF(rect.x() + rect.width(), rect.y()),
+                         QPointF(rect.x() + rect.width(), rect.y() + rect.width() * 3 / 4)
+                         );
+            QLineF line4(QPointF(rect.x() + rect.width(), rect.y() + rect.width() * 3 / 4),
+                         QPointF(rect.x() + rect.width() * 3 / 4, rect.y() + rect.width() * 3 / 4)
+                         );
+
+            lines.append(line1);
+            lines.append(line2);
+            lines.append(line3);
+            lines.append(line4);
+
+            p.drawLines(lines);
+
+            p.restore();
+        }
+
     }
         break;
     case CaptionButtons::Button_Close:
@@ -366,6 +406,22 @@ QPixmap CaptionFrame::btnPixmap(CaptionFrame::CaptionButtons button)
         break;
     }
     return pix;
+}
+
+QColor CaptionFrame::getIconColor(bool isClose)
+{
+    if(!isClose){
+        QColor color(Qt::black);
+        if(UtilQt::dwmColorPrevalence() && this->isActiveWindow()){
+            color = UtilQt::getForgroundColor(QtWin::colorizationColor());
+        }else if(inprivate_){
+            color =  QColor("#DEDEDE");
+        }
+
+        return color;
+    }else{
+        return Qt::white;
+    }
 }
 
 CaptionFrame::CaptionButtons CaptionFrame::buttonAt(const QPoint &pos)
@@ -399,15 +455,22 @@ void CaptionFrame::drawButtons(QPainter *p)
     if(close_button_hover_){
         p->fillRect(rectClose, QColor(0xE81123));
     }
-    QPixmap pix = btnPixmap(CaptionButtons::Button_Mini);
+    // mini
+    QPixmap pix = btnPixmap(CaptionButtons::Button_Mini, getIconColor());
     p->drawPixmap(QPointF(rectMini.x() + (rectMini.width() - pix.width()) / 2,
                          rectMini.y() + (rectMini.height() - pix.height()) / 2),
                  pix);
-    pix = btnPixmap(CaptionButtons::Button_NormalMax);
+    // normal max
+    pix = btnPixmap(CaptionButtons::Button_NormalMax, getIconColor());
     p->drawPixmap(QPointF(rectMax.x() + (rectMax.width() - pix.width()) / 2,
                          rectMax.y() + (rectMax.height() - pix.height()) / 2),
                  pix);
-    pix = btnPixmap(CaptionButtons::Button_Close);
+    // close
+    if(close_button_hover_){
+        pix = btnPixmap(CaptionButtons::Button_Close, Qt::white);
+    }else{
+        pix = btnPixmap(CaptionButtons::Button_Close, getIconColor());
+    }
     p->drawPixmap(QPointF(rectClose.x() + (rectClose.width() - pix.width()) / 2,
                          rectClose.y() + (rectClose.height() - pix.height()) / 2),
                  pix);

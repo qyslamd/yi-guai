@@ -71,10 +71,10 @@ background-color:transparent;
 .AddressBar > QPushButton{
 border:none;
 border-radius:4px;
-padding:4px;
+padding:6px;
 }
 .AddressBar > QPushButton:hover{
-background-color:#DCDCDC;
+background-color:rgba(192,192,192,100);
 }
 
 .AddressBar > QPushButton:open{
@@ -85,10 +85,10 @@ border:none;
 .AddressBar > QToolButton{
 border:none;
 border-radius:4px;
-padding:4px;
+padding:6px;
 }
 .AddressBar > QToolButton:hover{
-background-color:#DCDCDC;
+background-color:rgba(192,192,192,100);
 }
 
 .AddressBar > QToolButton:open{
@@ -107,26 +107,42 @@ border:none;
 }
 
 QMenu#TabBarTabMenu{
-padding-top:2px;
-padding-bottom:2px;
-background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:1, y2:0, stop:0 rgba(170,204,238,0.8), stop:1 rgba(0,193,222,0.7));
-border: px solid #e8e8e8;
+background-color: #ffffff;
+border: 2px solid #e8e8e8;
 border-radius: 6px;
-color:#000000;
+border-bottom-right-radius:0px;
+}
+QMenu#TabBarTabMenu::item {
+background-color: transparent;
+ /* padding: top right bottom left*/
+padding: 4px;
+padding-left: 8px;
+}
+QMenu#TabBarTabMenu::item:disabled {
+color:#808080;
+}
+QMenu#TabBarTabMenu::icon{
+padding-left: 15px;
 }
 QMenu#TabBarTabMenu::item:selected:enabled {
 background-color: #52B8EB;
 color:white;
 }
 
+
 QMenu#NaviBarMoreOptionMenu{
-background-color: white;
+background-color: #ffffff;
+border: 2px solid #e8e8e8;
 border-radius: 6px;
-padding:4px;
+border-bottom-right-radius:0px;
 }
 QMenu#NaviBarMoreOptionMenu::item {
 background-color: transparent;
-padding:6px;
+ /* padding: top right bottom left*/
+padding: 8px;
+}
+QMenu#NaviBarMoreOptionMenu::icon{
+padding-left: 15px;
 }
 QMenu#NaviBarMoreOptionMenu::item:selected:enabled  {
 color:black;

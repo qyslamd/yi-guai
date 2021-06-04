@@ -183,6 +183,7 @@ namespace UtilQt {
     {
         QFile file(path);
         if(!file.exists()){
+            qInfo()<<__FUNCTION__<<"file not exists";
             return QByteArray();
         }
         if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){

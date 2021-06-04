@@ -20,6 +20,7 @@ public:
     int shadowWidth() const;
     int shadowLeftWidth() const;
     int shadowRightWidth() const;
+    int shadowBottomWidth() const;
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;

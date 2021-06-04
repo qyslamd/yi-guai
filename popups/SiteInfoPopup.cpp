@@ -1,42 +1,103 @@
 #include "SiteInfoPopup.h"
-#include <QWidgetAction>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QToolButton>
+#include "ui_SiteInfoPopup.h"
+
+#include <QEvent>
+#include <QMouseEvent>
+#include <QPropertyAnimation>
+#include <QTimer>
+#include <QUrl>
+
+#include "utils/util_qt.h"
 
 SiteInfoPopup::SiteInfoPopup(QWidget *parent)
-    : QMenu(parent)
+    : PopupBase(parent)
+    , ui(new Ui::SiteInfoPopup)
 {
-    action_title_ = new QWidgetAction(this);
+    ui->setupUi(contentFrame());
+    resize(360, 44);
+    animation = new QPropertyAnimation(this, "size");
+    animation->setDuration(200);
+    animation->setLoopCount(1);
 
-    QWidget *titleW = new QWidget(this);
-    QHBoxLayout * titleLayout = new QHBoxLayout(titleW);
+    ui->frameSiteState->installEventFilter(this);
 
-    label_title_ = new QLabel(this);
-    QToolButton *btnClose = new QToolButton(this);
-    btnClose->setIcon(QIcon(":/icons/resources/imgs/close_24px.png"));
-    connect(btnClose, &QToolButton::clicked, this, &SiteInfoPopup::hide);
-
-    titleLayout->addWidget(label_title_);
-    titleLayout->addStretch();
-    titleLayout->addWidget(btnClose);
-    titleW->setLayout(titleLayout);
-
-    action_title_->setDefaultWidget(titleW);
-    addAction(action_title_);
+    connect(ui->btnClose, &QToolButton::clicked, this, &SiteInfoPopup::close);
+    connect(ui->btnBack2General, &QToolButton::clicked, this, [this](){
+        ui->stackedWidget->setCurrentWidget(ui->pageGeneral);
+    });
+    connect(ui->textBrowserSiteDesc, &QTextBrowser::anchorClicked, this, [this](const QUrl &link){
+        hide();
+        emit openUrl(link);
+    });
 }
 
 SiteInfoPopup::~SiteInfoPopup()
 {
-
+    delete ui;
 }
 
-void SiteInfoPopup::setTitle(const QString &title)
+bool SiteInfoPopup::eventFilter(QObject *obj, QEvent *ev)
 {
-    label_title_->setText(title);
+    if(obj == ui->frameSiteState){
+        if(ev->type() == QEvent::MouseButtonRelease){
+            auto mouseEvent = static_cast<QMouseEvent *>(ev);
+            if(mouseEvent->button() == Qt::LeftButton){
+                showSiteDesc();
+            }
+        }
+    }
+    return PopupBase::eventFilter(obj, ev);
 }
 
-void SiteInfoPopup::showEvent(QShowEvent *event)
+void SiteInfoPopup::setDomain(const QString &domain)
 {
-
+    site_domain_ = domain;
+    ui->labelTitle->setText(tr("View ") + site_domain_);
 }
+
+void SiteInfoPopup::setLevel(SecurityLevel level)
+{
+    level_ = level;
+}
+
+void SiteInfoPopup::showEvent(QShowEvent *ev)
+{
+    PopupBase::showEvent(ev);
+    ui->stackedWidget->setCurrentWidget(ui->pageGeneral);
+
+    QTimer::singleShot(200, this, [this](){
+        animation->setStartValue(QSize(360, 44));
+        animation->setEndValue(QSize(360,290));
+        animation->start();
+    });
+}
+
+void SiteInfoPopup::hideEvent(QHideEvent *ev)
+{
+    PopupBase::hideEvent(ev);
+    resize(360, 44);
+}
+
+void SiteInfoPopup::showSiteDesc()
+{
+    ui->textBrowserSiteDesc->clear();
+    switch(level_){
+    case SecurityLevel::Http:
+        break;
+    case SecurityLevel::Https:
+    {
+        auto desc = UtilQt::readFileUtf8(":/dists/resources/txt/https.txt");
+        ui->textBrowserSiteDesc->setHtml(QString::fromUtf8(desc));
+    }
+        break;
+    case SecurityLevel::File:
+        break;
+    case SecurityLevel::LocalScheme:
+        break;
+    default:
+        break;
+    }
+    ui->stackedWidget->setCurrentWidget(ui->pageSiteDesc);
+}
+
+

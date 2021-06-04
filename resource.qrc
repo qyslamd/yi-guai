@@ -107,6 +107,9 @@
         <file>resources/imgs/shutdown_64px.png</file>
         <file>resources/imgs/tab_48px.png</file>
         <file>resources/imgs/meinv.jpg</file>
+        <file>resources/imgs/forward_64px.png</file>
+        <file>resources/imgs/lock_100px.png</file>
+        <file>resources/imgs/certificate_48px.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file>resources/styles/normal.qss</file>
@@ -117,5 +120,8 @@
     </qresource>
     <qresource prefix="/htmls">
         <file>resources/html/HomePage.html</file>
+    </qresource>
+    <qresource prefix="/dists">
+        <file>resources/txt/https.txt</file>
     </qresource>
 </RCC>

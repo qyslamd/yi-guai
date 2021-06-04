@@ -398,13 +398,16 @@ bool CefQWidget::onBrowserWndPreKeyEvent(const CefKeyEvent &event,
                                          CefEventHandle os_event,
                                          bool *is_keyboard_shortcut)
 {
+    if(event.focus_on_editable_field){
+        return false;
+    }
 
 #if 1
     qInfo()<<__FUNCTION__
-         <<"type:"<<event.type
-        <<"modifiers:"<<QString::number(event.modifiers,2)
-       <<"windows_key_code:"<<QString::number(event.windows_key_code,16).toUpper().prepend("0x")
-      <<"native_key_code:"<<QString::number(event.native_key_code,16).toUpper().prepend("0x");
+          <<"type:"<<event.type
+         <<"modifiers:"<<QString::number(event.modifiers,2)
+        <<"windows_key_code:"<<QString::number(event.windows_key_code,16).toUpper().prepend("0x")
+       <<"native_key_code:"<<QString::number(event.native_key_code,16).toUpper().prepend("0x");
 #endif
     if(!is_dev_tool_){
         dealCefKeyEvent(event, os_event, is_keyboard_shortcut);
@@ -415,7 +418,6 @@ bool CefQWidget::onBrowserWndPreKeyEvent(const CefKeyEvent &event,
 bool CefQWidget::onBrowserWndKeyEvent(const CefKeyEvent &event,
                                       CefEventHandle os_event)
 {
-
     if(is_dev_tool_){
         emit devToolShortcut(event, os_event);
     }else{

@@ -119,6 +119,7 @@ FORMS += \
     popups/InprivatePopup.ui \
     popups/HistoryPopup.ui \
     popups/PopupBase.ui \
+    popups/SiteInfoPopup.ui \
     popups/UserInfoPopup.ui \
     popups/ZoomPopup.ui \
     test/test.ui \

@@ -15,6 +15,7 @@
 #include <QWidgetAction>
 #include <QShowEvent>
 #include <QStyle>
+#include <QTimer>
 
 NaviBar::NaviBar(QWidget *parent)
     : QFrame(parent)
@@ -41,7 +42,7 @@ NaviBar::NaviBar(QWidget *parent)
     , action_new_window_(new QAction(this))
     , action_new_inprivate_window_(new QAction)
     , action_zoom_(new QWidgetAction(this))
-    , frame_zoom_(new QFrame)
+    , frame_zoom_bar_(new QFrame)
     , label_zoom_(new QLabel(tr("Zoom")))
     , label_zoom_value_(new QLabel)
     , btn_zoom_out_(new QToolButton)
@@ -159,9 +160,9 @@ NaviBar::NaviBar(QWidget *parent)
     action_quit_->setText(tr("quit app"));
     action_quit_->setIcon(QIcon());
 
-    frame_zoom_->installEventFilter(this);
-    frame_zoom_->setFrameShape(QFrame::NoFrame);
-    frame_zoom_->setObjectName("ZoomBarFrame");
+    frame_zoom_bar_->installEventFilter(this);
+    frame_zoom_bar_->setFrameShape(QFrame::NoFrame);
+    frame_zoom_bar_->setObjectName("ZoomBarFrame");
     btn_zoom_out_->setObjectName("ZoomOutToolButton");
     btn_zoom_out_->setIcon(QIcon(":/icons/resources/imgs/zoom_out_64px.png"));
     label_zoom_value_->setObjectName("ZoomValueLabel");
@@ -187,10 +188,12 @@ NaviBar::NaviBar(QWidget *parent)
     zoom_layout->addWidget(label_zoom_value_);
     zoom_layout->addWidget(btn_zoom_in_);
     zoom_layout->addWidget(btn_fullscreen_);
-    frame_zoom_->setLayout(zoom_layout);
-    action_zoom_->setDefaultWidget(frame_zoom_);
+    frame_zoom_bar_->setLayout(zoom_layout);
+    action_zoom_->setDefaultWidget(frame_zoom_bar_);
 
     menu_more_options_->setObjectName("NaviBarMoreOptionMenu");
+    menu_more_options_->setWindowFlags(menu_more_options_->windowFlags() | Qt::FramelessWindowHint);
+    menu_more_options_->setAttribute(Qt::WA_TranslucentBackground);
 //    menu_more_options_->setMinimumSize(280,350);
     menu_more_options_->installEventFilter(this);
     menu_more_options_->addAction(action_new_tab_);
@@ -263,14 +266,17 @@ bool NaviBar::eventFilter(QObject *obj, QEvent *ev)
 {
     if(menu_more_options_ == obj){
         if(ev->type() == QEvent::Show){
-            auto pos = mapToGlobal(btn_more_options_->pos());
+            QTimer::singleShot(10, [this](){
+                auto pos = mapToGlobal(btn_more_options_->pos());
 
-            pos.setX(pos.x() - menu_more_options_->width());
-            pos.setX(pos.x() + btn_more_options_->width());
-            pos.setY(pos.y() + btn_more_options_->height());
-            menu_more_options_->move(pos);
+                pos.setX(pos.x() - menu_more_options_->width());
+                pos.setX(pos.x() + btn_more_options_->width());
+                pos.setY(pos.y() + btn_more_options_->height());
+                menu_more_options_->move(pos);
+            });
         }
-    }else if(frame_zoom_ == obj){
+    // Filter zoom-bar's mouse enter event, and cancel more options menu's active action
+    }else if(frame_zoom_bar_ == obj){
         if(ev->type() == QEvent::Enter)
         {
             menu_more_options_->setActiveAction(nullptr);

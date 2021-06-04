@@ -17,7 +17,6 @@ TabBar::TabBar(bool inprivate, QWidget *parent)
     setStyle(new TabbarStyle(inprivate));
 
     menu_ = new QMenu(this);
-    menu_->setWindowFlag(Qt::NoDropShadowWindowHint);
     menu_->setWindowFlag(Qt::FramelessWindowHint);
     menu_->setAttribute(Qt::WA_TranslucentBackground);
     menu_->setAutoFillBackground(true);

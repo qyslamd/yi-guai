@@ -79,7 +79,7 @@ void AddressBar::initUi()
     setGraphicsEffect(shadow);
 
     layout_ = new QHBoxLayout;
-    layout_->setContentsMargins(8,2,8,2);
+    layout_->setContentsMargins(2,1,2,1);
     layout_->setSpacing(1);
     btn_site_info_ = new QPushButton;
     btn_site_info_->setToolTip(tr("view website infomation"));

@@ -10,10 +10,11 @@ class CaptionFrame : public QFrame
 public:
     CaptionFrame(QWidget *parent = nullptr);
 
+    virtual bool event(QEvent *ev) override;
+
     int reservedWidth() const;
     QRect windowBtnRect();
-
-    virtual bool event(QEvent *ev) override;
+    void setInprivate(bool inprivate){inprivate_ = inprivate;}
 signals:
     void minBtnClicked();
     void normalMaxBtnClicked();
@@ -25,6 +26,7 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent *event) override;
     virtual void leaveEvent(QEvent *event) override;
 private:
+    bool inprivate_ = false;
     ///
     /// \brief The CaptionButtons enum
     ///
@@ -49,7 +51,8 @@ private:
 
     // Get rectangle of caption buttons
     QRectF btnRect(CaptionButtons button);
-    QPixmap btnPixmap(CaptionButtons button);
+    QPixmap btnPixmap(CaptionButtons button, const QColor &color);
+    QColor getIconColor(bool isClose = false);
     CaptionButtons buttonAt(const QPoint &pos);
 
     void drawButtons(QPainter *p);

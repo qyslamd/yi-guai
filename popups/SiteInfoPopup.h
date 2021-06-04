@@ -1,28 +1,38 @@
 #ifndef SITEINFOPOPUP_H
 #define SITEINFOPOPUP_H
 
-#include <QMenu>
-class QWidgetAction;
-class QWidget;
-class QLabel;
-class QToolButton;
+#include "PopupBase.h"
+#include "globaldef.h"
 
-class SiteInfoPopup : public QMenu
+namespace Ui {
+class SiteInfoPopup;
+}
+class QPropertyAnimation;
+class SiteInfoPopup : public PopupBase
 {
     Q_OBJECT
 
 public:
     explicit SiteInfoPopup(QWidget *parent = nullptr);
     ~SiteInfoPopup();
+    bool eventFilter(QObject *obj, QEvent *ev) override;
 
-    void setTitle(const QString &title);
+    void setDomain(const QString &domain);
+    void setLevel(SecurityLevel level);
+signals:
+    void openUrl(const QUrl &link);
+protected:
+    void showEvent(QShowEvent *ev) override;
+    void hideEvent(QHideEvent *ev) override;
+private:
+    Ui::SiteInfoPopup *ui;
+    QPropertyAnimation *animation;
+
+    void showSiteDesc();
 
 private:
-    QWidgetAction *action_title_;
-    QLabel *label_title_;
-protected:
-    void showEvent(QShowEvent *event) override;
-
+    QString site_domain_;
+    SecurityLevel level_;
 };
 
 #endif // SITEINFOPOPUP_H

@@ -75,31 +75,26 @@ void TabbarStyle::drawTabBarTabLabel(const QStyleOption *option,
 {
     if(option->rect.width() <= 60) return;
 
-    const QStyleOptionTab *tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
-    QRect textRect = subElementRect(QStyle::SE_TabBarTabText, tabOption, w);
-    QLinearGradient linearGrad(QPointF(textRect.x(), textRect.y() + textRect.height() / 2),
-                               QPointF(textRect.x() + textRect.width(), textRect.y() + textRect.height() / 2));
-    const qreal startPercent = 0.8f;
-    QColor color = isInprivate_ ? QColor("#FFFFFF") : QColor("#000000");
-    linearGrad.setColorAt(startPercent, color);
-    QColor color2 = isInprivate_ ? QColor(0,0,0,0) : QColor(255,255,255,0);
-    linearGrad.setColorAt(1, color2);
-
+    auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
+    auto tabRect = tabOption->rect;
+    auto textRect = subElementRect(QStyle::SE_TabBarTabText, tabOption, w);
     auto iconSize = tabOption->iconSize;
     auto pixmap = tabOption->icon.pixmap(iconSize);
-#if 0
-    QRect pR(textRect.x() - iconSize.width() / dpi_ - 2,
-             textRect.y() + ( textRect.height() - iconSize.height() / dpi_ ) / 2,
+
+    QRect iconRect(tabRect.x() + iconSize.width() / 2,
+             tabRect.y() + ( tabRect.height() - iconSize.height()) / 2,
              iconSize.width() / dpi_,
              iconSize.height() / dpi_);
-#else
-    auto rectAll = tabOption->rect;
-    QRect pR(rectAll.x() + iconSize.width() / 2,
-             rectAll.y() + ( rectAll.height() - iconSize.height()) / 2,
-             iconSize.width() / dpi_,
-             iconSize.height() / dpi_);
-#endif
-    painter->drawPixmap(pR, pixmap);
+
+    // Since the first tab borrows the range, the icon needs to be moved to the right
+    if(tabOption->position == QStyleOptionTab::Beginning || tabOption->position == QStyleOptionTab::OnlyOneTab)
+    {
+        iconRect = QRect(iconRect.x() + 4,
+                         iconRect.y(),
+                         iconRect.width(),
+                         iconRect.height());
+    }
+    painter->drawPixmap(iconRect, pixmap);
 
     auto drawLabel = [=](const QLinearGradient &grident){
         painter->save();
@@ -114,6 +109,13 @@ void TabbarStyle::drawTabBarTabLabel(const QStyleOption *option,
     };
 
     QStyle::State state = tabOption->state;
+    QLinearGradient linearGrad(QPointF(textRect.x(), textRect.y() + textRect.height() / 2),
+                               QPointF(textRect.x() + textRect.width(), textRect.y() + textRect.height() / 2));
+    const qreal startPercent = 0.8f;
+    QColor color = isInprivate_ ? QColor("#FFFFFF") : QColor("#000000");
+    linearGrad.setColorAt(startPercent, color);
+    QColor color2 = isInprivate_ ? QColor(0,0,0,0) : QColor(255,255,255,0);
+    linearGrad.setColorAt(1, color2);
     if (state.testFlag(QStyle::State_Selected))
     {
         drawLabel(linearGrad);

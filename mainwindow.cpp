@@ -288,6 +288,8 @@ void MainWindow::initUi()
     widget_north_->setLayout(widget_north_layout_);
 
     tab_bar_ = new TabPagesBar(created_cfg_.is_inprivate_, this);
+    tab_bar_->setInprivate(created_cfg_.is_inprivate_);
+
     navi_bar_ = new NaviBar;
     navi_bar_->setInprivate(created_cfg_.is_inprivate_);
     bookmark_bar_ = new BookmarkBar;
@@ -743,6 +745,12 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
         break;
     case PageCmd::ZoomReset:
         onZoomReset();
+        break;
+    case PageCmd::OpenUrl:
+    {
+        auto url = para.toUrl();
+        AddNewPage(url.toString(), true);
+    }
         break;
     default:
         break;

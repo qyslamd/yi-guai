@@ -40,6 +40,11 @@ int PopupBase::shadowRightWidth() const
     return ui->verticalLayout->contentsMargins().right();
 }
 
+int PopupBase::shadowBottomWidth() const
+{
+    return ui->verticalLayout->contentsMargins().bottom();
+}
+
 PopupBase::~PopupBase()
 {
     delete ui;

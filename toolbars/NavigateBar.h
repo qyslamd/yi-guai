@@ -68,7 +68,7 @@ private:
     *action_new_inprivate_window_;
 
     QWidgetAction *action_zoom_;
-    QFrame *frame_zoom_;
+    QFrame *frame_zoom_bar_;
     QLabel *label_zoom_,
     *label_zoom_value_;
     decltype (btn_back_) btn_zoom_out_,
