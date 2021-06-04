@@ -28,7 +28,7 @@
 
 #include "cef_qwidget.h"
 #include "utils/util_qt.h"
-#include "widgets/framelesswidget.h"
+#include "widgets/FramelessWidget.h"
 
 #if defined(CEF_USE_SANDBOX)
 // The cef_sandbox.lib static library may not link successfully with all VS
