@@ -1,0 +1,75 @@
+#settings-mainwindow {
+    background-color: #f5f5f7;
+}
+
+QWidget {
+    color: #333;
+    font-size: 16px;
+    font-family: "Microsoft Yahei";
+}
+
+/*///////////////////////////////////////////////////////////////*/
+TitleBar {
+    height: 50px;
+    background-color: #fbfbfd;
+}
+
+QLabel#logo {
+    background-color: #f5f5f7;
+}
+
+QLabel#title {
+    height: 50px;
+    padding-left； 15px;
+
+    color: #606060;
+    font-size: 24px;
+    font-family: "华文新魏";
+    background-color: #f5f5f7;
+}
+
+/*///////////////////////////////////////////////////////////////*/
+QTabWidget#firstmenu::pane {
+    border: none;
+    background: #fbfbfd;
+}
+
+QTabWidget#firstmenu::tab-bar {
+}
+
+QTabBar#fristtab::tab {
+    margin: 0;
+    padding: 0;
+    color: #666;
+    font-size: 17px;
+    font-family: "Microsoft Yahei";
+    border-left: 5px solid #f5f5f7;
+}
+
+QTabBar#fristtab::tab:selected,
+QTabBar#fristtab::tab:selected:hover {
+    background: #e9e9eb;
+    color: #333;
+    border-left: 5px solid #409eff;
+}
+
+QTabBar#fristtab::tab:hover {
+    color: #333;
+}
+
+/*///////////////////////////////////////////////////////////////*/
+ShortcutInput:focus {
+    color: #409eff;
+}
+
+ColorDialogButton {
+    height: 34px;
+    margin: 1px 0px;
+}
+#sub-title {
+    font-weight: bold;
+}
+#copyright-label {
+    color: #888888;
+    font-size: 15px;
+}
