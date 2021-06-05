@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QToolButton>
 #include <QLineEdit>
-#include "myframe.h"
+#include "ButtonLineEdit.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -23,6 +23,8 @@ public:
     ~Widget();
 
     bool eventFilter(QObject *obj, QEvent *ev) override;
+protected:
+    void timerEvent(QTimerEvent *event) override;
 private:
     Ui::Widget *ui;
 

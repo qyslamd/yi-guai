@@ -1,9 +1,9 @@
-#include "myframe.h"
+#include "ButtonLineEdit.h"
 #include <QGraphicsDropShadowEffect>
 #include <QEvent>
 #include <QtDebug>
 
-MyFrame::MyFrame(QWidget *parent)
+ButtonLineEdit::ButtonLineEdit(QWidget *parent)
     : QFrame(parent)
 {
     QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
@@ -29,15 +29,15 @@ MyFrame::MyFrame(QWidget *parent)
     layout_->addWidget(btnMark_);
     setLayout(layout_);
 
-    setStyleSheet(".MyFrame{"
+    setStyleSheet(".ButtonLineEdit{"
 "border:1px solid gray;"
 "border-radius:15px;"
 "background-color:white;"
 "}"
-".MyFrame:hover{"
+".ButtonLineEdit:hover{"
 "border:1px solid blue;"
 "}"
-".MyFrame:focus{"
+".ButtonLineEdit:focus{"
 "border:1px solid SkyBlue;"
 "}");
 
@@ -45,7 +45,7 @@ MyFrame::MyFrame(QWidget *parent)
 
 }
 
-bool MyFrame::eventFilter(QObject *obj, QEvent *ev)
+bool ButtonLineEdit::eventFilter(QObject *obj, QEvent *ev)
 {
     if(obj == lineEdit_){
         if(ev->type() == QEvent::FocusIn || ev->type() == QEvent::FocusOut){

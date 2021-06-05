@@ -28,6 +28,7 @@ protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void timerEvent(QTimerEvent* event) override;
+    void tabInserted(int index) override;
 private:
     QMenu *menu_;
     QAction *act_new_tab;

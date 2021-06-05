@@ -9,16 +9,18 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    listtabstyle.cpp \
+    ButtonLineEdit.cpp \
+    VerticalTabbarStyle.cpp \
     main.cpp \
     menubarstyle.cpp \
-    myframe.cpp \
+    ttabbar.cpp \
     widget.cpp
 
 HEADERS += \
-    listtabstyle.h \
+    ButtonLineEdit.h \
+    VerticalTabbarStyle.h \
     menubarstyle.h \
-    myframe.h \
+    ttabbar.h \
     widget.h
 
 FORMS += \

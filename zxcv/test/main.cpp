@@ -7,7 +7,7 @@
 #include <QToolButton>
 #include <QPushButton>
 
-#include "myframe.h"
+#include "ButtonLineEdit.h"
 
 int main(int argc, char *argv[])
 {

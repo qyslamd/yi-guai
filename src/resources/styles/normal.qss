@@ -98,12 +98,12 @@ border:none;
 
 
 .TabBar::close-button{
-    image: url(:/icons/resources/imgs/close_24px.png);
+    image: url(:/icons/resources/imgs/general_close.png);
 }
 
 .TabBar::close-button:hover {
     background-color:#CFCFCF;
-    border-radius:8px;
+    border-radius:4px;
 }
 
 QMenu#TabBarTabMenu{

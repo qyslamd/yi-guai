@@ -19,10 +19,12 @@
 #include <QPushButton>
 #include <QFrame>
 #include <QTabBar>
+#include <QTimerEvent>
 
 #include "menubarstyle.h"
-#include "listtabstyle.h"
-#include "myframe.h"
+#include "VerticalTabbarStyle.h"
+#include "ButtonLineEdit.h"
+#include "ttabbar.h"
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)/*
@@ -42,8 +44,12 @@ Widget::~Widget()
 
 bool Widget::eventFilter(QObject *obj, QEvent *ev)
 {
-
     return QWidget::eventFilter(obj, ev);
+}
+
+void Widget::timerEvent(QTimerEvent *event)
+{
+    return QWidget::timerEvent(event);
 }
 
 QPixmap Widget::switchPix(bool on)
@@ -171,7 +177,7 @@ void Widget::testLineEdit()
     mainLayout->setContentsMargins(9,9,9,9);
     mainLayout->setSpacing(6);
 
-    MyFrame *ff1 =  new MyFrame;
+    ButtonLineEdit *ff1 =  new ButtonLineEdit;
     QTextEdit *ff2 =  new QTextEdit;
     mainLayout->addWidget(ff1);
     mainLayout->addWidget(ff2);
@@ -181,32 +187,49 @@ void Widget::testLineEdit()
 
 void Widget::testTabShape()
 {
+    resize(500,300);
+
     QHBoxLayout *layout = new QHBoxLayout;
 
     QVBoxLayout *tabLayout = new QVBoxLayout;
+
     QToolButton *btnMenu = new QToolButton;
     tabLayout->addWidget(btnMenu);
 
-    QTabBar *tabbar = new QTabBar(this);
-    tabbar->setDrawBase(false);
-    tabbar->setStyle(new ListTabStyle);
-    tabbar->setShape(QTabBar::RoundedWest);
-    tabbar->setTabsClosable(true);
-    tabbar->setMovable(true);
-    tabbar->addTab("ASDFFSS");
-    tabbar->addTab("ASDFFSS");
-    tabbar->addTab("ASDFFSS");
+    TTabBar *tabbar = new TTabBar(this);
+    connect(tabbar, &QTabBar::tabCloseRequested, this,[=](int index)
+    {
+        tabbar->removeTab(index);
+    });
+
+    tabbar->installEventFilter(this);
+    tabbar->setStyle(new VerticalTabbarStyle);
+    auto icon = style()->standardIcon(QStyle::SP_ComputerIcon);
+    tabbar->addTab(icon, "ASDFFSS");
+    tabbar->addTab(icon, "ASDFFSS");
+    tabbar->addTab(icon, "ASDFFSS");
+    tabbar->setCurrentIndex(2);
 
     tabLayout->addWidget(tabbar);
 
+    QFrame *line = new QFrame;
+//    line->setStyleSheet("border:1px solid #D2D2D2");
+    line->setGeometry(QRect(160, 150, 118, 3));
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    tabLayout->addWidget(line);
+
     QToolButton *btnAdd = new QToolButton;
+    connect(btnAdd, &QToolButton::clicked, this, [=](){
+        tabbar->addTab(icon, "QWERTTY");
+    });
     tabLayout->addWidget(btnAdd);
     tabLayout->addStretch();
 
     layout->addLayout(tabLayout);
+
     QFrame *frame = new QFrame;
     frame->setStyleSheet("border:1px solid red;");
     layout->addWidget(frame);
-
     setLayout(layout);
 }

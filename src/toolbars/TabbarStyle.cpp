@@ -6,6 +6,7 @@
 #include <QPainterPath>
 #include <QApplication>
 #include <QScreen>
+#include <QtDebug>
 
 #include "utils/util_qt.h"
 
@@ -42,7 +43,6 @@ QRect TabbarStyle::subElementRect(QStyle::SubElement subElement,
                                   const QWidget *widget) const
 {
     const QStyleOptionTab *tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
-//    return QProxyStyle::subElementRect(subElement, option, widget);
     switch (subElement) {
     case QStyle::SE_TabBarTabLeftButton:
     {
@@ -63,6 +63,18 @@ QRect TabbarStyle::subElementRect(QStyle::SubElement subElement,
 //        return textRect;
 //    }
 //        break;
+
+//    case QStyle::SE_TabBarTabRightButton:
+//    {
+//        auto rect = QProxyStyle::subElementRect(subElement, option, widget);
+//         QRect ret(rect.x(),
+//                     rect.y(),
+//                     32,
+//                     32);
+//         qInfo()<<ret;
+//         return ret;
+//    }
+        break;
     default:
         break;
     }

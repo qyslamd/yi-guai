@@ -7,6 +7,7 @@
 #include <QContextMenuEvent>
 #include <QToolButton>
 #include <QGraphicsBlurEffect>
+#include <QChildEvent>
 
 TabBar::TabBar(bool inprivate, QWidget *parent)
     : QTabBar(parent)
@@ -92,6 +93,14 @@ bool TabBar::event(QEvent *e)
         pos = mapToGlobal(pos);
 //        emit showPreview(pos, index);
     }break;
+    case QEvent::ChildAdded:
+    {
+//        auto childEvent = static_cast<QChildEvent *>(e);
+//        auto child = childEvent->child();
+//        if(child){
+//            qInfo()<<child;
+//        }
+    }break;
     default:
         break;
     }
@@ -116,6 +125,14 @@ void TabBar::timerEvent(QTimerEvent *event)
         pos = mapFromGlobal(pos);
         if(tabAt(pos) == -1)
             emit showPreview(QPoint(), -1);
+    }
+}
+
+void TabBar::tabInserted(int index)
+{
+    auto closeBtn = tabButton(index, QTabBar::RightSide);
+    if(closeBtn){
+        closeBtn->setMinimumSize(20, 20);
     }
 }
 

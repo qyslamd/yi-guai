@@ -1,5 +1,5 @@
-#ifndef MYFRAME_H
-#define MYFRAME_H
+#ifndef BUTTONLINEEDIT_H
+#define BUTTONLINEEDIT_H
 
 #include <QFrame>
 #include <QLineEdit>
@@ -7,11 +7,11 @@
 #include <QToolButton>
 #include <QPushButton>
 
-class MyFrame : public QFrame
+class ButtonLineEdit : public QFrame
 {
     Q_OBJECT
 public:
-    MyFrame(QWidget *parent = nullptr);
+    ButtonLineEdit(QWidget *parent = nullptr);
 
     bool eventFilter(QObject *obj, QEvent *ev) override;
 
@@ -23,4 +23,4 @@ private:
     QToolButton *btnMark_;
 };
 
-#endif // MYFRAME_H
+#endif // BUTTONLINEEDIT_H
