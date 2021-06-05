@@ -420,6 +420,11 @@ Page *MainWindow::CurrentPage()
     return nullptr;
 }
 
+int MainWindow::CurrentPageIndex()
+{
+    return tab_bar_->currentIndex();
+}
+
 Page *MainWindow::GetPage(int index)
 {
     return qobject_cast<Page*>(stack_browsers_->widget(index));
@@ -804,6 +809,15 @@ void MainWindow::onBrowserShortcut(const CefKeyEvent &event,
 {
     Q_UNUSED(os_event);
 
+    // F5
+    // 刷新当前标签页
+    if (event.modifiers == EVENTFLAG_NONE
+            && event.windows_key_code == VK_F5
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        onRefresh();
+    }
+
     // F11
     // 改变浏览器的全屏模式
     if(event.modifiers == EVENTFLAG_NONE
@@ -872,6 +886,15 @@ void MainWindow::onBrowserShortcut(const CefKeyEvent &event,
         onPrint();
     }
 
+    // Ctrl + R
+    // 刷新当前标签页
+    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == 'R'
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        onRefresh();
+    }
+
     // Ctrl + T
     // 新建标签页
     if(event.modifiers == EVENTFLAG_CONTROL_DOWN
@@ -893,11 +916,36 @@ void MainWindow::onBrowserShortcut(const CefKeyEvent &event,
         MainWndMgr::Instance().createWindow(MainWndCfg(true));
     }
 
+    // Ctrl + Shift + I
+    // 新建InPrivate浏览器窗口
+    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_SHIFT_DOWN)
+            && event.windows_key_code == 'I'){
+        onDevTool();
+    }
+
     // Ctrl + H
     // 查看历史记录
     if(event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'H'){
         onShowHistory();
+    }
+
+    // Ctrl + W
+    // 查看历史记录
+    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == 'W'
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        onTabBarCloseRequested(CurrentPageIndex());
+    }
+
+    // Ctrl + Tab
+    // 标签页切换
+    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == VK_TAB
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        onTabSwitch();
     }
 }
 
@@ -1058,5 +1106,18 @@ void MainWindow::onNormalMax()
         if(isMaximized()){
             showNormal();
         }
+    }
+}
+
+void MainWindow::onTabSwitch()
+{
+    int index = tab_bar_->currentIndex();
+    int count = tab_bar_->count();
+    if(1 == count) {return;}
+
+    if(index >= count - 1){
+        tab_bar_->setCurrentIndex(0);
+    }else{
+        tab_bar_->setCurrentIndex(index + 1);
     }
 }

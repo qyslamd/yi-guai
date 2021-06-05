@@ -41,6 +41,11 @@ int TabPagesBar::count() const
     return tab_bar_->count();
 }
 
+int TabPagesBar::currentIndex() const
+{
+    return tab_bar_->currentIndex();
+}
+
 void TabPagesBar::moveTab(int from, int to)
 {
     tab_bar_->moveTab(from, to);
@@ -118,6 +123,9 @@ void TabPagesBar::initUi()
                   .arg(activeColor.name(QColor::HexArgb))
                   .arg(inActiveColor.name(QColor::HexArgb))
                   );
+
+    setFocusPolicy(Qt::TabFocus);
+    setFocusProxy(tab_bar_);
 
     setLayout(layout_);
     layout_->setContentsMargins(6, 8, 0, 0);

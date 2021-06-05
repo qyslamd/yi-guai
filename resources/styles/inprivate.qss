@@ -38,6 +38,9 @@ padding:3px;
 QPushButton#NaviBarInprivateBtn:hover{
 background-color:#1C7CC5;
 }
+
 .TabBar::close-button{
+    width:16px;
+    height:16px;
     image: url(:/icons/resources/imgs/close_white_16px.png);
 }

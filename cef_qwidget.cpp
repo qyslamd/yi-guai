@@ -434,6 +434,13 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
                                  bool isPre)
 {
     bool is_shortcut_and_need_to_be_done = false;
+    // F5
+    if (event.modifiers == EVENTFLAG_NONE
+            && event.windows_key_code == VK_F5
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
     // F11
     if (event.modifiers == EVENTFLAG_NONE
             && event.windows_key_code == VK_F11
@@ -497,6 +504,13 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
     {
         is_shortcut_and_need_to_be_done = true;
     }
+    // Ctrl + R
+    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == 'R'
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
     // Ctrl + T
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'T'
@@ -518,9 +532,30 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
     {
         is_shortcut_and_need_to_be_done = true;
     }
+    // Ctrl + Shift + N
+    if (event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_SHIFT_DOWN)
+            && event.windows_key_code == 'I'
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
     // Ctrl + H
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'H'
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
+    // Ctrl + W
+    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == 'W'
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
+    // Ctrl + Tab
+    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == VK_TAB
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
         is_shortcut_and_need_to_be_done = true;

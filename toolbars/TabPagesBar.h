@@ -72,6 +72,7 @@ public:
 
     int insertTab(int index, const QString &text);
     int count()const;
+    int currentIndex() const;
     void moveTab(int from, int to);
     void removeTab(int index);
     void setTabIcon(int index, const QIcon &icon);

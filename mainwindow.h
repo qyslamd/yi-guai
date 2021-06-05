@@ -113,6 +113,7 @@ private:
 
     void initPage(Page *page);
     Page *CurrentPage();
+    int CurrentPageIndex();
     Page *GetPage(int index);
 
 private slots:
@@ -145,5 +146,6 @@ private:
     void onStatusMessage(const QString &msg);
     void onWindowStateChanged();
     void onNormalMax();
+    void onTabSwitch();
 };
 #endif // MAINWINDOW_H
