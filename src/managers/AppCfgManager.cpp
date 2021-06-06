@@ -10,6 +10,7 @@ namespace {
     const char *KeyWindowGeo = "WindowGeo";
     const char *KeyHomePage = "HomePage";
     const char *KeyNewPageUrl = "HomePage";
+    const char *KeyShowBkmkBar = "ShowBookmarkBar";
 
 
     const char *SectionDevTool = "DevTool";
@@ -70,6 +71,16 @@ QByteArray AppCfgMgr::devToolGeometry()
 void AppCfgMgr::setDevToolGeometry(const QByteArray &data)
 {
     instance().setValue(SectionDevTool, KeyDevToolGeo, data);
+}
+
+bool AppCfgMgr::bookmarkBarVisible()
+{
+    return instance().value(SectionGeneral, KeyShowBkmkBar, "").toBool();
+}
+
+void AppCfgMgr::setBookmarkBarVisible(const bool &data)
+{
+    instance().setValue(SectionGeneral, KeyShowBkmkBar, data);
 }
 
 QVariant AppCfgMgr::value(const QString &group,

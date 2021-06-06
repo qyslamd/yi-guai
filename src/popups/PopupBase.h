@@ -15,7 +15,7 @@ public:
     explicit PopupBase(QWidget *parent = nullptr);
     ~PopupBase();
 
-    QWidget *contentFrame();
+    virtual QWidget *contentFrame();
 
     int shadowWidth() const;
     int shadowLeftWidth() const;

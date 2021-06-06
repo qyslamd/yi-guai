@@ -94,6 +94,8 @@ signals:
 public slots:
     void setCurrentIndex(int index);
     void onDwmColorChanged();
+protected:
+    void paintEvent(QPaintEvent *event) override;
 private:
     bool inprivate_;
     QHBoxLayout *layout_;

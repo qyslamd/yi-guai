@@ -25,7 +25,7 @@ NaviBar::NaviBar(QWidget *parent)
     , btn_stop_(new QToolButton)
     , btn_forward_(new QToolButton)
     , btn_home_(new QToolButton)
-    , btn_bookmarks_(new QToolButton)
+    , btn_favorites_(new QToolButton)
     , btn_history_(new QToolButton)
     , btn_download_(new QToolButton)
     , btn_capture_(new QToolButton)
@@ -73,8 +73,8 @@ NaviBar::NaviBar(QWidget *parent)
     btn_stop_->setToolTip(tr("stop loading"));
     btn_home_->setToolTip(tr("homepage"));
 
-    btn_bookmarks_->setCheckable(true);
-    btn_bookmarks_->setToolTip(tr("bookmarks"));
+    btn_favorites_->setCheckable(true);
+    btn_favorites_->setToolTip(tr("bookmarks"));
     btn_history_->setCheckable(true);
     btn_history_->setToolTip(tr("histories"));
     btn_download_->setCheckable(true);
@@ -100,7 +100,7 @@ NaviBar::NaviBar(QWidget *parent)
     layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
     layout_->addWidget(frame_extensions_);
     layout_->addWidget(frame_tools_);
-    layout_->addWidget(btn_bookmarks_);
+    layout_->addWidget(btn_favorites_);
     layout_->addWidget(btn_history_);
     layout_->addWidget(btn_download_);
     layout_->addWidget(btn_capture_);
@@ -194,14 +194,14 @@ NaviBar::NaviBar(QWidget *parent)
     menu_more_options_->setObjectName("NaviBarMoreOptionMenu");
     menu_more_options_->setWindowFlags(menu_more_options_->windowFlags() | Qt::FramelessWindowHint);
     menu_more_options_->setAttribute(Qt::WA_TranslucentBackground);
-//    menu_more_options_->setMinimumSize(280,350);
+    //    menu_more_options_->setMinimumSize(280,350);
     menu_more_options_->installEventFilter(this);
     menu_more_options_->addAction(action_new_tab_);
     menu_more_options_->addAction(action_new_window_);
     menu_more_options_->addAction(action_new_inprivate_window_);
-//    menu_more_options_->addSeparator();
+    //    menu_more_options_->addSeparator();
     menu_more_options_->addAction(action_zoom_);
-//    menu_more_options_->addSeparator();
+    //    menu_more_options_->addSeparator();
     menu_more_options_->addAction(action_favorates_);
     menu_more_options_->addAction(action_history_);
     menu_more_options_->addAction(action_download_);
@@ -275,7 +275,7 @@ bool NaviBar::eventFilter(QObject *obj, QEvent *ev)
                 menu_more_options_->move(pos);
             });
         }
-    // Filter zoom-bar's mouse enter event, and cancel more options menu's active action
+        // Filter zoom-bar's mouse enter event, and cancel more options menu's active action
     }else if(frame_zoom_bar_ == obj){
         if(ev->type() == QEvent::Enter)
         {
@@ -285,9 +285,24 @@ bool NaviBar::eventFilter(QObject *obj, QEvent *ev)
     return QFrame::eventFilter(obj, ev);
 }
 
-QPoint NaviBar::hisrotyBtnPos() const
+QPoint NaviBar::addBkmkBtnPos() const
+{
+    return address_bar_->gGeometryBtnAddBkmk().bottomRight();
+}
+
+QPoint NaviBar::historyBtnPos() const
 {
     return mapToGlobal(btn_history_->geometry().bottomRight());
+}
+
+QPoint NaviBar::bookmarkBtnPos() const
+{
+    return mapToGlobal(btn_favorites_->geometry().bottomRight());
+}
+
+QPoint NaviBar::downloadBtnPos() const
+{
+    return mapToGlobal(btn_download_->geometry().bottomRight());
 }
 
 QPoint NaviBar::inprivateBtnPos() const
@@ -328,14 +343,27 @@ void NaviBar::inpWndCntChanged()
     }
 }
 
-void NaviBar::onHistoryPopupVisibleChange(bool visible)
+void NaviBar::onToolWndVisibleChanged(ToolWndType type, bool visible)
 {
-    btn_history_->setChecked(visible);
-}
-
-void NaviBar::onUserInfoPopupVisibleChange(bool visible)
-{
-    btn_user_->setChecked(visible);
+    switch (type) {
+    case ToolWndType::AddFavorite:
+        address_bar_->updateBtnState(visible);
+        break;
+    case ToolWndType::Favorite:
+        btn_favorites_->setChecked(visible);
+        break;
+    case ToolWndType::History:
+        btn_history_->setChecked(visible);
+        break;
+    case ToolWndType::Download:
+        btn_download_->setChecked(visible);
+        break;
+    case ToolWndType::UserInfo:
+        btn_user_->setChecked(visible);
+        break;
+    default:
+        break;
+    }
 }
 
 void NaviBar::paintEvent(QPaintEvent *event)
@@ -362,6 +390,11 @@ void NaviBar::initSignals()
         auto rect = address_bar_->gGeometryBtnSiteInfo();
         emit naviBarCmd(NaviBarCmd::ViewSiteInfo, rect.bottomLeft());
     });
+    connect(address_bar_, &AddressBar::addFavorite, this, [this]()
+    {
+        auto rect = address_bar_->gGeometryBtnAddBkmk();
+        emit naviBarCmd(NaviBarCmd::AddFavorite, rect.bottomRight());
+    });
     connect(address_bar_, &AddressBar::showZoomBar, this, [this]()
     {
         auto rect = address_bar_->gGeometryBtnZoom();
@@ -387,9 +420,9 @@ void NaviBar::initSignals()
     {
         emit naviBarCmd(NaviBarCmd::StopLoading, QVariant());
     });
-    connect(btn_bookmarks_, &QToolButton::clicked, this, [this]()
+    connect(btn_favorites_, &QToolButton::clicked, this, [this]()
     {
-        auto pos = mapToGlobal(btn_bookmarks_->geometry().bottomRight());
+        auto pos = mapToGlobal(btn_favorites_->geometry().bottomRight());
         emit naviBarCmd(NaviBarCmd::Favorite, pos);
     });
     connect(btn_history_, &QToolButton::clicked, this, [this]()
@@ -524,7 +557,7 @@ void NaviBar::setAppearance()
     btn_stop_->setIcon(QIcon(":/icons/resources/newIcons/delete_64px_1128279_easyicon.net.png"));
     btn_forward_->setIcon(QIcon(":/icons/resources/newIcons/forward_64px_1128288_easyicon.net.png"));
     btn_home_->setIcon(QIcon(":/icons/resources/newIcons/home_80px.png"));
-    btn_bookmarks_->setIcon(QIcon(":/icons/resources/newIcons/mark_as_favorite_128px.png"));
+    btn_favorites_->setIcon(QIcon(":/icons/resources/newIcons/mark_as_favorite_128px.png"));
     btn_history_->setIcon(QIcon(":/icons/resources/newIcons/history2.png"));
     btn_download_->setIcon(QIcon(":/icons/resources/newIcons/downloads_48px.png"));
     btn_capture_->setIcon(QIcon(":/icons/resources/newIcons/screenshot_64px.png"));
@@ -544,6 +577,6 @@ void NaviBar::setAppearance()
         }
     }
 
-//    btn_inprivate_->setMinimumSize(btnSize);
+    //    btn_inprivate_->setMinimumSize(btnSize);
     btn_inprivate_->setIconSize(iconSize);
 }

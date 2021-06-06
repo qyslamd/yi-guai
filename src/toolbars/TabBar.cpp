@@ -8,6 +8,7 @@
 #include <QToolButton>
 #include <QGraphicsBlurEffect>
 #include <QChildEvent>
+#include <QAbstractButton>
 
 TabBar::TabBar(bool inprivate, QWidget *parent)
     : QTabBar(parent)
@@ -133,6 +134,10 @@ void TabBar::tabInserted(int index)
     auto closeBtn = tabButton(index, QTabBar::RightSide);
     if(closeBtn){
         closeBtn->setMinimumSize(20, 20);
+//        if(auto btn = qobject_cast<QAbstractButton *>(closeBtn)){
+//            qInfo()<<__FUNCTION__<<btn;
+//            btn->setIconSize(QSize(16,16));
+//        }
     }
 }
 

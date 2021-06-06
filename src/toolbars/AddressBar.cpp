@@ -47,6 +47,15 @@ QRect AddressBar::gGeometryBtnSiteInfo() const
                  btn_site_info_->height());
 }
 
+QRect AddressBar::gGeometryBtnAddBkmk() const
+{
+    auto pos = mapToGlobal(btn_add_favorite_->pos());
+    return QRect(pos.x(),
+                 pos.y(),
+                 btn_add_favorite_->width(),
+                 btn_add_favorite_->height());
+}
+
 QRect AddressBar::gGeometryBtnZoom() const
 {
     auto pos = mapToGlobal(btn_zoom_hint_->pos());
@@ -61,10 +70,10 @@ void AddressBar::setInprivate(bool inprivate)
     inprivate_ = inprivate;
     if(!inprivate){
         btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/alert_circle_64px.png"));
-        btn_mark_site_->setIcon(QIcon(":/icons/resources/imgs/star_64px.png"));
+        btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_64px.png"));
     }else{
         btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/info_white_48px.png"));
-        btn_mark_site_->setIcon(QIcon(":/icons/resources/imgs/star_white_48px.png"));
+        btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_white_48px.png"));
         btn_zoom_hint_->setIcon(QIcon(":/icons/resources/imgs/zoom_in_white_48px.png"));
     }
 }
@@ -94,14 +103,17 @@ void AddressBar::initUi()
 
     btn_zoom_hint_ = new QToolButton;
     connect(btn_zoom_hint_, &QToolButton::clicked, this, &AddressBar::showZoomBar);
-    btn_mark_site_ = new QToolButton;
-    btn_mark_site_->setToolTip(tr("mark to favorite"));
-    btn_mark_site_->setIcon(QIcon(":/icons/resources/imgs/star_64px.png"));
+    btn_add_favorite_ = new QToolButton;
+    btn_add_favorite_->setCheckable(true);
+    btn_add_favorite_->setIconSize(QSize(18,18));
+    btn_add_favorite_->setToolTip(tr("mark to favorite"));
+    btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_64px.png"));
+    connect(btn_add_favorite_, &QToolButton::clicked, this, &AddressBar::addFavorite);
 
     layout_->addWidget(btn_site_info_);
     layout_->addWidget(line_edit_addr_);
     layout_->addWidget(btn_zoom_hint_);
-    layout_->addWidget(btn_mark_site_);
+    layout_->addWidget(btn_add_favorite_);
     setLayout(layout_);
 
     setFocusProxy(line_edit_addr_);
@@ -136,6 +148,11 @@ void AddressBar::setZoomLevelValue(double value)
     }
     auto zoomLevel = CefManager::Instance().zoom_map.value(static_cast<int>(value));
     btn_zoom_hint_->setToolTip(tr("zoomlevel:%1").arg(zoomLevel));
+}
+
+void AddressBar::updateBtnState(bool checked)
+{
+    btn_add_favorite_->setChecked(checked);
 }
 
 void AddressBar::setText(const QString &text)

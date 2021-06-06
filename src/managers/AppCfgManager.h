@@ -22,6 +22,9 @@ public:
     static QByteArray devToolGeometry();
     static void setDevToolGeometry(const QByteArray &data);
 
+    static bool bookmarkBarVisible();
+    static void setBookmarkBarVisible(const bool &data);
+
 public:
     static AppCfgMgr& instance(){
         static AppCfgMgr inst;

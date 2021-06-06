@@ -9,13 +9,19 @@
 #include "toolbars/NavigateBar.h"
 #include "toolbars/BookmarkBar.h"
 #include "toolbars/NotificationBar.h"
+
 #include "widgets/TabThumbnailWidget.h"
 #include "widgets/AppConfigWidget.h"
 #include "widgets/FullscnHint.h"
+#include "widgets/HistoryWidget.h"
+#include "widgets/BookmarkWidget.h"
+#include "widgets/DownloadWidget.h"
+
 #include "managers/AppCfgManager.h"
 #include "managers/CefManager.h"
 
-#include "popups/HistoryPopup.h"
+#include "popups/AddToFavoritePopup.h"
+#include "popups/PopupGeneral.h"
 #include "popups/InprivatePopup.h"
 #include "popups/UserInfoPopup.h"
 
@@ -131,13 +137,30 @@ bool MainWindow::event(QEvent *e)
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
     auto type = event->type();
-    if(obj == history_popup_){
+    if(obj == bookmark_widget_){
         if(type == QEvent::Show || type == QEvent::Hide){
-            emit historyPopupVisibleChange(history_popup_->isVisible());
+           navi_bar_->onToolWndVisibleChanged(ToolWndType::Favorite,
+                                              bookmark_widget_->isVisible());
+        }
+    }else if(obj == history_widget_){
+        if(type == QEvent::Show || type == QEvent::Hide){
+            navi_bar_->onToolWndVisibleChanged(ToolWndType::History,
+                                               history_widget_->isVisible());
+        }
+    }else if(obj == download_widget_){
+        if(type == QEvent::Show || type == QEvent::Hide){
+            navi_bar_->onToolWndVisibleChanged(ToolWndType::Download,
+                                               download_widget_->isVisible());
         }
     }else if(obj == userinfo_popup_){
         if(type == QEvent::Show || type == QEvent::Hide){
-            emit userInfoPopupVisibleChange(userinfo_popup_->isVisible());
+            navi_bar_->onToolWndVisibleChanged(ToolWndType::UserInfo,
+                                               userinfo_popup_->isVisible());
+        }
+    }else if(obj == add_favorite_popup_){
+        if(type == QEvent::Show || type == QEvent::Hide){
+            navi_bar_->onToolWndVisibleChanged(ToolWndType::AddFavorite,
+                                               add_favorite_popup_->isVisible());
         }
     }
     return QtWinFramelessWindow::eventFilter(obj, event);
@@ -292,15 +315,20 @@ void MainWindow::initUi()
 
     navi_bar_ = new NaviBar;
     navi_bar_->setInprivate(created_cfg_.is_inprivate_);
+
     bookmark_bar_ = new BookmarkBar;
+    bookmark_bar_->setMinimumHeight(32);
+
     notify_bar_ = new NotificationBar;
+    notify_bar_->setMinimumHeight(32);
+    notify_bar_->hide();
 
     widget_north_layout_->addWidget(tab_bar_);
     widget_north_layout_->addWidget(navi_bar_);
     widget_north_layout_->addWidget(bookmark_bar_);
     widget_north_layout_->addWidget(notify_bar_);
 
-    bookmark_bar_->hide();
+//    bookmark_bar_->hide();
     /*设置成自定义的 MenuBar （其实是QWidget*）*/
     layout()->setMenuBar(widget_north_);
 
@@ -312,10 +340,17 @@ void MainWindow::initUi()
 
     widget_west_ = new QWidget(this);
     widget_west_->setObjectName("mainwindow_west_widget");
+
     stack_browsers_ = new QStackedWidget;
     stack_browsers_->setLineWidth(0);
+
     widget_east_ = new QWidget(this);
     widget_east_->setObjectName("mainwindow_east_widget");
+    widget_east_->setFixedWidth(300);
+    widget_east_->hide();
+    widget_east_layout_ = new QVBoxLayout(widget_east_);
+    widget_east_layout_->setContentsMargins(0,0,0,0);
+    widget_east_layout_->setSpacing(0);
 
     /* 左（西）、中、右（东）*/
     central_area_layout_ = new QHBoxLayout;
@@ -340,20 +375,34 @@ void MainWindow::initUi()
     tab_thumbnail_anime_->setPropertyName("geometry"); // 动画要动的属性
     tab_thumbnail_anime_->setDuration(50);       // 动画持续时间
 
-    history_popup_ = new HistoryPopup(this);
-    history_popup_->resize(360, 600);
-    history_popup_->installEventFilter(this);
+    add_favorite_popup_ = new AddToFavoritePopup(this);
+    add_favorite_popup_->installEventFilter(this);
+    add_favorite_popup_->resize(340,190);
+
+    popup_history_ = new PopupGeneral(this);
+    popup_history_->resize(360,600);
+
+    history_widget_ = new HistoryWidget;
+    history_widget_->installEventFilter(this);
+    popup_history_->setWidget(history_widget_);
+
+    popup_bookmark_ = new PopupGeneral(this);
+    popup_bookmark_->resize(360,600);
+
+    bookmark_widget_ = new BookmarkWidget;
+    bookmark_widget_->installEventFilter(this);
+    popup_bookmark_->setWidget(bookmark_widget_);
+
+    popup_download_ = new PopupGeneral(this);
+    popup_download_->resize(360,600);
+
+    download_widget_ = new DownloadWidget;
+    download_widget_->installEventFilter(this);
+    popup_download_->setWidget(download_widget_);
 
     userinfo_popup_ = new UserInfoPopup(this);
     userinfo_popup_->resize(320, 360);
     userinfo_popup_->installEventFilter(this);
-
-    notify_bar_->hide();
-#if 0
-    widget_west_->setMinimumWidth(70);
-    widget_east_->setMinimumWidth(70);
-    widget_south_->setMinimumHeight(50);
-#endif
 }
 
 void MainWindow::setAppearance()
@@ -382,7 +431,7 @@ void MainWindow::initSignalSlot()
     });
     connect(tab_bar_, &TabPagesBar::showDockPage, [this]()
     {
-        AddNewPage("about:version", true);
+        // todo:
     });
     connect(tab_bar_, &TabPagesBar::testBtnClicked, [this]()
     {
@@ -394,8 +443,8 @@ void MainWindow::initSignalSlot()
     connect(this, &MainWindow::dwmColorChanged, tab_bar_, &TabPagesBar::onDwmColorChanged);
 #endif
     connect(navi_bar_, &NaviBar::naviBarCmd, this, &MainWindow::onNaviBarCmd);
-    connect(this, &MainWindow::historyPopupVisibleChange, navi_bar_, &NaviBar::onHistoryPopupVisibleChange);
-    connect(this, &MainWindow::userInfoPopupVisibleChange, navi_bar_, &NaviBar::onUserInfoPopupVisibleChange);
+    connect(history_widget_, &HistoryWidget::pinOrCloseClicked, this, &MainWindow::onPinOrCloseHistoryWidget);
+    connect(bookmark_widget_, &BookmarkWidget::pinOrCloseClicked, this, &MainWindow::onPinOrCloseBookmarkWidget);
 }
 
 void MainWindow::initPage(Page *page)
@@ -571,19 +620,22 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
             page->showSiteInfomation(para.toPoint());
         }
         break;
+    case NaviBarCmd::AddFavorite:
+        onAddFavorite();
+        break;
     case NaviBarCmd::ShowZoomBar:
         if(page){
             page->showZoomBar(para.toPoint());
         }
         break;
     case NaviBarCmd::Favorite:
-
+        onShowBookmark();
         break;
     case NaviBarCmd::History:
         onShowHistory();
         break;
     case NaviBarCmd::Download:
-
+        onShowDownload();
         break;
     case NaviBarCmd::Inprivate:
         onShowInprivate();
@@ -929,9 +981,16 @@ void MainWindow::onBrowserShortcut(const CefKeyEvent &event,
             && event.windows_key_code == 'H'){
         onShowHistory();
     }
-
+    // Ctrl + J
+    // 查看下载
+    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == 'J'
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        onShowDownload();
+    }
     // Ctrl + W
-    // 查看历史记录
+    // 关闭当前标签页
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'W'
             && event.type == KEYEVENT_RAWKEYDOWN)
@@ -947,6 +1006,33 @@ void MainWindow::onBrowserShortcut(const CefKeyEvent &event,
     {
         onTabSwitch();
     }
+}
+
+void MainWindow::onPinOrCloseHistoryWidget()
+{
+    auto parentW = history_widget_->parentWidget();
+    if(parentW == popup_history_->contentFrame()){
+        // pin to right
+        popup_history_->hide();
+        widget_east_layout_->addWidget(history_widget_);
+        history_widget_->show();
+        widget_east_->show();
+
+        history_widget_->onShowModeChanged(ToolWndShowMode::Dock);
+    }
+    else if(parentW == widget_east_){
+        // close
+        popup_history_->setWidget(history_widget_);
+        widget_east_->hide();
+        history_widget_->onShowModeChanged(ToolWndShowMode::Popup);
+    }else{
+        qInfo()<<__FUNCTION__<<"layout error!";
+    }
+}
+
+void MainWindow::onPinOrCloseBookmarkWidget()
+{
+
 }
 
 void MainWindow::onGoBack()
@@ -979,6 +1065,16 @@ void MainWindow::onRefresh()
     if(page){
         page->getBrowserWidget()->Refresh();
     }
+}
+
+void MainWindow::onAddFavorite()
+{
+    auto pos = navi_bar_->addBkmkBtnPos();
+    pos.ry() += 2;
+    pos.rx() -= add_favorite_popup_->width();
+    pos.rx() += add_favorite_popup_->shadowRightWidth();
+    add_favorite_popup_->move(pos);
+    add_favorite_popup_->setVisible(!add_favorite_popup_->isVisible());
 }
 
 void MainWindow::onZoomOut()
@@ -1028,12 +1124,42 @@ void MainWindow::onDevTool()
 
 void MainWindow::onShowHistory()
 {
-    auto pos = navi_bar_->hisrotyBtnPos();
+    auto parentW = history_widget_->parentWidget();
+    if(parentW == popup_history_->contentFrame()){
+        auto pos = navi_bar_->historyBtnPos();
+        pos.ry() += 2;
+        pos.rx() -= popup_history_->width();
+        pos.rx() += popup_history_->shadowRightWidth();
+        popup_history_->move(pos);
+        popup_history_->setVisible(!popup_history_->isVisible());
+    }
+    else if(parentW == widget_east_){
+        history_widget_->onShowModeChanged(ToolWndShowMode::Popup);
+        popup_history_->setWidget(history_widget_);
+        widget_east_->hide();
+    }else{
+        qInfo()<<__FUNCTION__<<"layout error!";
+    }
+}
+
+void MainWindow::onShowBookmark()
+{
+    auto pos = navi_bar_->bookmarkBtnPos();
     pos.ry() += 2;
-    pos.rx() -= history_popup_->width();
-    pos.rx() += history_popup_->shadowRightWidth();
-    history_popup_->move(pos);
-    history_popup_->setVisible(!history_popup_->isVisible());
+    pos.rx() -= popup_bookmark_->width();
+    pos.rx() += popup_bookmark_->shadowRightWidth();
+    popup_bookmark_->move(pos);
+    popup_bookmark_->setVisible(!popup_bookmark_->isVisible());
+}
+
+void MainWindow::onShowDownload()
+{
+    auto pos = navi_bar_->downloadBtnPos();
+    pos.ry() += 2;
+    pos.rx() -= popup_download_->width();
+    pos.rx() += popup_download_->shadowRightWidth();
+    popup_download_->move(pos);
+    popup_download_->setVisible(!popup_download_->isVisible());
 }
 
 void MainWindow::onShowInprivate()

@@ -546,6 +546,13 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
     {
         is_shortcut_and_need_to_be_done = true;
     }
+    // Ctrl + J
+    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
+            && event.windows_key_code == 'J'
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
     // Ctrl + W
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'W'

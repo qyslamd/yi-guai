@@ -59,9 +59,10 @@ void VerticalTabbarStyle::drawControl(QStyle::ControlElement element,
             p->restore();
         }
     }else if(element == CE_TabBarTabLabel){
+        static const int leftSpacing = 8;
         auto rect = tabOpt->rect;
         auto size = tabOpt->iconSize;
-        QRect iconRect(rect.x() + size.width() / 2,
+        QRect iconRect(rect.x() + leftSpacing,
                       rect.y() + (rect.height()-size.height()) / 2,
                       size.width(),
                       size.height()
@@ -85,17 +86,17 @@ QRect VerticalTabbarStyle::subElementRect(SubElement subElement,
     {
        auto rect = QProxyStyle::subElementRect(subElement, option, widget);
        return QRect(tabOpt->rect.x() + tabOpt->rect.width() - rect.width() - 8,
-                    rect.y(),
+                    rect.y() + (rect.height()-rect.width()) / 2,
                     rect.width(),
                     rect.height());
     }
     case QStyle::SE_TabBarScrollLeftButton:
     {
-        auto rect = QProxyStyle::subElementRect(subElement, option, widget);
-        return QRect(widget->rect().x() + (widget->rect().width() - rect.width()) / 2,
-                     rect.y(),
-                     16,
-                     16);
+//        auto rect = QProxyStyle::subElementRect(subElement, option, widget);
+//        return QRect(widget->rect().x() + (widget->rect().width() - rect.width()) / 2,
+//                     rect.y(),
+//                     16,
+//                     16);
         return QProxyStyle::subElementRect(subElement, option, widget);
     }
     default:

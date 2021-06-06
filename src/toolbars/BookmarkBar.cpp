@@ -6,7 +6,7 @@
 BookmarkBar::BookmarkBar(QWidget *parent)
     : QFrame(parent)
 {
-    setMinimumHeight(30);
+
 }
 
 void BookmarkBar::paintEvent(QPaintEvent *event)

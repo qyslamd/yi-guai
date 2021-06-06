@@ -7,13 +7,18 @@ QWidget#mainwindow_north_widget{
 background-color:#A3C6DA;
 }
 
+QWidget#mainwindow_east_widget{
+background-color:white;
+}
+
+
 QToolButton{
 border:none;
 border-radius:4px;
 }
 
 QToolButton:hover{
-background-color:#DCDCDC;
+background-color:rgba(	169,169,169, 30%);
 }
 
 QToolButton:open{
@@ -85,7 +90,7 @@ border:none;
 .AddressBar > QToolButton{
 border:none;
 border-radius:4px;
-padding:6px;
+padding:4px;
 }
 .AddressBar > QToolButton:hover{
 background-color:rgba(192,192,192,100);
@@ -159,4 +164,24 @@ padding:6px;
 }
 QPushButton#InprivateCloseBtn:hover{
 background-color:#1C7CC5;
+}
+
+
+QMenu#BkmkWidgetMoreOptionMenu{
+background-color: #ffffff;
+border: 2px solid #e8e8e8;
+border-radius: 6px;
+border-bottom-right-radius:0px;
+}
+QMenu#BkmkWidgetMoreOptionMenu::item {
+background-color: transparent;
+ /* padding: top right bottom left*/
+padding: 8px;
+}
+QMenu#BkmkWidgetMoreOptionMenu::icon{
+padding-left: 15px;
+}
+QMenu#BkmkWidgetMoreOptionMenu::item:selected:enabled  {
+color:black;
+background-color: #EEEEEE;
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>HistoryPopup</class>
- <widget class="QWidget" name="HistoryPopup">
+ <class>HistoryWidget</class>
+ <widget class="QWidget" name="HistoryWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -14,6 +14,21 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="styleSheet">
@@ -197,7 +212,7 @@ QToolButton::menu-indicator{
             </property>
             <property name="icon">
              <iconset resource="../resource.qrc">
-              <normaloff>:/icons/resources/imgs/search_64px.png</normaloff>:/icons/resources/imgs/search_64px.png</iconset>
+              <normaloff>:/icons/resources/imgs/search2_64px.png</normaloff>:/icons/resources/imgs/search2_64px.png</iconset>
             </property>
             <property name="iconSize">
              <size>

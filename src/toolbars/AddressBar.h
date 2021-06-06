@@ -22,13 +22,16 @@ public:
     QString text();
 
     QRect gGeometryBtnSiteInfo() const;
+    QRect gGeometryBtnAddBkmk() const;
     QRect gGeometryBtnZoom() const;
     void setInprivate(bool inprivate);
     void setZoomLevelValue(double str);
+
+    void updateBtnState(bool checked);
 signals:
     void viewSiteInfo();
     void showZoomBar();
-    void markSite();
+    void addFavorite();
     void returnPressed();
 private:
     QCompleter *completer_ = nullptr;
@@ -38,7 +41,7 @@ private:
     QLineEdit *line_edit_addr_ = nullptr;
     QToolButton *btn_zoom_hint_ = nullptr;
     QToolButton *btn_find_hint_ = nullptr;
-    QToolButton *btn_mark_site_ = nullptr;
+    QToolButton *btn_add_favorite_ = nullptr;
 
     bool inprivate_ = false;
     double zoom_value_ = 0.0;

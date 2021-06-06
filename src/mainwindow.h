@@ -22,7 +22,11 @@ class QStackedWidget;
 class QStatusBar;
 class Page;
 class Tab_Thumbnail_Widget;
-class HistoryPopup;
+class AddToFavoritePopup;
+class BookmarkWidget;
+class HistoryWidget;
+class DownloadWidget;
+class PopupGeneral;
 class UserInfoPopup;
 class InprivatePopup;
 class AppCfgWidget;
@@ -46,8 +50,6 @@ public:
 
 signals:
     void windowStateChanged(Qt::WindowStates state, const QVariant &data);
-    void historyPopupVisibleChange(bool visible);
-    void userInfoPopupVisibleChange(bool visible);
 #ifdef Q_OS_WIN
     void dwmColorChanged();
 #endif
@@ -91,12 +93,23 @@ private:
     QWidget *widget_west_ = nullptr;
     QWidget *widget_south_ = nullptr;
     QWidget *widget_east_ = nullptr;
+    QVBoxLayout *widget_east_layout_ = nullptr;
 
     QStackedWidget *stack_browsers_ = nullptr;    /*浏览器窗口栈*/
     Tab_Thumbnail_Widget *tab_thumbnail_ = nullptr; /*标签页预览窗口*/
     QPropertyAnimation *tab_thumbnail_anime_ = nullptr;   /* tab预览窗口移动动画*/
 
-    HistoryPopup *history_popup_ = nullptr; /*历史记录 popup*/
+    AddToFavoritePopup *add_favorite_popup_;    /*添加书签 popup*/
+
+    PopupGeneral *popup_history_ = nullptr;
+    HistoryWidget *history_widget_ = nullptr;   /*历史记录widget*/
+
+    PopupGeneral *popup_bookmark_ = nullptr;
+    BookmarkWidget *bookmark_widget_ = nullptr;   /*书签 widget*/
+
+    PopupGeneral *popup_download_ = nullptr;
+    DownloadWidget *download_widget_ = nullptr;   /*下载 widget*/
+
     static InprivatePopup *gInprivatePopup; /*隐私窗口 popup*/
     UserInfoPopup *userinfo_popup_ = nullptr; /*用户信息 popup*/
     static AppCfgWidget *gAppCfgWidget;
@@ -126,12 +139,15 @@ private slots:
     void onShowTabThumnail(const QPoint &g_pos, const int index);
     void onBrowserShortcut(const CefKeyEvent &event,
                            CefEventHandle os_event);
+    void onPinOrCloseHistoryWidget();
+    void onPinOrCloseBookmarkWidget();
 
 private:
     void onGoBack();
     void onGoForward();
     void onHomepage();
     void onRefresh();
+    void onAddFavorite();
     void onZoomOut();
     void onZoomReset();
     void onZoomIn();
@@ -139,6 +155,8 @@ private:
     void onFullScreen();
     void onDevTool();
     void onShowHistory();
+    void onShowBookmark();
+    void onShowDownload();
     void onShowInprivate();
     void onShowUser();
     void onPrint();

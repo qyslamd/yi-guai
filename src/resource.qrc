@@ -110,6 +110,11 @@
         <file>resources/imgs/forward_64px.png</file>
         <file>resources/imgs/lock_100px.png</file>
         <file>resources/imgs/certificate_48px.png</file>
+        <file>resources/imgs/plus_48px.png</file>
+        <file>resources/imgs/add_folder_60px.png</file>
+        <file>resources/imgs/add_to_favorites_52px.png</file>
+        <file>resources/imgs/more_60px.png</file>
+        <file>resources/imgs/folder_48px.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file>resources/styles/normal.qss</file>

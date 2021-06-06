@@ -26,6 +26,7 @@ enum class NaviBarCmd {
     Refresh,
     StopLoading,
     ViewSiteInfo,
+    AddFavorite,
     ShowZoomBar,
     Favorite,
     History,
@@ -50,6 +51,26 @@ enum class NaviBarCmd {
     AboutQt,
     AboutCef,
     QuitApp
+};
+
+enum class ToolWndType
+{
+    None,
+    AddFavorite,
+    Favorite,
+    History,
+    Download,
+    UserInfo,
+};
+
+enum class BookmarkCmd{
+    None,
+    Open,
+    OpenInNewPage,
+    OpenInNewWnd,
+    OpenInInprivate,
+    Changed,
+    BkmkBarVisibleChanged,
 };
 
 ///
@@ -80,5 +101,11 @@ typedef enum class SiteSecurityLevel{
     File,
     LocalScheme
 }SecurityLevel;
+
+enum class ToolWndShowMode{
+    None,
+    Popup,
+    Dock
+} ;
 
 #endif // GLOBALDEF_H

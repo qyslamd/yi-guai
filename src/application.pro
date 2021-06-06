@@ -33,9 +33,10 @@ SOURCES += \
     managers/MainWindowManager.cpp \
     page.cpp \
     popup.cpp \
-    popups/HistoryPopup.cpp \
+    popups/AddToFavoritePopup.cpp \
     popups/InprivatePopup.cpp \
     popups/PopupBase.cpp \
+    popups/PopupGeneral.cpp \
     popups/SiteInfoPopup.cpp \
     popups/UserInfoPopup.cpp \
     popups/ZoomPopup.cpp \
@@ -62,7 +63,10 @@ SOURCES += \
     utils/util_qt.cpp \
     utils/util_win.cc \
     widgets/AppConfigWidget.cpp \
+    widgets/BookmarkWidget.cpp \
+    widgets/DownloadWidget.cpp \
     widgets/FramelessWidget.cpp \
+    widgets/HistoryWidget.cpp \
     widgets/FullscnHint.cpp \
     widgets/QtWinFrameless.cpp \
     widgets/TabThumbnailWidget.cpp
@@ -80,9 +84,10 @@ HEADERS += \
     managers/MainWindowManager.h \
     page.h \
     popup.h \
-    popups/HistoryPopup.h \
+    popups/AddToFavoritePopup.h \
     popups/InprivatePopup.h \
     popups/PopupBase.h \
+    popups/PopupGeneral.h \
     popups/SiteInfoPopup.h \
     popups/UserInfoPopup.h \
     popups/ZoomPopup.h \
@@ -107,6 +112,9 @@ HEADERS += \
     mainwindow.h \
     utils/util_qt.h \
     utils/util_win.h \
+    widgets/BookmarkWidget.h \
+    widgets/DownloadWidget.h \
+    widgets/HistoryWidget.h \
     widgets/FullscnHint.h \
     widgets/QtWinFrameless.h \
     widgets/TabThumbnailWidget.h \
@@ -116,14 +124,17 @@ HEADERS += \
 FORMS += \
     dialogs/alertdialog.ui \
     popup.ui \
+    popups/AddToFavoritePopup.ui \
     popups/InprivatePopup.ui \
-    popups/HistoryPopup.ui \
     popups/PopupBase.ui \
     popups/SiteInfoPopup.ui \
     popups/UserInfoPopup.ui \
     popups/ZoomPopup.ui \
     test/test.ui \
     toolbars/NotificationBar.ui \
+    widgets/BookmarkWidget.ui \
+    widgets/DownloadWidget.ui \
+    widgets/HistoryWidget.ui \
     widgets/FullscnHint.ui \
     widgets/TabThumbnailWidget.ui \
     widgets/AppConfigWidget.ui

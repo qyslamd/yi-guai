@@ -96,6 +96,11 @@ void TabPagesBar::onDwmColorChanged()
 #endif
 }
 
+void TabPagesBar::paintEvent(QPaintEvent *event)
+{
+    CaptionFrame::paintEvent(event);
+}
+
 void TabPagesBar::initUi()
 {
     QColor activeColor(0x609DBF), inActiveColor = activeColor;    // CECECE E8E8E8
@@ -114,7 +119,6 @@ void TabPagesBar::initUi()
     }
     setStyleSheet(QString(
                 ".TabPagesBar{"
-                "border-top:1px solid #404142;"
                 "background-color:%1;"
                 "}"
                 ".TabPagesBar:!active{"
@@ -144,7 +148,7 @@ void TabPagesBar::initUi()
     btn_dock_tabs_->setIconSize(iconSize);
     btn_add_page_->setIconSize(iconSize);
     btn_dock_tabs_->setIcon(QIcon(":/icons/resources/imgs/normal_pagelist_hide.png"));
-    btn_add_page_->setIcon(QIcon(":/icons/resources/newIcons/add_60px.png"));
+    btn_add_page_->setIcon(QIcon(":/icons/resources/imgs/plus_48px.png"));
 
     connect(tab_bar_, &TabBar::currentChanged, this, &TabPagesBar::currentChanged);
     connect(tab_bar_, &TabBar::tabCloseRequested, this, &TabPagesBar::tabCloseRequested);
@@ -154,6 +158,7 @@ void TabPagesBar::initUi()
 
     connect(btn_add_page_, &QToolButton::clicked, this, &TabPagesBar::addPage);
     connect(btn_dock_tabs_, &QToolButton::clicked, this, &TabPagesBar::showDockPage);
+    btn_dock_tabs_->hide();
 }
 
 CaptionFrame::CaptionFrame(QWidget *parent)

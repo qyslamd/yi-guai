@@ -26,7 +26,10 @@ public:
     void setFocus(bool focus);
     bool eventFilter(QObject *obj, QEvent *ev) override;
 
-    QPoint hisrotyBtnPos() const;
+    QPoint addBkmkBtnPos() const;
+    QPoint historyBtnPos() const;
+    QPoint bookmarkBtnPos() const;
+    QPoint downloadBtnPos() const;
     QPoint inprivateBtnPos() const;
     QPoint userBtnPos() const;
     QPoint zoomBtnPos() const;
@@ -35,37 +38,36 @@ public:
 signals:
     void naviBarCmd(NaviBarCmd cmd, const QVariant &para);
 public slots:
-    void onHistoryPopupVisibleChange(bool visible);
-    void onUserInfoPopupVisibleChange(bool visible);
+    void onToolWndVisibleChanged(ToolWndType type, bool visible);
 protected:
     void paintEvent(QPaintEvent *event) override;
 private:
     QHBoxLayout *layout_;
 
-    QToolButton *btn_back_,
-    *btn_refresh_,
-    *btn_stop_,
-    *btn_forward_,
-    *btn_home_,
-    *btn_bookmarks_,
-    *btn_history_,
-    *btn_download_,
-    *btn_capture_;
+    QToolButton *btn_back_;
+    QToolButton *btn_refresh_;
+    QToolButton *btn_stop_;
+    QToolButton *btn_forward_;
+    QToolButton *btn_home_;
+    QToolButton *btn_favorites_;
+    QToolButton *btn_history_;
+    QToolButton *btn_download_;
+    QToolButton *btn_capture_;
     QPushButton *btn_inprivate_;
     QToolButton *btn_user_;
     QToolButton *btn_more_options_;
 
     AddressBar *address_bar_;
-    QFrame *frame_extensions_,
-    *frame_tools_;
+    QFrame *frame_extensions_;
+    QFrame *frame_tools_;
 
-    QMenu *menu_more_options_ = nullptr,
-    *menu_more_tools_ = nullptr,
-    *menu_help_ = nullptr;
+    QMenu *menu_more_options_ = nullptr;
+    QMenu *menu_more_tools_ = nullptr;
+    QMenu *menu_help_ = nullptr;
 
     QAction *action_new_tab_ = nullptr;
-    QAction * action_new_window_,
-    *action_new_inprivate_window_;
+    QAction * action_new_window_;
+    QAction *action_new_inprivate_window_;
 
     QWidgetAction *action_zoom_;
     QFrame *frame_zoom_bar_;
