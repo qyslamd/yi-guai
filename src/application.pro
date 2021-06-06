@@ -33,7 +33,6 @@ SOURCES += \
     managers/MainWindowManager.cpp \
     page.cpp \
     popup.cpp \
-    popups/HistoryPopup.cpp \
     popups/InprivatePopup.cpp \
     popups/PopupBase.cpp \
     popups/SiteInfoPopup.cpp \
@@ -63,6 +62,7 @@ SOURCES += \
     utils/util_win.cc \
     widgets/AppConfigWidget.cpp \
     widgets/FramelessWidget.cpp \
+    widgets/HistoryWidget.cpp \
     widgets/FullscnHint.cpp \
     widgets/QtWinFrameless.cpp \
     widgets/TabThumbnailWidget.cpp
@@ -80,7 +80,6 @@ HEADERS += \
     managers/MainWindowManager.h \
     page.h \
     popup.h \
-    popups/HistoryPopup.h \
     popups/InprivatePopup.h \
     popups/PopupBase.h \
     popups/SiteInfoPopup.h \
@@ -107,6 +106,7 @@ HEADERS += \
     mainwindow.h \
     utils/util_qt.h \
     utils/util_win.h \
+    widgets/HistoryWidget.h \
     widgets/FullscnHint.h \
     widgets/QtWinFrameless.h \
     widgets/TabThumbnailWidget.h \
@@ -117,13 +117,13 @@ FORMS += \
     dialogs/alertdialog.ui \
     popup.ui \
     popups/InprivatePopup.ui \
-    popups/HistoryPopup.ui \
     popups/PopupBase.ui \
     popups/SiteInfoPopup.ui \
     popups/UserInfoPopup.ui \
     popups/ZoomPopup.ui \
     test/test.ui \
     toolbars/NotificationBar.ui \
+    widgets/HistoryWidget.ui \
     widgets/FullscnHint.ui \
     widgets/TabThumbnailWidget.ui \
     widgets/AppConfigWidget.ui

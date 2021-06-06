@@ -154,6 +154,7 @@ void TabPagesBar::initUi()
 
     connect(btn_add_page_, &QToolButton::clicked, this, &TabPagesBar::addPage);
     connect(btn_dock_tabs_, &QToolButton::clicked, this, &TabPagesBar::showDockPage);
+    btn_dock_tabs_->hide();
 }
 
 CaptionFrame::CaptionFrame(QWidget *parent)

@@ -22,7 +22,8 @@ class QStackedWidget;
 class QStatusBar;
 class Page;
 class Tab_Thumbnail_Widget;
-class HistoryPopup;
+class PopupBase;
+class HistoryWidget;
 class UserInfoPopup;
 class InprivatePopup;
 class AppCfgWidget;
@@ -91,12 +92,16 @@ private:
     QWidget *widget_west_ = nullptr;
     QWidget *widget_south_ = nullptr;
     QWidget *widget_east_ = nullptr;
+    QVBoxLayout *widget_east_layout_ = nullptr;
 
     QStackedWidget *stack_browsers_ = nullptr;    /*浏览器窗口栈*/
     Tab_Thumbnail_Widget *tab_thumbnail_ = nullptr; /*标签页预览窗口*/
     QPropertyAnimation *tab_thumbnail_anime_ = nullptr;   /* tab预览窗口移动动画*/
 
-    HistoryPopup *history_popup_ = nullptr; /*历史记录 popup*/
+    PopupBase *popup_history_ = nullptr;    /*历史记录 popup*/
+    HistoryWidget *history_widget_ = nullptr;   /*历史记录widget*/
+    PopupBase *popup_bookmark_ = nullptr;    /*书签 popup*/
+
     static InprivatePopup *gInprivatePopup; /*隐私窗口 popup*/
     UserInfoPopup *userinfo_popup_ = nullptr; /*用户信息 popup*/
     static AppCfgWidget *gAppCfgWidget;
@@ -126,6 +131,7 @@ private slots:
     void onShowTabThumnail(const QPoint &g_pos, const int index);
     void onBrowserShortcut(const CefKeyEvent &event,
                            CefEventHandle os_event);
+    void onPinOrCloseHistoryWidget();
 
 private:
     void onGoBack();

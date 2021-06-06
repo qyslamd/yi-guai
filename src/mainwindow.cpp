@@ -9,13 +9,15 @@
 #include "toolbars/NavigateBar.h"
 #include "toolbars/BookmarkBar.h"
 #include "toolbars/NotificationBar.h"
+
 #include "widgets/TabThumbnailWidget.h"
 #include "widgets/AppConfigWidget.h"
 #include "widgets/FullscnHint.h"
+#include "widgets/HistoryWidget.h"
+
 #include "managers/AppCfgManager.h"
 #include "managers/CefManager.h"
 
-#include "popups/HistoryPopup.h"
 #include "popups/InprivatePopup.h"
 #include "popups/UserInfoPopup.h"
 
@@ -131,9 +133,9 @@ bool MainWindow::event(QEvent *e)
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
     auto type = event->type();
-    if(obj == history_popup_){
+    if(obj == history_widget_){
         if(type == QEvent::Show || type == QEvent::Hide){
-            emit historyPopupVisibleChange(history_popup_->isVisible());
+            emit historyPopupVisibleChange(history_widget_->isVisible());
         }
     }else if(obj == userinfo_popup_){
         if(type == QEvent::Show || type == QEvent::Hide){
@@ -312,10 +314,17 @@ void MainWindow::initUi()
 
     widget_west_ = new QWidget(this);
     widget_west_->setObjectName("mainwindow_west_widget");
+
     stack_browsers_ = new QStackedWidget;
     stack_browsers_->setLineWidth(0);
+
     widget_east_ = new QWidget(this);
+    widget_east_->setMinimumWidth(300);
     widget_east_->setObjectName("mainwindow_east_widget");
+    widget_east_->hide();
+    widget_east_layout_ = new QVBoxLayout(widget_east_);
+    widget_east_layout_->setContentsMargins(0,0,0,0);
+    widget_east_layout_->setSpacing(0);
 
     /* 左（西）、中、右（东）*/
     central_area_layout_ = new QHBoxLayout;
@@ -340,9 +349,21 @@ void MainWindow::initUi()
     tab_thumbnail_anime_->setPropertyName("geometry"); // 动画要动的属性
     tab_thumbnail_anime_->setDuration(50);       // 动画持续时间
 
-    history_popup_ = new HistoryPopup(this);
-    history_popup_->resize(360, 600);
-    history_popup_->installEventFilter(this);
+    popup_history_ = new PopupBase(this);
+    popup_history_->resize(360, 600);
+    auto popupContent = popup_history_->contentFrame();
+    if(popupContent){
+        QVBoxLayout *popup_history_layout = new QVBoxLayout;
+        popup_history_layout->setContentsMargins(0,0,0,0);
+        popup_history_layout->setSpacing(0);
+        popupContent->setLayout(popup_history_layout);
+    }
+
+    history_widget_ = new HistoryWidget;
+    connect(history_widget_, &HistoryWidget::pinOrCloseClicked,
+            this, &MainWindow::onPinOrCloseHistoryWidget);
+    history_widget_->installEventFilter(this);
+    history_widget_->hide();
 
     userinfo_popup_ = new UserInfoPopup(this);
     userinfo_popup_->resize(320, 360);
@@ -949,6 +970,29 @@ void MainWindow::onBrowserShortcut(const CefKeyEvent &event,
     }
 }
 
+void MainWindow::onPinOrCloseHistoryWidget()
+{
+    auto parent = history_widget_->parentWidget();
+    auto contentWidget = popup_history_->contentFrame();
+
+    // pin
+    if(parent == contentWidget)
+    {
+        // 添加到 widget_east 的布局器中
+        widget_east_->layout()->addWidget(history_widget_);
+        history_widget_->show();
+        widget_east_->show();
+        popup_history_->hide();
+    }else if(parent == widget_east_) // close
+    {
+        // 如果是 widget_easet 的孩子，这时候点击按钮代表关闭
+        widget_east_->hide();
+    }else{
+        // 不在任何窗口中
+        history_widget_->hide();
+    }
+}
+
 void MainWindow::onGoBack()
 {
     auto page = CurrentPage();
@@ -1028,12 +1072,28 @@ void MainWindow::onDevTool()
 
 void MainWindow::onShowHistory()
 {
-    auto pos = navi_bar_->hisrotyBtnPos();
-    pos.ry() += 2;
-    pos.rx() -= history_popup_->width();
-    pos.rx() += history_popup_->shadowRightWidth();
-    history_popup_->move(pos);
-    history_popup_->setVisible(!history_popup_->isVisible());
+    auto showHistoryPopup = [this](){
+        auto pos = navi_bar_->hisrotyBtnPos();
+        pos.ry() += 2;
+        pos.rx() -= popup_history_->width();
+        pos.rx() += popup_history_->shadowRightWidth();
+        popup_history_->move(pos);
+        popup_history_->setVisible(!popup_history_->isVisible());
+    };
+    auto parent = history_widget_->parentWidget();
+    auto contentWidget = popup_history_->contentFrame();
+    if(!parent){
+        contentWidget->layout()->addWidget(history_widget_);
+        history_widget_->show();
+        showHistoryPopup();
+
+    }else if(parent == contentWidget){
+        showHistoryPopup();
+    }else if(parent == widget_east_){
+        auto layout = widget_east_->layout();
+        layout->takeAt(0);  // 从布局器中取出
+        widget_east_->hide();
+    }
 }
 
 void MainWindow::onShowInprivate()

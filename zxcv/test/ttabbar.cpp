@@ -12,11 +12,12 @@ TTabBar::TTabBar(QWidget *parent)
     setUsesScrollButtons(true);
 
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    qInfo()<<this->sizePolicy();
+//    qInfo()<<this->sizePolicy();
 }
 
 QSize TTabBar::tabSizeHint(int index) const
 {
+//    return QTabBar::tabSizeHint(index);
     if(index == 0){
         return QSize(34,34);
     }
@@ -25,5 +26,6 @@ QSize TTabBar::tabSizeHint(int index) const
 
 QSize TTabBar::minimumTabSizeHint(int index) const
 {
+//    return QTabBar::minimumTabSizeHint(index);
     return QSize(36,34);
 }
