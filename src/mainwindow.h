@@ -22,6 +22,7 @@ class QStackedWidget;
 class QStatusBar;
 class Page;
 class Tab_Thumbnail_Widget;
+
 class AddToFavoritePopup;
 class BookmarkWidget;
 class HistoryWidget;

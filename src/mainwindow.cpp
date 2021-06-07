@@ -345,6 +345,7 @@ void MainWindow::initUi()
     stack_browsers_->setLineWidth(0);
 
     widget_east_ = new QWidget(this);
+    widget_east_->setMinimumWidth(300);
     widget_east_->setObjectName("mainwindow_east_widget");
     widget_east_->setFixedWidth(300);
     widget_east_->hide();

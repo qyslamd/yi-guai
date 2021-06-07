@@ -37,4 +37,3 @@ void HistoryWidget::onShowModeChanged(ToolWndShowMode mode)
     ui->buttonPinOrClose->setIcon(icon);
     ui->buttonPinOrClose->setToolTip(tooltip);
 }
-
