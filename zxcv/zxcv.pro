@@ -1,2 +1,4 @@
 TEMPLATE = subdirs
-SUBDIRS = test
+SUBDIRS = test \
+    testList \
+	QListViewDemo
