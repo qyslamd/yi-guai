@@ -43,10 +43,7 @@ SOURCES += \
     test/test.cpp \
     toolbars/AddressBar.cpp \
     toolbars/BookmarkBar.cpp \
-    toolbars/NavigateBar.cpp \
-    toolbars/NotificationBar.cpp \
     toolbars/TabBar.cpp \
-    toolbars/TabPagesBar.cpp \
     toolbars/TabbarStyle.cpp \
     dialogs/alertdialog.cpp \
     browser/browser_window.cpp \
@@ -60,6 +57,9 @@ SOURCES += \
     browser/message_loop/main_message_loop_multithreaded_win.cc \
     browser/message_loop/main_message_loop_std.cc \
     mainwindow.cpp \
+    toolbars/navigate_toolbar.cpp \
+    toolbars/notification_toolbar.cpp \
+    toolbars/tabpage_toolbar.cpp \
     utils/util_qt.cpp \
     utils/util_win.cc \
     widgets/AppConfigWidget.cpp \
@@ -94,10 +94,7 @@ HEADERS += \
     test/test.h \
     toolbars/AddressBar.h \
     toolbars/BookmarkBar.h \
-    toolbars/NavigateBar.h \
-    toolbars/NotificationBar.h \
     toolbars/TabBar.h \
-    toolbars/TabPagesBar.h \
     toolbars/TabbarStyle.h \
     dialogs/alertdialog.h \
     browser/browser_window.h \
@@ -110,6 +107,9 @@ HEADERS += \
     browser/message_loop/main_message_loop_multithreaded_win.h \
     browser/message_loop/main_message_loop_std.h \
     mainwindow.h \
+    toolbars/navigate_toolbar.h \
+    toolbars/notification_toolbar.h \
+    toolbars/tabpage_toolbar.h \
     utils/util_qt.h \
     utils/util_win.h \
     widgets/BookmarkWidget.h \
@@ -131,7 +131,7 @@ FORMS += \
     popups/UserInfoPopup.ui \
     popups/ZoomPopup.ui \
     test/test.ui \
-    toolbars/NotificationBar.ui \
+    toolbars/notification_toolbar.ui \
     widgets/BookmarkWidget.ui \
     widgets/DownloadWidget.ui \
     widgets/HistoryWidget.ui \

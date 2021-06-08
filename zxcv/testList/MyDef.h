@@ -3,6 +3,7 @@
 
 #include <QVariant>
 #include <QString>
+#include <QPixmap>
 
 enum ItemStatus {
     S_RED,
@@ -13,6 +14,7 @@ enum ItemStatus {
 struct ItemData{
     QString name;
     QString tel;
+    QPixmap icon;
 };
 
 Q_DECLARE_METATYPE(ItemData);

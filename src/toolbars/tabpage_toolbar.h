@@ -1,5 +1,5 @@
-#ifndef TABPAGESBAR_H
-#define TABPAGESBAR_H
+#ifndef TABPAGE_TOOLBAR_H
+#define TABPAGE_TOOLBAR_H
 
 #include <QFrame>
 #include "globaldef.h"
@@ -8,13 +8,12 @@ class CaptionFrame : public QFrame
 {
     Q_OBJECT
 public:
-    CaptionFrame(QWidget *parent = nullptr);
+    explicit CaptionFrame(bool inprivate, QWidget *parent = nullptr);
 
     virtual bool event(QEvent *ev) override;
 
     int reservedWidth() const;
     QRect windowBtnRect();
-    void setInprivate(bool inprivate){inprivate_ = inprivate;}
 signals:
     void minBtnClicked();
     void normalMaxBtnClicked();
@@ -63,12 +62,12 @@ private:
 class QToolButton;
 class TabBar;
 class QHBoxLayout;
-class TabPagesBar final: public CaptionFrame
+class TabPageToolBar final: public CaptionFrame
 {
     Q_OBJECT
 public:
-    explicit TabPagesBar(bool inprivate, QWidget *parent = nullptr);
-    ~TabPagesBar();
+    explicit TabPageToolBar(bool inprivate, QWidget *parent = nullptr);
+    ~TabPageToolBar();
 
     int insertTab(int index, const QString &text);
     int count()const;
@@ -107,4 +106,4 @@ private:
     void initUi();
 };
 
-#endif // TABPAGESBAR_H
+#endif // TABPAGE_TOOLBAR_H

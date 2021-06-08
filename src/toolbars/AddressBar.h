@@ -14,7 +14,7 @@ class AddressBar final: public QFrame
 {
     Q_OBJECT
 public:
-    AddressBar(QWidget *parent = nullptr);
+    explicit AddressBar(bool inprivate = false, QWidget *parent = nullptr);
     bool eventFilter(QObject *obj, QEvent *ev) override;
 
     void setText(const QString &text);
@@ -24,7 +24,6 @@ public:
     QRect gGeometryBtnSiteInfo() const;
     QRect gGeometryBtnAddBkmk() const;
     QRect gGeometryBtnZoom() const;
-    void setInprivate(bool inprivate);
     void setZoomLevelValue(double str);
 
     void updateBtnState(bool checked);
@@ -34,6 +33,8 @@ signals:
     void addFavorite();
     void returnPressed();
 private:
+    bool inprivate_ = false;
+
     QCompleter *completer_ = nullptr;
     QStringListModel *model_ = nullptr;
     QHBoxLayout *layout_ = nullptr;
@@ -43,10 +44,10 @@ private:
     QToolButton *btn_find_hint_ = nullptr;
     QToolButton *btn_add_favorite_ = nullptr;
 
-    bool inprivate_ = false;
     double zoom_value_ = 0.0;
 
     void initUi();
+    void setIcons();
 
 private slots:
     void onEditingFinished();

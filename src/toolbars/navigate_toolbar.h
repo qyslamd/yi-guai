@@ -1,5 +1,5 @@
-#ifndef NAVIGATEBAR_H
-#define NAVIGATEBAR_H
+#ifndef NAVIGATE_TOOLBAR_H
+#define NAVIGATE_TOOLBAR_H
 
 #include <QFrame>
 #include "globaldef.h"
@@ -14,11 +14,11 @@ class QLabel;
 class QWidgetAction;
 class ZoomPopup;
 
-class NaviBar final: public QFrame
+class NavigateToolBar final: public QFrame
 {
     Q_OBJECT
 public:
-    NaviBar(QWidget *parent = nullptr);
+    explicit NavigateToolBar(bool inprivate, QWidget *parent = nullptr);
 
     void setAddress(const QString &url);
     void setLoadingState(bool isLoading, bool canGoBack, bool canGoForward);
@@ -33,7 +33,6 @@ public:
     QPoint inprivateBtnPos() const;
     QPoint userBtnPos() const;
     QPoint zoomBtnPos() const;
-    void setInprivate(bool inprivate);
     void inpWndCntChanged();
 signals:
     void naviBarCmd(NaviBarCmd cmd, const QVariant &para);
@@ -42,6 +41,7 @@ public slots:
 protected:
     void paintEvent(QPaintEvent *event) override;
 private:
+    bool inprivate_ = false;
     QHBoxLayout *layout_;
 
     QToolButton *btn_back_;
@@ -96,12 +96,9 @@ private:
     action_quit_;
 
 private:
-    bool inprivate_ = false;
-
-private:
-    void initSignals();
+    void initSignalSlot();
     void setAppearance();
 
 };
 
-#endif // NAVIGATEBAR_H
+#endif // NAVIGATE_TOOLBAR_H

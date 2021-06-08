@@ -77,7 +77,7 @@ void MainWindow::initData()
             yellowNum++;
             break;
         }
-        Item->setData(itemStatus,Qt::UserRole);  // 单一存取
+        Item->setData(QVariant::fromValue(itemStatus),Qt::UserRole);  // 单一存取
         Item->setData(QVariant::fromValue(itemData),Qt::UserRole+1);//整体存取
 
         m_model->appendRow(Item);      //追加Item

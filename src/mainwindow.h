@@ -14,8 +14,8 @@ class QFrame;
 class QVBoxLayout;
 class QHBoxLayout;
 class QToolButton;
-class TabPagesBar;
-class NaviBar;
+class TabPageToolBar;
+class NavigateToolBar;
 class BookmarkBar;
 class NotificationBar;
 class QStackedWidget;
@@ -83,8 +83,8 @@ private:
     QWidget *widget_north_ = nullptr;
     QVBoxLayout *widget_north_layout_ = nullptr;
     QMenuBar *menu_bar_ = nullptr;      /*MacOS需要菜单栏*/
-    TabPagesBar *tab_bar_ = nullptr;   /*标签栏*/
-    NaviBar *navi_bar_ = nullptr; /*导航栏*/
+    TabPageToolBar *tab_bar_ = nullptr;   /*标签栏*/
+    NavigateToolBar *navi_bar_ = nullptr; /*导航栏*/
     BookmarkBar *bookmark_bar_ = nullptr; /*书签栏*/
     NotificationBar *notify_bar_ = nullptr; /*通知栏*/
 

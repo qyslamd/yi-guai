@@ -20,7 +20,8 @@ public:
                          const QWidget *widget) const override;
 
 private:
-    void drawRectShadow(QPainter *p, const QRect &rect, const int shadowWidth) const;
+    void drawRectShadow(QPainter *p, const QRect &rect,
+                        const int shadowWidth) const;
 };
 
 #endif // VERTICALTABBARSTYLE_H

@@ -4,7 +4,7 @@ font-family:"Microsoft Yahei";
 }
 
 QWidget#mainwindow_north_widget{
-background-color:#A3C6DA;
+background-color:#F9F9FB;
 }
 
 QWidget#mainwindow_east_widget{
@@ -59,7 +59,7 @@ border:none;
 .AddressBar{
 border:none;
 border-radius:6px;
-background-color:#CADEEA;
+background-color:#F0F0F4;
 }
 .AddressBar:hover{
 border:1px solid #D2D2D2;

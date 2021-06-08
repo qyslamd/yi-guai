@@ -15,10 +15,12 @@
 #include "managers/AddrInputManager.h"
 #include "managers/CefManager.h"
 
-AddressBar::AddressBar(QWidget *parent)
+AddressBar::AddressBar(bool inprivate, QWidget *parent)
     : QFrame(parent)
+    , inprivate_(inprivate)
 {
     initUi();
+    setIcons();
 }
 
 bool AddressBar::eventFilter(QObject *obj, QEvent *ev)
@@ -63,19 +65,6 @@ QRect AddressBar::gGeometryBtnZoom() const
                  pos.y(),
                  btn_zoom_hint_->width(),
                  btn_zoom_hint_->height());
-}
-
-void AddressBar::setInprivate(bool inprivate)
-{
-    inprivate_ = inprivate;
-    if(!inprivate){
-        btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/alert_circle_64px.png"));
-        btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_64px.png"));
-    }else{
-        btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/info_white_48px.png"));
-        btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_white_48px.png"));
-        btn_zoom_hint_->setIcon(QIcon(":/icons/resources/imgs/zoom_in_white_48px.png"));
-    }
 }
 
 void AddressBar::initUi()
@@ -127,6 +116,18 @@ void AddressBar::initUi()
     connect(line_edit_addr_, &QLineEdit::editingFinished,
             this, &AddressBar::onEditingFinished);
 
+}
+
+void AddressBar::setIcons()
+{
+    if(!inprivate_){
+        btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/alert_circle_64px.png"));
+        btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_64px.png"));
+    }else{
+        btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/info_white_48px.png"));
+        btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_white_48px.png"));
+        btn_zoom_hint_->setIcon(QIcon(":/icons/resources/imgs/zoom_in_white_48px.png"));
+    }
 }
 
 void AddressBar::setZoomLevelValue(double value)

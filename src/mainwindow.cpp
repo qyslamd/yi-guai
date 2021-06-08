@@ -5,10 +5,10 @@
 #include "browser/cef_client_handler.h"
 #include "utils/util_qt.h"
 #include "utils/util_win.h"
-#include "toolbars/TabPagesBar.h"
-#include "toolbars/NavigateBar.h"
+#include "toolbars/tabpage_toolbar.h"
+#include "toolbars/navigate_toolbar.h"
 #include "toolbars/BookmarkBar.h"
-#include "toolbars/NotificationBar.h"
+#include "toolbars/notification_toolbar.h"
 
 #include "widgets/TabThumbnailWidget.h"
 #include "widgets/AppConfigWidget.h"
@@ -310,11 +310,9 @@ void MainWindow::initUi()
     widget_north_layout_->setSpacing(0);
     widget_north_->setLayout(widget_north_layout_);
 
-    tab_bar_ = new TabPagesBar(created_cfg_.is_inprivate_, this);
-    tab_bar_->setInprivate(created_cfg_.is_inprivate_);
+    tab_bar_ = new TabPageToolBar(created_cfg_.is_inprivate_, this);
 
-    navi_bar_ = new NaviBar;
-    navi_bar_->setInprivate(created_cfg_.is_inprivate_);
+    navi_bar_ = new NavigateToolBar(created_cfg_.is_inprivate_);
 
     bookmark_bar_ = new BookmarkBar;
     bookmark_bar_->setMinimumHeight(32);
@@ -419,31 +417,31 @@ void MainWindow::setAppearance()
 
 void MainWindow::initSignalSlot()
 {
-    connect(tab_bar_, &TabPagesBar::minBtnClicked, this, &MainWindow::showMinimized);
-    connect(tab_bar_, &TabPagesBar::normalMaxBtnClicked, this, &MainWindow::onNormalMax);
-    connect(tab_bar_, &TabPagesBar::closeBtnClicked, this, &MainWindow::close);
-    connect(tab_bar_, &TabPagesBar::currentChanged, this, &MainWindow::onTabBarCurrentChanged);
-    connect(tab_bar_, &TabPagesBar::tabCloseRequested,this, &MainWindow::onTabBarCloseRequested);
-    connect(tab_bar_, &TabPagesBar::tabMoved, this, &MainWindow::onTabBarTabMoved);
-    connect(tab_bar_, &TabPagesBar::showPreview, this, &MainWindow::onShowTabThumnail);
-    connect(tab_bar_, &TabPagesBar::addPage, [this]()
+    connect(tab_bar_, &TabPageToolBar::minBtnClicked, this, &MainWindow::showMinimized);
+    connect(tab_bar_, &TabPageToolBar::normalMaxBtnClicked, this, &MainWindow::onNormalMax);
+    connect(tab_bar_, &TabPageToolBar::closeBtnClicked, this, &MainWindow::close);
+    connect(tab_bar_, &TabPageToolBar::currentChanged, this, &MainWindow::onTabBarCurrentChanged);
+    connect(tab_bar_, &TabPageToolBar::tabCloseRequested,this, &MainWindow::onTabBarCloseRequested);
+    connect(tab_bar_, &TabPageToolBar::tabMoved, this, &MainWindow::onTabBarTabMoved);
+    connect(tab_bar_, &TabPageToolBar::showPreview, this, &MainWindow::onShowTabThumnail);
+    connect(tab_bar_, &TabPageToolBar::addPage, [this]()
     {
         AddNewPage("about:version", true);
     });
-    connect(tab_bar_, &TabPagesBar::showDockPage, [this]()
+    connect(tab_bar_, &TabPageToolBar::showDockPage, [this]()
     {
         // todo:
     });
-    connect(tab_bar_, &TabPagesBar::testBtnClicked, [this]()
+    connect(tab_bar_, &TabPageToolBar::testBtnClicked, [this]()
     {
         auto visible = stack_browsers_->isVisible();
         stack_browsers_->setVisible(!visible);
     });
-    connect(tab_bar_, &TabPagesBar::tabbarMenuTriggered, this, &MainWindow::onTabBarMenuTriggered);
+    connect(tab_bar_, &TabPageToolBar::tabbarMenuTriggered, this, &MainWindow::onTabBarMenuTriggered);
 #ifdef Q_OS_WIN
-    connect(this, &MainWindow::dwmColorChanged, tab_bar_, &TabPagesBar::onDwmColorChanged);
+    connect(this, &MainWindow::dwmColorChanged, tab_bar_, &TabPageToolBar::onDwmColorChanged);
 #endif
-    connect(navi_bar_, &NaviBar::naviBarCmd, this, &MainWindow::onNaviBarCmd);
+    connect(navi_bar_, &NavigateToolBar::naviBarCmd, this, &MainWindow::onNaviBarCmd);
     connect(history_widget_, &HistoryWidget::pinOrCloseClicked, this, &MainWindow::onPinOrCloseHistoryWidget);
     connect(bookmark_widget_, &BookmarkWidget::pinOrCloseClicked, this, &MainWindow::onPinOrCloseBookmarkWidget);
 }

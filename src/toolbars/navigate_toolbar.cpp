@@ -1,4 +1,4 @@
-#include "NavigateBar.h"
+#include "navigate_toolbar.h"
 #include "AddressBar.h"
 #include "utils/util_qt.h"
 #include "managers/MainWindowManager.h"
@@ -17,8 +17,9 @@
 #include <QStyle>
 #include <QTimer>
 
-NaviBar::NaviBar(QWidget *parent)
+NavigateToolBar::NavigateToolBar(bool inprivate, QWidget *parent)
     : QFrame(parent)
+    , inprivate_(inprivate)
     , layout_(new QHBoxLayout)
     , btn_back_(new QToolButton)
     , btn_refresh_(new QToolButton)
@@ -32,7 +33,7 @@ NaviBar::NaviBar(QWidget *parent)
     , btn_inprivate_(new QPushButton)
     , btn_user_(new QToolButton)
     , btn_more_options_(new QToolButton)
-    , address_bar_(new AddressBar)
+    , address_bar_(new AddressBar(inprivate))
     , frame_extensions_(new QFrame)
     , frame_tools_(new QFrame)
     , menu_more_options_(new QMenu(this))
@@ -109,8 +110,8 @@ NaviBar::NaviBar(QWidget *parent)
     layout_->addWidget(btn_more_options_);
 
     setLayout(layout_);
-    layout_->setContentsMargins(4,4,4,5);
-    layout_->setSpacing(2);
+    layout_->setContentsMargins(4,4,4,4);
+    layout_->setSpacing(1);
 
     action_new_tab_->setText(tr("create new tab page"));
     action_new_tab_->setShortcut(QKeySequence("Ctrl+T"));
@@ -230,17 +231,17 @@ NaviBar::NaviBar(QWidget *parent)
     menu_help_->addAction(action_about_cef_);
     action_helps_->setMenu(menu_help_);
 
-    initSignals();
+    initSignalSlot();
     setAppearance();
 }
 
-void NaviBar::setAddress(const QString &url)
+void NavigateToolBar::setAddress(const QString &url)
 {
     address_bar_->setText(url);
     address_bar_->setCursorPosition(0);
 }
 
-void NaviBar::setLoadingState(bool isLoading, bool canGoBack, bool canGoForward)
+void NavigateToolBar::setLoadingState(bool isLoading, bool canGoBack, bool canGoForward)
 {
     btn_back_->setEnabled(canGoBack);
     btn_forward_->setEnabled(canGoForward);
@@ -248,21 +249,21 @@ void NaviBar::setLoadingState(bool isLoading, bool canGoBack, bool canGoForward)
     btn_stop_->setVisible(isLoading);
 }
 
-void NaviBar::setZoomLevelValue(double value)
+void NavigateToolBar::setZoomLevelValue(double value)
 {
     auto zoomStr = CefManager::Instance().zoom_map.value(static_cast<int>(value));
     label_zoom_value_->setText(zoomStr);
     address_bar_->setZoomLevelValue(value);
 }
 
-void NaviBar::setFocus(bool focus)
+void NavigateToolBar::setFocus(bool focus)
 {
     if(focus){
         address_bar_->clearFocus();
     }
 }
 
-bool NaviBar::eventFilter(QObject *obj, QEvent *ev)
+bool NavigateToolBar::eventFilter(QObject *obj, QEvent *ev)
 {
     if(menu_more_options_ == obj){
         if(ev->type() == QEvent::Show){
@@ -285,53 +286,42 @@ bool NaviBar::eventFilter(QObject *obj, QEvent *ev)
     return QFrame::eventFilter(obj, ev);
 }
 
-QPoint NaviBar::addBkmkBtnPos() const
+QPoint NavigateToolBar::addBkmkBtnPos() const
 {
     return address_bar_->gGeometryBtnAddBkmk().bottomRight();
 }
 
-QPoint NaviBar::historyBtnPos() const
+QPoint NavigateToolBar::historyBtnPos() const
 {
     return mapToGlobal(btn_history_->geometry().bottomRight());
 }
 
-QPoint NaviBar::bookmarkBtnPos() const
+QPoint NavigateToolBar::bookmarkBtnPos() const
 {
     return mapToGlobal(btn_favorites_->geometry().bottomRight());
 }
 
-QPoint NaviBar::downloadBtnPos() const
+QPoint NavigateToolBar::downloadBtnPos() const
 {
     return mapToGlobal(btn_download_->geometry().bottomRight());
 }
 
-QPoint NaviBar::inprivateBtnPos() const
+QPoint NavigateToolBar::inprivateBtnPos() const
 {
     return mapToGlobal(btn_inprivate_->geometry().bottomRight());
 }
 
-QPoint NaviBar::userBtnPos() const
+QPoint NavigateToolBar::userBtnPos() const
 {
     return mapToGlobal(btn_user_->geometry().bottomRight());
 }
 
-QPoint NaviBar::zoomBtnPos() const
+QPoint NavigateToolBar::zoomBtnPos() const
 {
     return address_bar_->gGeometryBtnZoom().bottomRight();
 }
 
-void NaviBar::setInprivate(bool inprivate)
-{
-    inprivate_ = inprivate;
-    btn_inprivate_->setVisible(inprivate_);
-    btn_user_->setVisible(!inprivate_);
-    btn_history_->setVisible(!inprivate_);
-    btn_download_->setVisible(!inprivate_);
-
-    address_bar_->setInprivate(inprivate);
-}
-
-void NaviBar::inpWndCntChanged()
+void NavigateToolBar::inpWndCntChanged()
 {
     if(inprivate_){
         auto cnt = MainWndMgr::Instance().inprivateCount();
@@ -343,7 +333,7 @@ void NaviBar::inpWndCntChanged()
     }
 }
 
-void NaviBar::onToolWndVisibleChanged(ToolWndType type, bool visible)
+void NavigateToolBar::onToolWndVisibleChanged(ToolWndType type, bool visible)
 {
     switch (type) {
     case ToolWndType::AddFavorite:
@@ -366,7 +356,7 @@ void NaviBar::onToolWndVisibleChanged(ToolWndType type, bool visible)
     }
 }
 
-void NaviBar::paintEvent(QPaintEvent *event)
+void NavigateToolBar::paintEvent(QPaintEvent *event)
 {
     return QFrame::paintEvent(event);
 
@@ -379,7 +369,7 @@ void NaviBar::paintEvent(QPaintEvent *event)
     p.restore();
 }
 
-void NaviBar::initSignals()
+void NavigateToolBar::initSignalSlot()
 {
     connect(address_bar_, &AddressBar::returnPressed, this, [this]()
     {
@@ -540,31 +530,38 @@ void NaviBar::initSignals()
 
 }
 
-void NaviBar::setAppearance()
+void NavigateToolBar::setAppearance()
 {
-#if 0
-    btn_back_->setIcon(QIcon(":/icons/resources/imgs/arrow_left2_64px.png"));
-    btn_refresh_->setIcon(QIcon(":/icons/resources/imgs/reload_64px.png"));
-    btn_stop_->setIcon(QIcon(":/icons/resources/imgs/CLOSE3_64px.png"));
-    btn_forward_->setIcon(QIcon(":/icons/resources/imgs/arrow_right2_64px.png"));
-    btn_home_->setIcon(QIcon(":/icons/resources/imgs/home_64px.png"));
-    btn_history_->setIcon(QIcon(":/icons/resources/imgs/time_history_64px.png"));
-    btn_user_->setIcon(QIcon(":/icons/resources/imgs/user_64px.png"));
-    btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/more_horizontal_64px.png"));
-#else
-    btn_back_->setIcon(QIcon(":/icons/resources/newIcons/back_64px_1128270_easyicon.net.png"));
-    btn_refresh_->setIcon(QIcon(":/icons/resources/newIcons/Refresh_64px.png"));
-    btn_stop_->setIcon(QIcon(":/icons/resources/newIcons/delete_64px_1128279_easyicon.net.png"));
-    btn_forward_->setIcon(QIcon(":/icons/resources/newIcons/forward_64px_1128288_easyicon.net.png"));
-    btn_home_->setIcon(QIcon(":/icons/resources/newIcons/home_80px.png"));
-    btn_favorites_->setIcon(QIcon(":/icons/resources/newIcons/mark_as_favorite_128px.png"));
-    btn_history_->setIcon(QIcon(":/icons/resources/newIcons/history2.png"));
-    btn_download_->setIcon(QIcon(":/icons/resources/newIcons/downloads_48px.png"));
-    btn_capture_->setIcon(QIcon(":/icons/resources/newIcons/screenshot_64px.png"));
-    btn_inprivate_->setIcon(QIcon(":/icons/resources/newIcons/hacker_128px.png"));
-    btn_user_->setIcon(QIcon(":/icons/resources/newIcons/male_64px.png"));
-    btn_more_options_->setIcon(QIcon(":/icons/resources/newIcons/more_260.95774647887px_1201158_easyicon.net.png"));
-#endif
+    btn_inprivate_->setVisible(inprivate_);
+    btn_user_->setVisible(!inprivate_);
+    btn_history_->setVisible(!inprivate_);
+    btn_download_->setVisible(!inprivate_);
+    if(inprivate_){
+        btn_back_->setIcon(QIcon(":/icons/resources/imgs/two/left_64px.png"));
+        btn_refresh_->setIcon(QIcon(":/icons/resources/imgs/two/refresh_64px.png"));
+        btn_stop_->setIcon(QIcon(":/icons/resources/imgs/two/delete_64px.png"));
+        btn_forward_->setIcon(QIcon(":/icons/resources/imgs/two/right_64px.png"));
+        btn_home_->setIcon(QIcon(":/icons/resources/imgs/two/home_64px.png"));
+        btn_favorites_->setIcon(QIcon(":/icons/resources/imgs/two/favorite_window_64px.png"));
+        btn_history_->setIcon(QIcon(":/icons/resources/imgs/two/time_machine_64px.png"));
+        btn_download_->setIcon(QIcon(":/icons/resources/imgs/two/download_64px.png"));
+        btn_capture_->setIcon(QIcon(":/icons/resources/imgs/two/screenshot_64px.png"));
+        btn_inprivate_->setIcon(QIcon(":/icons/resources/newIcons/hacker_128px.png"));
+        btn_user_->setIcon(QIcon(":/icons/resources/imgs/two/user_64px.png"));
+        btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/two/more_64px.png"));
+    }else{
+        btn_back_->setIcon(QIcon(":/icons/resources/imgs/one/left_64px.png"));
+        btn_refresh_->setIcon(QIcon(":/icons/resources/imgs/one/refresh_64px.png"));
+        btn_stop_->setIcon(QIcon(":/icons/resources/imgs/one/delete_64px.png"));
+        btn_forward_->setIcon(QIcon(":/icons/resources/imgs/one/right_64px.png"));
+        btn_home_->setIcon(QIcon(":/icons/resources/imgs/one/home_64px.png"));
+        btn_favorites_->setIcon(QIcon(":/icons/resources/imgs/one/favorite_window_64px.png"));
+        btn_history_->setIcon(QIcon(":/icons/resources/imgs/one/time_machine_64px.png"));
+        btn_download_->setIcon(QIcon(":/icons/resources/imgs/one/download_64px.png"));
+        btn_capture_->setIcon(QIcon(":/icons/resources/imgs/one/screenshot_64px.png"));
+        btn_user_->setIcon(QIcon(":/icons/resources/imgs/one/user_64px.png"));
+        btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/one/more_64px.png"));
+    }
     QSize iconSize(24,24);
     QSize btnSize(42,30);
     for(auto item : this->children()){
@@ -576,7 +573,5 @@ void NaviBar::setAppearance()
             btn->setIconSize(iconSize);
         }
     }
-
-    //    btn_inprivate_->setMinimumSize(btnSize);
     btn_inprivate_->setIconSize(iconSize);
 }

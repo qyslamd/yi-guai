@@ -1,4 +1,4 @@
-#include "NotificationBar.h"
+#include "notification_toolbar.h"
 #include "ui_NotificationBar.h"
 
 #include <QGraphicsDropShadowEffect>

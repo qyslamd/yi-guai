@@ -172,7 +172,7 @@ void TabbarStyle::drawTabBarTabShape(const QStyleOption *option,
         if(isInprivate_){
             brush = QBrush(QColor("#3B3B3B"));
         }else{
-            brush = QBrush(QColor(0xA3C6DA)); //0xD3D3D3 0xA3C6DA 0xF7F7F7
+            brush = QBrush(QColor("#F9F9FB"));
             if(0){
                 const QStyleOptionTab *tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
                 QRectF rect = tabOption->rect;

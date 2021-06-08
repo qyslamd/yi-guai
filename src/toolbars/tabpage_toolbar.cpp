@@ -1,4 +1,4 @@
-#include "TabPagesBar.h"
+#include "tabpage_toolbar.h"
 
 #include <QtDebug>
 #include <QHBoxLayout>
@@ -15,8 +15,8 @@
 #include <QtWin>
 #endif
 
-TabPagesBar::TabPagesBar(bool inprivate, QWidget *parent)
-    : CaptionFrame(parent)
+TabPageToolBar::TabPageToolBar(bool inprivate, QWidget *parent)
+    : CaptionFrame(inprivate, parent)
     , inprivate_(inprivate)
     , layout_(new QHBoxLayout)
     , btn_dock_tabs_(new QToolButton)
@@ -26,52 +26,52 @@ TabPagesBar::TabPagesBar(bool inprivate, QWidget *parent)
     initUi();
 }
 
-TabPagesBar::~TabPagesBar()
+TabPageToolBar::~TabPageToolBar()
 {
 
 }
 
-int TabPagesBar::insertTab(int index, const QString &text)
+int TabPageToolBar::insertTab(int index, const QString &text)
 {
     return tab_bar_->insertTab(index, text);
 }
 
-int TabPagesBar::count() const
+int TabPageToolBar::count() const
 {
     return tab_bar_->count();
 }
 
-int TabPagesBar::currentIndex() const
+int TabPageToolBar::currentIndex() const
 {
     return tab_bar_->currentIndex();
 }
 
-void TabPagesBar::moveTab(int from, int to)
+void TabPageToolBar::moveTab(int from, int to)
 {
     tab_bar_->moveTab(from, to);
 }
 
-void TabPagesBar::removeTab(int index)
+void TabPageToolBar::removeTab(int index)
 {
     tab_bar_->removeTab(index);
 }
 
-void TabPagesBar::setTabIcon(int index, const QIcon &icon)
+void TabPageToolBar::setTabIcon(int index, const QIcon &icon)
 {
     tab_bar_->setTabIcon(index, icon);
 }
 
-void TabPagesBar::setTabText(int index, const QString &text)
+void TabPageToolBar::setTabText(int index, const QString &text)
 {
     tab_bar_->setTabText(index, text);
 }
 
-QString TabPagesBar::tabText(int index) const
+QString TabPageToolBar::tabText(int index) const
 {
     return tab_bar_->tabText(index);
 }
 
-bool TabPagesBar::hitTestCaption(const QPoint &gPos)
+bool TabPageToolBar::hitTestCaption(const QPoint &gPos)
 {
     // 映射全局坐标当前区域中
     auto pos = mapFromGlobal(gPos);
@@ -84,26 +84,26 @@ bool TabPagesBar::hitTestCaption(const QPoint &gPos)
     return !childAt(pos) && !windowBtnRect().contains(pos);
 }
 
-void TabPagesBar::setCurrentIndex(int index)
+void TabPageToolBar::setCurrentIndex(int index)
 {
     tab_bar_->setCurrentIndex(index);
 }
 
-void TabPagesBar::onDwmColorChanged()
+void TabPageToolBar::onDwmColorChanged()
 {
 #ifdef Q_OS_WIN
 
 #endif
 }
 
-void TabPagesBar::paintEvent(QPaintEvent *event)
+void TabPageToolBar::paintEvent(QPaintEvent *event)
 {
     CaptionFrame::paintEvent(event);
 }
 
-void TabPagesBar::initUi()
+void TabPageToolBar::initUi()
 {
-    QColor activeColor(0x609DBF), inActiveColor = activeColor;    // CECECE E8E8E8
+    QColor activeColor(0xCECECE), inActiveColor = activeColor;    // CECECE E8E8E8
     inActiveColor.setAlphaF(0.7);
     if(inprivate_){
         activeColor = "#2E2F30";
@@ -118,10 +118,10 @@ void TabPagesBar::initUi()
         }
     }
     setStyleSheet(QString(
-                ".TabPagesBar{"
+                ".TabPageToolBar{"
                 "background-color:%1;"
                 "}"
-                ".TabPagesBar:!active{"
+                ".TabPageToolBar:!active{"
                 "background-color:%2"
                 "}")
                   .arg(activeColor.name(QColor::HexArgb))
@@ -150,19 +150,20 @@ void TabPagesBar::initUi()
     btn_dock_tabs_->setIcon(QIcon(":/icons/resources/imgs/normal_pagelist_hide.png"));
     btn_add_page_->setIcon(QIcon(":/icons/resources/imgs/plus_48px.png"));
 
-    connect(tab_bar_, &TabBar::currentChanged, this, &TabPagesBar::currentChanged);
-    connect(tab_bar_, &TabBar::tabCloseRequested, this, &TabPagesBar::tabCloseRequested);
-    connect(tab_bar_, &TabBar::tabMoved, this, &TabPagesBar::tabMoved);
-    connect(tab_bar_, &TabBar::showPreview, this, &TabPagesBar::showPreview);
-    connect(tab_bar_, &TabBar::menuTriggered, this, &TabPagesBar::tabbarMenuTriggered);
+    connect(tab_bar_, &TabBar::currentChanged, this, &TabPageToolBar::currentChanged);
+    connect(tab_bar_, &TabBar::tabCloseRequested, this, &TabPageToolBar::tabCloseRequested);
+    connect(tab_bar_, &TabBar::tabMoved, this, &TabPageToolBar::tabMoved);
+    connect(tab_bar_, &TabBar::showPreview, this, &TabPageToolBar::showPreview);
+    connect(tab_bar_, &TabBar::menuTriggered, this, &TabPageToolBar::tabbarMenuTriggered);
 
-    connect(btn_add_page_, &QToolButton::clicked, this, &TabPagesBar::addPage);
-    connect(btn_dock_tabs_, &QToolButton::clicked, this, &TabPagesBar::showDockPage);
+    connect(btn_add_page_, &QToolButton::clicked, this, &TabPageToolBar::addPage);
+    connect(btn_dock_tabs_, &QToolButton::clicked, this, &TabPageToolBar::showDockPage);
     btn_dock_tabs_->hide();
 }
 
-CaptionFrame::CaptionFrame(QWidget *parent)
+CaptionFrame::CaptionFrame(bool inprivate, QWidget *parent)
     : QFrame(parent)
+    , inprivate_(inprivate)
 {
     setMouseTracking(true);
 }

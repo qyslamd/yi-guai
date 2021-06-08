@@ -42,21 +42,23 @@ void VerticalTabbarStyle::drawControl(QStyle::ControlElement element,
             drawRectShadow(p, rect, 4);
 
             QPainterPath path;
-            path.addRoundedRect(rect.marginsAdded(QMargins(-4,-4,-4,-4)),4,4);
+            path.addRoundedRect(rect.marginsAdded(QMargins(-4,-2,-4,-4)),4,4);
+            p->save();
+            p->setPen(QPen(QColor(0xFF1493)));
+            p->drawPath(path);
+            p->restore();
+            p->fillPath(path, Qt::white);
+        }else if(tabOpt->state.testFlag(QStyle::State_MouseOver)){
+            auto rect = tabOpt->rect;
+            drawRectShadow(p, rect, 4);
+
+            QPainterPath path;
+            path.addRoundedRect(rect.marginsAdded(QMargins(-4,-2,-4,-4)),4,4);
             p->save();
             p->setPen(QPen(QColor(0xD2D2D2)));
             p->drawPath(path);
             p->restore();
             p->fillPath(path, Qt::white);
-
-        }else if(tabOpt->state.testFlag(QStyle::State_MouseOver)){
-            auto rect = tabOpt->rect;
-            p->save();
-            QPainterPath path;
-            path.addRoundedRect(rect.marginsAdded(QMargins(0,-4,0,-4)),4,4);
-            p->fillPath(path, Qt::lightGray);
-
-            p->restore();
         }
     }else if(element == CE_TabBarTabLabel){
         static const int leftSpacing = 8;
@@ -112,17 +114,22 @@ void VerticalTabbarStyle::drawRectShadow(QPainter *p,
         return;
     }
     p->save();
-    QColor color(100, 100, 100, 30);
+    // 满足 y = kx + b
+    qreal k = -1.0 / shadowWidth * 1.0;
+    int b = 10;
+    QColor color(0,0,0,b);
     for (int i = 0; i < shadowWidth; i++)
     {
-        color.setAlpha(120 - qSqrt(i) * 40);
+        // 控制透明度和圆角矩形即可
+        color.setAlpha(k * i + b);
         p->setPen(color);
+        // drawRoundedRect函数的半径是百分比
         p->drawRoundedRect(rect.x() + shadowWidth - i,
                            rect.y() + shadowWidth - i,
                            rect.width() -  (shadowWidth - i) * 2,
                            rect.height() - (shadowWidth - i) * 2,
-                           i,
-                           i);
+                           0.2 * rect.height(),
+                           0.2 * rect.height());
     }
     p->restore();
 }

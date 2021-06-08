@@ -115,6 +115,37 @@
         <file>resources/imgs/add_to_favorites_52px.png</file>
         <file>resources/imgs/more_60px.png</file>
         <file>resources/imgs/folder_48px.png</file>
+        <file>resources/imgs/one/back_64px.png</file>
+        <file>resources/imgs/one/delete_64px.png</file>
+        <file>resources/imgs/one/download_64px.png</file>
+        <file>resources/imgs/one/favorite_window_64px.png</file>
+        <file>resources/imgs/one/forward_64px.png</file>
+        <file>resources/imgs/one/home_64px.png</file>
+        <file>resources/imgs/one/left_64px.png</file>
+        <file>resources/imgs/one/more_64px.png</file>
+        <file>resources/imgs/one/plus_math_64px.png</file>
+        <file>resources/imgs/one/refresh_64px.png</file>
+        <file>resources/imgs/one/right_64px.png</file>
+        <file>resources/imgs/one/star_64px.png</file>
+        <file>resources/imgs/one/system_task_64px.png</file>
+        <file>resources/imgs/one/time_machine_64px.png</file>
+        <file>resources/imgs/one/user_64px.png</file>
+        <file>resources/imgs/one/screenshot_64px.png</file>
+        <file>resources/imgs/two/back_64px.png</file>
+        <file>resources/imgs/two/delete_64px.png</file>
+        <file>resources/imgs/two/download_64px.png</file>
+        <file>resources/imgs/two/favorite_window_64px.png</file>
+        <file>resources/imgs/two/forward_64px.png</file>
+        <file>resources/imgs/two/home_64px.png</file>
+        <file>resources/imgs/two/left_64px.png</file>
+        <file>resources/imgs/two/more_64px.png</file>
+        <file>resources/imgs/two/plus_math_64px.png</file>
+        <file>resources/imgs/two/refresh_64px.png</file>
+        <file>resources/imgs/two/right_64px.png</file>
+        <file>resources/imgs/two/screenshot_64px.png</file>
+        <file>resources/imgs/two/star_64px.png</file>
+        <file>resources/imgs/two/time_machine_64px.png</file>
+        <file>resources/imgs/two/user_64px.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file>resources/styles/normal.qss</file>

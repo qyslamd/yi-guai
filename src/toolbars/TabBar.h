@@ -11,7 +11,7 @@ class QContextMenuEvent;
 class TabBar final: public QTabBar
 {
     Q_OBJECT
-    friend class TabPagesBar;
+    friend class TabPageToolBar;
     TabBar(bool inprivate, QWidget *parent = nullptr);
 public:
     bool event(QEvent *e) override;

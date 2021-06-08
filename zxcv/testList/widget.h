@@ -4,6 +4,7 @@
 #include <QWidget>
 
 #include "listitemdelegate.h"
+#include <QStandardItemModel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -21,5 +22,8 @@ private:
     Ui::Widget *ui;
 
     ListItemDelegate *m_delegate;
+    QStandardItemModel *m_model;
+
+    void initData();
 };
 #endif // WIDGET_H

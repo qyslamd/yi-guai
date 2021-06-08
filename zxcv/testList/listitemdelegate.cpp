@@ -24,8 +24,6 @@ void ListItemDelegate::paint(QPainter *painter,
            QVariant variant = index.data(Qt::UserRole+1);
            ItemData data = variant.value<ItemData>();
 
-           QStyleOptionViewItem viewOption(option);//用来在视图中画一个item
-
            QRectF rect;
            rect.setX(option.rect.x());
            rect.setY(option.rect.y());
@@ -63,6 +61,7 @@ void ListItemDelegate::paint(QPainter *painter,
                painter->drawPath(path);
            }
 
+           return;
            //绘制数据位置
            QRect NameRect = QRect(rect.left() +10, rect.top()+10, rect.width()-30, 20);
            QRect circle = QRect(NameRect.right(), rect.top()+10, 10, 10);

@@ -1,5 +1,5 @@
-#ifndef NOTIFICATIONBAR_H
-#define NOTIFICATIONBAR_H
+#ifndef NOTIFICATION_TOOLBAR_H
+#define NOTIFICATION_TOOLBAR_H
 
 #include <QFrame>
 
@@ -20,4 +20,4 @@ private:
     Ui::NotificationBar *ui;
 };
 
-#endif // NOTIFICATIONBAR_H
+#endif // NOTIFICATION_TOOLBAR_H
