@@ -1,6 +1,7 @@
 #ifndef GLOBALDEF_H
 #define GLOBALDEF_H
 
+#include <QMetaType>
 ///
 /// \brief The TabBarCmd enum
 ///
@@ -106,6 +107,14 @@ enum class ToolWndShowMode{
     None,
     Popup,
     Dock
-} ;
+};
+
+struct History{
+    long time;
+    QString url;
+    QString title;
+};
+
+Q_DECLARE_METATYPE(History);
 
 #endif // GLOBALDEF_H

@@ -8,6 +8,7 @@ namespace Ui {
 class HistoryWidget;
 }
 
+class QStandardItemModel;
 class HistoryWidget : public QWidget
 {
     Q_OBJECT
@@ -21,6 +22,12 @@ signals:
 
 private:
     Ui::HistoryWidget *ui;
+    QStandardItemModel* all_model_;
+
+    void initUi();
+    void initSignalSlots();
+
+    void loadAllHistories();
 };
 
 #endif // HISTORYWIDGET_H

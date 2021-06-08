@@ -776,7 +776,9 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
         break;
     case PageCmd::LoadEnd:
     {
+        if(page){
 
+        }
     }
         break;
     case PageCmd::LoadingState:

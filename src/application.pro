@@ -30,6 +30,7 @@ SOURCES += \
     managers/CefManager.cpp \
     managers/EventManager.cpp \
     managers/FaviconManager.cpp \
+    managers/HistoryManager.cpp \
     managers/MainWindowManager.cpp \
     page.cpp \
     popup.cpp \
@@ -81,6 +82,7 @@ HEADERS += \
     managers/CefManager.h \
     managers/EventManager.h \
     managers/FaviconManager.h \
+    managers/HistoryManager.h \
     managers/MainWindowManager.h \
     page.h \
     popup.h \

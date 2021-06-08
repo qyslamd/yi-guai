@@ -104,6 +104,7 @@ private:
     CefRefPtr<CefBrowser> browser_;
 
     QString url_;
+    QString title_;
     QWindow *window_;
     scoped_ptr<BrowserWindow> browser_window_;
     QWidget *qwindow_containter_;

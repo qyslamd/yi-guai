@@ -314,7 +314,7 @@ margin:6px;
             <number>0</number>
            </property>
            <item>
-            <widget class="QListWidget" name="listWidget">
+            <widget class="QTreeView" name="treeViewAll">
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
              </property>
@@ -324,8 +324,11 @@ margin:6px;
              <property name="horizontalScrollBarPolicy">
               <enum>Qt::ScrollBarAlwaysOff</enum>
              </property>
-             <property name="spacing">
-              <number>6</number>
+             <property name="editTriggers">
+              <set>QAbstractItemView::NoEditTriggers</set>
+             </property>
+             <property name="headerHidden">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -352,7 +355,7 @@ margin:6px;
             <number>0</number>
            </property>
            <item>
-            <widget class="QTreeView" name="treeView">
+            <widget class="QListView" name="listViewRecently">
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
              </property>

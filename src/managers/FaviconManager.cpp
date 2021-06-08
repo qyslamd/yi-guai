@@ -51,10 +51,13 @@ QString FaviconMgr::iconFilePath(const QString &urlIndex)
     if(urlIndex.isEmpty())
         return "";
     QUrl qUrl(urlIndex);
-    if(qUrl.host().isEmpty())
-        return "";
-    if( icons_cache_.contains(qUrl.host()))
-        return icons_cache_.value(qUrl.host());
+    QString host = qUrl.host();
+    if(host.isEmpty())
+    {
+        host = urlIndex;
+    }
+    if( icons_cache_.contains(host))
+        return icons_cache_.value(host);
     return "";
 }
 

@@ -19,6 +19,9 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QDateTime>
+#include <QPixmap>
+#include <QBuffer>
 
 #include <include/base/cef_logging.h>
 #include "mainwindow.h"
@@ -28,6 +31,7 @@
 #include "managers/FaviconManager.h"
 #include "managers/MainWindowManager.h"
 #include "managers/AppCfgManager.h"
+#include "managers/HistoryManager.h"
 #include "utils/util_qt.h"
 #include "dialogs/alertdialog.h"
 
@@ -281,7 +285,8 @@ void CefQWidget::onBrowserWindowAddressChange(const std::string &url)
 
 void CefQWidget::onBrowserWindowTitleChange(const std::string &title)
 {
-    emit browserTitleChange(QString::fromStdString(title));
+    title_ = QString::fromStdString(title);
+    emit browserTitleChange(title_);
 }
 
 void CefQWidget::onBrowserWndFullscreenChange(bool fullscreen)
@@ -299,9 +304,11 @@ void CefQWidget::onBrowserWindowFaviconChange(CefRefPtr<CefImage> image,
 {
     if(image == nullptr || image->IsEmpty())
     {
-        QPixmap defaultPix = style()->standardPixmap(QStyle::SP_FileIcon);
-        emit browserFaviconChange(defaultPix);
-        return;
+        // 没有图添加图
+        auto pix = style()->standardPixmap(QStyle::SP_ComputerIcon);
+        QBuffer buffer;
+        pix.save(&buffer, "png");
+        image->AddPNG(1.0, buffer.data().data(), buffer.data().size());
     }
     auto cacheDir = UtilQt::appDataPath();
     QDir dir(cacheDir);
@@ -317,8 +324,8 @@ void CefQWidget::onBrowserWindowFaviconChange(CefRefPtr<CefImage> image,
     auto file_path = UtilQt::GetFileNameFromURL(QString::fromStdString(url));
     file_path = dir.absoluteFilePath(file_path);
     QString subFix = QFileInfo(QString::fromStdString(url)).suffix();
-    int width = 16;
-    int height = 16;
+    int width = image->GetWidth();
+    int height = image->GetHeight();
     QPixmap pixmap;
 
     // 有些臃肿，故意如此
@@ -340,8 +347,6 @@ void CefQWidget::onBrowserWindowFaviconChange(CefRefPtr<CefImage> image,
         value->GetData(buffer, value->GetSize(), 0);
         pixmap.loadFromData(buffer,value->GetSize());
         free(buffer);
-        QIcon icon(pixmap);
-        pixmap = icon.pixmap(QSize(16,16));
 
         if(! QFile(file_path).exists()){
             pixmap.save(file_path);
@@ -375,8 +380,12 @@ void CefQWidget::onBrowerWindowLoadStart(CefLoadHandler::TransitionType transiti
 {
     emit browserLoadStart(transition_type);
 }
+
 void CefQWidget::onBrowerWindowLoadEnd(int httpStatusCode)
 {
+    History data{(long)QDateTime::currentSecsSinceEpoch(), url_, title_};
+    HistoryMgr::Instance().addHistoryRecord(data);
+
     emit browserLoadEnd(httpStatusCode);
 }
 
