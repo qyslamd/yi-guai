@@ -54,9 +54,6 @@
         <file>resources/imgs/arrow_right2_64px.png</file>
         <file>resources/imgs/CLOSE3_64px.png</file>
         <file>resources/imgs/copy2_64px.png</file>
-        <file>resources/imgs/high_volume_64px.png</file>
-        <file>resources/imgs/medium_volume_64px.png</file>
-        <file>resources/imgs/mute_64px.png</file>
         <file>resources/imgs/printer2_64px.png</file>
         <file>resources/imgs/reload_64px.png</file>
         <file>resources/imgs/search2_64px.png</file>
@@ -80,37 +77,45 @@
         <file>resources/imgs/add_to_favorites_52px.png</file>
         <file>resources/imgs/more_60px.png</file>
         <file>resources/imgs/folder_48px.png</file>
-        <file>resources/imgs/one/back_64px.png</file>
-        <file>resources/imgs/one/delete_64px.png</file>
-        <file>resources/imgs/one/download_64px.png</file>
-        <file>resources/imgs/one/favorite_window_64px.png</file>
-        <file>resources/imgs/one/forward_64px.png</file>
-        <file>resources/imgs/one/home_64px.png</file>
-        <file>resources/imgs/one/left_64px.png</file>
-        <file>resources/imgs/one/more_64px.png</file>
-        <file>resources/imgs/one/plus_math_64px.png</file>
-        <file>resources/imgs/one/refresh_64px.png</file>
-        <file>resources/imgs/one/right_64px.png</file>
-        <file>resources/imgs/one/star_64px.png</file>
-        <file>resources/imgs/one/system_task_64px.png</file>
-        <file>resources/imgs/one/time_machine_64px.png</file>
-        <file>resources/imgs/one/user_64px.png</file>
-        <file>resources/imgs/one/screenshot_64px.png</file>
-        <file>resources/imgs/two/back_64px.png</file>
-        <file>resources/imgs/two/delete_64px.png</file>
-        <file>resources/imgs/two/download_64px.png</file>
-        <file>resources/imgs/two/favorite_window_64px.png</file>
-        <file>resources/imgs/two/forward_64px.png</file>
-        <file>resources/imgs/two/home_64px.png</file>
-        <file>resources/imgs/two/left_64px.png</file>
-        <file>resources/imgs/two/more_64px.png</file>
-        <file>resources/imgs/two/plus_math_64px.png</file>
-        <file>resources/imgs/two/refresh_64px.png</file>
-        <file>resources/imgs/two/right_64px.png</file>
-        <file>resources/imgs/two/screenshot_64px.png</file>
-        <file>resources/imgs/two/star_64px.png</file>
-        <file>resources/imgs/two/time_machine_64px.png</file>
-        <file>resources/imgs/two/user_64px.png</file>
+        <file>resources/imgs/dark/back_64px.png</file>
+        <file>resources/imgs/dark/delete_64px.png</file>
+        <file>resources/imgs/dark/download_64px.png</file>
+        <file>resources/imgs/dark/favorite_window_64px.png</file>
+        <file>resources/imgs/dark/forward_64px.png</file>
+        <file>resources/imgs/dark/home_64px.png</file>
+        <file>resources/imgs/dark/left_64px.png</file>
+        <file>resources/imgs/dark/more_64px.png</file>
+        <file>resources/imgs/dark/plus_math_64px.png</file>
+        <file>resources/imgs/dark/refresh_64px.png</file>
+        <file>resources/imgs/dark/right_64px.png</file>
+        <file>resources/imgs/dark/screenshot_64px.png</file>
+        <file>resources/imgs/dark/star_64px.png</file>
+        <file>resources/imgs/dark/time_machine_64px.png</file>
+        <file>resources/imgs/dark/user_64px.png</file>
+        <file>resources/imgs/light/back_64px.png</file>
+        <file>resources/imgs/light/delete_64px.png</file>
+        <file>resources/imgs/light/download_64px.png</file>
+        <file>resources/imgs/light/favorite_window_64px.png</file>
+        <file>resources/imgs/light/forward_64px.png</file>
+        <file>resources/imgs/light/home_64px.png</file>
+        <file>resources/imgs/light/left_64px.png</file>
+        <file>resources/imgs/light/more_64px.png</file>
+        <file>resources/imgs/light/plus_math_64px.png</file>
+        <file>resources/imgs/light/refresh_64px.png</file>
+        <file>resources/imgs/light/right_64px.png</file>
+        <file>resources/imgs/light/screenshot_64px.png</file>
+        <file>resources/imgs/light/star_64px.png</file>
+        <file>resources/imgs/light/system_task_64px.png</file>
+        <file>resources/imgs/light/time_machine_64px.png</file>
+        <file>resources/imgs/light/user_64px.png</file>
+        <file>resources/imgs/dark/left_docking_64px.png</file>
+        <file>resources/imgs/dark/top_docking_64px.png</file>
+        <file>resources/imgs/light/left_docking_64px.png</file>
+        <file>resources/imgs/light/top_docking_64px.png</file>
+        <file>resources/imgs/light/add_tab_64px.png</file>
+        <file>resources/imgs/light/no_audio_64px.png</file>
+        <file>resources/imgs/light/pivot_table_64px.png</file>
+        <file>resources/imgs/light/sound_64px.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file>resources/styles/normal.qss</file>

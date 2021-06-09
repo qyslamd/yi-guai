@@ -27,12 +27,26 @@ typedef struct MainWindowConfig{
         , bounds_(QRect())
         , url_("")
     {}
+    MainWindowConfig(const QString &url)
+        : is_inprivate_(false)
+        , always_on_top_(false)
+        , initially_hidden_(false)
+        , bounds_(QRect())
+        , url_(url)
+    {}
     MainWindowConfig(bool is_inprivate)
         : is_inprivate_(is_inprivate)
         , always_on_top_(false)
         , initially_hidden_(false)
         , bounds_(QRect())
         , url_("")
+    {}
+    MainWindowConfig(bool is_inprivate, const QString &url)
+        : is_inprivate_(is_inprivate)
+        , always_on_top_(false)
+        , initially_hidden_(false)
+        , bounds_(QRect())
+        , url_(url)
     {}
 
     // If true the window will be marked as inprivate window.

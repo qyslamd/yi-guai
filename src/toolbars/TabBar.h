@@ -30,6 +30,7 @@ protected:
     void timerEvent(QTimerEvent* event) override;
     void tabInserted(int index) override;
 private:
+    bool inprivate_;
     QMenu *menu_;
     QAction *act_new_tab;
     decltype (act_new_tab) act_reload_,

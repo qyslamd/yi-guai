@@ -1,8 +1,10 @@
 #include "navigate_toolbar.h"
 #include "AddressBar.h"
 #include "utils/util_qt.h"
-#include "managers/MainWindowManager.h"
+
+#include "managers/AppCfgManager.h"
 #include "managers/CefManager.h"
+#include "managers/MainWindowManager.h"
 #include "popups/ZoomPopup.h"
 
 #include <QtDebug>
@@ -20,219 +22,11 @@
 NavigateToolBar::NavigateToolBar(bool inprivate, QWidget *parent)
     : QFrame(parent)
     , inprivate_(inprivate)
-    , layout_(new QHBoxLayout)
-    , btn_back_(new QToolButton)
-    , btn_refresh_(new QToolButton)
-    , btn_stop_(new QToolButton)
-    , btn_forward_(new QToolButton)
-    , btn_home_(new QToolButton)
-    , btn_favorites_(new QToolButton)
-    , btn_history_(new QToolButton)
-    , btn_download_(new QToolButton)
-    , btn_capture_(new QToolButton)
-    , btn_inprivate_(new QPushButton)
-    , btn_user_(new QToolButton)
-    , btn_more_options_(new QToolButton)
-    , address_bar_(new AddressBar(inprivate))
-    , frame_extensions_(new QFrame)
-    , frame_tools_(new QFrame)
-    , menu_more_options_(new QMenu(this))
-    , menu_more_tools_(new QMenu)
-    , menu_help_(new QMenu)
-    , action_new_tab_(new QAction)
-    , action_new_window_(new QAction(this))
-    , action_new_inprivate_window_(new QAction)
-    , action_zoom_(new QWidgetAction(this))
-    , frame_zoom_bar_(new QFrame)
-    , label_zoom_(new QLabel(tr("Zoom")))
-    , label_zoom_value_(new QLabel)
-    , btn_zoom_out_(new QToolButton)
-    , btn_zoom_in_(new QToolButton)
-    , btn_fullscreen_(new QToolButton)
-    , action_favorates_(new QAction)
-    , action_history_(new QAction)
-    , action_download_(new QAction)
-    , action_print_(new QAction)
-    , action_capture_(new QAction)
-    , action_find_(new QAction)
-    , action_more_tools_(new QAction)
-    , action_task_mgr_(new QAction)
-    , action_dev_tools_(new QAction)
-    , action_settings_(new QAction)
-    , action_helps_(new QAction)
-    , action_help_you_(new QAction)
-    , action_feed_back_(new QAction)
-    , action_like_(new QAction)
-    , action_about_qt_(new QAction)
-    , action_about_cef_(new QAction)
-    , action_quit_(new QAction)
 
 {
-    btn_back_->setToolTip(tr("click to back, press to show more histories"));
-    btn_forward_->setToolTip(tr("click to forward, press to show more histories"));
-    btn_refresh_->setToolTip(tr("refresh"));
-    btn_stop_->setToolTip(tr("stop loading"));
-    btn_home_->setToolTip(tr("homepage"));
-
-    btn_favorites_->setCheckable(true);
-    btn_favorites_->setToolTip(tr("bookmarks"));
-    btn_history_->setCheckable(true);
-    btn_history_->setToolTip(tr("histories"));
-    btn_download_->setCheckable(true);
-    btn_download_->setToolTip(tr("downlaods"));
-    btn_capture_->setCheckable(true);
-    btn_capture_->setToolTip(tr("screen shot"));
-    btn_inprivate_->setObjectName("NaviBarInprivateBtn");
-    btn_inprivate_->setText(tr("InPrivate"));
-    btn_inprivate_->setCheckable(true);
-    btn_inprivate_->setToolTip(tr("You are browing InPrivate"));
-    btn_inprivate_->setLayoutDirection(Qt::RightToLeft);
-    btn_user_->setCheckable(true);
-    btn_user_->setToolTip(tr("show user information"));
-    btn_more_options_->setToolTip(tr("settings and other options"));
-
-    layout_->addWidget(btn_back_);
-    layout_->addWidget(btn_forward_);
-    layout_->addWidget(btn_refresh_);
-    layout_->addWidget(btn_stop_);
-    layout_->addWidget(btn_home_);
-    layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
-    layout_->addWidget(address_bar_);
-    layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
-    layout_->addWidget(frame_extensions_);
-    layout_->addWidget(frame_tools_);
-    layout_->addWidget(btn_favorites_);
-    layout_->addWidget(btn_history_);
-    layout_->addWidget(btn_download_);
-    layout_->addWidget(btn_capture_);
-    layout_->addWidget(btn_inprivate_);
-    layout_->addWidget(btn_user_);
-    layout_->addWidget(btn_more_options_);
-
-    setLayout(layout_);
-    layout_->setContentsMargins(4,4,4,4);
-    layout_->setSpacing(1);
-
-    action_new_tab_->setText(tr("create new tab page"));
-    action_new_tab_->setShortcut(QKeySequence("Ctrl+T"));
-    action_new_tab_->setIcon(QIcon(":/icons/resources/imgs/layout_64px.png"));
-    action_new_window_->setText(tr("create new window"));
-    action_new_window_->setShortcut(QKeySequence("Ctrl+N"));
-    action_new_window_->setIcon(QIcon(":/icons/resources/imgs/stack_64px.png"));
-    action_new_inprivate_window_->setText(tr("create new inprivate window"));
-    action_new_inprivate_window_->setIcon(QIcon(":/icons/resources/imgs/frame_64px.png"));
-    action_new_inprivate_window_->setShortcut(QKeySequence("Ctrl+Shift+N"));
-    action_favorates_->setText(tr("favorates"));
-    action_favorates_->setIcon(QIcon(":/icons/resources/imgs/heart_64px.png"));
-    action_history_->setText(tr("histories"));
-    action_history_->setIcon(QIcon(":/icons/resources/imgs/time_history_64px.png"));
-    action_history_->setShortcut(QKeySequence("Ctrl+H"));
-    action_download_->setText(tr("downloads"));
-    action_download_->setIcon(QIcon(":/icons/resources/imgs/download_64px.png"));
-    action_download_->setShortcut(QKeySequence("Ctrl+J"));
-    action_print_->setText(tr("print"));
-    action_print_->setShortcut(QKeySequence("Ctrl+P"));
-    action_print_->setIcon(QIcon(":/icons/resources/imgs/printer_64px.png"));
-    action_capture_->setText(tr("capture"));
-    action_capture_->setIcon(QIcon(":/icons/resources/imgs/cut_coupon_64px.png"));
-    action_find_->setText(tr("find in this page"));
-    action_find_->setIcon(QIcon(":/icons/resources/imgs/search_64px.png"));
-    action_find_->setShortcut(QKeySequence("Ctrl+F"));
-    action_more_tools_->setText(tr("more tools"));
-    action_more_tools_->setIcon(QIcon());
-    action_task_mgr_->setText(tr("browser task manager"));
-    action_task_mgr_->setIcon(QIcon(":/icons/resources/imgs/statistics_64px.png"));
-    action_dev_tools_->setText(tr("developer tool"));
-    action_dev_tools_->setIcon(QIcon(":/icons/resources/imgs/hammer_64px.png"));
-    action_settings_->setText(tr("settings"));
-    action_settings_->setIcon(QIcon(":/icons/resources/imgs/settings_64px.png"));
-    action_helps_->setText(tr("help and feedback"));
-    action_helps_->setIcon(QIcon(":/icons/resources/imgs/question_64px.png"));
-    action_help_you_->setText(tr("help"));
-    action_help_you_->setIcon(QIcon(":/icons/resources/imgs/question_64px.png"));
-    action_feed_back_->setText(tr("send feed back"));
-    action_feed_back_->setIcon(QIcon(":/icons/resources/imgs/bug_64px.png"));
-    action_like_->setText(tr("give a like"));
-    action_like_->setIcon(QIcon(":/icons/resources/imgs/good_64px.png"));
-    action_about_qt_->setText(tr("about qt"));
-    action_about_qt_->setIcon(QIcon(":/icons/resources/imgs/qt_64px.png"));
-    action_about_cef_->setText(tr("about cef"));
-    action_about_cef_->setIcon(QIcon(":/icons/resources/imgs/cef.png"));
-    action_quit_->setText(tr("quit app"));
-    action_quit_->setIcon(QIcon());
-
-    frame_zoom_bar_->installEventFilter(this);
-    frame_zoom_bar_->setFrameShape(QFrame::NoFrame);
-    frame_zoom_bar_->setObjectName("ZoomBarFrame");
-    btn_zoom_out_->setObjectName("ZoomOutToolButton");
-    btn_zoom_out_->setIcon(QIcon(":/icons/resources/imgs/zoom_out_64px.png"));
-    label_zoom_value_->setObjectName("ZoomValueLabel");
-    label_zoom_value_->setAlignment(Qt::AlignCenter);
-    label_zoom_value_->setText("100%");
-    label_zoom_value_->setMaximumWidth(42);
-    btn_zoom_in_->setObjectName("ZoomInToolButton");
-    btn_zoom_in_->setIcon(QIcon(":/icons/resources/imgs/zoom_in_64px.png"));
-    btn_fullscreen_->setObjectName("ZoomBarFullscrnButton");
-    btn_fullscreen_->setIcon(QIcon(":/icons/resources/imgs/arrows_diagonals_64px.png"));
-
-    QSize zoomBtnSize(40,30);
-    btn_zoom_out_->setFixedSize(zoomBtnSize);
-    btn_zoom_in_->setFixedSize(zoomBtnSize);
-    btn_fullscreen_->setFixedSize(zoomBtnSize);
-
-    QHBoxLayout *zoom_layout = new QHBoxLayout;
-    zoom_layout->setContentsMargins(0,0,0,0);
-    zoom_layout->setSpacing(0);
-    zoom_layout->addSpacerItem(new QSpacerItem(26,5, QSizePolicy::Fixed));
-    zoom_layout->addWidget(label_zoom_);
-    zoom_layout->addWidget(btn_zoom_out_);
-    zoom_layout->addWidget(label_zoom_value_);
-    zoom_layout->addWidget(btn_zoom_in_);
-    zoom_layout->addWidget(btn_fullscreen_);
-    frame_zoom_bar_->setLayout(zoom_layout);
-    action_zoom_->setDefaultWidget(frame_zoom_bar_);
-
-    menu_more_options_->setObjectName("NaviBarMoreOptionMenu");
-    menu_more_options_->setWindowFlags(menu_more_options_->windowFlags() | Qt::FramelessWindowHint);
-    menu_more_options_->setAttribute(Qt::WA_TranslucentBackground);
-    //    menu_more_options_->setMinimumSize(280,350);
-    menu_more_options_->installEventFilter(this);
-    menu_more_options_->addAction(action_new_tab_);
-    menu_more_options_->addAction(action_new_window_);
-    menu_more_options_->addAction(action_new_inprivate_window_);
-    //    menu_more_options_->addSeparator();
-    menu_more_options_->addAction(action_zoom_);
-    //    menu_more_options_->addSeparator();
-    menu_more_options_->addAction(action_favorates_);
-    menu_more_options_->addAction(action_history_);
-    menu_more_options_->addAction(action_download_);
-    menu_more_options_->addSeparator();
-    menu_more_options_->addAction(action_print_);
-    menu_more_options_->addAction(action_capture_);
-    menu_more_options_->addAction(action_find_);
-    menu_more_options_->addAction(action_more_tools_);
-    menu_more_options_->addSeparator();
-    menu_more_options_->addAction(action_settings_);
-    menu_more_options_->addAction(action_helps_);
-    menu_more_options_->addAction(action_quit_);
-
-    btn_more_options_->setObjectName("NaviBarOptionBtn");
-    btn_more_options_->setMenu(menu_more_options_);
-    btn_more_options_->setPopupMode(QToolButton::InstantPopup);
-
-    menu_more_tools_->addAction(action_task_mgr_);
-    menu_more_tools_->addAction(action_dev_tools_);
-    action_more_tools_->setMenu(menu_more_tools_);
-
-    menu_help_->addAction(action_help_you_);
-    menu_help_->addAction(action_feed_back_);
-    menu_help_->addAction(action_like_);
-    menu_help_->addAction(action_about_qt_);
-    menu_help_->addAction(action_about_cef_);
-    action_helps_->setMenu(menu_help_);
-
+    initUi();
     initSignalSlot();
-    setAppearance();
+    setIcons();
 }
 
 void NavigateToolBar::setAddress(const QString &url)
@@ -358,15 +152,220 @@ void NavigateToolBar::onToolWndVisibleChanged(ToolWndType type, bool visible)
 
 void NavigateToolBar::paintEvent(QPaintEvent *event)
 {
-    return QFrame::paintEvent(event);
+    QFrame::paintEvent(event);
 
-    QPainter p(this);
-    p.save();
-    qreal penWidth = 0.5f;
-    QColor color((QLatin1String("#D2D2D2")));
-    p.setPen(QPen(QBrush(color), 0.5f));
-    p.drawLine(0.0, height() - penWidth, width(), height() - penWidth);
-    p.restore();
+    if(!AppCfgMgr::instance().bookmarkBarVisible()){
+        QPainter p(this);
+        p.save();
+        qreal penWidth = 0.5f;
+        QColor color(0xD2D2D2);
+        p.setPen(QPen(QBrush(color), 0.5f));
+        p.drawLine(0.0, height() - penWidth, width(), height() - penWidth);
+        p.restore();
+    }
+}
+
+void NavigateToolBar::initUi()
+{
+    layout_ = new QHBoxLayout;
+    layout_->setContentsMargins(4,4,4,4);
+    layout_->setSpacing(1);
+    setLayout(layout_);
+
+    btn_back_ = new QToolButton;
+    btn_back_->setToolTip(tr("click to back, press to show more histories"));
+
+    btn_refresh_ = new QToolButton;
+    btn_refresh_->setToolTip(tr("refresh"));
+
+    btn_stop_ = new QToolButton;
+    btn_stop_->setToolTip(tr("stop loading"));
+
+    btn_forward_ = new QToolButton;
+    btn_forward_->setToolTip(tr("click to forward, press to show more histories"));
+
+    btn_home_ = new QToolButton;
+    btn_home_->setToolTip(tr("homepage"));
+
+    address_bar_ = new AddressBar(inprivate_);
+    frame_extensions_ = new QFrame;
+    frame_tools_ = new QFrame;
+
+    btn_favorites_ = new QToolButton;
+    btn_favorites_->setCheckable(true);
+    btn_favorites_->setToolTip(tr("bookmarks"));
+
+    btn_history_ = new QToolButton;
+    btn_history_->setCheckable(true);
+    btn_history_->setToolTip(tr("histories"));
+
+    btn_download_ = new QToolButton;
+    btn_download_->setCheckable(true);
+    btn_download_->setToolTip(tr("downlaods"));
+
+    btn_capture_ = new QToolButton;
+    btn_capture_->setCheckable(true);
+    btn_capture_->setToolTip(tr("screen shot"));
+
+    btn_inprivate_ = new QPushButton;
+    btn_inprivate_->setObjectName("NaviBarInprivateBtn");
+    btn_inprivate_->setText(tr("InPrivate"));
+    btn_inprivate_->setCheckable(true);
+    btn_inprivate_->setToolTip(tr("You are browing InPrivate"));
+    btn_inprivate_->setLayoutDirection(Qt::RightToLeft);
+
+    btn_user_ = new QToolButton;
+    btn_user_->setCheckable(true);
+    btn_user_->setToolTip(tr("show user information"));
+
+    btn_more_options_ = new QToolButton;
+    btn_more_options_->setToolTip(tr("settings and other options"));
+
+    menu_more_options_ = new QMenu(this);
+    menu_more_tools_ = new QMenu;
+    menu_help_ = new QMenu;
+    action_new_tab_ = new QAction;
+    action_new_tab_->setText(tr("create new tab page"));
+    action_new_tab_->setShortcut(QKeySequence("Ctrl+T"));
+    action_new_window_ = new QAction(this);
+    action_new_window_->setText(tr("create new window"));
+    action_new_window_->setShortcut(QKeySequence("Ctrl+N"));
+    action_new_inprivate_window_ = new QAction;
+    action_new_inprivate_window_->setText(tr("create new inprivate window"));
+    action_new_inprivate_window_->setShortcut(QKeySequence("Ctrl+Shift+N"));
+
+    action_zoom_ = new QWidgetAction(this);
+    frame_zoom_bar_ = new QFrame;
+    frame_zoom_bar_->installEventFilter(this);
+    frame_zoom_bar_->setFrameShape(QFrame::NoFrame);
+    frame_zoom_bar_->setObjectName("ZoomBarFrame");
+    label_zoom_ = new QLabel(tr("Zoom"));
+    label_zoom_value_ = new QLabel;
+    label_zoom_value_->setObjectName("ZoomValueLabel");
+    label_zoom_value_->setAlignment(Qt::AlignCenter);
+    label_zoom_value_->setText("100%");
+    label_zoom_value_->setMaximumWidth(42);
+    btn_zoom_out_ = new QToolButton;
+    btn_zoom_out_->setObjectName("ZoomOutToolButton");
+    btn_zoom_in_ = new QToolButton;
+    btn_zoom_in_->setObjectName("ZoomInToolButton");
+    btn_fullscreen_ = new QToolButton;
+    btn_fullscreen_->setObjectName("ZoomBarFullscrnButton");
+    QSize zoomBtnSize(40,30);
+    btn_zoom_out_->setFixedSize(zoomBtnSize);
+    btn_zoom_in_->setFixedSize(zoomBtnSize);
+    btn_fullscreen_->setFixedSize(zoomBtnSize);
+    QHBoxLayout *zoom_layout = new QHBoxLayout;
+    zoom_layout->setContentsMargins(0,0,0,0);
+    zoom_layout->setSpacing(0);
+    zoom_layout->addSpacerItem(new QSpacerItem(26,5, QSizePolicy::Fixed));
+    zoom_layout->addWidget(label_zoom_);
+    zoom_layout->addWidget(btn_zoom_out_);
+    zoom_layout->addWidget(label_zoom_value_);
+    zoom_layout->addWidget(btn_zoom_in_);
+    zoom_layout->addWidget(btn_fullscreen_);
+    frame_zoom_bar_->setLayout(zoom_layout);
+    action_zoom_->setDefaultWidget(frame_zoom_bar_);
+
+    action_favorates_ = new QAction;
+    action_favorates_->setText(tr("favorates"));
+    action_history_ = new QAction;
+    action_history_->setText(tr("histories"));
+    action_history_->setShortcut(QKeySequence("Ctrl+H"));
+    action_download_ = new QAction;
+    action_download_->setText(tr("downloads"));
+    action_download_->setShortcut(QKeySequence("Ctrl+J"));
+    action_print_ = new QAction;
+    action_print_->setText(tr("print"));
+    action_print_->setShortcut(QKeySequence("Ctrl+P"));
+    action_capture_ = new QAction;
+    action_capture_->setText(tr("capture"));
+    action_find_ = new QAction;
+    action_find_->setText(tr("find in this page"));
+
+    action_find_->setShortcut(QKeySequence("Ctrl+F"));
+    action_more_tools_ = new QAction;
+    action_more_tools_->setText(tr("more tools"));
+    action_task_mgr_ = new QAction;
+    action_task_mgr_->setText(tr("browser task manager"));
+
+    action_dev_tools_ = new QAction;
+    action_dev_tools_->setText(tr("developer tool"));
+    action_settings_ = new QAction;
+    action_settings_->setText(tr("settings"));
+
+    action_helps_ = new QAction;
+    action_helps_->setText(tr("help and feedback"));
+    action_help_you_ = new QAction;
+    action_help_you_->setText(tr("help"));
+    action_feed_back_ = new QAction;
+    action_feed_back_->setText(tr("send feed back"));
+    action_like_ = new QAction;
+    action_like_->setText(tr("give a like"));
+    action_about_qt_ = new QAction;
+    action_about_qt_->setText(tr("about qt"));
+    action_about_cef_ = new QAction;
+    action_about_cef_->setText(tr("about cef"));
+    action_quit_ = new QAction;
+    action_quit_->setText(tr("quit app"));
+
+
+    menu_more_options_->setObjectName("NaviBarMoreOptionMenu");
+    menu_more_options_->setWindowFlags(menu_more_options_->windowFlags() | Qt::FramelessWindowHint);
+    menu_more_options_->setAttribute(Qt::WA_TranslucentBackground);
+    //    menu_more_options_->setMinimumSize(280,350);
+    menu_more_options_->installEventFilter(this);
+    menu_more_options_->addAction(action_new_tab_);
+    menu_more_options_->addAction(action_new_window_);
+    menu_more_options_->addAction(action_new_inprivate_window_);
+    //    menu_more_options_->addSeparator();
+    menu_more_options_->addAction(action_zoom_);
+    //    menu_more_options_->addSeparator();
+    menu_more_options_->addAction(action_favorates_);
+    menu_more_options_->addAction(action_history_);
+    menu_more_options_->addAction(action_download_);
+    menu_more_options_->addSeparator();
+    menu_more_options_->addAction(action_print_);
+    menu_more_options_->addAction(action_capture_);
+    menu_more_options_->addAction(action_find_);
+    menu_more_options_->addAction(action_more_tools_);
+    menu_more_options_->addSeparator();
+    menu_more_options_->addAction(action_settings_);
+    menu_more_options_->addAction(action_helps_);
+    menu_more_options_->addAction(action_quit_);
+
+    btn_more_options_->setObjectName("NaviBarOptionBtn");
+    btn_more_options_->setMenu(menu_more_options_);
+    btn_more_options_->setPopupMode(QToolButton::InstantPopup);
+
+    menu_more_tools_->addAction(action_task_mgr_);
+    menu_more_tools_->addAction(action_dev_tools_);
+    action_more_tools_->setMenu(menu_more_tools_);
+
+    menu_help_->addAction(action_help_you_);
+    menu_help_->addAction(action_feed_back_);
+    menu_help_->addAction(action_like_);
+    menu_help_->addAction(action_about_qt_);
+    menu_help_->addAction(action_about_cef_);
+    action_helps_->setMenu(menu_help_);
+
+    layout_->addWidget(btn_back_);
+    layout_->addWidget(btn_forward_);
+    layout_->addWidget(btn_refresh_);
+    layout_->addWidget(btn_stop_);
+    layout_->addWidget(btn_home_);
+    layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
+    layout_->addWidget(address_bar_);
+    layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
+    layout_->addWidget(frame_extensions_);
+    layout_->addWidget(frame_tools_);
+    layout_->addWidget(btn_favorites_);
+    layout_->addWidget(btn_history_);
+    layout_->addWidget(btn_download_);
+    layout_->addWidget(btn_capture_);
+    layout_->addWidget(btn_inprivate_);
+    layout_->addWidget(btn_user_);
+    layout_->addWidget(btn_more_options_);
 }
 
 void NavigateToolBar::initSignalSlot()
@@ -530,37 +529,61 @@ void NavigateToolBar::initSignalSlot()
 
 }
 
-void NavigateToolBar::setAppearance()
+void NavigateToolBar::setIcons()
 {
     btn_inprivate_->setVisible(inprivate_);
     btn_user_->setVisible(!inprivate_);
     btn_history_->setVisible(!inprivate_);
     btn_download_->setVisible(!inprivate_);
     if(inprivate_){
-        btn_back_->setIcon(QIcon(":/icons/resources/imgs/two/left_64px.png"));
-        btn_refresh_->setIcon(QIcon(":/icons/resources/imgs/two/refresh_64px.png"));
-        btn_stop_->setIcon(QIcon(":/icons/resources/imgs/two/delete_64px.png"));
-        btn_forward_->setIcon(QIcon(":/icons/resources/imgs/two/right_64px.png"));
-        btn_home_->setIcon(QIcon(":/icons/resources/imgs/two/home_64px.png"));
-        btn_favorites_->setIcon(QIcon(":/icons/resources/imgs/two/favorite_window_64px.png"));
-        btn_history_->setIcon(QIcon(":/icons/resources/imgs/two/time_machine_64px.png"));
-        btn_download_->setIcon(QIcon(":/icons/resources/imgs/two/download_64px.png"));
-        btn_capture_->setIcon(QIcon(":/icons/resources/imgs/two/screenshot_64px.png"));
+        btn_back_->setIcon(QIcon(":/icons/resources/imgs/dark/left_64px.png"));
+        btn_refresh_->setIcon(QIcon(":/icons/resources/imgs/dark/refresh_64px.png"));
+        btn_stop_->setIcon(QIcon(":/icons/resources/imgs/dark/delete_64px.png"));
+        btn_forward_->setIcon(QIcon(":/icons/resources/imgs/dark/right_64px.png"));
+        btn_home_->setIcon(QIcon(":/icons/resources/imgs/dark/home_64px.png"));
+        btn_favorites_->setIcon(QIcon(":/icons/resources/imgs/dark/favorite_window_64px.png"));
+        btn_history_->setIcon(QIcon(":/icons/resources/imgs/dark/time_machine_64px.png"));
+        btn_download_->setIcon(QIcon(":/icons/resources/imgs/dark/download_64px.png"));
+        btn_capture_->setIcon(QIcon(":/icons/resources/imgs/dark/screenshot_64px.png"));
         btn_inprivate_->setIcon(QIcon(":/icons/resources/newIcons/hacker_128px.png"));
-        btn_user_->setIcon(QIcon(":/icons/resources/imgs/two/user_64px.png"));
-        btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/two/more_64px.png"));
+        btn_user_->setIcon(QIcon(":/icons/resources/imgs/dark/user_64px.png"));
+        btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/dark/more_64px.png"));
     }else{
-        btn_back_->setIcon(QIcon(":/icons/resources/imgs/one/left_64px.png"));
-        btn_refresh_->setIcon(QIcon(":/icons/resources/imgs/one/refresh_64px.png"));
-        btn_stop_->setIcon(QIcon(":/icons/resources/imgs/one/delete_64px.png"));
-        btn_forward_->setIcon(QIcon(":/icons/resources/imgs/one/right_64px.png"));
-        btn_home_->setIcon(QIcon(":/icons/resources/imgs/one/home_64px.png"));
-        btn_favorites_->setIcon(QIcon(":/icons/resources/imgs/one/favorite_window_64px.png"));
-        btn_history_->setIcon(QIcon(":/icons/resources/imgs/one/time_machine_64px.png"));
-        btn_download_->setIcon(QIcon(":/icons/resources/imgs/one/download_64px.png"));
-        btn_capture_->setIcon(QIcon(":/icons/resources/imgs/one/screenshot_64px.png"));
-        btn_user_->setIcon(QIcon(":/icons/resources/imgs/one/user_64px.png"));
-        btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/one/more_64px.png"));
+        btn_back_->setIcon(QIcon(":/icons/resources/imgs/light/left_64px.png"));
+        btn_refresh_->setIcon(QIcon(":/icons/resources/imgs/light/refresh_64px.png"));
+        btn_stop_->setIcon(QIcon(":/icons/resources/imgs/light/delete_64px.png"));
+        btn_forward_->setIcon(QIcon(":/icons/resources/imgs/light/right_64px.png"));
+        btn_home_->setIcon(QIcon(":/icons/resources/imgs/light/home_64px.png"));
+        btn_favorites_->setIcon(QIcon(":/icons/resources/imgs/light/favorite_window_64px.png"));
+        btn_history_->setIcon(QIcon(":/icons/resources/imgs/light/time_machine_64px.png"));
+        btn_download_->setIcon(QIcon(":/icons/resources/imgs/light/download_64px.png"));
+        btn_capture_->setIcon(QIcon(":/icons/resources/imgs/light/screenshot_64px.png"));
+        btn_user_->setIcon(QIcon(":/icons/resources/imgs/light/user_64px.png"));
+        btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/light/more_64px.png"));
+
+        action_new_tab_->setIcon(QIcon(":/icons/resources/imgs/layout_64px.png"));
+        action_new_window_->setIcon(QIcon(":/icons/resources/imgs/stack_64px.png"));
+        action_new_inprivate_window_->setIcon(QIcon(":/icons/resources/imgs/frame_64px.png"));
+        btn_zoom_out_->setIcon(QIcon(":/icons/resources/imgs/zoom_out_64px.png"));
+        btn_zoom_in_->setIcon(QIcon(":/icons/resources/imgs/zoom_in_64px.png"));
+        btn_fullscreen_->setIcon(QIcon(":/icons/resources/imgs/arrows_diagonals_64px.png"));
+        action_favorates_->setIcon(QIcon(":/icons/resources/imgs/heart_64px.png"));
+        action_history_->setIcon(QIcon(":/icons/resources/imgs/time_history_64px.png"));
+        action_download_->setIcon(QIcon(":/icons/resources/imgs/download_64px.png"));
+        action_print_->setIcon(QIcon(":/icons/resources/imgs/printer_64px.png"));
+        action_capture_->setIcon(QIcon(":/icons/resources/imgs/cut_coupon_64px.png"));
+        action_find_->setIcon(QIcon(":/icons/resources/imgs/search_64px.png"));
+        action_more_tools_->setIcon(QIcon());
+        action_task_mgr_->setIcon(QIcon(":/icons/resources/imgs/statistics_64px.png"));
+        action_dev_tools_->setIcon(QIcon(":/icons/resources/imgs/hammer_64px.png"));
+        action_settings_->setIcon(QIcon(":/icons/resources/imgs/settings_64px.png"));
+        action_helps_->setIcon(QIcon(":/icons/resources/imgs/question_64px.png"));
+        action_help_you_->setIcon(QIcon(":/icons/resources/imgs/question_64px.png"));
+        action_feed_back_->setIcon(QIcon(":/icons/resources/imgs/bug_64px.png"));
+        action_like_->setIcon(QIcon(":/icons/resources/imgs/good_64px.png"));
+        action_about_qt_->setIcon(QIcon(":/icons/resources/imgs/qt_64px.png"));
+        action_about_cef_->setIcon(QIcon(":/icons/resources/imgs/cef.png"));
+        action_quit_->setIcon(QIcon());
     }
     QSize iconSize(24,24);
     QSize btnSize(42,30);

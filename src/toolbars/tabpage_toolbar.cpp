@@ -24,6 +24,7 @@ TabPageToolBar::TabPageToolBar(bool inprivate, QWidget *parent)
     , btn_add_page_(new QToolButton)
 {
     initUi();
+    setIcons();
 }
 
 TabPageToolBar::~TabPageToolBar()
@@ -69,6 +70,11 @@ void TabPageToolBar::setTabText(int index, const QString &text)
 QString TabPageToolBar::tabText(int index) const
 {
     return tab_bar_->tabText(index);
+}
+
+void TabPageToolBar::setTabToolTip(int index, const QString &tip)
+{
+    tab_bar_->setTabToolTip(index, tip);
 }
 
 bool TabPageToolBar::hitTestCaption(const QPoint &gPos)
@@ -131,11 +137,19 @@ void TabPageToolBar::initUi()
     setFocusPolicy(Qt::TabFocus);
     setFocusProxy(tab_bar_);
 
+    QFrame* line = new QFrame(this);
+    line->setStyleSheet("margin-top:4px;margin-bottom:4px;");
+    line->setObjectName(QString::fromUtf8("line"));
+    line->setGeometry(QRect(160, 150, 3, 3));
+    line->setFrameShape(QFrame::VLine);
+    line->setFrameShadow(QFrame::Sunken);
+
     setLayout(layout_);
     layout_->setContentsMargins(6, 8, 0, 0);
     layout_->setSpacing(2);
     layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
     layout_->addWidget(btn_dock_tabs_);
+    layout_->addWidget(line);
     layout_->addWidget(tab_bar_);
     layout_->addWidget(btn_add_page_);
     layout_->addStretch();
@@ -144,11 +158,9 @@ void TabPageToolBar::initUi()
     btn_dock_tabs_->setToolTip(tr("open vertical tabs"));
     btn_add_page_->setToolTip(tr("Add a tab page"));
 
-    QSize iconSize(20,20);
+    QSize iconSize(22,22);
     btn_dock_tabs_->setIconSize(iconSize);
     btn_add_page_->setIconSize(iconSize);
-    btn_dock_tabs_->setIcon(QIcon(":/icons/resources/imgs/normal_pagelist_hide.png"));
-    btn_add_page_->setIcon(QIcon(":/icons/resources/imgs/plus_48px.png"));
 
     connect(tab_bar_, &TabBar::currentChanged, this, &TabPageToolBar::currentChanged);
     connect(tab_bar_, &TabBar::tabCloseRequested, this, &TabPageToolBar::tabCloseRequested);
@@ -158,7 +170,17 @@ void TabPageToolBar::initUi()
 
     connect(btn_add_page_, &QToolButton::clicked, this, &TabPageToolBar::addPage);
     connect(btn_dock_tabs_, &QToolButton::clicked, this, &TabPageToolBar::showDockPage);
-    btn_dock_tabs_->hide();
+}
+
+void TabPageToolBar::setIcons()
+{
+    if(inprivate_){
+        btn_dock_tabs_->setIcon(QIcon(":/icons/resources/imgs/dark/left_docking_64px.png"));
+        btn_add_page_->setIcon(QIcon(":/icons/resources/imgs/dark/plus_math_64px.png"));
+    }else{
+        btn_dock_tabs_->setIcon(QIcon(":/icons/resources/imgs/light/left_docking_64px.png"));
+        btn_add_page_->setIcon(QIcon(":/icons/resources/imgs/light/plus_math_64px.png"));
+    }
 }
 
 CaptionFrame::CaptionFrame(bool inprivate, QWidget *parent)

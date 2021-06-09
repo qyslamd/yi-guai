@@ -96,8 +96,9 @@ private:
     action_quit_;
 
 private:
+    void initUi();
     void initSignalSlot();
-    void setAppearance();
+    void setIcons();
 
 };
 

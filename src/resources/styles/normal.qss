@@ -9,6 +9,8 @@ background-color:#F9F9FB;
 
 QWidget#mainwindow_east_widget{
 background-color:white;
+border:none;
+border-left:1px solid #D2D2D2;
 }
 
 
@@ -18,7 +20,7 @@ border-radius:4px;
 }
 
 QToolButton:hover{
-background-color:rgba(	169,169,169, 30%);
+background-color:rgba(169,169,169, 30%);
 }
 
 QToolButton:open{
@@ -79,7 +81,7 @@ border-radius:4px;
 padding:6px;
 }
 .AddressBar > QPushButton:hover{
-background-color:rgba(192,192,192,100);
+background-color:rgba(169,169,169, 30%);
 }
 
 .AddressBar > QPushButton:open{
@@ -93,7 +95,7 @@ border-radius:4px;
 padding:4px;
 }
 .AddressBar > QToolButton:hover{
-background-color:rgba(192,192,192,100);
+background-color:rgba(169,169,169, 30%);
 }
 
 .AddressBar > QToolButton:open{
@@ -103,12 +105,12 @@ border:none;
 
 
 .TabBar::close-button{
-    image: url(:/icons/resources/imgs/general_close.png);
+    image: url(:/icons/resources/imgs/light/delete_64px.png);
 }
 
 .TabBar::close-button:hover {
-    background-color:#CFCFCF;
-    border-radius:4px;
+background-color:rgba(169,169,169, 30%);
+border-radius:4px;
 }
 
 QMenu#TabBarTabMenu{
@@ -163,7 +165,7 @@ color:white;
 padding:6px;
 }
 QPushButton#InprivateCloseBtn:hover{
-background-color:#1C7CC5;
+background-color:rgba(169,169,169, 30%);
 }
 
 

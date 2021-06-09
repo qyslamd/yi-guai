@@ -383,8 +383,8 @@ void CefQWidget::onBrowerWindowLoadStart(CefLoadHandler::TransitionType transiti
 
 void CefQWidget::onBrowerWindowLoadEnd(int httpStatusCode)
 {
-    History data{(long)QDateTime::currentSecsSinceEpoch(), url_, title_};
-    HistoryMgr::Instance().addHistoryRecord(data);
+//    History data{(long)QDateTime::currentSecsSinceEpoch(), url_, title_};
+//    HistoryMgr::Instance().addHistoryRecord(data);
 
     emit browserLoadEnd(httpStatusCode);
 }
@@ -668,7 +668,20 @@ void CefQWidget::resizeBorser(const QSize &size)
     }
     auto browser = browser_window_->GetBrowser();
     if(browser){
-        HWND wnd = browser->GetHost()->GetWindowHandle();
-        ::MoveWindow(wnd, rect.x(), rect.y(), rect.width(), rect.height(), false);
+        auto windowHandle = browser->GetHost()->GetWindowHandle();
+#if defined(OS_WIN)
+//        auto hdwp = BeginDeferWindowPos(1);
+//        hdwp = DeferWindowPos(hdwp, windowHandle, HWND_BOTTOM, rect.x(), rect.y(),
+//                              rect.width(), rect.height(), SWP_SHOWWINDOW); // SWP_NOZORDER SWP_SHOWWINDOW
+//        EndDeferWindowPos(hdwp);
+        ::MoveWindow(windowHandle, rect.x(), rect.y(), rect.width(), rect.height(), false);
+#elif defined(OS_LINUX)
+        // todo:
+#else
+        ::Window xwindow = windowHandle;
+        SetXWindowBounds(xwindow, 0, 0,
+                         static_cast<size_t>(size.width()),
+                         static_cast<size_t>(size.height()));
+#endif
     }
 }

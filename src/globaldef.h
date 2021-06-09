@@ -74,6 +74,16 @@ enum class BookmarkCmd{
     BkmkBarVisibleChanged,
 };
 
+enum class HistoryCmd{
+    None,
+    Open,
+    OpenInNewPage,
+    OpenInNewWnd,
+    OpenInInprivate,
+    Changed,
+    Add2Favorite,
+};
+
 ///
 /// \brief The PageCmd enum
 ///

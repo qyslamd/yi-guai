@@ -77,6 +77,7 @@ public:
     void setTabIcon(int index, const QIcon &icon);
     void setTabText(int index, const QString &text);
     QString tabText(int index) const;
+    void setTabToolTip(int index, const QString &tip);
 
     bool hitTestCaption(const QPoint &gPos);
 
@@ -104,6 +105,7 @@ private:
 
 private:
     void initUi();
+    void setIcons();
 };
 
 #endif // TABPAGE_TOOLBAR_H

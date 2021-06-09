@@ -140,6 +140,7 @@ private slots:
     void onShowTabThumnail(const QPoint &g_pos, const int index);
     void onBrowserShortcut(const CefKeyEvent &event,
                            CefEventHandle os_event);
+    void onHistoryWidgetCmd(HistoryCmd cmd, const QVariant &para);
     void onPinOrCloseHistoryWidget();
     void onPinOrCloseBookmarkWidget();
 

@@ -18,16 +18,16 @@
     <number>0</number>
    </property>
    <property name="leftMargin">
-    <number>0</number>
+    <number>1</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>1</number>
    </property>
    <property name="rightMargin">
-    <number>0</number>
+    <number>1</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>1</number>
    </property>
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
@@ -274,21 +274,33 @@ QToolButton::menu-indicator{
        <item>
         <widget class="QTabWidget" name="tabWidget">
          <property name="styleSheet">
-          <string notr="true">QTabWidget::pane {
-     border: none;
+          <string notr="true">QTabWidget {
+border: none;
+}
+QTabWidget::pane {
+border: none;
+top:4px;
  }
 QTabWidget::tab-bar {
-     left: 5px; 
- }
-QTabBar::tab:selected {
-margin:6px;
-     border-bottom:2px solid blue;
-color:black;
- }
-QTabBar::tab:!selected {
-margin:6px;
+alignment: center;
+}
+QTabBar::tab {
     border:none;
- }</string>
+    background: #FFFFFF;
+    width: 100px;
+    height: 30px;
+    color: #999999;
+}
+QTabBar::tab:hover {
+    color:#84b2fc;
+}
+QTabBar::tab:selected {
+color:black;
+color:#4285f4;
+font:bold;
+border-bottom:2px solid #5183D5;
+}
+</string>
          </property>
          <property name="currentIndex">
           <number>0</number>

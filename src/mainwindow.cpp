@@ -162,6 +162,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             navi_bar_->onToolWndVisibleChanged(ToolWndType::AddFavorite,
                                                add_favorite_popup_->isVisible());
         }
+    }else if(obj == bookmark_bar_){
+        // 临时测试用的，不能根据显示去改配置
+        if(type == QEvent::Show || type == QEvent::Hide){
+            AppCfgMgr::instance().setBookmarkBarVisible(bookmark_bar_->isVisible());
+        }
     }
     return QtWinFramelessWindow::eventFilter(obj, event);
 }
@@ -315,6 +320,7 @@ void MainWindow::initUi()
     navi_bar_ = new NavigateToolBar(created_cfg_.is_inprivate_);
 
     bookmark_bar_ = new BookmarkBar;
+    bookmark_bar_->installEventFilter(this);
     bookmark_bar_->setMinimumHeight(32);
 
     notify_bar_ = new NotificationBar;
@@ -443,6 +449,7 @@ void MainWindow::initSignalSlot()
 #endif
     connect(navi_bar_, &NavigateToolBar::naviBarCmd, this, &MainWindow::onNaviBarCmd);
     connect(history_widget_, &HistoryWidget::pinOrCloseClicked, this, &MainWindow::onPinOrCloseHistoryWidget);
+    connect(history_widget_, &HistoryWidget::menuCmd, this, &MainWindow::onHistoryWidgetCmd);
     connect(bookmark_widget_, &BookmarkWidget::pinOrCloseClicked, this, &MainWindow::onPinOrCloseBookmarkWidget);
 }
 
@@ -752,6 +759,8 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
     {
         auto index = stack_browsers_->indexOf(page);
         tab_bar_->setTabText(index, para.toString());
+        QString tip = page->title() + "\n" + QUrl(page->url()).host();
+        tab_bar_->setTabToolTip(index, tip);
         tab_bar_->update();
     }
         break;
@@ -1006,6 +1015,26 @@ void MainWindow::onBrowserShortcut(const CefKeyEvent &event,
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
         onTabSwitch();
+    }
+}
+
+void MainWindow::onHistoryWidgetCmd(HistoryCmd cmd, const QVariant &para)
+{
+    switch (cmd) {
+    case HistoryCmd::Open:
+        NavigateInCurPage(para.toString());
+        break;
+    case HistoryCmd::OpenInNewPage:
+        AddNewPage(para.toString(), false);
+        break;
+    case HistoryCmd::OpenInNewWnd:
+        MainWndMgr::Instance().createWindow(MainWndCfg(para.toString()));
+        break;
+    case HistoryCmd::OpenInInprivate:
+         MainWndMgr::Instance().createWindow(MainWndCfg(true, para.toString()));
+        break;
+    default:
+        break;
     }
 }
 

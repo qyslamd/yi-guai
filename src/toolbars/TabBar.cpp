@@ -12,6 +12,7 @@
 
 TabBar::TabBar(bool inprivate, QWidget *parent)
     : QTabBar(parent)
+    , inprivate_(inprivate)
 {
     setDrawBase(false);
     setTabsClosable(true);
@@ -134,19 +135,23 @@ void TabBar::tabInserted(int index)
     auto closeBtn = tabButton(index, QTabBar::RightSide);
     if(closeBtn){
         closeBtn->setMinimumSize(20, 20);
-//        if(auto btn = qobject_cast<QAbstractButton *>(closeBtn)){
-//            qInfo()<<__FUNCTION__<<btn;
-//            btn->setIconSize(QSize(16,16));
-//        }
+        if(auto btn = qobject_cast<QAbstractButton *>(closeBtn))
+        {
+            if(inprivate_){
+                btn->setIcon(QIcon(":/icons/resources/imgs/dark/delete_64px.png"));
+            }else{
+                btn->setIcon(QIcon(":/icons/resources/imgs/light/delete_64px.png"));
+            }
+        }
     }
 }
 
 void TabBar::setIcons()
 {
-    act_new_tab->setIcon(QIcon(":/icons/resources/newIcons/new_window_dark_100px.png"));
-    act_reload_->setIcon(QIcon(":/icons/resources/newIcons/reload_drak_100px.png"));
-    act_mute_->setIcon(QIcon(":/icons/resources/newIcons/mute_dark_100px.png"));
-    act_close_this_->setIcon(QIcon(":/icons/resources/newIcons/delete_dark_64px.png"));
+    act_new_tab->setIcon(QIcon(":/icons/resources/imgs/light/add_tab_64px.png"));
+    act_reload_->setIcon(QIcon(":/icons/resources/imgs/light/refresh_64px.png"));
+    act_mute_->setIcon(QIcon(":/icons/resources/imgs/light/no_audio_64px.png"));
+    act_close_this_->setIcon(QIcon(":/icons/resources/imgs/light/delete_64px.png"));
 }
 
 void TabBar::mousePressEvent(QMouseEvent *event)

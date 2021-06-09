@@ -1,7 +1,7 @@
 /******************************************
 Scope:Class NavigationBar and it's children
 */
-.NaviBar{
+.NavigateToolBar{
     background-color:#404244;
 }
 .BookmarkBar{
@@ -40,7 +40,10 @@ background-color:#1C7CC5;
 }
 
 .TabBar::close-button{
-    width:16px;
-    height:16px;
-    image: url(:/icons/resources/imgs/close_white_16px.png);
+    image: url(:/icons/resources/imgs/dark/delete_64px.png);
+}
+
+.TabBar::close-button:hover {
+background-color:rgba(169,169,169, 30%);
+    border-radius:4px;
 }
