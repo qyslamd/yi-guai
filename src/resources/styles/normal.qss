@@ -122,8 +122,7 @@ border-bottom-right-radius:0px;
 QMenu#TabBarTabMenu::item {
 background-color: transparent;
  /* padding: top right bottom left*/
-padding: 4px;
-padding-left: 8px;
+padding: 4px 16px 4px 14px;
 }
 QMenu#TabBarTabMenu::item:disabled {
 color:#808080;
@@ -146,7 +145,7 @@ border-bottom-right-radius:0px;
 QMenu#NaviBarMoreOptionMenu::item {
 background-color: transparent;
  /* padding: top right bottom left*/
-padding: 8px;
+padding: 4px 16px 4px 14px;
 }
 QMenu#NaviBarMoreOptionMenu::icon{
 padding-left: 15px;
@@ -178,7 +177,7 @@ border-bottom-right-radius:0px;
 QMenu#BkmkWidgetMoreOptionMenu::item {
 background-color: transparent;
  /* padding: top right bottom left*/
-padding: 8px;
+padding: 4px 16px 4px 14px;
 }
 QMenu#BkmkWidgetMoreOptionMenu::icon{
 padding-left: 15px;

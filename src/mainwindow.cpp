@@ -544,11 +544,7 @@ void MainWindow::onTabBarCloseRequested(int index)
     }
     auto page = GetPage(index);
     if(page){
-        History data{(long)QDateTime::currentSecsSinceEpoch(),
-                    page->url(),
-                    page->title()};
-        RecentlyHistory.push(data);
-
+        addRecently(page);
         page->close();
     }
 }
@@ -1285,4 +1281,17 @@ void MainWindow::onTabSwitch()
     }else{
         tab_bar_->setCurrentIndex(index + 1);
     }
+}
+
+void MainWindow::addRecently(Page *page)
+{
+    for(auto item : RecentlyHistory){
+        if(item.url == page->url()){
+            return;
+        }
+    }
+    History data{(long)QDateTime::currentSecsSinceEpoch(),
+                page->url(),
+                page->title()};
+    RecentlyHistory.push(data);
 }

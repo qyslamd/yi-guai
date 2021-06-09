@@ -21,8 +21,6 @@ HistoryWidget::HistoryWidget(QWidget *parent) :
     initUi();
     initSignalSlots();
     setIcons();
-
-    loadAllHistories();
 }
 
 HistoryWidget::~HistoryWidget()
@@ -51,6 +49,12 @@ bool HistoryWidget::eventFilter(QObject *obj, QEvent *ev)
         }
     }
     return QWidget::eventFilter(obj, ev);
+}
+
+void HistoryWidget::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    loadAllHistories();
 }
 
 void HistoryWidget::initUi()
@@ -126,6 +130,8 @@ void HistoryWidget::loadAllHistories()
 //    QDateTime now = QDateTime::currentDateTime();
 //    QDate today = QDate::currentDate();
 //    QDate yestoday = today.addDays(-1);
+
+    all_model_->clear();
 
     //一级节点，目前只处理今天和昨天
     QStandardItem* todayItem = new QStandardItem(icon, tr("Today"));

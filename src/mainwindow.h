@@ -169,5 +169,6 @@ private:
     void onWindowStateChanged();
     void onNormalMax();
     void onTabSwitch();
+    void addRecently(Page *page);
 };
 #endif // MAINWINDOW_H

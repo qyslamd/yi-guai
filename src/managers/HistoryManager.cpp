@@ -35,6 +35,14 @@ void HistoryMgr::addHistoryRecord(const History &data)
         return;
     }
 
+    QDate today = QDateTime::fromSecsSinceEpoch(data.time).date();
+    for(auto &item : histories_cache_){
+        auto date = QDateTime::fromSecsSinceEpoch(item.time).date();
+        if(today == date && data.url == item.url){
+            return;
+        }
+    }
+
     histories_cache_.insert(0, data);
     saveToFile();
 }

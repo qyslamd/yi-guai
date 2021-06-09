@@ -20,6 +20,9 @@ public:
     void onShowModeChanged(ToolWndShowMode mode);
 
     bool eventFilter(QObject *obj, QEvent *ev) override;
+
+protected:
+    void showEvent(QShowEvent *event) override;
 signals:
     void pinOrCloseClicked(bool pin);
     void menuCmd(HistoryCmd cmd, const QVariant &para);
