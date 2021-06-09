@@ -44,6 +44,7 @@
 #include <QMessageBox>
 #include <QPainter>
 #include <QStyle>
+#include <QDateTime>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -51,12 +52,15 @@
 #pragma comment(lib, "Gdi32.lib")
 #endif
 
+namespace  {
+const char default_url[] = "https://cn.bing.com/";
+const char gitee_url[] = "https://gitee.com/slamdd/yi-guai";
+}
+
 InprivatePopup* MainWindow::gInprivatePopup = nullptr;
 AppCfgWidget *MainWindow::gAppCfgWidget = nullptr;
 FullscnHint *MainWindow::gFullscnWidget = nullptr;
-
-const char default_url[] = "https://cn.bing.com/";
-const char gitee_url[] = "https://gitee.com/slamdd/yi-guai";
+QStack<History> MainWindow::RecentlyHistory;
 
 MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
     : QtWinFramelessWindow(parent)
@@ -538,8 +542,13 @@ void MainWindow::onTabBarCloseRequested(int index)
     if(stack_browsers_->count() == 1){
         window_closing_ = true;
     }
-    auto page = stack_browsers_->widget(index);
+    auto page = GetPage(index);
     if(page){
+        History data{(long)QDateTime::currentSecsSinceEpoch(),
+                    page->url(),
+                    page->title()};
+        RecentlyHistory.push(data);
+
         page->close();
     }
 }

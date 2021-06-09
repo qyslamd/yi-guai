@@ -4,6 +4,7 @@
 #include "managers/HistoryManager.h"
 #include "managers/FaviconManager.h"
 #include "globaldef.h"
+#include "mainwindow.h"
 
 #include <QtDebug>
 #include <QStandardItemModel>
@@ -41,11 +42,27 @@ void HistoryWidget::onShowModeChanged(ToolWndShowMode mode)
     ui->buttonPinOrClose->setToolTip(tooltip);
 }
 
+bool HistoryWidget::eventFilter(QObject *obj, QEvent *ev)
+{
+    if(obj == ui->listViewRecently){
+        if(ev->type() == QEvent::Show)
+        {
+            loadRecentlyHistories();
+        }
+    }
+    return QWidget::eventFilter(obj, ev);
+}
+
 void HistoryWidget::initUi()
 {
     ui->treeViewAll->setContextMenuPolicy(Qt::CustomContextMenu);
     all_model_ = new QStandardItemModel(ui->treeViewAll);
     ui->treeViewAll->setModel(all_model_);
+
+    ui->listViewRecently->installEventFilter(this);
+    ui->listViewRecently->setContextMenuPolicy(Qt::CustomContextMenu);
+    recently_model_ = new QStandardItemModel(ui->listViewRecently);
+    ui->listViewRecently->setModel(recently_model_);
 
     menu_in_all_ = new QMenu(this);
 //    menu_in_all_->setWindowFlag(Qt::FramelessWindowHint);
@@ -130,6 +147,23 @@ void HistoryWidget::loadAllHistories()
         item->setData(QVariant::fromValue(data), Qt::UserRole + 2);
         item->setToolTip(data.title + "\n" + data.url);
         todayItem->appendRow(item);
+    }
+}
+
+void HistoryWidget::loadRecentlyHistories()
+{
+    recently_model_->clear();
+
+    for (auto data : MainWindow::RecentlyHistory){
+        QIcon icon(FaviconMgr::Instance().iconFilePath(data.url));
+        if(icon.isNull()){
+            icon = style()->standardIcon(QStyle::SP_MessageBoxInformation);
+        }
+        QStandardItem *item = new QStandardItem(icon, data.title);
+        item->setData(true, Qt::UserRole + 1);
+        item->setData(QVariant::fromValue(data), Qt::UserRole + 2);
+        item->setToolTip(data.title + "\n" + data.url);
+        recently_model_->appendRow(item);
     }
 }
 

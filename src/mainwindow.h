@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QMap>
 #include <QFrame>
+#include <QStack>
 
 #include "browser/cef_client_handler.h"
 #include "managers/MainWindowManager.h"
@@ -48,6 +49,7 @@ public:
     bool isInprivate() const {return created_cfg_.is_inprivate_;}
 
     static void updateInprivateCount();
+    static QStack<History> RecentlyHistory;
 
 signals:
     void windowStateChanged(Qt::WindowStates state, const QVariant &data);

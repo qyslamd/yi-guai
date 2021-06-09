@@ -18,13 +18,17 @@ public:
      explicit HistoryWidget(QWidget *parent = nullptr);
     ~HistoryWidget();
     void onShowModeChanged(ToolWndShowMode mode);
+
+    bool eventFilter(QObject *obj, QEvent *ev) override;
 signals:
     void pinOrCloseClicked(bool pin);
     void menuCmd(HistoryCmd cmd, const QVariant &para);
 
+
 private:
     Ui::HistoryWidget *ui;
     QStandardItemModel* all_model_;
+    QStandardItemModel* recently_model_;
 
     QMenu *menu_in_all_;
     QAction *ac_open_;
@@ -44,6 +48,7 @@ private:
     void setIcons();
 
     void loadAllHistories();
+    void loadRecentlyHistories();
 private slots:
     void onTreeAllHisContextMenu(const QPoint &pos);
 };
