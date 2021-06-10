@@ -10,7 +10,7 @@ namespace Ui {
 class BookmarkWidget;
 }
 
-class QMenu;
+class StyledMenu;
 class QAction;
 class QTreeWidgetItem;
 class BookmarkWidget : public QWidget
@@ -35,7 +35,7 @@ private:
     void initUi();
 
     // actions for more button
-    QMenu *menu_more_;
+    StyledMenu *menu_more_;
     QAction *action_manage_bookmarks_;         // 管理书签
                                                // ------------------
     QAction *action_add_current_;              // 将当前页添加到收藏夹
@@ -49,7 +49,7 @@ private:
     QAction *action_show_bookmark_btn_;        // 在工具栏中显示/隐藏收藏夹按钮
 
     // actions for bookmarks
-    QMenu *menu_tree_bkmk_;
+    StyledMenu *menu_tree_bkmk_;
     QAction *ac_open_bkmk_in_new_page_;        // 在新标签页中打开
     QAction *ac_open_bkmk_in_new_window_;      // 在新窗口中打开
     QAction *ac_open_in_inprivate_;            // 在新无痕窗口中打开
@@ -60,7 +60,7 @@ private:
     QAction *ac_delte_bkmk_;                   // 删除
 
     // actions for bookmark folder
-    QMenu *menu_tree_bkmk_dir_;
+    StyledMenu *menu_tree_bkmk_dir_;
     QAction *ac_open_all_bkmk_page_;           // 在新标签页中打开所有
     QAction *ac_open_all_bkmk_window_;         // 在新窗口中打开所有
     QAction *ac_open_all_in_inprivate_;        // 在新无痕窗口中打开

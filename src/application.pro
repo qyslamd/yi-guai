@@ -39,6 +39,7 @@ SOURCES += \
     popups/PopupBase.cpp \
     popups/PopupGeneral.cpp \
     popups/SiteInfoPopup.cpp \
+    popups/StyledMenu.cpp \
     popups/UserInfoPopup.cpp \
     popups/ZoomPopup.cpp \
     test/test.cpp \
@@ -91,6 +92,7 @@ HEADERS += \
     popups/PopupBase.h \
     popups/PopupGeneral.h \
     popups/SiteInfoPopup.h \
+    popups/StyledMenu.h \
     popups/UserInfoPopup.h \
     popups/ZoomPopup.h \
     test/test.h \

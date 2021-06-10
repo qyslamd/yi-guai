@@ -2,7 +2,6 @@
 #include "ui_BookmarkWidget.h"
 
 #include <QTreeWidget>
-#include <QMenu>
 #include <QtDebug>
 #include <QShowEvent>
 #include <QTreeWidgetItem>
@@ -10,14 +9,15 @@
 #include <QClipboard>
 #include <QTimer>
 
+#include "popups/StyledMenu.h"
 #include "managers/AppCfgManager.h"
 
 BookmarkWidget::BookmarkWidget(QWidget *parent) :
     QWidget(parent)
   , ui(new Ui::BookmarkWidget)
-  , menu_more_(new QMenu(this))
-  , menu_tree_bkmk_(new QMenu(this))
-  , menu_tree_bkmk_dir_(new QMenu(this))
+  , menu_more_(new StyledMenu(this))
+  , menu_tree_bkmk_(new StyledMenu(this))
+  , menu_tree_bkmk_dir_(new StyledMenu(this))
 {
     ui->setupUi(this);
     initUi();
@@ -54,7 +54,7 @@ bool BookmarkWidget::eventFilter(QObject *watched, QEvent *event)
 {
     if(watched == menu_more_){
         if(event->type() == QEvent::Show){
-            QTimer::singleShot(5, [this](){
+            QTimer::singleShot(5, this, [this](){
                 auto pos = mapToGlobal(ui->buttonMore->geometry().bottomRight());
                 pos.setX(pos.x() - menu_more_->width());
                 menu_more_->move(pos);
@@ -80,9 +80,6 @@ void BookmarkWidget::initUi()
     action_show_bookmark_bar_->setChecked(AppCfgMgr::bookmarkBarVisible());
     action_show_bookmark_btn_ = new QAction(QIcon(), tr("show bookmark button in toolbar"), this);
 
-    menu_more_->setObjectName("BkmkWidgetMoreOptionMenu");
-    menu_more_->setWindowFlags(menu_more_->windowFlags() | Qt::FramelessWindowHint);
-    menu_more_->setAttribute(Qt::WA_TranslucentBackground);
     menu_more_->installEventFilter(this);
     menu_more_->addAction(action_manage_bookmarks_);
     menu_more_->addSeparator();

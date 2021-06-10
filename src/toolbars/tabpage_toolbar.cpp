@@ -126,6 +126,7 @@ void TabPageToolBar::initUi()
     setStyleSheet(QString(
                 ".TabPageToolBar{"
                 "background-color:%1;"
+                "border-top:1px solid gray;"
                 "}"
                 ".TabPageToolBar:!active{"
                 "background-color:%2"

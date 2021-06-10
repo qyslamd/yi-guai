@@ -10,76 +10,15 @@
 #include <QChildEvent>
 #include <QAbstractButton>
 
+#include "popups/StyledMenu.h"
+
 TabBar::TabBar(bool inprivate, QWidget *parent)
     : QTabBar(parent)
     , inprivate_(inprivate)
 {
-    setDrawBase(false);
-    setTabsClosable(true);
-    setMovable(true);
-    setStyle(new TabbarStyle(inprivate));
-
-    menu_ = new QMenu(this);
-    menu_->setWindowFlag(Qt::FramelessWindowHint);
-    menu_->setAttribute(Qt::WA_TranslucentBackground);
-    menu_->setAutoFillBackground(true);
-    menu_->setObjectName("TabBarTabMenu");
-//    QGraphicsBlurEffect *effect = new QGraphicsBlurEffect(this);
-//    menu_->setGraphicsEffect(effect);
-
-    act_new_tab = new QAction( tr("Create a new tab page"),this);
-    act_new_tab->setShortcut(QKeySequence(tr("Ctrl+T")));
-    act_reload_  = new QAction( tr("Reload"),this);
-    act_reload_->setShortcut(QKeySequence(tr("Ctrl+R")));
-    act_mute_ = new QAction( tr("Mute the page"),this);
-    act_mute_->setIcon(QIcon(":/icons/resources/imgs/normal_opensound.png"));
-    act_close_this_     = new QAction( tr("Close this tab page"),this);
-    act_close_this_->setShortcut(QKeySequence(tr("Ctrl+W")));
-    act_close_others_   = new QAction(tr("Close other tab pages") ,this);
-    act_close_right_    = new QAction(tr("Close all on the right"), this);
-    act_reopen_closed_ = new QAction(tr("Reopen closed tab pages"), this);
-    act_vertical_tab_mode_ = new QAction(tr("Open vertical tab"), this);
-    act_add_all_favorates_ = new QAction(tr("Add all pages to favorates"), this);
-
-    menu_->addAction(act_new_tab);
-    menu_->addSeparator();
-
-    menu_->addAction(act_reload_);
-    menu_->addAction(act_mute_);
-    menu_->addSeparator();
-
-    menu_->addAction(act_close_this_);
-    menu_->addAction(act_close_right_);
-    menu_->addAction(act_close_others_);
-    menu_->addSeparator();
-    menu_->addAction(act_vertical_tab_mode_);
-    menu_->addAction(act_reopen_closed_);
-    menu_->addAction(act_add_all_favorates_);
-
+    initUi();
+    initSignalSlots();
     setIcons();
-
-    connect(act_new_tab, &QAction::triggered, this, [this](){
-        emit menuTriggered(TabBarCmd::NewTabPage, menu_triggered_index_);
-    });
-    connect(act_reload_, &QAction::triggered, this,[this](){
-
-        emit menuTriggered(TabBarCmd::Reload, menu_triggered_index_);
-    });
-    connect(act_mute_, &QAction::triggered, this,[this](){
-
-        emit menuTriggered(TabBarCmd::Mute, menu_triggered_index_);
-    });
-    connect(act_close_this_, &QAction::triggered, this,[this](){
-        emit menuTriggered(TabBarCmd::CloseTab, menu_triggered_index_);
-    });
-    connect(act_close_right_, &QAction::triggered, this,[this](){
-        emit menuTriggered(TabBarCmd::CloseRight, menu_triggered_index_);
-    });
-    connect(act_close_others_, &QAction::triggered, this,[this](){
-        emit menuTriggered(TabBarCmd::CloseOther, menu_triggered_index_);
-    });
-
-
     check_pos_timer_id_ = startTimer(1000);
 }
 
@@ -144,6 +83,69 @@ void TabBar::tabInserted(int index)
             }
         }
     }
+}
+
+void TabBar::initUi()
+{
+    setDrawBase(false);
+    setTabsClosable(true);
+    setMovable(true);
+    setStyle(new TabbarStyle(inprivate_));
+
+    menu_ = new StyledMenu(this);
+
+    act_new_tab = new QAction( tr("Create a new tab page"),this);
+    act_new_tab->setShortcut(QKeySequence(tr("Ctrl+T")));
+    act_reload_  = new QAction( tr("Reload"),this);
+    act_reload_->setShortcut(QKeySequence(tr("Ctrl+R")));
+    act_mute_ = new QAction( tr("Mute the page"),this);
+    act_mute_->setIcon(QIcon(":/icons/resources/imgs/normal_opensound.png"));
+    act_close_this_     = new QAction( tr("Close this tab page"),this);
+    act_close_this_->setShortcut(QKeySequence(tr("Ctrl+W")));
+    act_close_others_   = new QAction(tr("Close other tab pages") ,this);
+    act_close_right_    = new QAction(tr("Close all on the right"), this);
+    act_reopen_closed_ = new QAction(tr("Reopen closed tab pages"), this);
+    act_vertical_tab_mode_ = new QAction(tr("Open vertical tab"), this);
+    act_add_all_favorates_ = new QAction(tr("Add all pages to favorates"), this);
+
+    menu_->addAction(act_new_tab);
+    menu_->addSeparator();
+
+    menu_->addAction(act_reload_);
+    menu_->addAction(act_mute_);
+    menu_->addSeparator();
+
+    menu_->addAction(act_close_this_);
+    menu_->addAction(act_close_right_);
+    menu_->addAction(act_close_others_);
+    menu_->addSeparator();
+    menu_->addAction(act_vertical_tab_mode_);
+    menu_->addAction(act_reopen_closed_);
+    menu_->addAction(act_add_all_favorates_);
+}
+
+void TabBar::initSignalSlots()
+{
+    connect(act_new_tab, &QAction::triggered, this, [this](){
+        emit menuTriggered(TabBarCmd::NewTabPage, menu_triggered_index_);
+    });
+    connect(act_reload_, &QAction::triggered, this,[this](){
+
+        emit menuTriggered(TabBarCmd::Reload, menu_triggered_index_);
+    });
+    connect(act_mute_, &QAction::triggered, this,[this](){
+
+        emit menuTriggered(TabBarCmd::Mute, menu_triggered_index_);
+    });
+    connect(act_close_this_, &QAction::triggered, this,[this](){
+        emit menuTriggered(TabBarCmd::CloseTab, menu_triggered_index_);
+    });
+    connect(act_close_right_, &QAction::triggered, this,[this](){
+        emit menuTriggered(TabBarCmd::CloseRight, menu_triggered_index_);
+    });
+    connect(act_close_others_, &QAction::triggered, this,[this](){
+        emit menuTriggered(TabBarCmd::CloseOther, menu_triggered_index_);
+    });
 }
 
 void TabBar::setIcons()

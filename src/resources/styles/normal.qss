@@ -3,14 +3,23 @@
 font-family:"Microsoft Yahei";
 }
 
-QWidget#mainwindow_north_widget{
-background-color:#F9F9FB;
+StyledMenu{
+background-color: #ffffff;
+border: 2px solid #e8e8e8;
+border-radius: 6px;
+border-bottom-right-radius:0px;
 }
-
-QWidget#mainwindow_east_widget{
-background-color:white;
-border:none;
-border-left:1px solid #D2D2D2;
+StyledMenu::item {
+background-color: transparent;
+ /* padding: top right bottom left*/
+padding: 4px 14px 4px 14px;
+}
+StyledMenu::icon{
+padding-left: 15px;
+}
+StyledMenu::item:selected:enabled  {
+color:black;
+background-color: #EEEEEE;
 }
 
 
@@ -18,18 +27,118 @@ QToolButton{
 border:none;
 border-radius:4px;
 }
-
 QToolButton:hover{
 background-color:rgba(169,169,169, 30%);
 }
-
 QToolButton:open{
 background: #CFCFCF;
 border:none;
 }
-
 QToolButton#NaviBarOptionBtn::menu-indicator{
 image: none;
+}
+
+
+/******************************************
+Description:Customizing QScrollBar
+Scope:Global QScrollBar
+*/
+/*modify vertical*/
+QScrollBar:vertical
+{
+    width:8px;
+    background:rgba(0,0,0,0%);
+    margin:0px,0px,0px,0px;
+    padding-top:9px;
+    padding-bottom:9px;
+}
+QScrollBar::handle:vertical
+{
+    width:8px;
+    background:rgba(0,0,0,25%);
+    border-radius:4px;
+    min-height:20;
+}
+QScrollBar::handle:vertical:hover
+{
+    width:8px;
+    background:rgba(0,0,0,50%);
+    border-radius:4px;
+    min-height:20;
+}
+
+QScrollBar::add-line:vertical
+{
+    height:9px;width:8px;
+    border-image:url(:/icons/resources/imgs/page_down.png);
+    subcontrol-position:bottom;
+}
+QScrollBar::sub-line:vertical
+{
+    height:9px;width:8px;
+    border-image:url(:/icons/resources//imgs/page_up.png);
+    subcontrol-position:top;
+}
+
+QScrollBar::add-page:vertical,QScrollBar::sub-page:vertical
+{
+    background:rgba(0,0,0,10%);
+    border-radius:4px;
+}
+
+/*modify horizontal*/
+QScrollBar:horizontal
+{
+    height:8px;
+    background:rgba(0,0,0,0%);
+    margin:0px,0px,0px,0px;
+    padding-left:9px;
+    padding-right:9px;
+}
+QScrollBar::handle:horizontal
+{
+    height:8px;
+    background:rgba(0,0,0,25%);
+    border-radius:4px;
+    min-height:20;
+}
+QScrollBar::handle:horizontal:hover
+{
+    height:8px;
+    background:rgba(0,0,0,50%);
+    border-radius:4px;
+    min-height:20;
+}
+
+QScrollBar::add-line:horizontal
+{
+    height:9px;width:8px;
+    border-image:url(:/icons/resources/imgs/page_right.png);
+    subcontrol-position:right;
+}
+QScrollBar::sub-line:horizontal
+{
+    height:9px;width:8px;
+    border-image:url(:/icons/resources/imgs/page_left.png);
+    subcontrol-position:left;
+}
+
+QScrollBar::add-page:horizontal,QScrollBar::sub-page:horizontal
+{
+    background:rgba(0,0,0,10%);
+    border-radius:4px;
+}
+
+
+QWidget#mainwindow_north_widget{
+background-color:#F9F9FB;
+border:none;
+}
+
+QWidget#mainwindow_east_widget{
+background-color:white;
+border:none;
+border-left:1px solid #D2D2D2;
 }
 
 QFrame#ZoomBarFrame{
@@ -113,48 +222,6 @@ background-color:rgba(169,169,169, 30%);
 border-radius:4px;
 }
 
-QMenu#TabBarTabMenu{
-background-color: #ffffff;
-border: 2px solid #e8e8e8;
-border-radius: 6px;
-border-bottom-right-radius:0px;
-}
-QMenu#TabBarTabMenu::item {
-background-color: transparent;
- /* padding: top right bottom left*/
-padding: 4px 16px 4px 14px;
-}
-QMenu#TabBarTabMenu::item:disabled {
-color:#808080;
-}
-QMenu#TabBarTabMenu::icon{
-padding-left: 15px;
-}
-QMenu#TabBarTabMenu::item:selected:enabled {
-background-color: #52B8EB;
-color:white;
-}
-
-
-QMenu#NaviBarMoreOptionMenu{
-background-color: #ffffff;
-border: 2px solid #e8e8e8;
-border-radius: 6px;
-border-bottom-right-radius:0px;
-}
-QMenu#NaviBarMoreOptionMenu::item {
-background-color: transparent;
- /* padding: top right bottom left*/
-padding: 4px 16px 4px 14px;
-}
-QMenu#NaviBarMoreOptionMenu::icon{
-padding-left: 15px;
-}
-QMenu#NaviBarMoreOptionMenu::item:selected:enabled  {
-color:black;
-background-color: #EEEEEE;
-}
-
 
 QPushButton#InprivateCloseBtn{
 border:none;
@@ -164,25 +231,10 @@ color:white;
 padding:6px;
 }
 QPushButton#InprivateCloseBtn:hover{
-background-color:rgba(169,169,169, 30%);
+background-color:rgba(0,108,190, 70%);
 }
 
-
-QMenu#BkmkWidgetMoreOptionMenu{
-background-color: #ffffff;
-border: 2px solid #e8e8e8;
-border-radius: 6px;
-border-bottom-right-radius:0px;
-}
-QMenu#BkmkWidgetMoreOptionMenu::item {
-background-color: transparent;
+StyledMenu#HisWidgetAllHisMenu::item {
  /* padding: top right bottom left*/
-padding: 4px 16px 4px 14px;
-}
-QMenu#BkmkWidgetMoreOptionMenu::icon{
-padding-left: 15px;
-}
-QMenu#BkmkWidgetMoreOptionMenu::item:selected:enabled  {
-color:black;
-background-color: #EEEEEE;
+padding-right: 30px;
 }

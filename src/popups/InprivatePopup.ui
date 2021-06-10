@@ -83,7 +83,7 @@ font-weight:bold;</string>
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap resource="../resource.qrc">:/icons/resources/newIcons/hacker_128px.png</pixmap>
+        <pixmap resource="../resource.qrc">:/icons/resources/imgs/gray/private_64px.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>

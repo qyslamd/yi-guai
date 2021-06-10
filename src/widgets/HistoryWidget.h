@@ -8,7 +8,7 @@ namespace Ui {
 class HistoryWidget;
 }
 
-class QMenu;
+class StyledMenu;
 class QStandardItemModel;
 class HistoryWidget : public QWidget
 {
@@ -33,7 +33,7 @@ private:
     QStandardItemModel* all_model_;
     QStandardItemModel* recently_model_;
 
-    QMenu *menu_in_all_;
+    StyledMenu *menu_in_all_;
     QAction *ac_open_;
     QAction *ac_open_in_new_tab_;
     QAction *ac_open_in_new_window_;
@@ -53,6 +53,7 @@ private:
     void loadAllHistories();
     void loadRecentlyHistories();
 private slots:
+    void onTreeAllHisItemClicked(const QModelIndex &index);
     void onTreeAllHisContextMenu(const QPoint &pos);
 };
 

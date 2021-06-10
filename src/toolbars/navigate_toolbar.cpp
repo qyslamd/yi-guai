@@ -6,6 +6,7 @@
 #include "managers/CefManager.h"
 #include "managers/MainWindowManager.h"
 #include "popups/ZoomPopup.h"
+#include "popups/StyledMenu.h"
 
 #include <QtDebug>
 #include <QHBoxLayout>
@@ -221,9 +222,10 @@ void NavigateToolBar::initUi()
     btn_more_options_ = new QToolButton;
     btn_more_options_->setToolTip(tr("settings and other options"));
 
-    menu_more_options_ = new QMenu(this);
-    menu_more_tools_ = new QMenu;
-    menu_help_ = new QMenu;
+    menu_more_options_ = new StyledMenu(this);
+    menu_more_options_->installEventFilter(this);
+    menu_more_tools_ = new StyledMenu;
+    menu_help_ = new StyledMenu;
     action_new_tab_ = new QAction;
     action_new_tab_->setText(tr("create new tab page"));
     action_new_tab_->setShortcut(QKeySequence("Ctrl+T"));
@@ -309,12 +311,6 @@ void NavigateToolBar::initUi()
     action_quit_ = new QAction;
     action_quit_->setText(tr("quit app"));
 
-
-    menu_more_options_->setObjectName("NaviBarMoreOptionMenu");
-    menu_more_options_->setWindowFlags(menu_more_options_->windowFlags() | Qt::FramelessWindowHint);
-    menu_more_options_->setAttribute(Qt::WA_TranslucentBackground);
-    //    menu_more_options_->setMinimumSize(280,350);
-    menu_more_options_->installEventFilter(this);
     menu_more_options_->addAction(action_new_tab_);
     menu_more_options_->addAction(action_new_window_);
     menu_more_options_->addAction(action_new_inprivate_window_);
@@ -545,7 +541,7 @@ void NavigateToolBar::setIcons()
         btn_history_->setIcon(QIcon(":/icons/resources/imgs/dark/time_machine_64px.png"));
         btn_download_->setIcon(QIcon(":/icons/resources/imgs/dark/download_64px.png"));
         btn_capture_->setIcon(QIcon(":/icons/resources/imgs/dark/screenshot_64px.png"));
-        btn_inprivate_->setIcon(QIcon(":/icons/resources/newIcons/hacker_128px.png"));
+        btn_inprivate_->setIcon(QIcon(":/icons/resources/imgs/dark/private_64px.png"));
         btn_user_->setIcon(QIcon(":/icons/resources/imgs/dark/user_64px.png"));
         btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/dark/more_64px.png"));
     }else{

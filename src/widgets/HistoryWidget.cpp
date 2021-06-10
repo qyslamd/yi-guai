@@ -9,9 +9,11 @@
 #include <QtDebug>
 #include <QStandardItemModel>
 #include <QClipboard>
+#include <QKeySequence>
 #include <QDateTime>
 #include <QStyle>
-#include <QMenu>
+#include <QTimer>
+#include "popups/StyledMenu.h"
 
 HistoryWidget::HistoryWidget(QWidget *parent) :
     QWidget(parent),
@@ -68,23 +70,27 @@ void HistoryWidget::initUi()
     recently_model_ = new QStandardItemModel(ui->listViewRecently);
     ui->listViewRecently->setModel(recently_model_);
 
-    menu_in_all_ = new QMenu(this);
-//    menu_in_all_->setWindowFlag(Qt::FramelessWindowHint);
-//    menu_in_all_->setAttribute(Qt::WA_TranslucentBackground);
-//    menu_in_all_->setAutoFillBackground(true);
-//    menu_in_all_->setObjectName("HisWidgetAllHisMenu");
-
-    ac_open_ = new QAction(tr("Open"), this);
-    ac_open_in_new_tab_ = new QAction(tr("Open in new tab"), this);
-    ac_open_in_new_window_ = new QAction(tr("Open in new window"), this);
-    ac_open_in_inpriavte_ = new QAction(tr("Open in new Inprivate"), this);
-    ac_delete_ = new QAction(tr("Delete the record"), this);
-    ac_copy_link_ = new QAction(tr("Copy link"), this);
+    menu_in_all_ = new StyledMenu;
+    menu_in_all_->setObjectName("HisWidgetAllHisMenu");
+    ac_open_ = new QAction(tr("&Open"), this);
+    ac_open_in_new_tab_ = new QAction(tr("Open in new &tab"), this);
+    ac_open_in_new_window_ = new QAction(tr("Open in new &window"), this);
+    ac_open_in_inpriavte_ = new QAction(tr("Open in new &Inprivate"), this);
+    ac_delete_ = new QAction(tr("&Delete the record"), this);
+    ac_copy_link_ = new QAction(tr("&Copy link"), this);
     ac_add2favorite_ = new QAction(tr("Add to favorite"), this);
+
+    ui->tabWidget->setCurrentWidget(ui->tabAll);
 }
 
 void HistoryWidget::initSignalSlots()
 {
+    connect(menu_in_all_, &QMenu::aboutToShow, this, [this](){
+        auto size = menu_in_all_->size();
+        menu_in_all_->resize(size);
+    });
+    connect(ui->treeViewAll, &QTreeView::clicked,
+            this, &HistoryWidget::onTreeAllHisItemClicked);
     connect(ui->treeViewAll, &QTreeView::customContextMenuRequested,
             this, &HistoryWidget::onTreeAllHisContextMenu);
     connect(ui->buttonSearch, &QToolButton::clicked,
@@ -118,8 +124,11 @@ void HistoryWidget::setIcons()
 {
     ac_open_->setIcon(QIcon(""));
     ac_open_in_new_tab_->setIcon(QIcon(":/icons/resources/imgs/light/add_tab_64px.png"));
-    ac_open_in_new_window_->setIcon(QIcon(""));
+    ac_open_in_new_window_->setIcon(QIcon(":/icons/resources/imgs/light/new_window_64px.png"));
     ac_open_in_inpriavte_->setIcon(QIcon(""));
+    ac_delete_->setIcon(QIcon(":/icons/resources/imgs/light/trash_64px.png"));
+    ac_copy_link_->setIcon(QIcon(":/icons/resources/imgs/light/link_64px.png"));
+    ac_add2favorite_->setIcon(QIcon(":/icons/resources/imgs/light/add_to_favorites_64px.png"));
 }
 
 void HistoryWidget::loadAllHistories()
@@ -170,6 +179,19 @@ void HistoryWidget::loadRecentlyHistories()
         item->setData(QVariant::fromValue(data), Qt::UserRole + 2);
         item->setToolTip(data.title + "\n" + data.url);
         recently_model_->appendRow(item);
+    }
+}
+
+void HistoryWidget::onTreeAllHisItemClicked(const QModelIndex &index)
+{
+    auto item = all_model_->itemFromIndex(index);
+    if(!item){
+        return;
+    }
+    auto isData = item->data(Qt::UserRole + 1).value<bool>();
+    if(isData){
+        auto data = item->data(Qt::UserRole + 2).value<History>();
+        emit menuCmd(HistoryCmd::Open, data.url);
     }
 }
 

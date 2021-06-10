@@ -7,6 +7,7 @@
 class QAction;
 class QMenu;
 class QContextMenuEvent;
+class StyledMenu;
 
 class TabBar final: public QTabBar
 {
@@ -31,7 +32,7 @@ protected:
     void tabInserted(int index) override;
 private:
     bool inprivate_;
-    QMenu *menu_;
+    StyledMenu *menu_;
     QAction *act_new_tab;
     decltype (act_new_tab) act_reload_,
     act_mute_,
@@ -45,6 +46,8 @@ private:
     int check_pos_timer_id_;
     int menu_triggered_index_;
 
+    void initUi();
+    void initSignalSlots();
     void setIcons();
 };
 

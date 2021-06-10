@@ -13,6 +13,7 @@ class QAction;
 class QLabel;
 class QWidgetAction;
 class ZoomPopup;
+class StyledMenu;
 
 class NavigateToolBar final: public QFrame
 {
@@ -61,9 +62,9 @@ private:
     QFrame *frame_extensions_;
     QFrame *frame_tools_;
 
-    QMenu *menu_more_options_ = nullptr;
-    QMenu *menu_more_tools_ = nullptr;
-    QMenu *menu_help_ = nullptr;
+    StyledMenu *menu_more_options_ = nullptr;
+    StyledMenu *menu_more_tools_ = nullptr;
+    StyledMenu *menu_help_ = nullptr;
 
     QAction *action_new_tab_ = nullptr;
     QAction * action_new_window_;

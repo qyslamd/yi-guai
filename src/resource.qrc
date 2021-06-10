@@ -116,6 +116,19 @@
         <file>resources/imgs/light/no_audio_64px.png</file>
         <file>resources/imgs/light/pivot_table_64px.png</file>
         <file>resources/imgs/light/sound_64px.png</file>
+        <file>resources/imgs/page_down.png</file>
+        <file>resources/imgs/page_left.png</file>
+        <file>resources/imgs/page_right.png</file>
+        <file>resources/imgs/page_up.png</file>
+        <file>resources/imgs/light/add_to_favorites_64px.png</file>
+        <file>resources/imgs/light/link_64px.png</file>
+        <file>resources/imgs/light/new_window_64px.png</file>
+        <file>resources/imgs/light/trash_64px.png</file>
+        <file>resources/imgs/light/window_secured_64px.png</file>
+        <file>resources/imgs/dragon_face_96px.png</file>
+        <file>resources/imgs/hacker_128px.png</file>
+        <file>resources/imgs/gray/private_64px.png</file>
+        <file>resources/imgs/dark/private_64px.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file>resources/styles/normal.qss</file>
