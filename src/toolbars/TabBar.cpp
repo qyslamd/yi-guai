@@ -19,7 +19,7 @@ TabBar::TabBar(bool inprivate, QWidget *parent)
     initUi();
     initSignalSlots();
     setIcons();
-    check_pos_timer_id_ = startTimer(1000);
+//    check_pos_timer_id_ = startTimer(1000);
 }
 
 bool TabBar::event(QEvent *e)

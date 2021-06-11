@@ -2,12 +2,55 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN">
 <context>
+    <name>AddToFavoritePopup</name>
+    <message>
+        <location filename="../../popups/AddToFavoritePopup.ui" line="37"/>
+        <source>已添加到收藏夹</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../popups/AddToFavoritePopup.ui" line="81"/>
+        <source>名称</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../popups/AddToFavoritePopup.ui" line="98"/>
+        <source>文件夹</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../popups/AddToFavoritePopup.ui" line="131"/>
+        <source>更多</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../popups/AddToFavoritePopup.ui" line="157"/>
+        <source>完成</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../popups/AddToFavoritePopup.ui" line="170"/>
+        <source>删除</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AddressBar</name>
     <message>
-        <location filename="../../toolbars/AddressBar.cpp" line="111"/>
+        <location filename="../../toolbars/AddressBar.cpp" line="83"/>
         <source>view website infomation</source>
         <translatorcomment>查看网站的加密信息</translatorcomment>
         <translation>查看站点信息</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/AddressBar.cpp" line="98"/>
+        <source>mark to favorite</source>
+        <translation>添加到收藏夹</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/AddressBar.cpp" line="151"/>
+        <source>zoomlevel:%1</source>
+        <translation>缩放比：%1</translation>
     </message>
 </context>
 <context>
@@ -32,186 +75,425 @@
 <context>
     <name>AppCfgWidget</name>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="14"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="14"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="123"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="148"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="150"/>
-        <source>Search in settings</source>
-        <translation>搜索设置</translation>
-    </message>
-    <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="194"/>
-        <source>personal information </source>
-        <translation>个人信息</translation>
-    </message>
-    <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="214"/>
-        <source>Privacy Search and service</source>
-        <translation>隐私、搜索和服务</translation>
-    </message>
-    <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="224"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="171"/>
         <source>Appearence</source>
         <translation>外观</translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="234"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="185"/>
+        <source>Search</source>
+        <translation>搜索</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/AppConfigWidget.ui" line="199"/>
         <source>Startup</source>
         <translation>启动时</translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="244"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="213"/>
         <source>New tab page</source>
         <translation>新标签页</translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="254"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="227"/>
         <source>Download</source>
         <translation>下载</translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="339"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="316"/>
         <source>Customize browser</source>
         <translation>自定义浏览器</translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="362"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="339"/>
         <source>defualt theme</source>
         <translation>默认主题</translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="385"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="362"/>
         <source>Zoom level</source>
         <translation>缩放</translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="416"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="393"/>
         <source>Customize tool bars</source>
         <translation>自定义工具栏</translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="651"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="628"/>
         <source>show vertical tabs</source>
         <translation>显示垂直标签页按钮</translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="717"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="694"/>
         <source>show homepage button</source>
         <translation>显示“主页”按钮</translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="454"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="431"/>
         <source>set home page</source>
         <translation>设置主页</translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="730"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="707"/>
         <source>save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="588"/>
-        <location filename="../../widgets/appconfigwidget.ui" line="875"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="565"/>
         <source>show bookmark bar</source>
         <translation>显示收藏夹栏</translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="697"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="674"/>
         <source>show bookmark button</source>
         <translation>显示收藏夹按钮</translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="787"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="764"/>
         <source>show downlaod button</source>
         <translation>显示下载按钮</translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="461"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="438"/>
         <source>show history button</source>
         <translation>显示历史按钮</translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="595"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="572"/>
         <source>show capture button</source>
         <translation>显示截屏录屏按钮</translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="615"/>
+        <location filename="../../widgets/AppConfigWidget.ui" line="592"/>
         <source>show feedback button</source>
         <translation>显示反馈按钮</translation>
     </message>
+</context>
+<context>
+    <name>BookmarkWidget</name>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="852"/>
-        <source>Font</source>
-        <translation>字体</translation>
-    </message>
-    <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="903"/>
-        <source>中国制造，惠及全球</source>
+        <location filename="../../widgets/BookmarkWidget.ui" line="14"/>
+        <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="910"/>
-        <source>customize font</source>
-        <translation>自定义字体</translation>
+        <location filename="../../widgets/BookmarkWidget.ui" line="102"/>
+        <source>Bookmarks</source>
+        <translation>收藏夹</translation>
     </message>
     <message>
-        <location filename="../../widgets/appconfigwidget.ui" line="930"/>
-        <source>&lt;</source>
+        <location filename="../../widgets/BookmarkWidget.ui" line="128"/>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="73"/>
+        <source>add current to favorites</source>
+        <translation>添加当前到收藏夹</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.ui" line="154"/>
+        <source>add bookmark folder</source>
+        <translation>添加文件夹</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.ui" line="180"/>
+        <source>search in bookmarks</source>
+        <translation>在收藏夹中搜索</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.ui" line="206"/>
+        <source>more options</source>
+        <translation>更多</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.ui" line="232"/>
+        <source>pin bookmark</source>
+        <translation>固定收藏夹</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="34"/>
+        <source>pin to right</source>
+        <translation>向右停靠</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="37"/>
+        <source>close</source>
+        <translation>关闭</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="72"/>
+        <source>bookmark manage</source>
+        <translation>书签管理</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="74"/>
+        <source>add all to favorites</source>
+        <translation>添加所有到收藏夹</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="75"/>
+        <source>import favorites</source>
+        <translation>导入书签</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="76"/>
+        <source>export favorites</source>
+        <translation>导出书签</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="77"/>
+        <source>delete duplicate favorites</source>
+        <translation>删除重复的记录</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="78"/>
+        <source>show bookmark bar</source>
+        <translation>显示收藏夹栏</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="81"/>
+        <source>show bookmark button in toolbar</source>
+        <translation>在工具栏中显示收藏夹按钮</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="149"/>
+        <source>open in new page</source>
+        <translation>在新标签页中打开</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="150"/>
+        <source>open in new window</source>
+        <translation>在新窗口中打开</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="151"/>
+        <source>open in inprivate</source>
+        <translation>在新的隐私窗口中打开</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="153"/>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="202"/>
+        <source>rename</source>
+        <translation>重命名</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="154"/>
+        <source>copy link</source>
+        <translation>复制链接地址</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="155"/>
+        <source>modify</source>
+        <translation>修改</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="156"/>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="203"/>
+        <source>delete</source>
+        <translation>删除</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="197"/>
+        <source>open all</source>
+        <translation>打开所有</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="198"/>
+        <source>open all in new window</source>
+        <translation>在新窗口中打开所有</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="199"/>
+        <source>open all in inprivate</source>
+        <translation>在新的隐私窗口中打开所有</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="201"/>
+        <source>sort as name</source>
+        <translation>按名称排序</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="205"/>
+        <source>add current to this folder</source>
+        <translation>添加到当前目录</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/BookmarkWidget.cpp" line="206"/>
+        <source>add all to this folder</source>
+        <translation>添加所有到当前目录</translation>
+    </message>
+</context>
+<context>
+    <name>CaptionFrame</name>
+    <message>
+        <location filename="../../toolbars/tabpage_toolbar.cpp" line="217"/>
+        <source>minimize</source>
+        <translation>最小化</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/tabpage_toolbar.cpp" line="222"/>
+        <source>restore</source>
+        <translation>向下还原</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/tabpage_toolbar.cpp" line="223"/>
+        <source>maximize</source>
+        <translation>最大化</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/tabpage_toolbar.cpp" line="226"/>
+        <source>close</source>
+        <translation>关闭</translation>
+    </message>
+</context>
+<context>
+    <name>DownloadWidget</name>
+    <message>
+        <location filename="../../widgets/DownloadWidget.ui" line="14"/>
+        <source>Form</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../widgets/DownloadWidget.ui" line="107"/>
+        <source>Downloads</source>
+        <translation>下载</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/DownloadWidget.cpp" line="32"/>
+        <source>pin to right</source>
+        <translation>向右停靠</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/DownloadWidget.cpp" line="35"/>
+        <source>close</source>
+        <translation>关闭</translation>
     </message>
 </context>
 <context>
     <name>FramelessWidget</name>
     <message>
-        <location filename="../../widgets/framelesswidget.cpp" line="51"/>
+        <location filename="../../widgets/FramelessWidget.cpp" line="51"/>
         <source>minimize</source>
-        <translation type="unfinished"></translation>
+        <translation>最小化</translation>
     </message>
     <message>
-        <location filename="../../widgets/framelesswidget.cpp" line="56"/>
+        <location filename="../../widgets/FramelessWidget.cpp" line="56"/>
         <source>restore</source>
-        <translation type="unfinished"></translation>
+        <translation>向下还原</translation>
     </message>
     <message>
-        <location filename="../../widgets/framelesswidget.cpp" line="57"/>
+        <location filename="../../widgets/FramelessWidget.cpp" line="57"/>
         <source>maximize</source>
-        <translation type="unfinished"></translation>
+        <translation>最大化</translation>
     </message>
     <message>
-        <location filename="../../widgets/framelesswidget.cpp" line="60"/>
+        <location filename="../../widgets/FramelessWidget.cpp" line="60"/>
         <source>close</source>
-        <translation type="unfinished"></translation>
+        <translation>关闭</translation>
     </message>
 </context>
 <context>
-    <name>HistoryPopup</name>
+    <name>FullscnHint</name>
     <message>
-        <location filename="../../popups/HistoryPopup.ui" line="14"/>
+        <location filename="../../widgets/FullscnHint.ui" line="14"/>
+        <source>Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../widgets/FullscnHint.ui" line="44"/>
+        <source>Press</source>
+        <translation>按</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/FullscnHint.ui" line="70"/>
+        <source>to quit full screen</source>
+        <translation>退出全屏</translation>
+    </message>
+</context>
+<context>
+    <name>HistoryWidget</name>
+    <message>
+        <location filename="../../widgets/HistoryWidget.ui" line="14"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../popups/HistoryPopup.ui" line="170"/>
+        <location filename="../../widgets/HistoryWidget.ui" line="185"/>
         <source>Histories</source>
-        <translation type="unfinished"></translation>
+        <translation>历史记录</translation>
     </message>
     <message>
-        <location filename="../../popups/HistoryPopup.ui" line="283"/>
+        <location filename="../../widgets/HistoryWidget.ui" line="310"/>
         <source>All</source>
+        <translation>所有</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/HistoryWidget.ui" line="351"/>
+        <source>Recently Closed</source>
+        <translation>最近关闭</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/HistoryWidget.cpp" line="36"/>
+        <source>pin to right</source>
+        <translation>向右停靠</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/HistoryWidget.cpp" line="39"/>
+        <source>close</source>
+        <translation>关闭</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/HistoryWidget.cpp" line="75"/>
+        <source>&amp;Open</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../popups/HistoryPopup.ui" line="321"/>
-        <source>Recently Closed</source>
+        <location filename="../../widgets/HistoryWidget.cpp" line="76"/>
+        <source>Open in new &amp;tab</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../widgets/HistoryWidget.cpp" line="77"/>
+        <source>Open in new &amp;window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../widgets/HistoryWidget.cpp" line="78"/>
+        <source>Open in new &amp;Inprivate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../widgets/HistoryWidget.cpp" line="79"/>
+        <source>&amp;Delete the record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../widgets/HistoryWidget.cpp" line="80"/>
+        <source>&amp;Copy link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../widgets/HistoryWidget.cpp" line="81"/>
+        <source>Add to favorite</source>
+        <translation>添加到收藏夹</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/HistoryWidget.cpp" line="146"/>
+        <source>Today</source>
+        <translation>今天</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/HistoryWidget.cpp" line="148"/>
+        <source>Yestoday</source>
+        <translation>昨天</translation>
     </message>
 </context>
 <context>
@@ -240,199 +522,187 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <source>open vertical tabs</source>
-        <translation type="vanished">打开垂直标签页</translation>
-    </message>
-    <message>
-        <source>Add a tab page</source>
-        <translation type="vanished">新建标签页</translation>
-    </message>
-    <message>
-        <location filename="../../mainwindow.cpp" line="113"/>
+        <location filename="../../mainwindow.cpp" line="133"/>
         <source> %1 inprivate window%2 opened</source>
         <translation>你已打开%1个 Inprivate 窗口</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="617"/>
+        <location filename="../../mainwindow.cpp" line="707"/>
         <source>About Qt</source>
         <translation>关于Qt</translation>
     </message>
 </context>
 <context>
-    <name>NaviBar</name>
+    <name>NavigateToolBar</name>
     <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="112"/>
-        <source>create new tab page</source>
-        <translation>新建标签页</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="115"/>
-        <source>create new window</source>
-        <translation>新建窗口</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="118"/>
-        <source>create new inprivate window</source>
-        <translation>新建隐私窗口</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="121"/>
-        <source>favorates</source>
-        <translation>收藏夹</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="76"/>
-        <location filename="../../toolbars/NavigateBar.cpp" line="123"/>
-        <source>histories</source>
-        <translation>历史记录</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="43"/>
-        <source>Zoom</source>
-        <translation>缩放</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="67"/>
-        <source>click to back, press to show more histories</source>
-        <translation>点击可后退，按住可查看历史记录</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="68"/>
-        <source>click to forward, press to show more histories</source>
-        <translation>点击可前进，按住可查看历史记录</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="69"/>
-        <source>refresh</source>
-        <translation>刷新</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="70"/>
-        <source>stop loading</source>
-        <translation>停止加载</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="71"/>
-        <source>homepage</source>
-        <translation>主页</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="74"/>
-        <source>bookmarks</source>
-        <translation>书签</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="78"/>
-        <source>downlaods</source>
-        <translation>下载</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="80"/>
-        <source>screen shot</source>
-        <translation>截屏</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="82"/>
-        <location filename="../../toolbars/NavigateBar.cpp" line="299"/>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="124"/>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="213"/>
         <source>InPrivate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="84"/>
-        <source>You are browing InPrivate</source>
-        <translation>你正在浏览 InPrivate</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="87"/>
-        <source>show user information</source>
-        <translation>查看用户信息</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="88"/>
-        <source>settings and other options</source>
-        <translation>设置及其它选项</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="126"/>
-        <source>downloads</source>
-        <translation>下载</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="129"/>
-        <source>print</source>
-        <translation>打印</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="132"/>
-        <source>capture</source>
-        <translation>网页捕获</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="134"/>
-        <source>find in this page</source>
-        <translation>在页面上查找</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="137"/>
-        <source>more tools</source>
-        <translation>更多工具</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="139"/>
-        <source>browser task manager</source>
-        <translation>浏览器任务管理器</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="141"/>
-        <source>developer tool</source>
-        <translation>开发者工具</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="143"/>
-        <source>settings</source>
-        <translation>设置</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="145"/>
-        <source>help and feedback</source>
-        <translation>帮助和反馈</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="147"/>
-        <source>help</source>
-        <translation>帮助</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="149"/>
-        <source>send feed back</source>
-        <translation>发送反馈</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="151"/>
-        <source>give a like</source>
-        <translation>点个赞</translation>
-    </message>
-    <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="301"/>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="126"/>
         <source>InPrivate(%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>about</source>
-        <translation type="vanished">关于</translation>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="177"/>
+        <source>click to back, press to show more histories</source>
+        <translation>点击可后退，按住可查看历史记录</translation>
     </message>
     <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="153"/>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="180"/>
+        <source>refresh</source>
+        <translation>刷新</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="183"/>
+        <source>stop loading</source>
+        <translation>停止加载</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="186"/>
+        <source>click to forward, press to show more histories</source>
+        <translation>点击可前进，按住可查看历史记录</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="189"/>
+        <source>homepage</source>
+        <translation>主页</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="197"/>
+        <source>bookmarks</source>
+        <translation>书签</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="201"/>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="275"/>
+        <source>histories</source>
+        <translation>历史记录</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="205"/>
+        <source>downlaods</source>
+        <translation>下载</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="209"/>
+        <source>screen shot</source>
+        <translation>截屏</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="215"/>
+        <source>You are browing InPrivate</source>
+        <translation>你正在浏览 InPrivate</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="220"/>
+        <source>show user information</source>
+        <translation>查看用户信息</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="223"/>
+        <source>settings and other options</source>
+        <translation>设置及其它选项</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="230"/>
+        <source>create new tab page</source>
+        <translation>新建标签页</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="233"/>
+        <source>create new window</source>
+        <translation>新建窗口</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="236"/>
+        <source>create new inprivate window</source>
+        <translation>新建隐私窗口</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="244"/>
+        <source>Zoom</source>
+        <translation>缩放</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="273"/>
+        <source>favorates</source>
+        <translation>收藏夹</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="278"/>
+        <source>downloads</source>
+        <translation>下载</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="281"/>
+        <source>print</source>
+        <translation>打印</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="284"/>
+        <source>capture</source>
+        <translation>网页捕获</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="286"/>
+        <source>find in this page</source>
+        <translation>在页面上查找</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="290"/>
+        <source>more tools</source>
+        <translation>更多工具</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="292"/>
+        <source>browser task manager</source>
+        <translation>浏览器任务管理器</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="295"/>
+        <source>developer tool</source>
+        <translation>开发者工具</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="297"/>
+        <source>settings</source>
+        <translation>设置</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="300"/>
+        <source>help and feedback</source>
+        <translation>帮助和反馈</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="302"/>
+        <source>help</source>
+        <translation>帮助</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="304"/>
+        <source>send feed back</source>
+        <translation>发送反馈</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="306"/>
+        <source>give a like</source>
+        <translation>点个赞</translation>
+    </message>
+    <message>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="308"/>
         <source>about qt</source>
         <translation>关于Qt</translation>
     </message>
     <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="155"/>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="310"/>
         <source>about cef</source>
         <translation>关于“CEF”</translation>
     </message>
     <message>
-        <location filename="../../toolbars/NavigateBar.cpp" line="157"/>
+        <location filename="../../toolbars/navigate_toolbar.cpp" line="312"/>
         <source>quit app</source>
         <translation>退出应用</translation>
     </message>
@@ -440,30 +710,25 @@
 <context>
     <name>NotificationBar</name>
     <message>
-        <location filename="../../toolbars/NotificationBar.ui" line="14"/>
+        <location filename="../../toolbars/notification_toolbar.ui" line="14"/>
         <source>Frame</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toolbars/NotificationBar.ui" line="89"/>
+        <location filename="../../toolbars/notification_toolbar.ui" line="89"/>
         <source>Comfirm</source>
-        <translation type="unfinished"></translation>
+        <translation>确定</translation>
     </message>
     <message>
-        <location filename="../../toolbars/NotificationBar.ui" line="96"/>
+        <location filename="../../toolbars/notification_toolbar.ui" line="96"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>取消</translation>
     </message>
 </context>
 <context>
     <name>Page</name>
     <message>
-        <location filename="../../page.cpp" line="87"/>
-        <source>View </source>
-        <translation>查看 </translation>
-    </message>
-    <message>
-        <location filename="../../page.cpp" line="203"/>
+        <location filename="../../page.cpp" line="236"/>
         <source>Developer Tools - </source>
         <translation type="unfinished"></translation>
     </message>
@@ -489,87 +754,109 @@
     <message>
         <location filename="../../main.cpp" line="80"/>
         <source>warning</source>
-        <translation type="unfinished"></translation>
+        <translation>警告</translation>
     </message>
     <message>
         <location filename="../../main.cpp" line="81"/>
         <source>intialize cef failed!
  application will quit!</source>
+        <translation>Cef初始化失败！应用即将退出！</translation>
+    </message>
+</context>
+<context>
+    <name>SiteInfoPopup</name>
+    <message>
+        <location filename="../../popups/SiteInfoPopup.ui" line="147"/>
+        <source>链接安全</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../popups/SiteInfoPopup.ui" line="196"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;SimSun&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../popups/SiteInfoPopup.cpp" line="55"/>
+        <source>View </source>
+        <translation>查看 </translation>
     </message>
 </context>
 <context>
     <name>TabBar</name>
     <message>
-        <location filename="../../toolbars/TabBar.cpp" line="28"/>
+        <location filename="../../toolbars/TabBar.cpp" line="97"/>
         <source>Create a new tab page</source>
         <translation>新建标签页</translation>
     </message>
     <message>
-        <location filename="../../toolbars/TabBar.cpp" line="29"/>
+        <location filename="../../toolbars/TabBar.cpp" line="98"/>
         <source>Ctrl+T</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toolbars/TabBar.cpp" line="30"/>
+        <location filename="../../toolbars/TabBar.cpp" line="99"/>
         <source>Reload</source>
         <translation>刷新</translation>
     </message>
     <message>
-        <location filename="../../toolbars/TabBar.cpp" line="31"/>
+        <location filename="../../toolbars/TabBar.cpp" line="100"/>
         <source>Ctrl+R</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toolbars/TabBar.cpp" line="32"/>
+        <location filename="../../toolbars/TabBar.cpp" line="101"/>
         <source>Mute the page</source>
         <translation>使标签页静音</translation>
     </message>
     <message>
-        <location filename="../../toolbars/TabBar.cpp" line="34"/>
+        <location filename="../../toolbars/TabBar.cpp" line="103"/>
         <source>Close this tab page</source>
         <translation>关闭标签页</translation>
     </message>
     <message>
-        <location filename="../../toolbars/TabBar.cpp" line="35"/>
+        <location filename="../../toolbars/TabBar.cpp" line="104"/>
         <source>Ctrl+W</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toolbars/TabBar.cpp" line="36"/>
+        <location filename="../../toolbars/TabBar.cpp" line="105"/>
         <source>Close other tab pages</source>
         <translation>关闭其它标签页</translation>
     </message>
     <message>
-        <location filename="../../toolbars/TabBar.cpp" line="37"/>
+        <location filename="../../toolbars/TabBar.cpp" line="106"/>
         <source>Close all on the right</source>
         <translation>关闭右侧标签页</translation>
     </message>
     <message>
-        <location filename="../../toolbars/TabBar.cpp" line="38"/>
+        <location filename="../../toolbars/TabBar.cpp" line="107"/>
         <source>Reopen closed tab pages</source>
         <translation>重新打开关闭的标签页</translation>
     </message>
     <message>
-        <location filename="../../toolbars/TabBar.cpp" line="39"/>
+        <location filename="../../toolbars/TabBar.cpp" line="108"/>
         <source>Open vertical tab</source>
         <translation>打开垂直标签页</translation>
     </message>
     <message>
-        <location filename="../../toolbars/TabBar.cpp" line="40"/>
+        <location filename="../../toolbars/TabBar.cpp" line="109"/>
         <source>Add all pages to favorates</source>
         <translation>将所有标签页添加到收藏夹</translation>
     </message>
 </context>
 <context>
-    <name>TabPagesBar</name>
+    <name>TabPageToolBar</name>
     <message>
-        <location filename="../../toolbars/TabPagesBar.cpp" line="107"/>
+        <location filename="../../toolbars/tabpage_toolbar.cpp" line="159"/>
         <source>open vertical tabs</source>
-        <translation type="unfinished">打开垂直标签页</translation>
+        <translation>打开垂直标签页</translation>
     </message>
     <message>
-        <location filename="../../toolbars/TabPagesBar.cpp" line="108"/>
+        <location filename="../../toolbars/tabpage_toolbar.cpp" line="160"/>
         <source>Add a tab page</source>
         <translation>新建标签页</translation>
     </message>
@@ -646,6 +933,34 @@
         <location filename="../../popups/UserInfoPopup.ui" line="322"/>
         <source>Copy info</source>
         <translation>复制信息</translation>
+    </message>
+</context>
+<context>
+    <name>ZoomPopup</name>
+    <message>
+        <location filename="../../popups/ZoomPopup.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../popups/ZoomPopup.ui" line="42"/>
+        <source>zoom in</source>
+        <translation>放大</translation>
+    </message>
+    <message>
+        <location filename="../../popups/ZoomPopup.ui" line="56"/>
+        <source>zoom out</source>
+        <translation>缩小</translation>
+    </message>
+    <message>
+        <location filename="../../popups/ZoomPopup.ui" line="70"/>
+        <source>reset zoom level</source>
+        <translation>重置缩放</translation>
+    </message>
+    <message>
+        <location filename="../../popups/ZoomPopup.ui" line="85"/>
+        <source>Reset</source>
+        <translation>重置</translation>
     </message>
 </context>
 </TS>

@@ -25,6 +25,8 @@ private:
 
     void loadHistories();
     void saveToFile();
+
+    bool exist(const QString &url);
 };
 
 #endif // HISTORYMANAGER_H

@@ -287,7 +287,7 @@ alignment: center;
 QTabBar::tab {
     border:none;
     background: #FFFFFF;
-    width: 100px;
+    width: 80px;
     height: 30px;
     color: #999999;
 }

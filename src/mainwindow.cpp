@@ -984,7 +984,7 @@ void MainWindow::onBrowserShortcut(const CefKeyEvent &event,
     }
 
     // Ctrl + Shift + I
-    // 新建InPrivate浏览器窗口
+    // 打开开发者工具
     if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_SHIFT_DOWN)
             && event.windows_key_code == 'I'){
         onDevTool();
@@ -1020,6 +1020,21 @@ void MainWindow::onBrowserShortcut(const CefKeyEvent &event,
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
         onTabSwitch();
+    }
+
+    // Alt + <--(左箭头)
+    if(event.modifiers == EVENTFLAG_ALT_DOWN
+            && event.windows_key_code == VK_LEFT
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        onGoBack();
+    }
+    // Alt + -->(右箭头)
+    if(event.modifiers == EVENTFLAG_ALT_DOWN
+            && event.windows_key_code == VK_RIGHT
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        onGoForward();
     }
 }
 

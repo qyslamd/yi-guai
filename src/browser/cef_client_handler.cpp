@@ -8,6 +8,7 @@
 #include <QApplication>
 #include "dialogs/alertdialog.h"
 #include "utils/util_qt.h"
+#include "globaldef.h"
 
 
 int CefClientHandler::gBrowserCount = 0;
@@ -366,7 +367,156 @@ void CefClientHandler::OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
                                            CefRefPtr<CefContextMenuParams> params,
                                            CefRefPtr<CefMenuModel> model)
 {
+    if ((params->GetTypeFlags() & (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_FRAME)) != 0)
+    {
+        // 在 Page 上
+        if ( params->GetTypeFlags() == CM_TYPEFLAG_PAGE )
+        {
+            model->InsertItemAt(2, MENU_ID_RELOAD, CefString(QObject::tr("Refresh").toStdString()));
+            model->InsertItemAt(3, MENU_ID_RELOAD_NOCACHE,
+                                CefString(QObject::tr("Reload ignore cache").toStdString()));
+            model->InsertItemAt(5, MENU_ID_SAVE_AS,
+                                CefString(QObject::tr("Save as").toStdString()));
+            model->InsertSeparatorAt(7);
+            model->AddItem(MENU_ID_USER_INSPECT_ELEMENT,
+                            CefString(QObject::tr("Inspect element").toStdString()));
+        }
 
+        // 在有子frame参与的page上
+        if ( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_FRAME) )
+        {
+            model->InsertItemAt(2, MENU_ID_RELOAD, CefString(QObject::tr("Refresh").toStdString()));
+            model->InsertItemAt(3, MENU_ID_RELOAD_NOCACHE,
+                                CefString(QObject::tr("Reload ignore cache").toStdString()));
+            model->InsertItemAt(5, MENU_ID_SAVE_AS,
+                                CefString(QObject::tr("Save as").toStdString()));
+            model->InsertSeparatorAt(7);
+            model->AddItem(MENU_ID_USER_FRAME_VIEW_SOURCE,
+                            CefString(QObject::tr("View frame source").toStdString()));
+            model->AddItem(MENU_ID_USER_FRAME_REFRESH,
+                            CefString(QObject::tr("Refresh frame").toStdString()));
+            model->AddItem(MENU_ID_USER_INSPECT_ELEMENT,
+                            CefString(QObject::tr("Inspect element").toStdString()));
+        }
+
+        // 在某个链接地址上
+        if( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_LINK) )
+        {
+            if(model->Clear()){
+                model->AddItem(MENU_ID_USER_OPEN_LINK_PAGE, CefString(QObject::tr("Open the link in a new tab").toStdString()));
+                model->AddItem(MENU_ID_USER_OPEN_LINK_WINDOW, CefString(QObject::tr("Open the link in a new window").toStdString()));
+                model->AddItem(MENU_ID_USER_OPEN_LINK_INPRIVATE,
+                               CefString(QObject::tr("Open the link in private window").toStdString()));
+                model->AddSeparator();
+                model->AddItem(MENU_ID_USER_COPY_LINK_URL, CefString(QObject::tr("Copy link address").toStdString()));
+                model->AddSeparator();
+                model->AddItem(MENU_ID_USER_INSPECT_ELEMENT,
+                                CefString(QObject::tr("Inspect element").toStdString()));
+            }
+        }
+        // 输入框
+        if( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_EDITABLE) )
+        {
+            model->InsertItemAt(0, MENU_ID_USER_EMOJI, CefString(QObject::tr("emoji").toStdString()));
+        }
+
+        // 选中非链接地址的内容
+        if( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_SELECTION) )
+        {
+            model->AddItem(MENU_ID_USER_SEARCH_SELECTED, CefString(QObject::tr("Searh in web").toStdString()));
+            model->AddSeparator();
+            model->AddItem(MENU_ID_USER_INSPECT_ELEMENT,
+                            CefString(QObject::tr("Inspect element").toStdString()));
+        }
+
+        // 图片上
+        if( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_MEDIA) )
+        {
+            if(model->Clear()){
+                model->AddItem(MENU_ID_USER_OPEN_IMAGE_PAGE,
+                               CefString(QObject::tr("Open image in new page").toStdString()));
+                model->AddItem(MENU_ID_USER_SAVE_IMAGE_AS,
+                               CefString(QObject::tr("Save image as").toStdString()));
+                model->AddItem(MENU_ID_USER_COPY_IMAGE,
+                               CefString(QObject::tr("Copy image").toStdString()));
+                model->AddItem(MENU_ID_USER_COPY_IMAGE_LIINK,
+                               CefString(QObject::tr("Copy image url").toStdString()));
+                model->AddSeparator();
+                model->AddItem(MENU_ID_USER_INSPECT_ELEMENT,
+                                CefString(QObject::tr("Inspect element").toStdString()));
+            }
+        }
+        // 既是图片又是链接又在Page上
+        if( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_MEDIA | CM_TYPEFLAG_LINK) )
+        {
+            if(model->Clear()){
+                model->AddItem(MENU_ID_USER_OPEN_LINK_PAGE, CefString(QObject::tr("Open the link in a new tab").toStdString()));
+                model->AddItem(MENU_ID_USER_OPEN_LINK_WINDOW, CefString(QObject::tr("Open the link in a new window").toStdString()));
+                model->AddItem(MENU_ID_USER_OPEN_LINK_INPRIVATE,
+                               CefString(QObject::tr("Open the link in private window").toStdString()));
+                model->AddSeparator();
+                model->AddItem(MENU_ID_USER_COPY_LINK_URL, CefString(QObject::tr("Copy link address").toStdString()));
+                model->AddSeparator();
+                model->AddItem(MENU_ID_USER_OPEN_IMAGE_PAGE,
+                               CefString(QObject::tr("Open image in new page").toStdString()));
+                model->AddItem(MENU_ID_USER_SAVE_IMAGE_AS,
+                               CefString(QObject::tr("Save image as").toStdString()));
+                model->AddItem(MENU_ID_USER_COPY_IMAGE,
+                               CefString(QObject::tr("Copy image").toStdString()));
+                model->AddItem(MENU_ID_USER_COPY_IMAGE_LIINK,
+                               CefString(QObject::tr("Copy image url").toStdString()));
+                model->AddSeparator();
+                model->AddItem(MENU_ID_USER_INSPECT_ELEMENT,
+                                CefString(QObject::tr("Inspect element").toStdString()));
+            }
+        }
+        // 在Page上选中内容，选中的内容是链接地址
+        if( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_SELECTION | CM_TYPEFLAG_LINK) )
+        {
+            model->InsertItemAt(0, MENU_ID_USER_OPEN_LINK_PAGE, CefString(QObject::tr("Open the link in a new tab").toStdString()));
+            model->InsertItemAt(1, MENU_ID_USER_OPEN_LINK_WINDOW, CefString(QObject::tr("Open the link in a new window").toStdString()));
+            model->InsertItemAt(2, MENU_ID_USER_OPEN_LINK_INPRIVATE,
+                           CefString(QObject::tr("Open the link in private window").toStdString()));
+            model->InsertSeparatorAt(3);
+            model->InsertItemAt(4, MENU_ID_USER_COPY_LINK_URL, CefString(QObject::tr("Copy link address").toStdString()));
+            model->InsertSeparatorAt(5);
+            // copy
+            model->AddItem(MENU_ID_USER_SEARCH_SELECTED, CefString(QObject::tr("Searh in web").toStdString()));
+            model->AddSeparator();
+            model->AddItem(MENU_ID_USER_INSPECT_ELEMENT,
+                            CefString(QObject::tr("Inspect element").toStdString()));
+        }
+        if( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_SELECTION | CM_TYPEFLAG_LINK | CM_TYPEFLAG_FRAME) )
+        {
+
+        }
+        if( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_MEDIA | CM_TYPEFLAG_LINK | CM_TYPEFLAG_FRAME) )
+        {
+
+        }
+        if( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_EDITABLE| CM_TYPEFLAG_SELECTION ) )
+        {
+
+        }
+
+        qInfo()<<__FUNCTION__<<":";
+        for(int i = 0; i< model->GetCount(); i++)
+        {
+            if(model->GetCommandIdAt(i) == -1){
+                qInfo()<<"----------------";
+            }else{
+                qInfo()<<QString::fromStdString(model->GetLabelAt(i));
+            }
+        }
+
+        // virtual bool SetAccelerator(int command_id, int key_code, bool shift_pressed, bool ctrl_pressed, bool alt_pressed) = 0;
+        model->SetAccelerator(MENU_ID_BACK, 0x25, false, false, true); // 设置加速键，atl+左箭头
+        model->SetAccelerator(MENU_ID_FORWARD, 0x27, false, false, true); // 设置加速键，atl+右箭头
+        model->SetAccelerator(MENU_ID_RELOAD, 0x52, false, true, false); // 设置加速键，Ctrl + R,
+        model->SetAccelerator(MENU_ID_PRINT, 0x50, false, true, false); // 设置加速键，Ctrl + P
+        model->SetAccelerator(MENU_ID_VIEW_SOURCE, 0x55, false, true, false); // 设置加速键，Ctrl + U
+        model->SetAccelerator(MENU_ID_USER_INSPECT_ELEMENT, 0x49, true, true, false); // Ctrl + Shift + I
+    }
 }
 
 bool CefClientHandler::OnContextMenuCommand(CefRefPtr<CefBrowser> browser,
