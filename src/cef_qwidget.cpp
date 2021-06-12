@@ -383,8 +383,10 @@ void CefQWidget::onBrowerWindowLoadStart(CefLoadHandler::TransitionType transiti
 
 void CefQWidget::onBrowerWindowLoadEnd(int httpStatusCode)
 {
-    History data{(long)QDateTime::currentSecsSinceEpoch(), url_, title_};
-    HistoryMgr::Instance().addHistoryRecord(data);
+    if(!is_dev_tool_){
+        History data{(long)QDateTime::currentSecsSinceEpoch(), url_, title_};
+        HistoryMgr::Instance().addHistoryRecord(data);
+    }
 
     emit browserLoadEnd(httpStatusCode);
 }

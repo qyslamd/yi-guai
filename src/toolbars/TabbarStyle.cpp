@@ -173,21 +173,21 @@ void TabbarStyle::drawTabBarTabShape(const QStyleOption *option,
             brush = QBrush(QColor("#3B3B3B"));
         }else{
             brush = QBrush(QColor("#F9F9FB"));
-            if(0){
-                const QStyleOptionTab *tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
-                QRectF rect = tabOption->rect;
-                QLinearGradient linearGrad(QPointF(rect.x() + rect.width() / 2, rect.y()),
-                                           QPointF(rect.x()  + rect.width() / 2,
-                                                   rect.y() + rect.height())
-                                           );
-                QColor color1(0xFFFFFF);
-                color1.setAlphaF(0.7);
-                linearGrad.setColorAt(0, color1);
-                QColor color2(0xFFFFFF);
-                color2.setAlphaF(0.1);
-                linearGrad.setColorAt(1, color2);
-                brush = QBrush(linearGrad);
-            }
+#if 0
+            const QStyleOptionTab *tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
+            QRectF rect = tabOption->rect;
+            QLinearGradient linearGrad(QPointF(rect.x() + rect.width() / 2, rect.y()),
+                                       QPointF(rect.x()  + rect.width() / 2,
+                                               rect.y() + rect.height())
+                                       );
+            QColor color1(0xFFFFFF);
+            color1.setAlphaF(0.7);
+            linearGrad.setColorAt(0, color1);
+            QColor color2(0xFFFFFF);
+            color2.setAlphaF(0.1);
+            linearGrad.setColorAt(1, color2);
+            brush = QBrush(linearGrad);
+#endif
         }
         drawShape(path, brush);
     }else if(state.testFlag(QStyle::State_MouseOver))
@@ -240,7 +240,7 @@ QPainterPath TabbarStyle::getSelectedShape(const QStyleOption *option,
 {
     auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
     QRectF rect = tabOption->rect;   // 用于绘制的整个矩形大小
-//    rect.adjust(0, 2, 0, 0);
+    rect.adjust(0, 2, 0, 0);
     qreal len = 1.0 * rect.height() * scale;   // 画弧形的正方形的边长
 
     switch (tabOption->position) {

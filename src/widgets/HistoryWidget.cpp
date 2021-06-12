@@ -163,6 +163,7 @@ void HistoryWidget::loadAllHistories()
         item->setToolTip(data.title + "\n" + data.url);
         todayItem->appendRow(item);
     }
+    qInfo()<<__FUNCTION__<<all_model_->columnCount();
 }
 
 void HistoryWidget::loadRecentlyHistories()
