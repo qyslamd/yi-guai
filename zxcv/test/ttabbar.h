@@ -12,6 +12,7 @@ protected:
     // QTabBar interface
     QSize tabSizeHint(int index) const override;
     QSize minimumTabSizeHint(int index) const override;
+    void wheelEvent(QWheelEvent *event) override;
 };
 
 #endif // TTABBAR_H

@@ -20,6 +20,7 @@
 #include <QFrame>
 #include <QTabBar>
 #include <QTimerEvent>
+#include <QScrollArea>
 
 #include "menubarstyle.h"
 #include "VerticalTabbarStyle.h"
@@ -187,49 +188,46 @@ void Widget::testLineEdit()
 
 void Widget::testTabShape()
 {
-    resize(500,300);
-
-    QHBoxLayout *layout = new QHBoxLayout;
-
-    QVBoxLayout *tabLayout = new QVBoxLayout;
+    resize(300,300);
+    QVBoxLayout *layout = new QVBoxLayout;
+    setLayout(layout);
 
     QToolButton *btnMenu = new QToolButton;
-    tabLayout->addWidget(btnMenu);
+    layout->addWidget(btnMenu);
 
-    TTabBar *tabbar = new TTabBar(this);
+    TTabBar *tabbar = new TTabBar;
     connect(tabbar, &QTabBar::tabCloseRequested, this,[=](int index)
     {
         tabbar->removeTab(index);
     });
-
-    tabbar->installEventFilter(this);
+    connect(tabbar, &QTabBar::currentChanged, this,[=](int index)
+    {
+//        qInfo()<<"L:"<<tabbar->tabRect(index);
+    });
     tabbar->setStyle(new VerticalTabbarStyle);
     auto icon = style()->standardIcon(QStyle::SP_ComputerIcon);
-    tabbar->addTab(icon, "ASDFFSS");
-    tabbar->addTab(icon, "ASDFFSS");
-    tabbar->addTab(icon, "ASDFFSS");
+    int a = 0;
+    tabbar->addTab(icon, "ASDFFSS" + QString::number(a++));
+    tabbar->addTab(icon, "ASDFFSS" + QString::number(a++));
+    tabbar->addTab(icon, "ASDFFSS" + QString::number(a++));
     tabbar->setCurrentIndex(2);
 
-    tabLayout->addWidget(tabbar);
+    QScrollArea *scrollarea = new QScrollArea(this);
+    scrollarea->setWidget(tabbar);
+    scrollarea->setWidgetResizable(true);
+    layout->addWidget(scrollarea);
 
     QFrame *line = new QFrame;
-//    line->setStyleSheet("border:1px solid #D2D2D2");
     line->setGeometry(QRect(160, 150, 118, 3));
     line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
-    tabLayout->addWidget(line);
+    layout->addWidget(line);
 
     QToolButton *btnAdd = new QToolButton;
     connect(btnAdd, &QToolButton::clicked, this, [=](){
-        tabbar->addTab(icon, "QWERTTY");
+        static int a = 3;
+        tabbar->addTab(icon, "QWERTTY" + QString::number(a++));
     });
-    tabLayout->addWidget(btnAdd);
-    tabLayout->addStretch();
-
-    layout->addLayout(tabLayout);
-
-    QFrame *frame = new QFrame;
-    frame->setStyleSheet("border:1px solid red;");
-    layout->addWidget(frame);
-    setLayout(layout);
+    layout->addWidget(btnAdd);
+//    layout->addStretch();
 }

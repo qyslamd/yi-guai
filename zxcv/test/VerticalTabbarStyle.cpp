@@ -91,16 +91,16 @@ QRect VerticalTabbarStyle::subElementRect(SubElement subElement,
                     rect.y() + (rect.height()-rect.width()) / 2,
                     rect.width(),
                     rect.height());
+        return QProxyStyle::subElementRect(subElement, option, widget);
     }
-    case QStyle::SE_TabBarScrollLeftButton:
-    {
+//    case QStyle::SE_TabBarScrollLeftButton:
+//    {
 //        auto rect = QProxyStyle::subElementRect(subElement, option, widget);
 //        return QRect(widget->rect().x() + (widget->rect().width() - rect.width()) / 2,
 //                     rect.y(),
 //                     16,
 //                     16);
-        return QProxyStyle::subElementRect(subElement, option, widget);
-    }
+//    }
     default:
         return QProxyStyle::subElementRect(subElement,option, widget);
     }

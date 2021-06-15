@@ -452,33 +452,33 @@
     </message>
     <message>
         <location filename="../../widgets/HistoryWidget.cpp" line="75"/>
-        <source>&amp;Open</source>
-        <translation type="unfinished"></translation>
+        <source>Open</source>
+        <translation>打开</translation>
     </message>
     <message>
         <location filename="../../widgets/HistoryWidget.cpp" line="76"/>
-        <source>Open in new &amp;tab</source>
-        <translation type="unfinished"></translation>
+        <source>Open in new tab</source>
+        <translation>在新标签页中打开</translation>
     </message>
     <message>
         <location filename="../../widgets/HistoryWidget.cpp" line="77"/>
-        <source>Open in new &amp;window</source>
-        <translation type="unfinished"></translation>
+        <source>Open in new window</source>
+        <translation>在新窗口中打开</translation>
     </message>
     <message>
         <location filename="../../widgets/HistoryWidget.cpp" line="78"/>
-        <source>Open in new &amp;Inprivate</source>
-        <translation type="unfinished"></translation>
+        <source>Open in new Inprivate</source>
+        <translation>在隐私窗口中打开</translation>
     </message>
     <message>
         <location filename="../../widgets/HistoryWidget.cpp" line="79"/>
-        <source>&amp;Delete the record</source>
-        <translation type="unfinished"></translation>
+        <source>Delete the record</source>
+        <translation>删除记录</translation>
     </message>
     <message>
         <location filename="../../widgets/HistoryWidget.cpp" line="80"/>
-        <source>&amp;Copy link</source>
-        <translation type="unfinished"></translation>
+        <source>Copy link</source>
+        <translation>复制链接地址</translation>
     </message>
     <message>
         <location filename="../../widgets/HistoryWidget.cpp" line="81"/>
@@ -486,14 +486,19 @@
         <translation>添加到收藏夹</translation>
     </message>
     <message>
-        <location filename="../../widgets/HistoryWidget.cpp" line="146"/>
+        <location filename="../../widgets/HistoryWidget.cpp" line="145"/>
         <source>Today</source>
         <translation>今天</translation>
     </message>
     <message>
-        <location filename="../../widgets/HistoryWidget.cpp" line="148"/>
+        <location filename="../../widgets/HistoryWidget.cpp" line="147"/>
         <source>Yestoday</source>
         <translation>昨天</translation>
+    </message>
+    <message>
+        <location filename="../../widgets/HistoryWidget.cpp" line="149"/>
+        <source>last week</source>
+        <translation>上周</translation>
     </message>
 </context>
 <context>
@@ -761,6 +766,108 @@
         <source>intialize cef failed!
  application will quit!</source>
         <translation>Cef初始化失败！应用即将退出！</translation>
+    </message>
+    <message>
+        <location filename="../../browser/cef_client_handler.cpp" line="375"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="388"/>
+        <source>Refresh</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../browser/cef_client_handler.cpp" line="377"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="390"/>
+        <source>Reload ignore cache</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../browser/cef_client_handler.cpp" line="379"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="392"/>
+        <source>Save as</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../browser/cef_client_handler.cpp" line="382"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="399"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="414"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="429"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="446"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="470"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="487"/>
+        <source>Inspect element</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../browser/cef_client_handler.cpp" line="395"/>
+        <source>View frame source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../browser/cef_client_handler.cpp" line="397"/>
+        <source>Refresh frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../browser/cef_client_handler.cpp" line="406"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="453"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="476"/>
+        <source>Open the link in a new tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../browser/cef_client_handler.cpp" line="407"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="454"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="477"/>
+        <source>Open the link in a new window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../browser/cef_client_handler.cpp" line="409"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="456"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="479"/>
+        <source>Open the link in private window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../browser/cef_client_handler.cpp" line="411"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="458"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="481"/>
+        <source>Copy link address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../browser/cef_client_handler.cpp" line="420"/>
+        <source>emoji</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../browser/cef_client_handler.cpp" line="426"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="484"/>
+        <source>Searh in web</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../browser/cef_client_handler.cpp" line="437"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="461"/>
+        <source>Open image in new page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../browser/cef_client_handler.cpp" line="439"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="463"/>
+        <source>Save image as</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../browser/cef_client_handler.cpp" line="441"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="465"/>
+        <source>Copy image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../browser/cef_client_handler.cpp" line="443"/>
+        <location filename="../../browser/cef_client_handler.cpp" line="467"/>
+        <source>Copy image url</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -441,6 +441,7 @@ void MainWindow::initSignalSlot()
     connect(tab_bar_, &TabPageToolBar::showDockPage, [this]()
     {
         // todo:
+        qInfo()<<this->objectName();
     });
     connect(tab_bar_, &TabPageToolBar::testBtnClicked, [this]()
     {
@@ -529,7 +530,7 @@ void MainWindow::onTabBarCurrentChanged(int index)
     // 地址栏需要改变
     auto page = GetPage(index);
     if(page){
-        navi_bar_->setAddress(page->url());
+        navi_bar_->setAddress(page->url(), page->edited());
         navi_bar_->setLoadingState(page->isLoading(),
                                    page->canGoBack(),
                                    page->canGoForward());
@@ -633,6 +634,12 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         break;
     case NaviBarCmd::AddFavorite:
         onAddFavorite();
+        break;
+    case NaviBarCmd::AddressEdited:
+        qInfo()<<"AddressEdited";
+        if(page){
+            page->setEditedText(para.toString());
+        }
         break;
     case NaviBarCmd::ShowZoomBar:
         if(page){
@@ -1305,8 +1312,9 @@ void MainWindow::addRecently(Page *page)
             return;
         }
     }
-    History data{(long)QDateTime::currentSecsSinceEpoch(),
+    History data{QString::number(QDateTime::currentSecsSinceEpoch()),
                 page->url(),
-                page->title()};
+                page->title(),
+                0};
     RecentlyHistory.push(data);
 }

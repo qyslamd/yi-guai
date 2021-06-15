@@ -28,6 +28,7 @@ enum class NaviBarCmd {
     Refresh,
     StopLoading,
     ViewSiteInfo,
+    AddressEdited,
     AddFavorite,
     ShowZoomBar,
     Favorite,

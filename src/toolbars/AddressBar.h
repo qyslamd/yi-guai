@@ -17,21 +17,24 @@ public:
     explicit AddressBar(bool inprivate = false, QWidget *parent = nullptr);
     bool eventFilter(QObject *obj, QEvent *ev) override;
 
-    void setText(const QString &text);
+    void setText(const QString &text, bool edited);
     void setCursorPosition(int pos);
     QString text();
 
     QRect gGeometryBtnSiteInfo() const;
     QRect gGeometryBtnAddBkmk() const;
     QRect gGeometryBtnZoom() const;
-    void setZoomLevelValue(double str);
 
-    void updateBtnState(bool checked);
 signals:
     void viewSiteInfo();
     void showZoomBar();
     void addFavorite();
     void returnPressed();
+    void textEdited(const QString &text);
+
+public:
+    void setZoomLevelValue(double str);
+    void updateBtnState(bool checked);
 private:
     bool inprivate_ = false;
 
@@ -47,10 +50,10 @@ private:
     double zoom_value_ = 0.0;
 
     void initUi();
-    void setIcons();
 
 private slots:
     void onEditingFinished();
+    void onTextEdited(const QString &text);
 };
 
 #endif // ADDRESSBAR2_H

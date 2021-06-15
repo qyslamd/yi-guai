@@ -72,12 +72,12 @@ void HistoryWidget::initUi()
 
     menu_in_all_ = new StyledMenu;
     menu_in_all_->setObjectName("HisWidgetAllHisMenu");
-    ac_open_ = new QAction(tr("&Open"), this);
-    ac_open_in_new_tab_ = new QAction(tr("Open in new &tab"), this);
-    ac_open_in_new_window_ = new QAction(tr("Open in new &window"), this);
-    ac_open_in_inpriavte_ = new QAction(tr("Open in new &Inprivate"), this);
-    ac_delete_ = new QAction(tr("&Delete the record"), this);
-    ac_copy_link_ = new QAction(tr("&Copy link"), this);
+    ac_open_ = new QAction(tr("Open"), this);
+    ac_open_in_new_tab_ = new QAction(tr("Open in new tab"), this);
+    ac_open_in_new_window_ = new QAction(tr("Open in new window"), this);
+    ac_open_in_inpriavte_ = new QAction(tr("Open in new Inprivate"), this);
+    ac_delete_ = new QAction(tr("Delete the record"), this);
+    ac_copy_link_ = new QAction(tr("Copy link"), this);
     ac_add2favorite_ = new QAction(tr("Add to favorite"), this);
 
     ui->tabWidget->setCurrentWidget(ui->tabAll);
