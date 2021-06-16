@@ -134,22 +134,24 @@ void HistoryWidget::setIcons()
 void HistoryWidget::loadAllHistories()
 {
     auto allHistories = HistoryMgr::Instance().allHistories();
-
     QIcon icon(":/icons/resources/imgs/light/time_machine_64px.png");
-//    QDateTime now = QDateTime::currentDateTime();
-//    QDate today = QDate::currentDate();
-//    QDate yestoday = today.addDays(-1);
+    QDateTime now = QDateTime::currentDateTime();
+    QDate today = QDate::currentDate();
+    QDate yestoday = today.addDays(-1);
 
     all_model_->clear();
 
-    //一级节点，目前只处理今天和昨天
+    //一级节点，今天、昨天和过去一周
     QStandardItem* todayItem = new QStandardItem(icon, tr("Today"));
     todayItem->setData(false, Qt::UserRole + 1);
     QStandardItem* yestodayItem = new QStandardItem(icon, tr("Yestoday"));
     yestodayItem->setData(false, Qt::UserRole + 1);
+    QStandardItem* weekItem = new QStandardItem(icon, tr("last week"));
+    weekItem->setData(false, Qt::UserRole + 1);
 
     all_model_->appendRow(todayItem);
     all_model_->appendRow(yestodayItem);
+    all_model_->appendRow(weekItem);
 
 
     for(auto &data : allHistories){
@@ -161,7 +163,14 @@ void HistoryWidget::loadAllHistories()
         item->setData(true, Qt::UserRole + 1);
         item->setData(QVariant::fromValue(data), Qt::UserRole + 2);
         item->setToolTip(data.title + "\n" + data.url);
-        todayItem->appendRow(item);
+        auto datetime = QDateTime::fromSecsSinceEpoch(data.lastVisitedTime.toLongLong());
+        if(datetime.date() == today){
+            todayItem->appendRow(item);
+        }else if(datetime.date() == yestoday){
+            yestodayItem->appendRow(item);
+        }else{
+            weekItem->appendRow(item);
+        }
     }
     qInfo()<<__FUNCTION__<<all_model_->columnCount();
 }

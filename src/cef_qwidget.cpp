@@ -384,7 +384,10 @@ void CefQWidget::onBrowerWindowLoadStart(CefLoadHandler::TransitionType transiti
 void CefQWidget::onBrowerWindowLoadEnd(int httpStatusCode)
 {
     if(!is_dev_tool_){
-        History data{(long)QDateTime::currentSecsSinceEpoch(), url_, title_};
+        History data{QString::number(QDateTime::currentSecsSinceEpoch()),
+                    url_,
+                    title_,
+                    1};
         HistoryMgr::Instance().addHistoryRecord(data);
     }
 
@@ -413,7 +416,7 @@ bool CefQWidget::onBrowserWndPreKeyEvent(const CefKeyEvent &event,
         return false;
     }
 
-#if 1
+#if 0
     qInfo()<<__FUNCTION__
           <<"type:"<<event.type
          <<"modifiers:"<<QString::number(event.modifiers,2)
@@ -543,7 +546,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
     {
         is_shortcut_and_need_to_be_done = true;
     }
-    // Ctrl + Shift + N
+    // Ctrl + Shift + I
     if (event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_SHIFT_DOWN)
             && event.windows_key_code == 'I'
             && event.type == KEYEVENT_RAWKEYDOWN)
@@ -574,6 +577,20 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
     // Ctrl + Tab
     if(event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == VK_TAB
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
+    // Alt + <--(左箭头)
+    if(event.modifiers == EVENTFLAG_ALT_DOWN
+            && event.windows_key_code == VK_LEFT
+            && event.type == KEYEVENT_RAWKEYDOWN)
+    {
+        is_shortcut_and_need_to_be_done = true;
+    }
+    // Alt + -->(右箭头)
+    if(event.modifiers == EVENTFLAG_ALT_DOWN
+            && event.windows_key_code == VK_RIGHT
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
         is_shortcut_and_need_to_be_done = true;

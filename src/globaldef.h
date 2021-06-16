@@ -2,6 +2,7 @@
 #define GLOBALDEF_H
 
 #include <QMetaType>
+#include <include/internal/cef_types.h>
 ///
 /// \brief The TabBarCmd enum
 ///
@@ -120,11 +121,37 @@ enum class ToolWndShowMode{
 };
 
 struct History{
-    long time;
+    QString lastVisitedTime;
     QString url;
     QString title;
+    int count;
 };
 
 Q_DECLARE_METATYPE(History);
+
+typedef enum UserMenuId{
+    MENU_ID_USER_OPENLINK = MENU_ID_USER_FIRST + 200,
+
+    MENU_ID_USER_COPY,
+    MENU_ID_SAVE_AS,
+    MENU_ID_USER_SEARCH_SELECTED,
+    MENU_ID_USER_OPEN_LINK_WINDOW,
+    MENU_ID_USER_OPEN_LINK_PAGE,
+    MENU_ID_USER_OPEN_LINK_INPRIVATE,
+    MENU_ID_USER_PRINT,
+    MENU_ID_USER_VIEW_SOURCE,
+    MENU_ID_USER_SAVEAS,
+    MENU_ID_USER_INSPECT_ELEMENT,
+    MENU_ID_USER_SHOW_SSL_INFO,
+    MENU_ID_USER_COPY_LINK_URL,
+    MENU_ID_USER_OPEN_IMAGE_PAGE,
+    MENU_ID_USER_SAVE_IMAGE_AS,
+    MENU_ID_USER_COPY_IMAGE,
+    MENU_ID_USER_COPY_IMAGE_LIINK,
+    MENU_ID_USER_FRAME_VIEW_SOURCE,
+    MENU_ID_USER_FRAME_REFRESH,
+    MENU_ID_SHOW_SSL_INFO,
+    MENU_ID_USER_EMOJI,
+}cef_menu_id_t_user;
 
 #endif // GLOBALDEF_H

@@ -35,14 +35,6 @@ void HistoryMgr::addHistoryRecord(const History &data)
         return;
     }
 
-    QDate today = QDateTime::fromSecsSinceEpoch(data.time).date();
-    for(auto &item : histories_cache_){
-        auto date = QDateTime::fromSecsSinceEpoch(item.time).date();
-        if(today == date && data.url == item.url){
-            return;
-        }
-    }
-
     histories_cache_.insert(0, data);
     saveToFile();
 }
@@ -77,11 +69,11 @@ void HistoryMgr::loadHistories()
         auto value = *it;
         if(value.isObject()){
             auto obj = value.toObject();
-            History data
-            {
-                (long)obj.value("time").toDouble(),
-                        obj.value("url").toString(),
-                        obj.value("title").toString()
+            History data{
+                obj.value("lastVisitedTime").toString(),
+                obj.value("url").toString(),
+                obj.value("title").toString(),
+                obj.value("count").toInt(1)
             };
             histories_cache_.append(data);
         }
@@ -97,9 +89,10 @@ void HistoryMgr::saveToFile()
     for( ; citer != cend; citer++)
     {
         QJsonObject jsonObj;
-        jsonObj.insert("datetime",QString::number(citer->time));
+        jsonObj.insert("lastVisitedTime", citer->lastVisitedTime);
         jsonObj.insert("url", citer->url);
         jsonObj.insert("title",citer->title);
+        jsonObj.insert("count",citer->count);
         jsonArray.append(jsonObj);
     }
 
@@ -108,4 +101,17 @@ void HistoryMgr::saveToFile()
     QString strJson(byteArray);
 
     UtilQt::writeStringToFile(record_file_path_, strJson);
+}
+
+bool HistoryMgr::exist(const QString &url)
+{
+    auto citer = histories_cache_.constBegin();
+    auto cend = histories_cache_.constEnd();
+    for( ; citer != cend; citer++)
+    {
+        if(url.compare(citer->url, Qt::CaseInsensitive) == 0){
+            return true;
+        }
+    }
+    return false;
 }
