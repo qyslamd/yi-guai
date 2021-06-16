@@ -12,7 +12,8 @@ class BookmarkWidget;
 
 class StyledMenu;
 class QAction;
-class QTreeWidgetItem;
+class QStandardItem;
+class QStandardItemModel;
 class BookmarkWidget : public QWidget
 {
     Q_OBJECT
@@ -26,13 +27,16 @@ public:
     void onBookmarksChanged();
 signals:
     void pinOrCloseClicked();
-    void cmdTriggered(BookmarkCmd cmd, const QVariant &para);
+    void menuCmd(BookmarkCmd cmd, const QVariant &para);
 public:
     bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
     Ui::BookmarkWidget *ui;
+    QStandardItemModel *all_bookmark_model_;
+    QString all_bkmk_menu_data_;
     void initUi();
+    void initSignalSlots();
 
     // actions for more button
     StyledMenu *menu_more_;
@@ -76,8 +80,12 @@ protected:
     void showEvent(QShowEvent *event) override;
 
 private slots:
-    void onTreeWidgetCustomContextMenu(const QPoint &pos);
-    void onTreeWidgetItemClicked(QTreeWidgetItem *item, int column);
+    void onFavconUpdated(const QString &urlDomain);
+    void onAllBkmkTreeCustomContextMenu(const QPoint &pos);
+
+private:
+    void loadAllBookmarks();
+    void parseNode2Item(QStandardItem *parent, const BookmarkNode *node);
 };
 
 #endif // BOOKMARKWIDGET_H

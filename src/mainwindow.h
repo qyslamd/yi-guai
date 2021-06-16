@@ -58,7 +58,6 @@ signals:
 #endif
 public:
     // QObject interface
-    bool event(QEvent *e) override;
     bool eventFilter(QObject *obj, QEvent *event) override;
 public slots:
     void onInpWndCntChanged();
@@ -144,6 +143,7 @@ private slots:
                            CefEventHandle os_event);
     void onHistoryWidgetCmd(HistoryCmd cmd, const QVariant &para);
     void onPinOrCloseHistoryWidget();
+    void onBkmkWidgetCmd(BookmarkCmd cmd, const QVariant &para);
     void onPinOrCloseBookmarkWidget();
 
 private:
