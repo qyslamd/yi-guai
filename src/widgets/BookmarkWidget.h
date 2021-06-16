@@ -12,8 +12,6 @@ class BookmarkWidget;
 
 class StyledMenu;
 class QAction;
-class QStandardItem;
-class QStandardItemModel;
 class BookmarkWidget : public QWidget
 {
     Q_OBJECT
@@ -24,7 +22,6 @@ public:
 
     void onShowModeChanged(ToolWndShowMode mode);
     void onBkmkBarVisibleChanged();
-    void onBookmarksChanged();
 signals:
     void pinOrCloseClicked();
     void menuCmd(BookmarkCmd cmd, const QVariant &para);
@@ -33,7 +30,6 @@ public:
 
 private:
     Ui::BookmarkWidget *ui;
-    QStandardItemModel *all_bookmark_model_;
     QString all_bkmk_menu_data_;
     void initUi();
     void initSignalSlots();
@@ -80,12 +76,8 @@ protected:
     void showEvent(QShowEvent *event) override;
 
 private slots:
-    void onFavconUpdated(const QString &urlDomain);
+    void onBookmarksChanged();
     void onAllBkmkTreeCustomContextMenu(const QPoint &pos);
-
-private:
-    void loadAllBookmarks();
-    void parseNode2Item(QStandardItem *parent, const BookmarkNode *node);
 };
 
 #endif // BOOKMARKWIDGET_H

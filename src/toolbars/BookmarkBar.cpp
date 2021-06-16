@@ -2,11 +2,16 @@
 
 #include <QPaintEvent>
 #include <QPainter>
+#include <QMenu>
+#include <QAction>
+#include <QElapsedTimer>
+
+
+#include "managers/BookmarkManager.h"
 
 BookmarkBar::BookmarkBar(QWidget *parent)
     : QFrame(parent)
 {
-
 }
 
 void BookmarkBar::paintEvent(QPaintEvent *event)
@@ -21,3 +26,4 @@ void BookmarkBar::paintEvent(QPaintEvent *event)
     p.drawLine(0.0, height() - penWidth, width(), height() - penWidth);
     p.restore();
 }
+

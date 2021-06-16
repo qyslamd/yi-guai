@@ -26,8 +26,6 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) :
     ui->setupUi(this);
     initUi();
     initSignalSlots();
-
-    loadAllBookmarks();
 }
 
 BookmarkWidget::~BookmarkWidget()
@@ -52,11 +50,6 @@ void BookmarkWidget::onBkmkBarVisibleChanged()
     action_show_bookmark_bar_->setChecked(AppCfgMgr::bookmarkBarVisible());
 }
 
-void BookmarkWidget::onBookmarksChanged()
-{
-
-}
-
 bool BookmarkWidget::eventFilter(QObject *watched, QEvent *event)
 {
     if(watched == menu_more_){
@@ -74,8 +67,7 @@ bool BookmarkWidget::eventFilter(QObject *watched, QEvent *event)
 
 void BookmarkWidget::initUi()
 {
-    all_bookmark_model_ = new QStandardItemModel(ui->treeView);
-    ui->treeView->setModel(all_bookmark_model_);
+    ui->treeView->setModel(BookmarkMgr::gBookmarkModel_);
 
     /* *****************General Page*************************/
     // 更多按钮菜单
@@ -158,8 +150,9 @@ void BookmarkWidget::initUi()
 
 void BookmarkWidget::initSignalSlots()
 {
-    connect(&FaviconMgr::Instance(), &FaviconMgr::iconUpdated,
-            this, &BookmarkWidget::onFavconUpdated);
+    connect(BookmarkMgr::Instance(), &BookmarkMgr::bookmarksChanged,
+            this, &BookmarkWidget::onBookmarksChanged);
+
     connect(action_manage_bookmarks_, &QAction::triggered, this, [this]()
     {
         qInfo()<<"TODO:";
@@ -245,22 +238,16 @@ void BookmarkWidget::showEvent(QShowEvent *event)
     QWidget::showEvent(event);
 }
 
-void BookmarkWidget::onFavconUpdated(const QString &urlDomain)
+void BookmarkWidget::onBookmarksChanged()
 {
-    for(int i = 0; i < all_bookmark_model_->rowCount();i++){
-       auto item =  all_bookmark_model_->item(i);
-       auto url = item->data(Qt::UserRole + 2).toString();
-       if(QUrl(url).host() == urlDomain){
-           auto iconPath = FaviconMgr::Instance().iconFilePath(url);
-           item->setIcon(QIcon(iconPath));
-       }
-    }
+    auto item = BookmarkMgr::gBookmarkModel_->item(0);
+    ui->treeView->expand(BookmarkMgr::gBookmarkModel_->indexFromItem(item));
 }
 
 void BookmarkWidget::onAllBkmkTreeCustomContextMenu(const QPoint &)
 {
     auto index = ui->treeView->indexAt(ui->treeView->viewport()->mapFromGlobal(QCursor::pos()));
-    auto item = all_bookmark_model_->itemFromIndex(index);
+    auto item = BookmarkMgr::gBookmarkModel_->itemFromIndex(index);
     if(!item){
         return;
     }
@@ -271,54 +258,4 @@ void BookmarkWidget::onAllBkmkTreeCustomContextMenu(const QPoint &)
     }else{
         menu_tree_bkmk_dir_->exec(QCursor::pos());
     }
-}
-
-void BookmarkWidget::loadAllBookmarks()
-{
-    all_bookmark_model_->clear();
-
-    auto node = BookmarkMgr::Instance()->bookmarkBarNodes();
-    if(!node){
-        return;
-    }
-    QStandardItem *barItem = new QStandardItem(style()->standardIcon(QStyle::SP_DirIcon), node->name_);
-    barItem->setData(0, Qt::UserRole + 1);
-    if(auto barNode = dynamic_cast<const BookmarkFolder*>(node)){
-        for(auto node : barNode->children_){
-            parseNode2Item(barItem, node);
-        }
-    }
-    all_bookmark_model_->appendRow(barItem);
-
-    ui->treeView->expand(barItem->index());
-}
-
-void BookmarkWidget::parseNode2Item(QStandardItem *parent, const BookmarkNode *node)
-{
-    static const QIcon fileIcon = style()->standardIcon(QStyle::SP_FileIcon);
-    static const QIcon dirIcon = style()->standardIcon(QStyle::SP_DirIcon);
-
-    QStandardItem *item = new QStandardItem(dirIcon, node->name_);
-    if(node->type_ == "folder"){
-        item->setData(0, Qt::UserRole + 1);
-        if(auto folder = dynamic_cast<const BookmarkFolder*>(node)){
-            for(auto child : folder->children_){
-                parseNode2Item(item, child);
-            }
-        }
-    }else if(node->type_ == "url"){
-        if(auto url = dynamic_cast<const BookmarkUrl*>(node)){
-            auto iconPath = FaviconMgr::Instance().iconFilePath(url->url_);
-            QIcon icon(iconPath);
-            if(icon.isNull()){
-                icon = fileIcon;
-            }
-            item->setIcon(icon);
-
-            item->setData(1, Qt::UserRole + 1);
-            item->setData(url->url_, Qt::UserRole + 2);
-        }
-    }
-
-    parent->appendRow(item);
 }

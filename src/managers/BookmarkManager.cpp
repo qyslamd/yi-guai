@@ -1,22 +1,41 @@
 #include "BookmarkManager.h"
 
+#include <QUrl>
 #include <QDir>
 #include <QUuid>
+#include <QTimer>
+#include <QStyle>
 #include <QtDebug>
+#include <QApplication>
 #include <QJsonObject>
 #include <QMutexLocker>
 #include <QJsonArray>
 #include <QJsonParseError>
 #include <QElapsedTimer>
+#include <QStandardItem>
+#include <QStandardItemModel>
 
 #include "utils/util_qt.h"
+#include "FaviconManager.h"
+
+namespace bookmark {
+int BookmarkNode::count = 0;
+int BookmarkUrl::url_count = 0;
+int BookmarkFolder::folder_count = 0;
+}
 
 BookmarkMgr* BookmarkMgr::gInst = nullptr;
 QMutex BookmarkMgr::gMutex;
+QStandardItemModel *BookmarkMgr::gBookmarkModel_ = nullptr;
 
 BookmarkMgr::BookmarkMgr(QObject *parent)
     : QObject(parent)
 {
+    if(!gBookmarkModel_){
+        gBookmarkModel_ = new QStandardItemModel(this);
+    }
+    connect(&FaviconMgr::Instance(), &FaviconMgr::iconUpdated, this, &BookmarkMgr::onFaviconUpdated);
+
     worker_ = new BookmarkWorker;
     worker_->moveToThread(&worker_thread_);
     connect(&worker_thread_, &QThread::finished, this, [this](){
@@ -29,19 +48,92 @@ BookmarkMgr::BookmarkMgr(QObject *parent)
     connect(worker_, &BookmarkWorker::saveFinished, this, &BookmarkMgr::onWokerSaveFinished);
     worker_thread_.start();
 
-    // 实例化就加载书签
-    emit load();
+    QTimer::singleShot(1, this, &BookmarkMgr::load);
 }
 
 void BookmarkMgr::onWokerLoadFinished()
 {
+    updateModel();
     emit bookmarksChanged();
-    qInfo()<<__FUNCTION__;
 }
 
 void BookmarkMgr::onWokerSaveFinished()
 {
     qInfo()<<__FUNCTION__;
+}
+
+void BookmarkMgr::onFaviconUpdated(const QString &urlDomain)
+{
+    return;
+    qInfo()<<__FUNCTION__;
+    auto rows = gBookmarkModel_->rowCount();
+    auto columns = gBookmarkModel_->columnCount();
+    for(int i = 0; i < rows; i++){
+        for(int j = 0; j < columns; j++){
+            auto item = gBookmarkModel_->item(i, j);
+            if(item){
+                auto data = item->data(Qt::UserRole + 1).toBool();
+                if(data){
+                    auto url = item->data(Qt::UserRole + 2).toString();
+                    if(QUrl(url).host() == urlDomain){
+                        item->setIcon(QIcon(FaviconMgr::Instance().iconFilePath(url)));
+                    }
+                }
+            }
+        }
+    }
+}
+
+void BookmarkMgr::updateModel()
+{
+    QElapsedTimer timer;
+    timer.start();
+
+    gBookmarkModel_->clear();
+
+    auto node = bkmk_toolbar_bkmks_;
+    if(!node){
+        return;
+    }
+    QStandardItem *barItem = new QStandardItem(qApp->style()->standardIcon(QStyle::SP_DirIcon), node->name_);
+    barItem->setData(0, Qt::UserRole + 1);
+    if(auto barNode = dynamic_cast<const bookmark::BookmarkFolder*>(node)){
+        for(auto node : barNode->children_){
+            parseNode2Item(barItem, node);
+        }
+    }
+    gBookmarkModel_->appendRow(barItem);
+    qInfo()<<__FUNCTION__<<":" << timer.elapsed() << "milliseconds";
+}
+
+void BookmarkMgr::parseNode2Item(QStandardItem *parent, const bookmark::BookmarkNode *node)
+{
+    static const QIcon fileIcon = qApp->style()->standardIcon(QStyle::SP_FileIcon);
+    static const QIcon dirIcon = qApp->style()->standardIcon(QStyle::SP_DirIcon);
+
+    QStandardItem *item = new QStandardItem(dirIcon, node->name_);
+    if(node->type_ == "folder"){
+        item->setData(0, Qt::UserRole + 1);
+        if(auto folder = dynamic_cast<const bookmark::BookmarkFolder*>(node)){
+            for(auto child : folder->children_){
+                parseNode2Item(item, child);
+            }
+        }
+    }else if(node->type_ == "url"){
+        if(auto url = dynamic_cast<const bookmark::BookmarkUrl*>(node)){
+            auto iconPath = FaviconMgr::Instance().iconFilePath(url->url_);
+            QIcon icon(iconPath);
+            if(icon.isNull()){
+                icon = fileIcon;
+            }
+            item->setIcon(icon);
+
+            item->setData(1, Qt::UserRole + 1);
+            item->setData(url->url_, Qt::UserRole + 2);
+        }
+    }
+
+    parent->appendRow(item);
 }
 
 BookmarkMgr::~BookmarkMgr()
@@ -54,11 +146,6 @@ BookmarkMgr::~BookmarkMgr()
     delete bkmk_toolbar_bkmks_;
     delete other_bkmks_;
     delete synced_bkmks_;
-}
-
-const BookmarkNode *BookmarkMgr::bookmarkBarNodes()
-{
-    return bkmk_toolbar_bkmks_;
 }
 
 BookmarkMgr *BookmarkMgr::Instance()
@@ -212,23 +299,23 @@ void BookmarkWorker::loadFromFile()
     qInfo()<<__FUNCTION__<<":" << timer.elapsed() << "milliseconds";
 }
 
-BookmarkNode *BookmarkWorker::parseNode(const QJsonObject &obj)
+bookmark::BookmarkNode *BookmarkWorker::parseNode(const QJsonObject &obj)
 {
-    BookmarkNode *ret = nullptr;
+    bookmark::BookmarkNode *ret = nullptr;
     auto type = obj.value("type").toString();
     if(type == "folder"){
-        auto folder = new BookmarkFolder;
+        auto folder = new bookmark::BookmarkFolder;
         folder->guid_ = obj.value("guid").toString();
         folder->id_ = obj.value("id").toString();
         folder->date_added_ = obj.value("date_added").toString();
         folder->name_ = obj.value("name").toString();
         folder->type_ = obj.value("type").toString();
-        for(auto item : obj.value("children").toArray()){
+        foreach(auto item , obj.value("children").toArray()){
             folder->children_.append(parseNode(item.toObject()));
         }
         ret = folder;
     }else if(type == "url"){
-        auto url = new BookmarkUrl;
+        auto url = new bookmark::BookmarkUrl;
         url->guid_ = obj.value("guid").toString();
         url->id_ = obj.value("id").toString();
         url->date_added_ = obj.value("date_added").toString();
@@ -240,7 +327,7 @@ BookmarkNode *BookmarkWorker::parseNode(const QJsonObject &obj)
     return ret;
 }
 
-QJsonObject BookmarkWorker::createObject(BookmarkNode *node)
+QJsonObject BookmarkWorker::createObject(bookmark::BookmarkNode *node)
 {
     QJsonObject obj;
     obj.insert("guid",       node->guid_);
@@ -249,17 +336,17 @@ QJsonObject BookmarkWorker::createObject(BookmarkNode *node)
     obj.insert("name",       node->name_);
     obj.insert("type",       node->type_);
     if(node->type_ == "folder"){
-        if(auto folder = dynamic_cast<BookmarkFolder*>(node))
+        if(auto folder = dynamic_cast<bookmark::BookmarkFolder*>(node))
         {
             obj.insert("date_modified", folder->date_modified_);
             QJsonArray array;
-            for(auto child : folder->children_){
+            foreach(auto child , folder->children_){
                 array.append(createObject(child));
             }
             obj.insert("children", array);
         }
     }else if(node->type_ == "url"){
-        if(auto url = dynamic_cast<BookmarkUrl*>(node))
+        if(auto url = dynamic_cast<bookmark::BookmarkUrl*>(node))
             obj.insert("url", url->url_);
     }
     return obj;

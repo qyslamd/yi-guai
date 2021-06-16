@@ -2,6 +2,7 @@
 #define BOOKMARKBAR_H
 
 #include <QFrame>
+#include "globaldef.h"
 
 class BookmarkBar : public QFrame
 {

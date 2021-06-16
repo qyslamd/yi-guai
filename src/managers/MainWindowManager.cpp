@@ -6,6 +6,10 @@
 #include <QElapsedTimer>
 
 #include "AppCfgManager.h"
+#include "BookmarkManager.h"
+#include "FaviconManager.h"
+#include "HistoryManager.h"
+#include "AddrInputManager.h"
 
 int MainWndMgr::newWndOffsetX = 22;
 int MainWndMgr::newWndOffsetY = 30;
@@ -13,6 +17,16 @@ int MainWndMgr::newWndOffsetY = 30;
 MainWndMgr::MainWndMgr(QObject *parent)
     : QObject(parent)
 {
+    // 窗口创建之前需要准备好所有的数据
+
+    // icon数据
+    FaviconMgr::Instance();
+    // 书签数据
+    BookmarkMgr::Instance();
+    // 历史记录数据
+    HistoryMgr::Instance();
+    // 地址栏输入数据
+    AddrInputMgr::Instance();
 }
 
 

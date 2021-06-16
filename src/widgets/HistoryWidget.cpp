@@ -9,6 +9,7 @@
 #include <QtDebug>
 #include <QStandardItemModel>
 #include <QClipboard>
+#include <QElapsedTimer>
 #include <QKeySequence>
 #include <QDateTime>
 #include <QStyle>
@@ -133,6 +134,9 @@ void HistoryWidget::setIcons()
 
 void HistoryWidget::loadAllHistories()
 {
+    QElapsedTimer timer;
+    timer.start();
+
     auto allHistories = HistoryMgr::Instance().allHistories();
     QIcon icon(":/icons/resources/imgs/light/time_machine_64px.png");
     QDateTime now = QDateTime::currentDateTime();
@@ -172,7 +176,7 @@ void HistoryWidget::loadAllHistories()
             weekItem->appendRow(item);
         }
     }
-    qInfo()<<__FUNCTION__<<all_model_->columnCount();
+    qInfo()<<__FUNCTION__<<":" << timer.elapsed() << "milliseconds";
 }
 
 void HistoryWidget::loadRecentlyHistories()
