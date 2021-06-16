@@ -27,6 +27,7 @@ SOURCES += \
     browser/scheme_handler.cpp \
     managers/AddrInputManager.cpp \
     managers/AppCfgManager.cpp \
+    managers/BookmarkManager.cpp \
     managers/CefManager.cpp \
     managers/EventManager.cpp \
     managers/FaviconManager.cpp \
@@ -80,6 +81,7 @@ HEADERS += \
     globaldef.h \
     managers/AddrInputManager.h \
     managers/AppCfgManager.h \
+    managers/BookmarkManager.h \
     managers/CefManager.h \
     managers/EventManager.h \
     managers/FaviconManager.h \

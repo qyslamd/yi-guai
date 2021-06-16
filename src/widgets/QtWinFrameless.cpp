@@ -13,26 +13,22 @@
 #pragma comment (lib,"Dwmapi.lib") // Adds missing library, fixes error LNK2019: unresolved external symbol __imp__DwmExtendFrameIntoClientArea
 #pragma comment (lib,"user32.lib")
 
+
+#define LOG_MACRO(x) #x
+
 QtWinFramelessWindow::QtWinFramelessWindow(QWidget *parent)
     : QMainWindow(parent)
-    , m_bJustMaximized(false)
 {
-    // 好像不用这么复杂吧？？？
-#if 0
-    // 首先设置无边框和携带系统菜单的属性
-    setWindowFlags(windowFlags() | Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
+}
 
-    bool visible = isVisible();
-    setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint);
-
-    // this line will get titlebar/thick frame/Aero back, which is exactly what we want
-    // we will get rid of titlebar and thick frame again in nativeEvent() later
-    // 此行代码可以带回Aero效果，同时也带回了标题栏和边框,在nativeEvent()会再次去掉标题栏
-    HWND hwnd = (HWND)this->winId();
-    DWORD style = ::GetWindowLong(hwnd, GWL_STYLE);
-    ::SetWindowLong(hwnd, GWL_STYLE, style | WS_MAXIMIZEBOX | WS_THICKFRAME | WS_CAPTION);
-    setVisible(visible);
-#endif
+bool QtWinFramelessWindow::event(QEvent *ev)
+{
+    if(ev->type() == QEvent::WindowStateChange){
+        if(this->isMaximized()){
+            maximized_ = true;
+        }
+    }
+    return QMainWindow::event(ev);
 }
 
 bool QtWinFramelessWindow::nativeEvent(const QByteArray &eventType, void *message, long *result)
@@ -43,7 +39,8 @@ bool QtWinFramelessWindow::nativeEvent(const QByteArray &eventType, void *messag
     #else
     MSG* msg = reinterpret_cast<MSG*>(message);
     #endif
-    
+//    qInfo()<<__FUNCTION__<<QString::number(msg->message,16);
+
     switch (msg->message)
     {
     case WM_DWMCOLORIZATIONCOLORCHANGED:
@@ -109,7 +106,7 @@ bool QtWinFramelessWindow::nativeEvent(const QByteArray &eventType, void *messag
 
             // 改变后客户区大小
             RECT bcRect;
-            if(this->isFullScreen() || this->isMaximized()){
+            if(this->isFullScreen()){
                 bcRect.left = bRect.left;
                 bcRect.top = bRect.top;
                 bcRect.right = bRect.right;
@@ -179,7 +176,6 @@ bool QtWinFramelessWindow::nativeEvent(const QByteArray &eventType, void *messag
     }
     case WM_NCRBUTTONDOWN:
     {
-#define LOG_MACRO(x) #x
         qInfo()<<__FUNCTION__<<LOG_MACRO(WM_NCRBUTTONDOWN);
         auto xPos = GET_X_LPARAM(msg->lParam);
         auto yPos = GET_Y_LPARAM(msg->lParam);
@@ -188,99 +184,19 @@ bool QtWinFramelessWindow::nativeEvent(const QByteArray &eventType, void *messag
     }
         break;
     case WM_GETMINMAXINFO:
-        return false;
     {
-        if (::IsZoomed(msg->hwnd)) {
-            RECT frame = { 0, 0, 0, 0 };
-            AdjustWindowRectEx(&frame, WS_OVERLAPPEDWINDOW, FALSE, 0);
-
-            //record frame area data
-            double dpr = this->devicePixelRatioF();
-
-            m_frames.setLeft(abs(frame.left)/dpr+0.5);
-            m_frames.setTop(abs(frame.bottom)/dpr+0.5);
-            m_frames.setRight(abs(frame.right)/dpr+0.5);
-            m_frames.setBottom(abs(frame.bottom)/dpr+0.5);
-
-            QMainWindow::setContentsMargins(m_frames.left()+m_margins.left(),
-                                            m_frames.top()+m_margins.top(),
-                                            m_frames.right()+m_margins.right(),
-                                            m_frames.bottom()+m_margins.bottom());
-            m_bJustMaximized = true;
-        }else {
-            if (m_bJustMaximized)
-            {
-                QMainWindow::setContentsMargins(m_margins);
-                m_frames = QMargins();
-                m_bJustMaximized = false;
-            }
-        }
-        return false;
     }
+        return false;
     default:
         break;
     }
     return QMainWindow::nativeEvent(eventType, message, result);
 }
 
-void QtWinFramelessWindow::showEvent(QShowEvent *event)
+bool QtWinFramelessWindow::hitTestCaption(const QPoint &gPos)
 {
-    QMainWindow::showEvent(event);
-}
-
-void QtWinFramelessWindow::setContentsMargins(const QMargins &margins)
-{
-    QMainWindow::setContentsMargins(margins+m_frames);
-    m_margins = margins;
-}
-void QtWinFramelessWindow::setContentsMargins(int left, int top, int right, int bottom)
-{
-    QMainWindow::setContentsMargins(left+m_frames.left(),\
-                                    top+m_frames.top(), \
-                                    right+m_frames.right(), \
-                                    bottom+m_frames.bottom());
-    m_margins.setLeft(left);
-    m_margins.setTop(top);
-    m_margins.setRight(right);
-    m_margins.setBottom(bottom);
-}
-QMargins QtWinFramelessWindow::contentsMargins() const
-{
-    QMargins margins = QMainWindow::contentsMargins();
-    margins -= m_frames;
-    return margins;
-}
-void QtWinFramelessWindow::getContentsMargins(int *left, int *top, int *right, int *bottom) const
-{
-    QMainWindow::getContentsMargins(left,top,right,bottom);
-    if (!(left&&top&&right&&bottom)) return;
-    if (isMaximized())
-    {
-        *left -= m_frames.left();
-        *top -= m_frames.top();
-        *right -= m_frames.right();
-        *bottom -= m_frames.bottom();
-    }
-}
-QRect QtWinFramelessWindow::contentsRect() const
-{
-    QRect rect = QMainWindow::contentsRect();
-    int width = rect.width();
-    int height = rect.height();
-    rect.setLeft(rect.left() - m_frames.left());
-    rect.setTop(rect.top() - m_frames.top());
-    rect.setWidth(width);
-    rect.setHeight(height);
-    return rect;
-}
-void QtWinFramelessWindow::showFullScreen()
-{
-    if (isMaximized())
-    {
-        QMainWindow::setContentsMargins(m_margins);
-        m_frames = QMargins();
-    }
-    QMainWindow::showFullScreen();
+    Q_UNUSED(gPos);
+    return false;
 }
 
 #endif //Q_OS_WIN

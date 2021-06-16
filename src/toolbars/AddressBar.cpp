@@ -20,20 +20,21 @@ AddressBar::AddressBar(bool inprivate, QWidget *parent)
     , inprivate_(inprivate)
 {
     initUi();
-    setIcons();
 }
 
 bool AddressBar::eventFilter(QObject *obj, QEvent *ev)
 {
     if(obj == line_edit_addr_){
         auto type = ev->type();
-        if(type == QEvent::FocusIn || type == QEvent::FocusOut){
+        if(type == QEvent::FocusIn){
             auto focusEvent = static_cast<QFocusEvent *>(ev);
             if(focusEvent->reason() == Qt::MouseFocusReason){
                 QTimer::singleShot(0, line_edit_addr_, &QLineEdit::selectAll);
             }
+            line_edit_addr_->setPlaceholderText("");
             update();
         }else if(type == QEvent::FocusOut){
+            line_edit_addr_->setPlaceholderText(tr("search or input a web address"));
             update();
         }
     }
@@ -77,11 +78,11 @@ void AddressBar::initUi()
     setGraphicsEffect(shadow);
 
     layout_ = new QHBoxLayout;
-    layout_->setContentsMargins(2,1,2,1);
+    layout_->setContentsMargins(2,2,2,2);
     layout_->setSpacing(1);
     btn_site_info_ = new QPushButton;
+    btn_site_info_->setIconSize(QSize(18,18));
     btn_site_info_->setToolTip(tr("view website infomation"));
-    btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/alert_circle_64px.png"));
     connect(btn_site_info_, &QPushButton::clicked, this, &AddressBar::viewSiteInfo);
 
     line_edit_addr_ = new QLineEdit;
@@ -89,14 +90,15 @@ void AddressBar::initUi()
     line_edit_addr_->installEventFilter(this);
     line_edit_addr_->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     connect(line_edit_addr_, &QLineEdit::returnPressed, this, &AddressBar::returnPressed);
+    connect(line_edit_addr_, &QLineEdit::editingFinished,this, &AddressBar::onEditingFinished);
+    connect(line_edit_addr_, &QLineEdit::textEdited, this, &AddressBar::onTextEdited);
+    connect(line_edit_addr_, &QLineEdit::textEdited, this, &AddressBar::textEdited);
 
     btn_zoom_hint_ = new QToolButton;
     connect(btn_zoom_hint_, &QToolButton::clicked, this, &AddressBar::showZoomBar);
     btn_add_favorite_ = new QToolButton;
     btn_add_favorite_->setCheckable(true);
-    btn_add_favorite_->setIconSize(QSize(18,18));
     btn_add_favorite_->setToolTip(tr("mark to favorite"));
-    btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_64px.png"));
     connect(btn_add_favorite_, &QToolButton::clicked, this, &AddressBar::addFavorite);
 
     layout_->addWidget(btn_site_info_);
@@ -113,20 +115,13 @@ void AddressBar::initUi()
     completer_->setModel(model_);
     model_->setStringList(AddrInputMgr::Instance().inputList());
     line_edit_addr_->setCompleter(completer_);
-    connect(line_edit_addr_, &QLineEdit::editingFinished,
-            this, &AddressBar::onEditingFinished);
 
-}
-
-void AddressBar::setIcons()
-{
     if(!inprivate_){
         btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/alert_circle_64px.png"));
         btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_64px.png"));
     }else{
         btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/info_white_48px.png"));
         btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_white_48px.png"));
-        btn_zoom_hint_->setIcon(QIcon(":/icons/resources/imgs/zoom_in_white_48px.png"));
     }
 }
 
@@ -156,9 +151,18 @@ void AddressBar::updateBtnState(bool checked)
     btn_add_favorite_->setChecked(checked);
 }
 
-void AddressBar::setText(const QString &text)
+void AddressBar::setText(const QString &text, bool edited)
 {
     line_edit_addr_->setText(text);
+    btn_site_info_->setEnabled(!edited);
+    btn_add_favorite_->setVisible(!edited);
+    if(!edited){
+        if(!inprivate_){
+            btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/alert_circle_64px.png"));
+        }else{
+            btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/info_white_48px.png"));
+        }
+    }
 }
 
 void AddressBar::setCursorPosition(int pos)
@@ -183,4 +187,20 @@ void AddressBar::onEditingFinished()
             model_->setStringList(AddrInputMgr::Instance().inputList());
         }
     }
+}
+
+void AddressBar::onTextEdited(const QString &)
+{
+    btn_site_info_->setEnabled(false);
+    btn_add_favorite_->setVisible(false);
+    bool isUrl =  false;
+    QIcon icon;
+    if(inprivate_){
+        icon = isUrl ? QIcon(":/icons/resources/imgs/dark/globe_earth_64px.png")
+                     : QIcon(":/icons/resources/imgs/dark/search_64px.png");
+    }else{
+        icon = isUrl ? QIcon(":/icons/resources/imgs/light/globe_earth_64px.png")
+                     : QIcon(":/icons/resources/imgs/light/search_64px.png");
+    }
+    btn_site_info_->setIcon(icon);
 }

@@ -21,7 +21,7 @@ class NavigateToolBar final: public QFrame
 public:
     explicit NavigateToolBar(bool inprivate, QWidget *parent = nullptr);
 
-    void setAddress(const QString &url);
+    void setAddress(const QString &url,bool edited = false);
     void setLoadingState(bool isLoading, bool canGoBack, bool canGoForward);
     void setZoomLevelValue(double value);
     void setFocus(bool focus);

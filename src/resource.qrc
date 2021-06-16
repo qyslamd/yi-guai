@@ -129,6 +129,10 @@
         <file>resources/imgs/hacker_128px.png</file>
         <file>resources/imgs/gray/private_64px.png</file>
         <file>resources/imgs/dark/private_64px.png</file>
+        <file>resources/imgs/dark/globe_earth_64px.png</file>
+        <file>resources/imgs/dark/search_64px.png</file>
+        <file>resources/imgs/light/globe_earth_64px.png</file>
+        <file>resources/imgs/light/search_64px.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file>resources/styles/normal.qss</file>

@@ -30,9 +30,9 @@ NavigateToolBar::NavigateToolBar(bool inprivate, QWidget *parent)
     setIcons();
 }
 
-void NavigateToolBar::setAddress(const QString &url)
+void NavigateToolBar::setAddress(const QString &url, bool edited)
 {
-    address_bar_->setText(url);
+    address_bar_->setText(url, edited);
     address_bar_->setCursorPosition(0);
 }
 
@@ -380,6 +380,10 @@ void NavigateToolBar::initSignalSlot()
         auto rect = address_bar_->gGeometryBtnAddBkmk();
         emit naviBarCmd(NaviBarCmd::AddFavorite, rect.bottomRight());
     });
+    connect(address_bar_, &AddressBar::textEdited, this, [this](const QString &txt)
+    {
+        emit naviBarCmd(NaviBarCmd::AddressEdited, txt);
+    });
     connect(address_bar_, &AddressBar::showZoomBar, this, [this]()
     {
         auto rect = address_bar_->gGeometryBtnZoom();
@@ -557,30 +561,31 @@ void NavigateToolBar::setIcons()
         btn_user_->setIcon(QIcon(":/icons/resources/imgs/light/user_64px.png"));
         btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/light/more_64px.png"));
 
-        action_new_tab_->setIcon(QIcon(":/icons/resources/imgs/layout_64px.png"));
-        action_new_window_->setIcon(QIcon(":/icons/resources/imgs/stack_64px.png"));
-        action_new_inprivate_window_->setIcon(QIcon(":/icons/resources/imgs/frame_64px.png"));
-        btn_zoom_out_->setIcon(QIcon(":/icons/resources/imgs/zoom_out_64px.png"));
-        btn_zoom_in_->setIcon(QIcon(":/icons/resources/imgs/zoom_in_64px.png"));
-        btn_fullscreen_->setIcon(QIcon(":/icons/resources/imgs/arrows_diagonals_64px.png"));
-        action_favorates_->setIcon(QIcon(":/icons/resources/imgs/heart_64px.png"));
-        action_history_->setIcon(QIcon(":/icons/resources/imgs/time_history_64px.png"));
-        action_download_->setIcon(QIcon(":/icons/resources/imgs/download_64px.png"));
-        action_print_->setIcon(QIcon(":/icons/resources/imgs/printer_64px.png"));
-        action_capture_->setIcon(QIcon(":/icons/resources/imgs/cut_coupon_64px.png"));
-        action_find_->setIcon(QIcon(":/icons/resources/imgs/search_64px.png"));
-        action_more_tools_->setIcon(QIcon());
-        action_task_mgr_->setIcon(QIcon(":/icons/resources/imgs/statistics_64px.png"));
-        action_dev_tools_->setIcon(QIcon(":/icons/resources/imgs/hammer_64px.png"));
-        action_settings_->setIcon(QIcon(":/icons/resources/imgs/settings_64px.png"));
-        action_helps_->setIcon(QIcon(":/icons/resources/imgs/question_64px.png"));
-        action_help_you_->setIcon(QIcon(":/icons/resources/imgs/question_64px.png"));
-        action_feed_back_->setIcon(QIcon(":/icons/resources/imgs/bug_64px.png"));
-        action_like_->setIcon(QIcon(":/icons/resources/imgs/good_64px.png"));
-        action_about_qt_->setIcon(QIcon(":/icons/resources/imgs/qt_64px.png"));
-        action_about_cef_->setIcon(QIcon(":/icons/resources/imgs/cef.png"));
-        action_quit_->setIcon(QIcon());
     }
+    action_new_tab_->setIcon(QIcon(":/icons/resources/imgs/layout_64px.png"));
+    action_new_window_->setIcon(QIcon(":/icons/resources/imgs/stack_64px.png"));
+    action_new_inprivate_window_->setIcon(QIcon(":/icons/resources/imgs/frame_64px.png"));
+    btn_zoom_out_->setIcon(QIcon(":/icons/resources/imgs/zoom_out_64px.png"));
+    btn_zoom_in_->setIcon(QIcon(":/icons/resources/imgs/zoom_in_64px.png"));
+    btn_fullscreen_->setIcon(QIcon(":/icons/resources/imgs/arrows_diagonals_64px.png"));
+    action_favorates_->setIcon(QIcon(":/icons/resources/imgs/heart_64px.png"));
+    action_history_->setIcon(QIcon(":/icons/resources/imgs/time_history_64px.png"));
+    action_download_->setIcon(QIcon(":/icons/resources/imgs/download_64px.png"));
+    action_print_->setIcon(QIcon(":/icons/resources/imgs/printer_64px.png"));
+    action_capture_->setIcon(QIcon(":/icons/resources/imgs/cut_coupon_64px.png"));
+    action_find_->setIcon(QIcon(":/icons/resources/imgs/search_64px.png"));
+    action_more_tools_->setIcon(QIcon());
+    action_task_mgr_->setIcon(QIcon(":/icons/resources/imgs/statistics_64px.png"));
+    action_dev_tools_->setIcon(QIcon(":/icons/resources/imgs/hammer_64px.png"));
+    action_settings_->setIcon(QIcon(":/icons/resources/imgs/settings_64px.png"));
+    action_helps_->setIcon(QIcon(":/icons/resources/imgs/question_64px.png"));
+    action_help_you_->setIcon(QIcon(":/icons/resources/imgs/question_64px.png"));
+    action_feed_back_->setIcon(QIcon(":/icons/resources/imgs/bug_64px.png"));
+    action_like_->setIcon(QIcon(":/icons/resources/imgs/good_64px.png"));
+    action_about_qt_->setIcon(QIcon(":/icons/resources/imgs/qt_64px.png"));
+    action_about_cef_->setIcon(QIcon(":/icons/resources/imgs/cef.png"));
+    action_quit_->setIcon(QIcon());
+
     QSize iconSize(24,24);
     QSize btnSize(42,30);
     for(auto item : this->children()){

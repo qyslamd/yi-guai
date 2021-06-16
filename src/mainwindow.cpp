@@ -45,6 +45,7 @@
 #include <QPainter>
 #include <QStyle>
 #include <QDateTime>
+#include <QLocale>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -130,14 +131,10 @@ void MainWindow::updateInprivateCount()
         gInprivatePopup = new InprivatePopup;
     }
     auto cnt = MainWndMgr::Instance().inprivateCount();
-    gInprivatePopup->setHintText(tr(" %1 inprivate window%2 opened")
-                                 .arg(cnt).arg(cnt > 1 ? "s" : ""));
+    gInprivatePopup->setHintText(tr(" %1 inprivate window opened")
+                                 .arg(cnt));
 }
 
-bool MainWindow::event(QEvent *e)
-{
-    return QtWinFramelessWindow::event(e);
-}
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
     auto type = event->type();
@@ -441,6 +438,7 @@ void MainWindow::initSignalSlot()
     connect(tab_bar_, &TabPageToolBar::showDockPage, [this]()
     {
         // todo:
+        qInfo()<<this->objectName();
     });
     connect(tab_bar_, &TabPageToolBar::testBtnClicked, [this]()
     {
@@ -455,6 +453,7 @@ void MainWindow::initSignalSlot()
     connect(history_widget_, &HistoryWidget::pinOrCloseClicked, this, &MainWindow::onPinOrCloseHistoryWidget);
     connect(history_widget_, &HistoryWidget::menuCmd, this, &MainWindow::onHistoryWidgetCmd);
     connect(bookmark_widget_, &BookmarkWidget::pinOrCloseClicked, this, &MainWindow::onPinOrCloseBookmarkWidget);
+    connect(bookmark_widget_, &BookmarkWidget::menuCmd, this, &MainWindow::onBkmkWidgetCmd);
 }
 
 void MainWindow::initPage(Page *page)
@@ -529,7 +528,7 @@ void MainWindow::onTabBarCurrentChanged(int index)
     // 地址栏需要改变
     auto page = GetPage(index);
     if(page){
-        navi_bar_->setAddress(page->url());
+        navi_bar_->setAddress(page->url(), page->edited());
         navi_bar_->setLoadingState(page->isLoading(),
                                    page->canGoBack(),
                                    page->canGoForward());
@@ -634,6 +633,12 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
     case NaviBarCmd::AddFavorite:
         onAddFavorite();
         break;
+    case NaviBarCmd::AddressEdited:
+        qInfo()<<"AddressEdited";
+        if(page){
+            page->setEditedText(para.toString());
+        }
+        break;
     case NaviBarCmd::ShowZoomBar:
         if(page){
             page->showZoomBar(para.toPoint());
@@ -698,8 +703,10 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         break;
     case NaviBarCmd::About:
         AddNewPage(gitee_url, true);
+        break;
     case NaviBarCmd::Feedback:
         AddNewPage(gitee_url, true);
+        break;
     case  NaviBarCmd::Like:
         AddNewPage(gitee_url, true);
         break;
@@ -1080,6 +1087,26 @@ void MainWindow::onPinOrCloseHistoryWidget()
     }
 }
 
+void MainWindow::onBkmkWidgetCmd(BookmarkCmd cmd, const QVariant &para)
+{
+    switch (cmd) {
+    case BookmarkCmd::Open:
+        NavigateInCurPage(para.toString());
+        break;
+    case BookmarkCmd::OpenInNewPage:
+        AddNewPage(para.toString(), false);
+        break;
+    case BookmarkCmd::OpenInNewWnd:
+        MainWndMgr::Instance().createWindow(MainWndCfg(para.toString()));
+        break;
+    case BookmarkCmd::OpenInInprivate:
+         MainWndMgr::Instance().createWindow(MainWndCfg(true, para.toString()));
+        break;
+    default:
+        break;
+    }
+}
+
 void MainWindow::onPinOrCloseBookmarkWidget()
 {
 
@@ -1305,8 +1332,9 @@ void MainWindow::addRecently(Page *page)
             return;
         }
     }
-    History data{(long)QDateTime::currentSecsSinceEpoch(),
+    History data{QString::number(QDateTime::currentSecsSinceEpoch()),
                 page->url(),
-                page->title()};
+                page->title(),
+                0};
     RecentlyHistory.push(data);
 }

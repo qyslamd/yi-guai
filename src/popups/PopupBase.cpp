@@ -2,6 +2,8 @@
 #include "ui_PopupBase.h"
 
 #include <QGraphicsDropShadowEffect>
+#include <QMouseEvent>
+#include <QtDebug>
 
 PopupBase::PopupBase(QWidget *parent) :
     QWidget(parent),
@@ -13,9 +15,9 @@ PopupBase::PopupBase(QWidget *parent) :
     setWindowFlags(Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
 
     QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
-    shadow->setOffset(0, 4);
-    shadow->setColor(QColor(38, 78, 119, 100));
-    shadow->setBlurRadius(9);
+    shadow->setOffset(0, 0);
+    shadow->setColor(QColor(	105,105,105, 100)); // 38, 78, 119
+    shadow->setBlurRadius(20);
     ui->frameShadow->setGraphicsEffect(shadow);
 }
 

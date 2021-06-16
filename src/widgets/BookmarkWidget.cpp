@@ -4,13 +4,17 @@
 #include <QTreeWidget>
 #include <QtDebug>
 #include <QShowEvent>
-#include <QTreeWidgetItem>
+#include <QStandardItemModel>
 #include <QFileInfo>
 #include <QClipboard>
 #include <QTimer>
+#include <QStyle>
+#include <QUrl>
 
 #include "popups/StyledMenu.h"
 #include "managers/AppCfgManager.h"
+#include "managers/BookmarkManager.h"
+#include "managers/FaviconManager.h"
 
 BookmarkWidget::BookmarkWidget(QWidget *parent) :
     QWidget(parent)
@@ -21,6 +25,9 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     initUi();
+    initSignalSlots();
+
+    loadAllBookmarks();
 }
 
 BookmarkWidget::~BookmarkWidget()
@@ -67,6 +74,9 @@ bool BookmarkWidget::eventFilter(QObject *watched, QEvent *event)
 
 void BookmarkWidget::initUi()
 {
+    all_bookmark_model_ = new QStandardItemModel(ui->treeView);
+    ui->treeView->setModel(all_bookmark_model_);
+
     /* *****************General Page*************************/
     // 更多按钮菜单
     action_manage_bookmarks_  = new QAction(QIcon(), tr("bookmark manage"), this);
@@ -96,6 +106,60 @@ void BookmarkWidget::initUi()
     ui->buttonMore->setPopupMode(QToolButton::InstantPopup);
     ui->buttonMore->setMenu(menu_more_);
 
+    ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
+    ac_open_bkmk_in_new_page_    = new QAction(QIcon(), tr("open in new page"), this);
+    ac_open_bkmk_in_new_window_  = new QAction(QIcon(), tr("open in new window"), this);
+    ac_open_in_inprivate_ = new QAction(QIcon(), tr("open in inprivate"), this);
+
+    ac_rename_bkmk_       = new QAction(QIcon(), tr("rename"), this);
+    ac_copy_link_         = new QAction(QIcon(), tr("copy link"), this);
+    ac_modify_bkmk_       = new QAction(QIcon(), tr("modify"), this);
+    ac_delte_bkmk_        = new QAction(QIcon(":/Resources/imgs/others/normal_remove.png"), tr("delete"), this);
+
+    menu_tree_bkmk_->addAction(ac_open_bkmk_in_new_page_);
+    menu_tree_bkmk_->addAction(ac_open_bkmk_in_new_window_);
+    menu_tree_bkmk_->addAction(ac_open_in_inprivate_);
+    menu_tree_bkmk_->addSeparator();
+    menu_tree_bkmk_->addAction(ac_rename_bkmk_);
+    menu_tree_bkmk_->addAction(ac_copy_link_);
+    menu_tree_bkmk_->addAction(ac_modify_bkmk_);
+    menu_tree_bkmk_->addAction(ac_delte_bkmk_);
+
+
+    ac_open_all_bkmk_page_    = new QAction(QIcon(), tr("open all"), this);
+    ac_open_all_bkmk_window_  = new QAction(QIcon(), tr("open all in new window"), this);
+    ac_open_all_in_inprivate_ = new QAction(QIcon(), tr("open all in inprivate"), this);
+
+    ac_sort_as_name_          = new QAction(QIcon(), tr("sort as name"), this);
+    ac_rename_folder_         = new QAction(QIcon(), tr("rename"), this);
+    ac_delte_folder_          = new QAction(QIcon(), tr("delete"), this);
+
+    ac_add_cur_to_folder_     = new QAction(QIcon(), tr("add current to this folder"), this);
+    ac_add_all_to_folder_     = new QAction(QIcon(), tr("add all to this folder"), this);
+
+    menu_tree_bkmk_dir_->addAction(ac_open_all_bkmk_page_);
+    menu_tree_bkmk_dir_->addAction(ac_open_all_bkmk_window_);
+    menu_tree_bkmk_dir_->addAction(ac_open_all_in_inprivate_);
+    menu_tree_bkmk_dir_->addSeparator();
+    menu_tree_bkmk_dir_->addAction(ac_sort_as_name_);
+    menu_tree_bkmk_dir_->addAction(ac_rename_folder_);
+    menu_tree_bkmk_dir_->addAction(ac_delte_folder_);
+    menu_tree_bkmk_dir_->addSeparator();
+    menu_tree_bkmk_dir_->addAction(ac_add_cur_to_folder_);
+    menu_tree_bkmk_dir_->addAction(ac_add_all_to_folder_);
+
+
+    /* *****************Search Page*************************/
+    QAction *ac_serch_left_icon = new QAction(QIcon(":/Resources/imgs/others/normal_search.png"),
+                                              tr(""),
+                                              ui->lineEditSearch);
+    ui->lineEditSearch->addAction(ac_serch_left_icon, QLineEdit::LeadingPosition);
+}
+
+void BookmarkWidget::initSignalSlots()
+{
+    connect(&FaviconMgr::Instance(), &FaviconMgr::iconUpdated,
+            this, &BookmarkWidget::onFavconUpdated);
     connect(action_manage_bookmarks_, &QAction::triggered, this, [this]()
     {
         qInfo()<<"TODO:";
@@ -114,7 +178,6 @@ void BookmarkWidget::initUi()
     });
     connect(action_export_bookmarks_, &QAction::triggered, this, [this]()
     {
-
     });
     connect(action_delete_duplicate_, &QAction::triggered, this, [this]()
     {
@@ -144,37 +207,17 @@ void BookmarkWidget::initUi()
     {
         emit pinOrCloseClicked();
     });
-
-    ui->treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-    ac_open_bkmk_in_new_page_    = new QAction(QIcon(), tr("open in new page"), this);
-    ac_open_bkmk_in_new_window_  = new QAction(QIcon(), tr("open in new window"), this);
-    ac_open_in_inprivate_ = new QAction(QIcon(), tr("open in inprivate"), this);
-
-    ac_rename_bkmk_       = new QAction(QIcon(), tr("rename"), this);
-    ac_copy_link_         = new QAction(QIcon(), tr("copy link"), this);
-    ac_modify_bkmk_       = new QAction(QIcon(), tr("modify"), this);
-    ac_delte_bkmk_        = new QAction(QIcon(":/Resources/imgs/others/normal_remove.png"), tr("delete"), this);
-
-    menu_tree_bkmk_->addAction(ac_open_bkmk_in_new_page_);
-    menu_tree_bkmk_->addAction(ac_open_bkmk_in_new_window_);
-    menu_tree_bkmk_->addAction(ac_open_in_inprivate_);
-    menu_tree_bkmk_->addSeparator();
-    menu_tree_bkmk_->addAction(ac_rename_bkmk_);
-    menu_tree_bkmk_->addAction(ac_copy_link_);
-    menu_tree_bkmk_->addAction(ac_modify_bkmk_);
-    menu_tree_bkmk_->addAction(ac_delte_bkmk_);
-
     connect(ac_open_bkmk_in_new_page_, &QAction::triggered, [this]()
     {
-
+        emit menuCmd(BookmarkCmd::OpenInNewPage, all_bkmk_menu_data_);
     });
     connect(ac_open_bkmk_in_new_window_, &QAction::triggered, [this]()
     {
-
+        emit menuCmd(BookmarkCmd::OpenInNewWnd, all_bkmk_menu_data_);
     });
     connect(ac_open_in_inprivate_, &QAction::triggered, [this]()
     {
-
+        emit menuCmd(BookmarkCmd::OpenInInprivate, all_bkmk_menu_data_);
     });
     connect(ac_rename_bkmk_, &QAction::triggered, [this]()
     {
@@ -192,80 +235,90 @@ void BookmarkWidget::initUi()
     {
 
     });
-
-
-    ac_open_all_bkmk_page_    = new QAction(QIcon(), tr("open all"), this);
-    ac_open_all_bkmk_window_  = new QAction(QIcon(), tr("open all in new window"), this);
-    ac_open_all_in_inprivate_ = new QAction(QIcon(), tr("open all in inprivate"), this);
-
-    ac_sort_as_name_          = new QAction(QIcon(), tr("sort as name"), this);
-    ac_rename_folder_         = new QAction(QIcon(), tr("rename"), this);
-    ac_delte_folder_          = new QAction(QIcon(), tr("delete"), this);
-
-    ac_add_cur_to_folder_     = new QAction(QIcon(), tr("add current to this folder"), this);
-    ac_add_all_to_folder_     = new QAction(QIcon(), tr("add all to this folder"), this);
-
-    menu_tree_bkmk_dir_->addAction(ac_open_all_bkmk_page_);
-    menu_tree_bkmk_dir_->addAction(ac_open_all_bkmk_window_);
-    menu_tree_bkmk_dir_->addAction(ac_open_all_in_inprivate_);
-    menu_tree_bkmk_dir_->addSeparator();
-    menu_tree_bkmk_dir_->addAction(ac_sort_as_name_);
-    menu_tree_bkmk_dir_->addAction(ac_rename_folder_);
-    menu_tree_bkmk_dir_->addAction(ac_delte_folder_);
-    menu_tree_bkmk_dir_->addSeparator();
-    menu_tree_bkmk_dir_->addAction(ac_add_cur_to_folder_);
-    menu_tree_bkmk_dir_->addAction(ac_add_all_to_folder_);
-
     // QTreeWidget 右键菜单
-    connect(ui->treeWidget, &QTreeWidget::customContextMenuRequested,
-            this, &BookmarkWidget::onTreeWidgetCustomContextMenu);
-    connect(ui->treeWidget, &QTreeWidget::itemClicked,
-            this, &BookmarkWidget::onTreeWidgetItemClicked);
-
-
-    /* *****************Search Page*************************/
-    QAction *ac_serch_left_icon = new QAction(QIcon(":/Resources/imgs/others/normal_search.png"),
-                                              tr(""),
-                                              ui->lineEditSearch);
-    ui->lineEditSearch->addAction(ac_serch_left_icon, QLineEdit::LeadingPosition);
+    connect(ui->treeView, &QTreeWidget::customContextMenuRequested,
+            this, &BookmarkWidget::onAllBkmkTreeCustomContextMenu);
 }
 
 void BookmarkWidget::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
-    // 默认显示顶部通用页面
-    ui->stackedWidget->setCurrentWidget(ui->pageGeneral);
-
-    // 加载书签
-    ui->treeWidget->clear();
-
 }
 
-void BookmarkWidget::onTreeWidgetCustomContextMenu(const QPoint &)
+void BookmarkWidget::onFavconUpdated(const QString &urlDomain)
 {
-//    auto pos = ui->treeWidget->viewport()->mapFromGlobal(QCursor::pos());
-//    auto item = ui->treeWidget->itemAt(pos);
-//    if(item){
-//        bkmk_ac_trigger_data_ = item->data(0, Qt::UserRole + 1)
-//                .value<bookmark::BookmarkData>();
-//        // on bookmark
-//        if(bkmk_ac_trigger_data_.type.compare("url") == 0)
-//        {
-//            menu_tree_bkmk_->exec(QCursor::pos());
-//        }else // on bookmark dir
-//        {
-//            menu_tree_bkmk_dir_->exec(QCursor::pos());
-//        }
-//    }
+    for(int i = 0; i < all_bookmark_model_->rowCount();i++){
+       auto item =  all_bookmark_model_->item(i);
+       auto url = item->data(Qt::UserRole + 2).toString();
+       if(QUrl(url).host() == urlDomain){
+           auto iconPath = FaviconMgr::Instance().iconFilePath(url);
+           item->setIcon(QIcon(iconPath));
+       }
+    }
 }
 
-void BookmarkWidget::onTreeWidgetItemClicked(QTreeWidgetItem *item, int column)
+void BookmarkWidget::onAllBkmkTreeCustomContextMenu(const QPoint &)
 {
-    if(!item) return;
+    auto index = ui->treeView->indexAt(ui->treeView->viewport()->mapFromGlobal(QCursor::pos()));
+    auto item = all_bookmark_model_->itemFromIndex(index);
+    if(!item){
+        return;
+    }
+    auto isData = item->data(Qt::UserRole + 1).value<bool>();
+    if(isData){
+        all_bkmk_menu_data_ = item->data(Qt::UserRole + 2).toString();
+        menu_tree_bkmk_->exec(QCursor::pos());
+    }else{
+        menu_tree_bkmk_dir_->exec(QCursor::pos());
+    }
+}
 
-//    bookmark::BookmarkData data = item->data(column, Qt::UserRole + 1).value<bookmark::BookmarkData>();
-//    if(data.type.compare("url") == 0){
-//        cmdTriggered(static_cast<int>(BkmkWidget_OpenInCurPage),
-//                     data.url);
-//    }
+void BookmarkWidget::loadAllBookmarks()
+{
+    all_bookmark_model_->clear();
+
+    auto node = BookmarkMgr::Instance()->bookmarkBarNodes();
+    if(!node){
+        return;
+    }
+    QStandardItem *barItem = new QStandardItem(style()->standardIcon(QStyle::SP_DirIcon), node->name_);
+    barItem->setData(0, Qt::UserRole + 1);
+    if(auto barNode = dynamic_cast<const BookmarkFolder*>(node)){
+        for(auto node : barNode->children_){
+            parseNode2Item(barItem, node);
+        }
+    }
+    all_bookmark_model_->appendRow(barItem);
+
+    ui->treeView->expand(barItem->index());
+}
+
+void BookmarkWidget::parseNode2Item(QStandardItem *parent, const BookmarkNode *node)
+{
+    static const QIcon fileIcon = style()->standardIcon(QStyle::SP_FileIcon);
+    static const QIcon dirIcon = style()->standardIcon(QStyle::SP_DirIcon);
+
+    QStandardItem *item = new QStandardItem(dirIcon, node->name_);
+    if(node->type_ == "folder"){
+        item->setData(0, Qt::UserRole + 1);
+        if(auto folder = dynamic_cast<const BookmarkFolder*>(node)){
+            for(auto child : folder->children_){
+                parseNode2Item(item, child);
+            }
+        }
+    }else if(node->type_ == "url"){
+        if(auto url = dynamic_cast<const BookmarkUrl*>(node)){
+            auto iconPath = FaviconMgr::Instance().iconFilePath(url->url_);
+            QIcon icon(iconPath);
+            if(icon.isNull()){
+                icon = fileIcon;
+            }
+            item->setIcon(icon);
+
+            item->setData(1, Qt::UserRole + 1);
+            item->setData(url->url_, Qt::UserRole + 2);
+        }
+    }
+
+    parent->appendRow(item);
 }

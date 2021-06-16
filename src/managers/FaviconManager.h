@@ -19,7 +19,7 @@ public:
     void addIconsMap(const QMap<QString, QString> &icons);
     QString iconFilePath(const QString &urlIndex);
 signals:
-    void iconChanged(const QString &url);
+    void iconUpdated(const QString &urlDomain);
 private:
     QString record_file_path_;
     QMap<QString, QString> icons_cache_;

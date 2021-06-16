@@ -21,6 +21,7 @@ Page::Page(const QString &url, QWidget *parent)
     , dock_dev_tool_(new QDockWidget)
     , site_info_popup_(new SiteInfoPopup(this))
     , zoom_popup_(new ZoomPopup(this))
+    , zoom_bar_timer_(new QTimer(this))
 {
     setMinimumHeight(100);
     if(!centralWidget()){
@@ -45,6 +46,7 @@ Page::Page(CefQWidget*browser, QWidget *parent)
     , dock_dev_tool_(new QDockWidget)
     , site_info_popup_(new SiteInfoPopup(this))
     , zoom_popup_(new ZoomPopup(this))
+    , zoom_bar_timer_(new QTimer(this))
 {
     setMinimumHeight(100);
     if(!centralWidget()){
@@ -89,6 +91,24 @@ CefQWidget* Page::getBrowserWidget()
     return browser_widget_;
 }
 
+QString Page::url() const
+{
+    return edited_flag_ ? edited_txt_ : url_;
+}
+
+void Page::setEditedText(const QString &txt)
+{
+    if(url_.compare(txt, Qt::CaseInsensitive) == 0){
+        return;
+    }
+    if(txt.isEmpty())
+    {
+        return;
+    }
+    edited_flag_ = true;
+    edited_txt_ = txt;
+}
+
 void Page::showSiteInfomation(const QPoint &pos)
 {
     /*设置必要的信息*/
@@ -106,11 +126,6 @@ void Page::showZoomBar(const QPoint &pos)
     auto zoomLevel = browser_widget_->ZoomLevel();
     zoom_popup_->setZoomLevelStr(CefManager::Instance().zoom_map.value(static_cast<int>(zoomLevel)));
     zoom_popup_->show();
-    if(zoomLevel == 0.0){
-        QTimer::singleShot(2000, [this](){
-           zoom_popup_->hide();
-        });
-    }
 }
 
 void Page::openDevTool()
@@ -223,6 +238,9 @@ void Page::initOthers()
     {
         emit pageCmd(PageCmd::OpenUrl, url);
     });
+
+    connect(zoom_bar_timer_, &QTimer::timeout,this, &Page::onZoomBarTimer);
+    zoom_bar_timer_->start(2000);
 }
 
 void Page::onBrowserDevTool(CefQWidget *devTool)
@@ -354,6 +372,17 @@ void Page::onDevToolShortcut(const CefKeyEvent &event, CefEventHandle)
         if(devTool && devTool == dock_dev_tool_->widget())
         {
             devTool->ZoomIn();
+        }
+    }
+}
+
+void Page::onZoomBarTimer()
+{
+    auto zoomLevel = browser_widget_->ZoomLevel();
+    if(zoomLevel == 0.0){
+        if( !zoom_popup_->rect().contains( zoom_popup_->mapFromGlobal(QCursor::pos()) ) )
+        {
+            zoom_popup_->hide();
         }
     }
 }

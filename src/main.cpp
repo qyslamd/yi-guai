@@ -20,6 +20,7 @@
 #include "managers/MainWindowManager.h"
 #include "managers/CefManager.h"
 #include "managers/AppCfgManager.h"
+#include "managers/BookmarkManager.h"
 #include "browser/cef_app_browser.h"
 #include "browser/scheme_handler.h"
 #include "browser/message_loop/main_message_loop.h"
@@ -81,6 +82,9 @@ int main(int argc, char *argv[])
                              QObject::tr("intialize cef failed!\n application will quit!"));
         return -1;
     }
+
+    BookmarkMgr::Instance();
+
     MainWindowConfig cfg{
         false,
         false,

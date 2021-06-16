@@ -1,5 +1,5 @@
-#include "appconfigwidget.h"
-#include "ui_appconfigwidget.h"
+#include "AppConfigWidget.h"
+#include "ui_AppConfigWidget.h"
 
 #include <QGraphicsDropShadowEffect>
 #include <QButtonGroup>

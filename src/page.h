@@ -11,6 +11,7 @@ class CefQWidget;
 class QDockWidget;
 class SiteInfoPopup;
 class ZoomPopup;
+class QTimer;
 
 ///
 /// \brief The Page class
@@ -26,14 +27,17 @@ public:
 
     CefQWidget* getBrowserWidget();
 
-    QString url() const {return url_;}
+    QString url() const;
     QString title() const {return title_;}
     QPixmap favicon() const {return favicon_; }
     bool isLoading() const {return isLoading_;}
     bool canGoBack() const {return canGoBack_;}
     bool canGoForward() const {return canGoForward_;}
 
+    QString editedTxt() const {return edited_txt_;}
+    bool edited() const {return edited_flag_;}
 
+    void setEditedText(const QString &txt);
     void showSiteInfomation(const QPoint &pos);
     void showZoomBar(const QPoint &pos);
     void openDevTool();
@@ -51,6 +55,7 @@ private:
     QDockWidget *dock_dev_tool_ = nullptr;    /*开发者工具停靠窗口*/
     SiteInfoPopup *site_info_popup_ = nullptr;  /*站点信息查看*/
     ZoomPopup *zoom_popup_ = nullptr;   /*缩放比例调整 popup*/
+    QTimer *zoom_bar_timer_ = nullptr;
 
     QString url_;
     QString title_;
@@ -58,6 +63,9 @@ private:
     bool isLoading_;
     bool canGoBack_;
     bool canGoForward_;
+
+    bool edited_flag_ = false;
+    QString edited_txt_;
 private:
     void initBrowser();
     void initOthers();
@@ -67,6 +75,9 @@ private slots:
     void onDockDevToolLocChanged(Qt::DockWidgetArea area);
     void onDevToolShortcut(const CefKeyEvent &event,
                            CefEventHandle);
+
+private slots:
+    void onZoomBarTimer();
 };
 
 #endif // PAGE_H
