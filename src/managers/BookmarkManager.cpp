@@ -70,6 +70,7 @@ void BookmarkMgr::onWokerSaveFinished()
 
 }
 
+int BookmarkWorker::count = 0;
 BookmarkWorker::BookmarkWorker()
 {
     auto loc = UtilQt::appDataPath();
@@ -125,6 +126,7 @@ void BookmarkWorker::loadFromFile()
         version = root.value("version").toString();
     }
     qInfo()<<"\033[32m[Time:]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";
+    qInfo()<<__FUNCTION__<<"count:"<<count;
     emit loadFinished();
 }
 
@@ -290,8 +292,8 @@ QStandardItem *BookmarkWorker::parseObj2Item(const QJsonObject &obj)
         item->setIcon(FaviconMgr::systemFileIcon);
         item->setData(obj.value("url").toString(), BookmarkMgr::Url);
     }
+    count++;
     return item;
-
 }
 
 QJsonObject BookmarkWorker::paseItem2Obj(QStandardItem *item)

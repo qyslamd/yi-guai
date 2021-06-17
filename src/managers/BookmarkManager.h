@@ -68,6 +68,7 @@ signals:
     void saveFinished();
 
 private:
+    static int count;
      QMutex mutext_, mutext2_;
      QString file_path_;
      void createFileIfNotExist();
