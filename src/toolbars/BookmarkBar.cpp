@@ -19,8 +19,8 @@ BookmarkBar::BookmarkBar(QWidget *parent)
     : QFrame(parent)
 {
     initUi();
-    connect(BookmarkMgr::Instance(), &BookmarkMgr::bookmarkBarLoadFinished,
-            this, &BookmarkBar::onBookmarkBarLoadFinished);
+    connect(BookmarkMgr::Instance(), &BookmarkMgr::bookmarksChanged,
+            this, &BookmarkBar::onBookmarksChanged);
 }
 
 void BookmarkBar::paintEvent(QPaintEvent *event)
@@ -51,6 +51,12 @@ void BookmarkBar::paintEvent(QPaintEvent *event)
 
 void BookmarkBar::showEvent(QShowEvent *event)
 {
+    static bool firstShown = true;
+    if(firstShown){
+        firstShown = false;
+    }else{
+        onBookmarksChanged();
+    }
     QFrame::showEvent(event);
 }
 
@@ -65,7 +71,7 @@ void BookmarkBar::initUi()
 "text-align: left;"
 "border:none;"
 "color:#666666;"
-"min-height:1.5em;"
+"padding:4px;"
 "}"
 "QPushButton:hover{"
 "background: #DCDCDC;"
@@ -132,24 +138,33 @@ void BookmarkBar::onCustomContextMenuRequested(const QPoint &)
     menu.exec(QCursor::pos());
 }
 
-void BookmarkBar::onBookmarkBarLoadFinished(const QStandardItem *item)
+void BookmarkBar::onBookmarksChanged()
 {
     if(loaded_){return;}
+
     QElapsedTimer timer;
     timer.start();
 
-    for (int i = 0; i< item->rowCount(); i++){
-        auto child = item->child(i);
-        if(child){
-            auto type = child->data(BookmarkMgr::Type).toString();
-            auto icon = type=="folder"?FaviconMgr::systemDirIcon:FaviconMgr::systemFileIcon;
-            auto button = new BarItem(icon, child->data(BookmarkMgr::Name).toString(), this);
-            item_layout_->addWidget(button);
+    auto model = BookmarkMgr::Instance()->gBookmarkModel;
+    auto barItem = model->item(0);
+    if(barItem){
+        for (int i = 0; i< barItem->rowCount(); i++){
+            auto child = barItem->child(i);
+            if(child){
+                auto type = child->data(BookmarkMgr::Type).toString();
+                auto icon = type=="folder"?FaviconMgr::systemDirIcon:FaviconMgr::systemFileIcon;
+                auto button = new BarItem(icon, child->data(BookmarkMgr::Name).toString(), this);
+                item_layout_->addWidget(button);
 
-            if(type == "folder"){
-                button->setMenu(makeMenu(child));
+    //            if(type == "folder"){
+    //                button->setMenu(makeMenu(child));
+    //            }
             }
         }
+    }
+    auto otherItem = model->item(1);
+    if(otherItem){
+        btn_others_->setMenu(makeMenu(otherItem));
     }
 
     loaded_ = true;

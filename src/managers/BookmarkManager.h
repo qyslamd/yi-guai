@@ -36,7 +36,6 @@ private:
 signals:
     void load();
     void save();
-    void bookmarkBarLoadFinished(const QStandardItem *item);
     void bookmarksChanged();
 private:
     static QMutex gMutex;
@@ -65,7 +64,6 @@ public slots:
     void loadFromFile();
     void saveToFile();
 signals:
-    void bookmarkBarLoadFinished(const QStandardItem *item);
     void loadFinished();
     void saveFinished();
 

@@ -33,7 +33,7 @@ private:
 
 private slots:
     void onCustomContextMenuRequested(const QPoint &);
-    void onBookmarkBarLoadFinished(const QStandardItem* item);
+    void onBookmarksChanged();
 
 };
 

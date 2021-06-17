@@ -22,9 +22,9 @@ FaviconMgr::FaviconMgr(QObject *parent)
     systemDirIcon = qApp->style()->standardIcon(QStyle::SP_DirIcon);
     systemFileIcon = qApp->style()->standardIcon(QStyle::SP_FileIcon);
 
-    auto loc = UtilQt::appDataPath();
-    record_file_path_ = QDir(loc).filePath("favicon");
-    loadIcons();
+//    auto loc = UtilQt::appDataPath();
+//    record_file_path_ = QDir(loc).filePath("favicon");
+//    loadIcons();
 }
 
 FaviconMgr::~FaviconMgr() {

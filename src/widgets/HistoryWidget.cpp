@@ -159,11 +159,7 @@ void HistoryWidget::loadAllHistories()
 
 
     for(auto &data : allHistories){
-        QIcon icon(FaviconMgr::Instance().getFavicon(data.url));
-        if(icon.isNull()){
-            icon = style()->standardIcon(QStyle::SP_MessageBoxInformation);
-        }
-        QStandardItem *item = new QStandardItem(icon, data.title);
+        QStandardItem *item = new QStandardItem(style()->standardIcon(QStyle::SP_MessageBoxInformation), data.title);
         item->setData(true, Qt::UserRole + 1);
         item->setData(QVariant::fromValue(data), Qt::UserRole + 2);
         item->setToolTip(data.title + "\n" + data.url);
@@ -184,11 +180,8 @@ void HistoryWidget::loadRecentlyHistories()
     recently_model_->clear();
 
     for (auto data : MainWindow::RecentlyHistory){
-        QIcon icon(FaviconMgr::Instance().getFavicon(data.url));
-        if(icon.isNull()){
-            icon = style()->standardIcon(QStyle::SP_MessageBoxInformation);
-        }
-        QStandardItem *item = new QStandardItem(icon, data.title);
+        QStandardItem *item = new QStandardItem(style()->standardIcon(QStyle::SP_MessageBoxInformation),
+                                                data.title);
         item->setData(true, Qt::UserRole + 1);
         item->setData(QVariant::fromValue(data), Qt::UserRole + 2);
         item->setToolTip(data.title + "\n" + data.url);

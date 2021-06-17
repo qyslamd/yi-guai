@@ -351,7 +351,6 @@ void CefQWidget::onBrowserWindowFaviconChange(CefRefPtr<CefImage> image,
         if(! QFile(file_path).exists()){
             pixmap.save(file_path);
         }
-        FaviconMgr::Instance().addIconRecord(url_, file_path);
     }
     else if(subFix.compare("png", Qt::CaseInsensitive) == 0)
     {
@@ -366,7 +365,6 @@ void CefQWidget::onBrowserWindowFaviconChange(CefRefPtr<CefImage> image,
         if(! QFile(file_path).exists()){
             pixmap.save(file_path);
         }
-        FaviconMgr::Instance().addIconRecord(url_, file_path);
     }
     else {
         pixmap = style()->standardPixmap(QStyle::SP_FileIcon);
