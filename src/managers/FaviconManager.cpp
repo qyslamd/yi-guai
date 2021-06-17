@@ -45,7 +45,7 @@ void FaviconMgr::addIconRecord(const QString &urlIndex,
     if(qUrl.host().isEmpty())
         return;
 
-    icons_cache_.insert(qUrl.host(), filePath);
+    icons_path_cache_.insert(qUrl.host(), filePath);
     emit iconUpdated(qUrl.host());
 
     saveToFile();
@@ -56,24 +56,31 @@ void FaviconMgr::addIconsMap(const QMap<QString, QString> &)
     qInfo()<<__FUNCTION__<<"TODO:";
 }
 
-QString FaviconMgr::iconFilePath(const QString &urlIndex)
+QIcon FaviconMgr::getFavicon(const QString &urlIndex)
 {
     if(urlIndex.isEmpty())
-        return "";
-    QUrl qUrl(urlIndex);
-    QString host = qUrl.host();
+        return systemFileIcon;
+    auto host = QUrl(urlIndex).host();
+
+    if(icons_.contains(host)){
+        return icons_[host];
+    }
+
     if(host.isEmpty())
     {
         host = urlIndex;
     }
-    if( icons_cache_.contains(host))
-        return icons_cache_.value(host);
-    return "";
+    if( icons_path_cache_.contains(host)){
+        icons_.insert(host, QIcon(icons_path_cache_.value(host)));
+        return icons_[host];
+    }
+
+    return systemFileIcon;
 }
 
 void FaviconMgr::loadIcons()
 {
-    icons_cache_.clear();
+    icons_path_cache_.clear();
 
     auto data = UtilQt::readFileUtf8(record_file_path_);
 
@@ -94,7 +101,7 @@ void FaviconMgr::loadIcons()
         QString key = it.key().toUtf8();
         if( !key.isEmpty() )
         {
-            icons_cache_.insert(it.key().toUtf8(),it.value().toString());
+            icons_path_cache_.insert(it.key().toUtf8(),it.value().toString());
         }
     }
 }
@@ -103,8 +110,8 @@ void FaviconMgr::saveToFile()
 {
     QJsonObject jsonObject;
 
-    auto citer = icons_cache_.constBegin();
-    auto cend = icons_cache_.constEnd();
+    auto citer = icons_path_cache_.constBegin();
+    auto cend = icons_path_cache_.constEnd();
     for( ; citer != cend; citer++)
     {
         jsonObject.insert(citer.key(), citer.value());

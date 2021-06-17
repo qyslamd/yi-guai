@@ -159,7 +159,7 @@ void HistoryWidget::loadAllHistories()
 
 
     for(auto &data : allHistories){
-        QIcon icon(FaviconMgr::Instance().iconFilePath(data.url));
+        QIcon icon(FaviconMgr::Instance().getFavicon(data.url));
         if(icon.isNull()){
             icon = style()->standardIcon(QStyle::SP_MessageBoxInformation);
         }
@@ -184,7 +184,7 @@ void HistoryWidget::loadRecentlyHistories()
     recently_model_->clear();
 
     for (auto data : MainWindow::RecentlyHistory){
-        QIcon icon(FaviconMgr::Instance().iconFilePath(data.url));
+        QIcon icon(FaviconMgr::Instance().getFavicon(data.url));
         if(icon.isNull()){
             icon = style()->standardIcon(QStyle::SP_MessageBoxInformation);
         }

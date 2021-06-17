@@ -36,6 +36,7 @@ BookmarkMgr::BookmarkMgr(QObject *parent)
     connect(this, &BookmarkMgr::save, worker_, &BookmarkWorker::saveToFile);
     connect(worker_, &BookmarkWorker::loadFinished, this, &BookmarkMgr::onWokerLoadFinished);
     connect(worker_, &BookmarkWorker::saveFinished, this, &BookmarkMgr::onWokerSaveFinished);
+    connect(worker_, &BookmarkWorker::bookmarkBarLoadFinished, this, &BookmarkMgr::bookmarkBarLoadFinished);
     worker_thread_.start();
 
     QTimer::singleShot(1, this, &BookmarkMgr::load);
@@ -116,9 +117,12 @@ void BookmarkWorker::loadFromFile()
     if(root.contains("roots"))
     {
         BookmarkMgr::gBookmarkModel->clear();
-        QJsonObject obj_roots = root.value("roots").toObject();
 
-        BookmarkMgr::gBookmarkModel->appendRow(parseObj2Item(obj_roots.value("bookmark_bar").toObject()));
+        QJsonObject obj_roots = root.value("roots").toObject();
+        auto item = parseObj2Item(obj_roots.value("bookmark_bar").toObject());
+        emit bookmarkBarLoadFinished(item);
+
+        BookmarkMgr::gBookmarkModel->appendRow(item);
         BookmarkMgr::gBookmarkModel->appendRow(parseObj2Item(obj_roots.value("other").toObject()));
         BookmarkMgr::gBookmarkModel->appendRow(parseObj2Item(obj_roots.value("synced").toObject()));
     }
@@ -289,8 +293,9 @@ QStandardItem *BookmarkWorker::parseObj2Item(const QJsonObject &obj)
             item->appendRow(parseObj2Item(child.toObject()));
         }
     }else if(type == "url"){
-        item->setIcon(FaviconMgr::systemFileIcon);
-        item->setData(obj.value("url").toString(), BookmarkMgr::Url);
+        auto url = obj.value("url").toString();
+        item->setIcon(FaviconMgr::Instance().getFavicon(url));
+        item->setData(url, BookmarkMgr::Url);
     }
     count++;
     return item;

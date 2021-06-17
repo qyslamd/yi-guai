@@ -31,9 +31,9 @@ public:
 
 private:
     Ui::BookmarkWidget *ui;
-    QStandardItem * menu_trigger_item_;
     void initUi();
     void initSignalSlots();
+    QStandardItem * menu_trigger_item_;
 
     // actions for more button
     StyledMenu *menu_more_;

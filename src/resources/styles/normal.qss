@@ -14,12 +14,17 @@ background-color: transparent;
  /* padding: top right bottom left*/
 padding: 4px 14px 4px 14px;
 }
+
 StyledMenu::icon{
 padding-left: 15px;
 }
 StyledMenu::item:selected:enabled  {
 color:black;
 background-color: #EEEEEE;
+}
+StyledMenu#HisWidgetAllHisMenu::item {
+ /* padding: top right bottom left*/
+padding-right: 30px;
 }
 
 
@@ -234,7 +239,24 @@ QPushButton#InprivateCloseBtn:hover{
 background-color:rgba(0,108,190, 70%);
 }
 
-StyledMenu#HisWidgetAllHisMenu::item {
+
+BookmarkMenu{
+menu-scrollable: 1;
+background-color: #ffffff;
+border: 2px solid #e8e8e8;
+border-radius: 6px;
+border-bottom-right-radius:0px;
+}
+BookmarkMenu::item {
+background-color: transparent;
  /* padding: top right bottom left*/
-padding-right: 30px;
+padding: 4px 14px 4px 14px;
+}
+
+BookmarkMenu::icon{
+padding-left: 15px;
+}
+BookmarkMenu::item:selected:enabled  {
+color:black;
+background-color: #EEEEEE;
 }

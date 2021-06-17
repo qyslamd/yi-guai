@@ -15,7 +15,7 @@ class BookmarkMgr : public QObject
 {
     Q_OBJECT
 public:
-    enum ModelDataType{
+    enum ItemDataType{
         Type = Qt::UserRole + 1,
         Name,
         Id,
@@ -36,6 +36,7 @@ private:
 signals:
     void load();
     void save();
+    void bookmarkBarLoadFinished(const QStandardItem *item);
     void bookmarksChanged();
 private:
     static QMutex gMutex;
@@ -57,26 +58,28 @@ class BookmarkWorker : public QObject
 {
     Q_OBJECT
 public:
-     BookmarkWorker();
+    BookmarkWorker();
     ~BookmarkWorker();
 
 public slots:
     void loadFromFile();
     void saveToFile();
 signals:
+    void bookmarkBarLoadFinished(const QStandardItem *item);
     void loadFinished();
     void saveFinished();
 
 private:
     static int count;
-     QMutex mutext_, mutext2_;
-     QString file_path_;
-     void createFileIfNotExist();
-     QString makeEpochStr(bool msecond = false);
-     QString makeUUidStr();
+    QMutex mutext_, mutext2_;
+    QString file_path_;
 
-     QStandardItem* parseObj2Item(const QJsonObject &obj);
-     QJsonObject paseItem2Obj(QStandardItem *item);
+    void createFileIfNotExist();
+    QString makeEpochStr(bool msecond = false);
+    QString makeUUidStr();
+
+    QStandardItem* parseObj2Item(const QJsonObject &obj);
+    QJsonObject paseItem2Obj(QStandardItem *item);
 };
 
 #endif // BOOKMARKMANAGER_H

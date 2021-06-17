@@ -11,6 +11,7 @@
 #include <QStyle>
 #include <QMessageBox>
 #include <QUrl>
+#include <QLabel>
 
 #include "popups/StyledMenu.h"
 #include "managers/AppCfgManager.h"
@@ -70,7 +71,6 @@ bool BookmarkWidget::eventFilter(QObject *watched, QEvent *event)
 void BookmarkWidget::initUi()
 {
     ui->treeView->setModel(BookmarkMgr::gBookmarkModel);
-
     /* *****************General Page*************************/
     // 更多按钮菜单
     action_manage_bookmarks_  = new QAction(QIcon(), tr("bookmark manage"), this);
