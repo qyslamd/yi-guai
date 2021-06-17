@@ -10,6 +10,7 @@ namespace Ui {
 class BookmarkWidget;
 }
 
+class QStandardItem;
 class StyledMenu;
 class QAction;
 class BookmarkWidget : public QWidget
@@ -30,7 +31,7 @@ public:
 
 private:
     Ui::BookmarkWidget *ui;
-    QString all_bkmk_menu_data_;
+    QStandardItem * menu_trigger_item_;
     void initUi();
     void initSignalSlots();
 
@@ -48,6 +49,7 @@ private:
     QAction *action_show_bookmark_bar_;        // 显示收藏夹栏
     QAction *action_show_bookmark_btn_;        // 在工具栏中显示/隐藏收藏夹按钮
 
+    QAction *ac_details_;
     // actions for bookmarks
     StyledMenu *menu_tree_bkmk_;
     QAction *ac_open_bkmk_in_new_page_;        // 在新标签页中打开

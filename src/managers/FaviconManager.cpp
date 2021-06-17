@@ -4,15 +4,24 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QUrl>
+#include <QIcon>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QApplication>
+#include <QStyle>
 #include <QJsonParseError>
 
 #include "utils/util_qt.h"
 
+QIcon FaviconMgr::systemFileIcon;
+QIcon FaviconMgr::systemDirIcon;
+
 FaviconMgr::FaviconMgr(QObject *parent)
     : QObject(parent)
 {
+    systemDirIcon = qApp->style()->standardIcon(QStyle::SP_DirIcon);
+    systemFileIcon = qApp->style()->standardIcon(QStyle::SP_FileIcon);
+
     auto loc = UtilQt::appDataPath();
     record_file_path_ = QDir(loc).filePath("favicon");
     loadIcons();

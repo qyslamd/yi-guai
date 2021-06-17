@@ -14,6 +14,9 @@ public:
     static FaviconMgr& Instance();
     ~FaviconMgr();
 
+    static QIcon systemFileIcon;
+    static QIcon systemDirIcon;
+
 public:
     void addIconRecord(const QString &urlIndex, const QString &filePath);
     void addIconsMap(const QMap<QString, QString> &icons);

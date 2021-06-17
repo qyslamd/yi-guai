@@ -102,8 +102,7 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
         window->show();
     }
 
-    qInfo() << "The creation of mainwindow took:"
- << timer.elapsed() << "milliseconds";
+    qInfo()<<"\033[32m[Time:]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";
 
 }
 

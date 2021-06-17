@@ -176,7 +176,7 @@ void HistoryWidget::loadAllHistories()
             weekItem->appendRow(item);
         }
     }
-    qInfo()<<__FUNCTION__<<":" << timer.elapsed() << "milliseconds";
+    qInfo()<<"\033[32m[Time:]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";
 }
 
 void HistoryWidget::loadRecentlyHistories()
