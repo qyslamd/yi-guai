@@ -62,6 +62,7 @@ public:
 public slots:
     void onInpWndCntChanged();
 protected:
+    void showEvent(QShowEvent *event) override;
     void closeEvent(QCloseEvent *evnet) override;
     void changeEvent(QEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
@@ -143,7 +144,7 @@ private slots:
                            CefEventHandle os_event);
     void onHistoryWidgetCmd(HistoryCmd cmd, const QVariant &para);
     void onPinOrCloseHistoryWidget();
-    void onBkmkWidgetCmd(BookmarkCmd cmd, const QVariant &para);
+    void onBookmarkCmd(BookmarkCmd cmd, const QVariant &para);
     void onPinOrCloseBookmarkWidget();
 
 private:

@@ -6,8 +6,10 @@
 #include <QObject>
 #include <QMutex>
 #include <QVector>
+#include <QSet>
 #include <QThread>
 
+class QAction;
 class BookmarkWorker;
 class QStandardItem;
 class QStandardItemModel;
@@ -26,13 +28,29 @@ public:
     };
     static BookmarkMgr* Instance();
     static QStandardItemModel *gBookmarkModel;
+    static QSet<quint32> gIdSet;
 
     ~BookmarkMgr();
+public:
+    QAction *action_open_new_tab_ = nullptr;
+    QAction *action_open_new_wnd_ = nullptr;
+    QAction *action_open_in_private_ = nullptr;
+    QAction *action_modify_ = nullptr;
+    QAction *action_rename_;
+    QAction *action_cut_;
+    QAction *action_copy_;
+    QAction *action_paste_;
+    QAction *action_delete_;
+    QAction *action_add_current_;
+    QAction *action_add_folder_;
+    QAction *action_show_bookmark_bar_;
+    QAction *action_show_bookmakr_btn_;
+    QAction *action_manage_bookmarks_;
 private:
     explicit BookmarkMgr(QObject *parent = nullptr);
     BookmarkMgr(const BookmarkMgr& other);
     BookmarkMgr& operator=(const BookmarkMgr & other);
-
+    void initActions();
 signals:
     void load();
     void save();
@@ -49,6 +67,7 @@ private:
     QThread worker_thread_;
     BookmarkWorker *worker_ = nullptr;
 private slots:
+    void doLoadWork();
     void onWokerLoadFinished();
     void onWokerSaveFinished();
 };
@@ -68,7 +87,6 @@ signals:
     void saveFinished();
 
 private:
-    static int count;
     QMutex mutext_, mutext2_;
     QString file_path_;
 

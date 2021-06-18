@@ -5,6 +5,7 @@
 #include <QUuid>
 #include <QTimer>
 #include <QThread>
+#include <QAction>
 #include <QJsonObject>
 #include <QMutexLocker>
 #include <QJsonDocument>
@@ -20,25 +21,46 @@
 BookmarkMgr* BookmarkMgr::gInst = nullptr;
 QMutex BookmarkMgr::gMutex;
 QStandardItemModel *BookmarkMgr::gBookmarkModel = nullptr;
+QSet<quint32> BookmarkMgr::gIdSet;
 
 BookmarkMgr::BookmarkMgr(QObject *parent)
     : QObject(parent)
 {
+    initActions();
+    qInfo()<<"\033[34m[Thread]"<<__FUNCTION__<<QThread::currentThreadId()<<"\033[0m";
+
     if(!gBookmarkModel){
         gBookmarkModel = new QStandardItemModel(this);
     }
 
     worker_ = new BookmarkWorker;
     worker_->moveToThread(&worker_thread_);
-    connect(&worker_thread_, &QThread::finished, worker_, &BookmarkWorker::deleteLater);
+//    connect(&worker_thread_, &QThread::finished, worker_, &BookmarkWorker::deleteLater);
     connect(&worker_thread_, &QThread::finished, this, [](){qInfo()<<"worker thread finished!";});
     connect(this, &BookmarkMgr::load, worker_, &BookmarkWorker::loadFromFile);
     connect(this, &BookmarkMgr::save, worker_, &BookmarkWorker::saveToFile);
     connect(worker_, &BookmarkWorker::loadFinished, this, &BookmarkMgr::onWokerLoadFinished);
     connect(worker_, &BookmarkWorker::saveFinished, this, &BookmarkMgr::onWokerSaveFinished);
-    worker_thread_.start();
 
-    QTimer::singleShot(1, this, &BookmarkMgr::load);
+    QTimer::singleShot(0, this, &BookmarkMgr::doLoadWork);
+}
+
+void BookmarkMgr::initActions()
+{
+    action_open_new_tab_ = new QAction(QIcon(), tr("open"), this);
+    action_open_new_wnd_ = new QAction(QIcon(), tr("open in new window"), this);
+    action_open_in_private_ = new QAction(QIcon(), tr("open in private window"), this);
+    action_modify_ = new QAction(QIcon(), tr("modify"), this);
+    action_rename_ = new QAction(QIcon(), tr("rename"), this);
+    action_cut_ = new QAction(QIcon(), tr("cut"), this);
+    action_copy_ = new QAction(QIcon(), tr("copy"), this);
+    action_paste_ = new QAction(QIcon(), tr("paste"), this);
+    action_delete_ = new QAction(QIcon(), tr("delete"), this);
+    action_add_current_ = new QAction(QIcon(), tr("add current tab to favorite"), this);
+    action_add_folder_ = new QAction(QIcon(), tr("add folder"), this);
+    action_show_bookmark_bar_ = new QAction(QIcon(), tr("show bookmark bar"), this);
+    action_show_bookmakr_btn_ = new QAction(QIcon(), tr("show bookmark button"), this);
+    action_manage_bookmarks_ = new QAction(QIcon(), tr("open bookmark manager"), this);
 }
 
 BookmarkMgr *BookmarkMgr::Instance()
@@ -58,10 +80,20 @@ BookmarkMgr::~BookmarkMgr()
     qInfo()<<__FUNCTION__;
     worker_thread_.quit();
     worker_thread_.wait();
+
+    delete worker_;
+}
+
+void BookmarkMgr::doLoadWork()
+{
+    worker_thread_.start();
+    emit load();
 }
 
 void BookmarkMgr::onWokerLoadFinished()
 {
+    worker_thread_.quit();
+    worker_thread_.wait();
     emit bookmarksChanged();
 }
 
@@ -70,9 +102,9 @@ void BookmarkMgr::onWokerSaveFinished()
 
 }
 
-int BookmarkWorker::count = 0;
 BookmarkWorker::BookmarkWorker()
 {
+    qInfo()<<"\033[34m[Thread]"<<__FUNCTION__<<QThread::currentThreadId()<<"\033[0m";
     auto loc = UtilQt::appDataPath();
     file_path_ = QDir(loc).filePath("Bookmarks");
     if(!QFileInfo::exists(file_path_)){
@@ -87,6 +119,8 @@ BookmarkWorker::~BookmarkWorker()
 
 void BookmarkWorker::loadFromFile()
 {
+    qInfo()<<"\033[34m[Thread]"<<__FUNCTION__<<QThread::currentThreadId()<<"\033[0m";
+
     QElapsedTimer timer;
     timer.start();
 
@@ -104,7 +138,7 @@ void BookmarkWorker::loadFromFile()
 
     if(json_error.error != QJsonParseError::NoError)
     {
-        qDebug() << __FUNCTION__ <<"json error!";
+        qDebug() << __FUNCTION__ <<"json error:"<<json_error.errorString();
         return;
     }
     QString checksum, version;
@@ -126,8 +160,8 @@ void BookmarkWorker::loadFromFile()
     if(root.contains("version")){
         version = root.value("version").toString();
     }
-    qInfo()<<"\033[32m[Time:]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";
-    qInfo()<<__FUNCTION__<<"count:"<<count;
+    qInfo()<<"\033[32m[Execute Time]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";
+    qInfo()<<__FUNCTION__<<"count:"<<BookmarkMgr::gIdSet.count();
     emit loadFinished();
 }
 
@@ -195,7 +229,7 @@ void BookmarkWorker::saveToFile()
     }
 
     emit saveFinished();
-    qInfo()<<"\033[32m[Time:]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";
+    qInfo()<<"\033[32m[Execute Time]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";
 }
 
 void BookmarkWorker::createFileIfNotExist()
@@ -277,12 +311,16 @@ QString BookmarkWorker::makeUUidStr()
 QStandardItem *BookmarkWorker::parseObj2Item(const QJsonObject &obj)
 {
     QStandardItem *item = new QStandardItem(obj.value("name").toString());
-    item->setData(obj.value("type").toString(), BookmarkMgr::Type);
-    item->setData( obj.value("guid").toString(), BookmarkMgr::Guid);
-    item->setData(obj.value("id").toString(), BookmarkMgr::Id);
+    auto type = obj.value("type").toString();
+    auto id = obj.value("id").toString();
+    BookmarkMgr::gIdSet.insert(id.toUInt());
+
+    item->setData(type, BookmarkMgr::Type);
+    item->setData(obj.value("guid").toString(), BookmarkMgr::Guid);
+    item->setData(id, BookmarkMgr::Id);
     item->setData(obj.value("date_added").toString(), BookmarkMgr::DateAdded);
     item->setData(obj.value("name").toString(), BookmarkMgr::Name);
-    auto type = obj.value("type").toString();
+
     if(type == "folder"){
         item->setIcon(FaviconMgr::systemDirIcon);
         item->setData(obj.value("date_modified").toString(), BookmarkMgr::DateModified);
@@ -294,7 +332,6 @@ QStandardItem *BookmarkWorker::parseObj2Item(const QJsonObject &obj)
         item->setIcon(FaviconMgr::systemFileIcon);
         item->setData(url, BookmarkMgr::Url);
     }
-    count++;
     return item;
 }
 

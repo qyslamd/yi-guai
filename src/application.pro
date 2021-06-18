@@ -25,7 +25,6 @@ win32{
 SOURCES += \
     browser/client_switches.cc \
     browser/scheme_handler.cpp \
-    globaldef.cpp \
     managers/AddrInputManager.cpp \
     managers/AppCfgManager.cpp \
     managers/BookmarkManager.cpp \

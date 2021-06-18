@@ -102,7 +102,7 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
         window->show();
     }
 
-    qInfo()<<"\033[32m[Time:]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";
+    qInfo()<<"\033[32m[Execute Time]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";
 
 }
 

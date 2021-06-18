@@ -6,10 +6,12 @@
 #include <QPushButton>
 
 #include "globaldef.h"
+#include "popups/StyledMenu.h"
 
 class BookmarkMenu;
 class BarItem;
 class QMenu;
+class QLabel;
 class QStandardItem;
 class QHBoxLayout;
 class BookmarkBar : public QFrame
@@ -19,12 +21,15 @@ public:
     explicit BookmarkBar(QWidget *parent = nullptr);
 
 signals:
+    void cmdTriggered(BookmarkCmd cmd, const QVariant &data);
 protected:
     void paintEvent(QPaintEvent *event) override;
     void showEvent(QShowEvent *event) override;
 private:
     void initUi();
     QHBoxLayout *layout_;
+    QToolButton *btn_niubi_;
+    QLabel *label_empty_;
     QHBoxLayout *item_layout_;
     QPushButton *btn_others_;
     bool loaded_ = false;
@@ -32,7 +37,7 @@ private:
     BookmarkMenu *makeMenu(const QStandardItem *item);
 
 private slots:
-    void onCustomContextMenuRequested(const QPoint &);
+    void onCustomContextMenuRequested(const QPoint &pos);
     void onBookmarksChanged();
 
 };
@@ -45,8 +50,12 @@ public:
     BarItem(const QString &title, QWidget *parent = nullptr);
     BarItem(QWidget *parent = nullptr);
 
+    QVariant data() const;
+    void setData(const QVariant &var);
 private:
     void init();
+
+    QVariant data_;
 };
 
 class BookmarkMenu : public QMenu
@@ -58,6 +67,9 @@ public:
 
 private:
     void initUi();
+
+private slots:
+    void onCustomContextMenuRequested(const QPoint &pos);
 };
 
 #endif // BOOKMARKBAR_H

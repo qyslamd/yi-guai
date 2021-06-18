@@ -141,7 +141,7 @@ void TabPageToolBar::initUi()
     QFrame* line = new QFrame(this);
     line->setStyleSheet("margin-top:4px;margin-bottom:4px;");
     line->setObjectName(QString::fromUtf8("line"));
-    line->setGeometry(QRect(160, 150, 3, 3));
+    line->setMaximumWidth(2);
     line->setMaximumHeight(28);
     line->setFrameShape(QFrame::VLine);
     line->setFrameShadow(QFrame::Sunken);

@@ -180,6 +180,16 @@ void MainWindow::onInpWndCntChanged()
     }
 }
 
+void MainWindow::showEvent(QShowEvent *event)
+{
+    QtWinFramelessWindow::showEvent(event);
+    static bool firstShown = true;
+    if(firstShown){
+        qInfo()<<"\033[34m[Thread]"<<__FUNCTION__<<QThread::currentThreadId()<<"\033[0m";
+        firstShown = false;
+    }
+}
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     window_closing_ = true;
@@ -450,10 +460,11 @@ void MainWindow::initSignalSlot()
     connect(this, &MainWindow::dwmColorChanged, tab_bar_, &TabPageToolBar::onDwmColorChanged);
 #endif
     connect(navi_bar_, &NavigateToolBar::naviBarCmd, this, &MainWindow::onNaviBarCmd);
+    connect(bookmark_bar_, &BookmarkBar::cmdTriggered, this, &MainWindow::onBookmarkCmd);
     connect(history_widget_, &HistoryWidget::pinOrCloseClicked, this, &MainWindow::onPinOrCloseHistoryWidget);
     connect(history_widget_, &HistoryWidget::menuCmd, this, &MainWindow::onHistoryWidgetCmd);
     connect(bookmark_widget_, &BookmarkWidget::pinOrCloseClicked, this, &MainWindow::onPinOrCloseBookmarkWidget);
-    connect(bookmark_widget_, &BookmarkWidget::menuCmd, this, &MainWindow::onBkmkWidgetCmd);
+    connect(bookmark_widget_, &BookmarkWidget::menuCmd, this, &MainWindow::onBookmarkCmd);
 }
 
 void MainWindow::initPage(Page *page)
@@ -1087,7 +1098,7 @@ void MainWindow::onPinOrCloseHistoryWidget()
     }
 }
 
-void MainWindow::onBkmkWidgetCmd(BookmarkCmd cmd, const QVariant &para)
+void MainWindow::onBookmarkCmd(BookmarkCmd cmd, const QVariant &para)
 {
     switch (cmd) {
     case BookmarkCmd::Open:

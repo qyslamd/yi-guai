@@ -97,6 +97,7 @@ void AddressBar::initUi()
     btn_zoom_hint_ = new QToolButton;
     connect(btn_zoom_hint_, &QToolButton::clicked, this, &AddressBar::showZoomBar);
     btn_add_favorite_ = new QToolButton;
+    btn_add_favorite_->setIconSize(QSize(18,18));
     btn_add_favorite_->setCheckable(true);
     btn_add_favorite_->setToolTip(tr("mark to favorite"));
     connect(btn_add_favorite_, &QToolButton::clicked, this, &AddressBar::addFavorite);

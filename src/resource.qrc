@@ -133,6 +133,7 @@
         <file>resources/imgs/dark/search_64px.png</file>
         <file>resources/imgs/light/globe_earth_64px.png</file>
         <file>resources/imgs/light/search_64px.png</file>
+        <file>resources/imgs/gray/squared_menu_96px.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file>resources/styles/normal.qss</file>
