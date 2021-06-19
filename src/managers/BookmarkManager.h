@@ -8,6 +8,7 @@
 #include <QVector>
 #include <QSet>
 #include <QThread>
+#include <QWidget>
 
 class QAction;
 class BookmarkWorker;
@@ -97,5 +98,6 @@ private:
     QStandardItem* parseObj2Item(const QJsonObject &obj);
     QJsonObject paseItem2Obj(QStandardItem *item);
 };
+
 
 #endif // BOOKMARKMANAGER_H

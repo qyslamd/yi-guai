@@ -18,7 +18,6 @@
 #include <QStyle>
 #include <QDir>
 #include <QMessageBox>
-#include <QPushButton>
 #include <QDateTime>
 #include <QPixmap>
 #include <QBuffer>
@@ -659,15 +658,6 @@ void CefQWidget::initUi()
 
     layout_->setContentsMargins(0,0,0,0);
     layout_->setSpacing(0);
-
-#if 0
-    QPushButton *button = new QPushButton("zoomIn",this);
-    connect(button, &QPushButton::clicked, this, [this]()
-    {
-        browser_->GetHost()->SetZoomLevel(-3.0);
-    });
-    layout_->addWidget(button);
-#endif
 
     layout_->addWidget(qwindow_containter_);
     setLayout(layout_);

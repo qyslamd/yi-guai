@@ -114,7 +114,7 @@ BookmarkWorker::BookmarkWorker()
 
 BookmarkWorker::~BookmarkWorker()
 {
-
+    qInfo()<<__FUNCTION__;
 }
 
 void BookmarkWorker::loadFromFile()
