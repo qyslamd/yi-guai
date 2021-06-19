@@ -34,13 +34,15 @@ private:
     QLabel *label_empty_;
     BookmarkToolBar *toolbar_;
     QPushButton *btn_others_;
+
+    bool first_shown_ = true;   /*本类任何对象第一次显示的标记*/
     bool loaded_ = false;
 
     BookmarkMenu *makeMenu(const QStandardItem *item);
 
 private slots:
     void onCustomContextMenuRequested(const QPoint &pos);
-    void onBookmarksChanged();
+    void loadBookmarks();
 
 };
 

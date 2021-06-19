@@ -22,8 +22,8 @@ BookmarkBar::BookmarkBar(QWidget *parent)
     : QFrame(parent)
 {
     initUi();
-    connect(BookmarkMgr::gProviderWidget, &ToolBarProviderWnd::loadToUiFinished,
-            this, &BookmarkBar::onBookmarksChanged);
+    connect(BookmarkMgr::gToolbarProvider, &ToolBarProviderWnd::loadToUiFinished,
+            this, &BookmarkBar::loadBookmarks);
 }
 
 void BookmarkBar::paintEvent(QPaintEvent *event)
@@ -54,7 +54,20 @@ void BookmarkBar::paintEvent(QPaintEvent *event)
 
 void BookmarkBar::showEvent(QShowEvent *event)
 {
-    onBookmarksChanged();
+    /*本类的首个对象标志*/
+    static bool first_wnd = true;
+    if(first_wnd){
+        first_wnd = false;
+        return QFrame::showEvent(event);
+    }
+    /*
+     * 每个对象显示的时候，均判断是否是首次显示
+     * 如果是首次显示，加载书签
+     */
+    if(first_shown_){
+        loadBookmarks();
+        first_shown_ = false;
+    }
     QFrame::showEvent(event);
 }
 
@@ -151,15 +164,16 @@ void BookmarkBar::onCustomContextMenuRequested(const QPoint &pos)
     menu.exec(QCursor::pos());
 }
 
-void BookmarkBar::onBookmarksChanged()
+void BookmarkBar::loadBookmarks()
 {
-    if(!BookmarkMgr::Instance()->isLoaded()){
+    loaded_ = false;
+
+    auto providerWnd = BookmarkMgr::gToolbarProvider;
+
+    if(!providerWnd){
         return;
     }
-    if(loaded_){
-        return;
-    }
-    for (auto item : BookmarkMgr::gProviderWidget->buttons){
+    for (auto item : providerWnd->buttons){
         toolbar_->addAction(item);
     }
 
@@ -174,10 +188,12 @@ void BookmarkBar::onBookmarksChanged()
         }
     }
 
-    if(BookmarkMgr::gProviderWidget->others_menu_){
-        btn_others_->setMenu(BookmarkMgr::gProviderWidget->others_menu_);
+    if(providerWnd->others_menu_){
+        btn_others_->setMenu(providerWnd->others_menu_);
     }
     loaded_ = true;
+
+    label_empty_->setVisible(providerWnd->buttons.isEmpty());
 }
 
 BookmarkToolBar::BookmarkToolBar(QWidget *parent)

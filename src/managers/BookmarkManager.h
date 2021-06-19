@@ -16,6 +16,9 @@ class BookmarkWorker;
 class QStandardItem;
 class QStandardItemModel;
 class ToolBarProviderWnd;
+///
+/// \brief The BookmarkMgr class
+/// 书签管理类，负责书签文件的读写和同步
 class BookmarkMgr : public QObject
 {
     Q_OBJECT
@@ -32,7 +35,7 @@ public:
     ~BookmarkMgr();
     static BookmarkMgr* Instance();
     static QStandardItemModel *gBookmarkModel;
-    static ToolBarProviderWnd *gProviderWidget;
+    static ToolBarProviderWnd *gToolbarProvider;
     static QSet<quint32> gIdSet;
 
     bool isLoaded() const{return loaded_;}
@@ -66,9 +69,7 @@ private:
     static BookmarkMgr *gInst;
 
     struct Gc{
-        ~Gc() {
-            if(gInst){ delete gInst; gInst = nullptr;}
-        }
+        ~Gc(){if(gInst){ delete gInst; gInst = nullptr; } }
     };
     QThread worker_thread_;
     BookmarkWorker *worker_ = nullptr;
@@ -78,6 +79,10 @@ private slots:
     void onWokerSaveFinished();
 };
 
+///
+/// \brief The BookmarkWorker class
+/// 书签文件读写线程的具体工作类
+/// 读文件，并创建好具体的 QStandardItemModel
 class BookmarkWorker : public QObject
 {
     Q_OBJECT
@@ -106,6 +111,11 @@ private:
 
 class QPushButton;
 class BookmarkMenu;
+///
+/// \brief The ToolBarProviderWnd class
+/// 创建一个QWidget来承载书签工具栏的所有QAction和QMenu
+/// 在多个顶层窗口之间共享
+/// 此窗口是典型的“工具人”
 class ToolBarProviderWnd: public QWidget{
     Q_OBJECT
 public:
@@ -121,6 +131,7 @@ public slots:
     void onBookmarksChanged();
 
 private:
+    QList<QMenu *> added_menu_;
     BookmarkMenu *makeMenu(const QStandardItem *item);
 };
 

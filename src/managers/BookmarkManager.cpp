@@ -15,6 +15,7 @@
 #include <QStandardItem>
 #include <QStandardItemModel>
 #include <QPushButton>
+#include <QApplication>
 
 #include "utils/util_qt.h"
 #include "FaviconManager.h"
@@ -23,7 +24,7 @@
 BookmarkMgr* BookmarkMgr::gInst = nullptr;
 QMutex BookmarkMgr::gMutex;
 QStandardItemModel *BookmarkMgr::gBookmarkModel = nullptr;
-ToolBarProviderWnd *BookmarkMgr::gProviderWidget = nullptr;
+ToolBarProviderWnd *BookmarkMgr::gToolbarProvider = nullptr;
 QSet<quint32> BookmarkMgr::gIdSet;
 
 BookmarkMgr::BookmarkMgr(QObject *parent)
@@ -36,16 +37,19 @@ BookmarkMgr::BookmarkMgr(QObject *parent)
         gBookmarkModel = new QStandardItemModel(this);
     }
 
-    if(!gProviderWidget){
-        gProviderWidget = new ToolBarProviderWnd;
-        gProviderWidget->hide();
+    if(!gToolbarProvider){
+        gToolbarProvider = new ToolBarProviderWnd;
+        gToolbarProvider->hide();
+        connect(this, &BookmarkMgr::bookmarksChanged, gToolbarProvider, &ToolBarProviderWnd::onBookmarksChanged);
     }
+    /*虽然Provider是一个static变量，但是其生命周期需要在qApp结束之前结束，不然释放不掉*/
+    connect(qApp, &QCoreApplication::aboutToQuit, this, [](){
+        delete gToolbarProvider;
+    });
 
-    connect(this, &BookmarkMgr::bookmarksChanged, gProviderWidget, &ToolBarProviderWnd::onBookmarksChanged);
 
     worker_ = new BookmarkWorker;
     worker_->moveToThread(&worker_thread_);
-//    connect(&worker_thread_, &QThread::finished, worker_, &BookmarkWorker::deleteLater);
     connect(&worker_thread_, &QThread::finished, this, [](){qInfo()<<"worker thread finished!";});
     connect(this, &BookmarkMgr::load, worker_, &BookmarkWorker::loadFromFile);
     connect(this, &BookmarkMgr::save, worker_, &BookmarkWorker::saveToFile);
@@ -92,8 +96,6 @@ BookmarkMgr::~BookmarkMgr()
     worker_thread_.wait();
 
     delete worker_;
-
-    delete gProviderWidget;
 }
 
 void BookmarkMgr::doLoadWork()
@@ -385,6 +387,10 @@ ToolBarProviderWnd::~ToolBarProviderWnd()
 
 void ToolBarProviderWnd::onBookmarksChanged()
 {
+    if(!BookmarkMgr::Instance()->isLoaded()){
+        return ;
+    }
+
     QElapsedTimer timer;
     timer.start();
 
@@ -411,22 +417,15 @@ void ToolBarProviderWnd::onBookmarksChanged()
                                                          action->font(),
                                                          470);
                     action->setToolTip(text1 + "\n" + text2);
-//                    connect(action, &QAction::clicked, [=](){
-//                        emit cmdTriggered(BookmarkCmd::Open, url);
-//                    });
                 }
                 action->setData(QVariant::fromValue<void *>(child));
             }
         }
-//        label_empty_->setVisible(barItem->rowCount() == 0);
     }
     auto otherItem = model->item(1);
     if(otherItem){
         others_menu_ = makeMenu(otherItem);
     }
-
-//    loaded_ = true;
-
     emit loadToUiFinished();
     qInfo()<<"\033[32m[Execute Time]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";
 }
@@ -446,11 +445,6 @@ BookmarkMenu *ToolBarProviderWnd::makeMenu(const QStandardItem *item)
             if(type == "folder"){
                 action->setMenu(makeMenu(child));
             }else if(type == "url"){
-//                connect(action, &QAction::triggered,[=](){
-//                    if(auto dataItem = (QStandardItem *)action->data().value<void *>()){
-//                        emit cmdTriggered(BookmarkCmd::Open, dataItem->data(BookmarkMgr::Url));
-//                    }
-//                });
                 auto url = child->data(BookmarkMgr::Url).toString();
                 action->setToolTip(name + "\n" + url);
             }
