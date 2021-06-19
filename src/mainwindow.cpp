@@ -1105,7 +1105,7 @@ void MainWindow::onBookmarkCmd(BookmarkCmd cmd, const QVariant &para)
         NavigateInCurPage(para.toString());
         break;
     case BookmarkCmd::OpenInNewPage:
-        AddNewPage(para.toString(), false);
+        AddNewPage(para.toString(), true);
         break;
     case BookmarkCmd::OpenInNewWnd:
         MainWndMgr::Instance().createWindow(MainWndCfg(para.toString()));

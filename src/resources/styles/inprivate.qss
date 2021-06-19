@@ -55,3 +55,7 @@ background-color:rgba(169,169,169, 30%);
 BookmarkToolBar > QToolButton{
 color:white;
 }
+
+QPushButton#BookmarkBarOhtersButton:{
+color:white;
+}

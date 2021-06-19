@@ -27,6 +27,9 @@ MainWndMgr::MainWndMgr(QObject *parent)
     HistoryMgr::Instance();
     // 地址栏输入数据
     AddrInputMgr::Instance();
+
+    connect(BookmarkMgr::Instance(), &BookmarkMgr::menuCmd, this, &MainWndMgr::onBkmkMgrMenuCmd);
+
 }
 
 
@@ -153,4 +156,29 @@ size_t MainWndMgr::inprivateCount() const
         }
     }
     return count;
+}
+
+MainWindow *MainWndMgr::activeWindow()
+{
+    auto it = windows_.begin();
+    auto end = windows_.end();
+    for(; it != end; ++it)
+    {
+        if((*it) != nullptr)
+        {
+            if((*it)->isActiveWindow()){
+                return *it;
+            }
+        }
+    }
+    return nullptr;
+}
+
+void MainWndMgr::onBkmkMgrMenuCmd(BookmarkCmd cmd, const QVariant &data)
+{
+    auto wnd = activeWindow();
+    if(wnd){
+        activeWindow()->onBookmarkCmd(cmd, data);
+    }else{
+    }
 }

@@ -11,6 +11,8 @@
 #include <QWidget>
 #include <QMenu>
 
+#include "globaldef.h"
+
 class QAction;
 class BookmarkWorker;
 class QStandardItem;
@@ -39,6 +41,7 @@ public:
     static QSet<quint32> gIdSet;
 
     bool isLoaded() const{return loaded_;}
+    void setMenuTriggerItem(QStandardItem *item);
 public:
     QAction *action_open_new_tab_ = nullptr;
     QAction *action_open_new_wnd_ = nullptr;
@@ -60,10 +63,12 @@ private:
     BookmarkMgr& operator=(const BookmarkMgr & other);
     void initActions();
     bool loaded_ = false;
+    QStandardItem *menu_trigger_item_ = nullptr;
 signals:
     void load();
     void save();
     void bookmarksChanged();
+    void menuCmd(BookmarkCmd cmd,  const QVariant &para);
 private:
     static QMutex gMutex;
     static BookmarkMgr *gInst;
@@ -126,6 +131,7 @@ public:
     QMenu *others_menu_;
 
 signals:
+    void menuActionTriggered(const QVariant &data);
     void loadToUiFinished();
 public slots:
     void onBookmarksChanged();

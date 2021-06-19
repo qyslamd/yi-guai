@@ -61,6 +61,7 @@ public:
     bool eventFilter(QObject *obj, QEvent *event) override;
 public slots:
     void onInpWndCntChanged();
+    void onBookmarkCmd(BookmarkCmd cmd, const QVariant &para);
 protected:
     void showEvent(QShowEvent *event) override;
     void closeEvent(QCloseEvent *evnet) override;
@@ -144,7 +145,6 @@ private slots:
                            CefEventHandle os_event);
     void onHistoryWidgetCmd(HistoryCmd cmd, const QVariant &para);
     void onPinOrCloseHistoryWidget();
-    void onBookmarkCmd(BookmarkCmd cmd, const QVariant &para);
     void onPinOrCloseBookmarkWidget();
 
 private:

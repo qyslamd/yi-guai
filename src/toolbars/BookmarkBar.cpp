@@ -89,6 +89,7 @@ void BookmarkBar::initUi()
     toolbar_ = new BookmarkToolBar(this);
 
     btn_others_ = new QPushButton(FaviconMgr::systemDirIcon, QStringLiteral("其它书签"), this);
+    btn_others_->setObjectName("BookmarkBarOhtersButton");
     QFrame* line = new QFrame(this);
     line->setStyleSheet("margin-top:4px;margin-bottom:4px;");
     line->setObjectName("line");

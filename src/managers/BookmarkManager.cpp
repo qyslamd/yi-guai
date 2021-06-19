@@ -19,6 +19,7 @@
 
 #include "utils/util_qt.h"
 #include "FaviconManager.h"
+#include "MainWindowManager.h"
 #include "popups/StyledMenu.h"
 
 BookmarkMgr* BookmarkMgr::gInst = nullptr;
@@ -41,13 +42,15 @@ BookmarkMgr::BookmarkMgr(QObject *parent)
         gToolbarProvider = new ToolBarProviderWnd;
         gToolbarProvider->hide();
         connect(this, &BookmarkMgr::bookmarksChanged, gToolbarProvider, &ToolBarProviderWnd::onBookmarksChanged);
+        connect(gToolbarProvider, &ToolBarProviderWnd::menuActionTriggered, this, [this](const QVariant &data)
+        {
+           menuCmd(BookmarkCmd::Open, data);
+        });
     }
     /*虽然Provider是一个static变量，但是其生命周期需要在qApp结束之前结束，不然释放不掉*/
     connect(qApp, &QCoreApplication::aboutToQuit, this, [](){
         delete gToolbarProvider;
     });
-
-
     worker_ = new BookmarkWorker;
     worker_->moveToThread(&worker_thread_);
     connect(&worker_thread_, &QThread::finished, this, [](){qInfo()<<"worker thread finished!";});
@@ -75,6 +78,13 @@ void BookmarkMgr::initActions()
     action_show_bookmark_bar_ = new QAction(QIcon(), tr("show bookmark bar"), this);
     action_show_bookmakr_btn_ = new QAction(QIcon(), tr("show bookmark button"), this);
     action_manage_bookmarks_ = new QAction(QIcon(), tr("open bookmark manager"), this);
+
+    connect(action_open_new_tab_, &QAction::triggered, this, [this](){
+        if(menu_trigger_item_){
+            emit menuCmd(BookmarkCmd::OpenInNewPage, menu_trigger_item_->data(Url).toString());
+            menu_trigger_item_ = nullptr;
+        }
+    });
 }
 
 BookmarkMgr *BookmarkMgr::Instance()
@@ -87,6 +97,11 @@ BookmarkMgr *BookmarkMgr::Instance()
     }
     static BookmarkMgr::Gc gc;
     return gInst;
+}
+
+void BookmarkMgr::setMenuTriggerItem(QStandardItem *item)
+{
+    menu_trigger_item_ = item;
 }
 
 BookmarkMgr::~BookmarkMgr()
@@ -417,6 +432,11 @@ void ToolBarProviderWnd::onBookmarksChanged()
                                                          action->font(),
                                                          470);
                     action->setToolTip(text1 + "\n" + text2);
+
+                    connect(action, &QAction::triggered, this, [this, url]()
+                    {
+                        emit menuActionTriggered(url);
+                    });
                 }
                 action->setData(QVariant::fromValue<void *>(child));
             }
@@ -447,6 +467,11 @@ BookmarkMenu *ToolBarProviderWnd::makeMenu(const QStandardItem *item)
             }else if(type == "url"){
                 auto url = child->data(BookmarkMgr::Url).toString();
                 action->setToolTip(name + "\n" + url);
+
+                connect(action, &QAction::triggered, this, [this, url]()
+                {
+                    emit menuActionTriggered(url);
+                });
             }
             action->setData(QVariant::fromValue<void *>(child));
         }
@@ -493,13 +518,14 @@ void BookmarkMenu::onCustomContextMenuRequested(const QPoint &pos)
         action = menuAction();
     }
     if(auto dataItem = (QStandardItem *)action->data().value<void *>()){
+        BookmarkMgr::Instance()->setMenuTriggerItem(dataItem);
         auto type = dataItem->data(BookmarkMgr::Type).toString();
         auto openAction = BookmarkMgr::Instance()->action_open_new_tab_;
         auto openWndAction = BookmarkMgr::Instance()->action_open_new_wnd_;
         auto openPrivateAction = BookmarkMgr::Instance()->action_open_in_private_;
 
         if(type == "folder"){
-            openAction->setText(tr("open all") + QString("(%1)").arg(dataItem->rowCount()));
+            openAction->setText(tr("open all in new tab") + QString("(%1)").arg(dataItem->rowCount()));
             openWndAction->setText(tr("open all in new window") + QString("(%1)").arg(dataItem->rowCount()));
             openPrivateAction->setText(tr("open all in private window") + QString("(%1)").arg(dataItem->rowCount()));
             menu.addAction(openAction);
@@ -509,7 +535,7 @@ void BookmarkMenu::onCustomContextMenuRequested(const QPoint &pos)
             menu.addAction(BookmarkMgr::Instance()->action_rename_);
 
         }else if(type == "url"){
-            openAction->setText(tr("open") );
+            openAction->setText(tr("open in new tab"));
             openWndAction->setText(tr("open in new window"));
             openPrivateAction->setText(tr("open in private window"));
             menu.addAction(openAction);

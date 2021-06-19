@@ -7,6 +7,8 @@
 #include <QSet>
 #include <QSharedPointer>
 
+#include "globaldef.h"
+
 typedef struct MainWindowConfig{
     MainWindowConfig(bool inprivate,
                      bool always_on_top,
@@ -78,6 +80,8 @@ public:
     void closeAllInprivate();
     size_t inprivateCount() const;
 
+    MainWindow *activeWindow();
+
     static int newWndOffsetX;
     static int newWndOffsetY;
 signals:
@@ -92,6 +96,8 @@ private:
     explicit MainWndMgr(QObject *parent = nullptr);
     MainWndMgr(const MainWndMgr& other);
     MainWndMgr& operator=(const MainWndMgr & other);
+private slots:
+    void onBkmkMgrMenuCmd(BookmarkCmd cmd, const QVariant &data);
 };
 
 #endif // MAINWINDOWMANAGER_H
