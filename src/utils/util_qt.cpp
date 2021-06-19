@@ -13,6 +13,7 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QtMath>
+#include <QFontMetrics>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -286,6 +287,12 @@ namespace UtilQt {
                                     i);
 #endif
         }
+    }
+
+    QString getElideText(const QString &origin, const QFont &font, const int width, Qt::TextElideMode mode)
+    {
+        QFontMetrics fontMetrics(font);
+        return fontMetrics.elidedText(origin, mode, width);
     }
 
 #endif

@@ -4,6 +4,7 @@
 #include <QMenu>
 #include <QFrame>
 #include <QPushButton>
+#include <QToolBar>
 
 #include "globaldef.h"
 #include "popups/StyledMenu.h"
@@ -14,6 +15,7 @@ class QMenu;
 class QLabel;
 class QStandardItem;
 class QHBoxLayout;
+class BookmarkToolBar;
 class BookmarkBar : public QFrame
 {
     Q_OBJECT
@@ -30,7 +32,7 @@ private:
     QHBoxLayout *layout_;
     QToolButton *btn_niubi_;
     QLabel *label_empty_;
-    QHBoxLayout *item_layout_;
+    BookmarkToolBar *toolbar_;
     QPushButton *btn_others_;
     bool loaded_ = false;
 
@@ -42,34 +44,17 @@ private slots:
 
 };
 
-class BarItem : public QPushButton
+class BookmarkToolBar : public QToolBar
 {
     Q_OBJECT
 public:
-    BarItem(const QIcon &icon, const QString &title, QWidget *parent = nullptr);
-    BarItem(const QString &title, QWidget *parent = nullptr);
-    BarItem(QWidget *parent = nullptr);
+    explicit BookmarkToolBar(QWidget *parent = nullptr);
+    explicit BookmarkToolBar(const QString &title, QWidget *parent = nullptr);
 
-    QVariant data() const;
-    void setData(const QVariant &var);
-private:
-    void init();
-
-    QVariant data_;
-};
-
-class BookmarkMenu : public QMenu
-{
-    Q_OBJECT
-public:
-    BookmarkMenu(const QString &title, QWidget *parent = nullptr);
-    BookmarkMenu(QWidget *parent = nullptr);
+    bool event(QEvent *ev) override;
 
 private:
     void initUi();
-
-private slots:
-    void onCustomContextMenuRequested(const QPoint &pos);
 };
 
 #endif // BOOKMARKBAR_H

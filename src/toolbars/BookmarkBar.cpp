@@ -12,6 +12,8 @@
 #include <QPushButton>
 #include <QStyle>
 #include <QFontMetrics>
+#include <QToolBar>
+#include <QChildEvent>
 
 #include "managers/BookmarkManager.h"
 #include "managers/FaviconManager.h"
@@ -20,7 +22,7 @@ BookmarkBar::BookmarkBar(QWidget *parent)
     : QFrame(parent)
 {
     initUi();
-    connect(BookmarkMgr::Instance(), &BookmarkMgr::bookmarksChanged,
+    connect(BookmarkMgr::gProviderWidget, &ToolBarProviderWnd::loadToUiFinished,
             this, &BookmarkBar::onBookmarksChanged);
 }
 
@@ -52,12 +54,7 @@ void BookmarkBar::paintEvent(QPaintEvent *event)
 
 void BookmarkBar::showEvent(QShowEvent *event)
 {
-    static bool firstShown = true;
-    if(firstShown){
-        firstShown = false;
-    }else{
-        onBookmarksChanged();
-    }
+    onBookmarksChanged();
     QFrame::showEvent(event);
 }
 
@@ -76,9 +73,7 @@ void BookmarkBar::initUi()
     btn_niubi_->setIconSize(QSize(26,26));
     label_empty_ = new QLabel(QStringLiteral("你还没有书签，赶紧添加一个吧"), this);
 
-    item_layout_ = new QHBoxLayout;
-    item_layout_->setSpacing(2);
-    item_layout_->setContentsMargins(1,1,1,1);
+    toolbar_ = new BookmarkToolBar(this);
 
     btn_others_ = new QPushButton(FaviconMgr::systemDirIcon, QStringLiteral("其它书签"), this);
     QFrame* line = new QFrame(this);
@@ -90,7 +85,7 @@ void BookmarkBar::initUi()
 
     layout_->addWidget(btn_niubi_);
     layout_->addWidget(label_empty_);
-    layout_->addLayout(item_layout_);
+    layout_->addWidget(toolbar_);
     layout_->addStretch();
     layout_->addWidget(line);
     layout_->addWidget(btn_others_);
@@ -158,159 +153,52 @@ void BookmarkBar::onCustomContextMenuRequested(const QPoint &pos)
 
 void BookmarkBar::onBookmarksChanged()
 {
-    if(loaded_){return;}
+    if(!BookmarkMgr::Instance()->isLoaded()){
+        return;
+    }
+    if(loaded_){
+        return;
+    }
+    for (auto item : BookmarkMgr::gProviderWidget->buttons){
+        toolbar_->addAction(item);
+    }
 
-    QElapsedTimer timer;
-    timer.start();
-
-    auto model = BookmarkMgr::Instance()->gBookmarkModel;
-    auto barItem = model->item(0);
-    if(barItem){
-        for (int i = 0; i< barItem->rowCount(); i++)
+    for (auto item : toolbar_->children()){
+        if(!item->isWidgetType()){
+            continue;
+        }
+        if(item->inherits("QToolButton") || QString(item->metaObject()->className()).compare("QToolButton") == 0)
         {
-            auto child = barItem->child(i);
-            if(child){
-                auto type = child->data(BookmarkMgr::Type).toString();
-                auto name = child->data(BookmarkMgr::Name).toString();
-                auto icon = type=="folder"?FaviconMgr::systemDirIcon:FaviconMgr::systemFileIcon;
-                auto button = new BarItem(icon, name, this);
-                item_layout_->addWidget(button);
-
-                if(type == "folder"){
-                    button->setMenu(makeMenu(child));
-                }else if(type == "url"){
-                    auto url = child->data(BookmarkMgr::Url).toString();
-                    button->setToolTip(name + "\n" + url);
-                    connect(button, &QPushButton::clicked, [=](){
-                        emit cmdTriggered(BookmarkCmd::Open, url);
-                    });
-                }
-                button->setData(QVariant::fromValue<void *>(child));
-            }
+            auto button = qobject_cast<QToolButton*>(item);
+            button->setPopupMode(QToolButton::InstantPopup);
         }
-        label_empty_->setVisible(barItem->rowCount() == 0);
-    }
-    auto otherItem = model->item(1);
-    if(otherItem){
-        btn_others_->setMenu(makeMenu(otherItem));
     }
 
+    if(BookmarkMgr::gProviderWidget->others_menu_){
+        btn_others_->setMenu(BookmarkMgr::gProviderWidget->others_menu_);
+    }
     loaded_ = true;
-    qInfo()<<"\033[32m[Execute Time]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";
 }
 
-
-BarItem::BarItem(QWidget *parent)
-    : QPushButton(parent)
-{
-    init();
-}
-
-void BarItem::setData(const QVariant &var)
-{
-    data_ = var;
-}
-
-QVariant BarItem::data() const
-{
-    return data_;
-}
-
-BarItem::BarItem(const QIcon &icon, const QString &title, QWidget *parent)
-    :QPushButton(icon,title, parent)
-{
-    init();
-}
-
-BarItem::BarItem(const QString &title, QWidget *parent)
-    :QPushButton(title, parent)
-{
-    init();
-}
-
-void BarItem::init()
-{
-    setMaximumWidth(150);
-}
-
-
-BookmarkMenu::BookmarkMenu(const QString &title, QWidget *parent)
-    : QMenu(title, parent)
+BookmarkToolBar::BookmarkToolBar(QWidget *parent)
+    : QToolBar(parent)
 {
     initUi();
 }
 
-BookmarkMenu::BookmarkMenu(QWidget *parent)
-    : QMenu(parent)
+BookmarkToolBar::BookmarkToolBar(const QString &title, QWidget *parent)
+    : QToolBar(title, parent)
 {
     initUi();
 }
 
-void BookmarkMenu::initUi()
+bool BookmarkToolBar::event(QEvent *ev)
 {
-    setWindowFlag(Qt::FramelessWindowHint);
-    setAttribute(Qt::WA_TranslucentBackground);
-    setAutoFillBackground(true);
-    setContextMenuPolicy(Qt::CustomContextMenu);
-    setMaximumWidth(560);
-    setToolTipsVisible(true);
-
-    connect(this, &BookmarkMenu::customContextMenuRequested,
-            this, &BookmarkMenu::onCustomContextMenuRequested);
+    return QToolBar::event(ev);
 }
 
-void BookmarkMenu::onCustomContextMenuRequested(const QPoint &)
+void BookmarkToolBar::initUi()
 {
-    static StyledMenu menu;
-    menu.clear();
-    auto action = activeAction();
-    // without menu
-    if(action){
-        if(action->isSeparator()){
-            return;
-        }
-    }else{
-        action = menuAction();
-    }
-    if(auto dataItem = (QStandardItem *)action->data().value<void *>()){
-        auto type = dataItem->data(BookmarkMgr::Type).toString();
-        auto openAction = BookmarkMgr::Instance()->action_open_new_tab_;
-        auto openWndAction = BookmarkMgr::Instance()->action_open_new_wnd_;
-        auto openPrivateAction = BookmarkMgr::Instance()->action_open_in_private_;
-
-        if(type == "folder"){
-            openAction->setText(tr("open all") + QString("(%1)").arg(dataItem->rowCount()));
-            openWndAction->setText(tr("open all in new window") + QString("(%1)").arg(dataItem->rowCount()));
-            openPrivateAction->setText(tr("open all in private window") + QString("(%1)").arg(dataItem->rowCount()));
-            menu.addAction(openAction);
-            menu.addAction(openWndAction);
-            menu.addAction(openPrivateAction);
-            menu.addSeparator();
-            menu.addAction(BookmarkMgr::Instance()->action_rename_);
-
-        }else if(type == "url"){
-            openAction->setText(tr("open") );
-            openWndAction->setText(tr("open in new window"));
-            openPrivateAction->setText(tr("open in private window"));
-            menu.addAction(openAction);
-            menu.addAction(openWndAction);
-            menu.addAction(openPrivateAction);
-            menu.addSeparator();
-            menu.addAction(BookmarkMgr::Instance()->action_modify_);
-        }
-    }
-    menu.addSeparator();
-    menu.addAction(BookmarkMgr::Instance()->action_cut_);
-    menu.addAction(BookmarkMgr::Instance()->action_copy_);
-    menu.addAction(BookmarkMgr::Instance()->action_paste_);
-    menu.addSeparator();
-    menu.addAction(BookmarkMgr::Instance()->action_delete_);
-    menu.addSeparator();
-    menu.addAction(BookmarkMgr::Instance()->action_add_current_);
-    menu.addAction(BookmarkMgr::Instance()->action_add_folder_);
-    menu.addSeparator();
-    menu.addAction(BookmarkMgr::Instance()->action_show_bookmark_bar_);
-    menu.addAction(BookmarkMgr::Instance()->action_show_bookmakr_btn_);
-    menu.addAction(BookmarkMgr::Instance()->action_manage_bookmarks_);
-    menu.exec(QCursor::pos());
+    setFloatable(false);
+    setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 }

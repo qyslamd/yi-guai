@@ -33,6 +33,11 @@ namespace UtilQt {
     extern QString GetFileNameFromURL(const QString &url);
 
     extern void drawShadow(QPaintDevice *device);
+
+    extern QString getElideText(const QString &origin,
+                                const QFont &font,
+                                const int width,
+                                Qt::TextElideMode mode = Qt::ElideRight);
 }
 
 #endif // UTIL_QT_H

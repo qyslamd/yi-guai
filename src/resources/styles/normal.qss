@@ -239,23 +239,23 @@ QPushButton#InprivateCloseBtn:hover{
 background-color:rgba(0,108,190, 70%);
 }
 
-BookmarkBar > QPushButton:menu-indicator{
+
+BookmarkToolBar > QToolButton:menu-indicator{
 image:none;
 }
-BookmarkBar > QPushButton{
-text-align: left;
+BookmarkToolBar > QToolButton{
 border:none;
 color:#666666;
-padding:4px;
+/*padding:2px;*/
 }
-BookmarkBar > QPushButton:hover{
+BookmarkToolBar > QToolButton:hover{
 background: rgba(169,169,169, 30%);
 border-radius:4px;
 }
-BookmarkBar > QPushButton:pressed{
+BookmarkToolBar > QToolButton:pressed{
 background: #e8ebec;
 }
-BookmarkBar > QPushButton:open{
+BookmarkToolBar > QToolButton:open{
 background: #DCDCDC;
 border:none;
 border-radius:4px;

@@ -52,6 +52,6 @@ background-color:rgba(169,169,169, 30%);
     border-radius:4px;
 }
 
-BookmarkBar > QPushButton{
+BookmarkToolBar > QToolButton{
 color:white;
 }

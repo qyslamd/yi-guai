@@ -9,11 +9,13 @@
 #include <QSet>
 #include <QThread>
 #include <QWidget>
+#include <QMenu>
 
 class QAction;
 class BookmarkWorker;
 class QStandardItem;
 class QStandardItemModel;
+class ToolBarProviderWnd;
 class BookmarkMgr : public QObject
 {
     Q_OBJECT
@@ -27,11 +29,13 @@ public:
         Url,
         DateModified
     };
+    ~BookmarkMgr();
     static BookmarkMgr* Instance();
     static QStandardItemModel *gBookmarkModel;
+    static ToolBarProviderWnd *gProviderWidget;
     static QSet<quint32> gIdSet;
 
-    ~BookmarkMgr();
+    bool isLoaded() const{return loaded_;}
 public:
     QAction *action_open_new_tab_ = nullptr;
     QAction *action_open_new_wnd_ = nullptr;
@@ -52,6 +56,7 @@ private:
     BookmarkMgr(const BookmarkMgr& other);
     BookmarkMgr& operator=(const BookmarkMgr & other);
     void initActions();
+    bool loaded_ = false;
 signals:
     void load();
     void save();
@@ -99,5 +104,38 @@ private:
     QJsonObject paseItem2Obj(QStandardItem *item);
 };
 
+class QPushButton;
+class BookmarkMenu;
+class ToolBarProviderWnd: public QWidget{
+    Q_OBJECT
+public:
+    explicit ToolBarProviderWnd(QWidget *parent = nullptr);
+    ~ToolBarProviderWnd();
+
+    QList<QAction *> buttons;
+    QMenu *others_menu_;
+
+signals:
+    void loadToUiFinished();
+public slots:
+    void onBookmarksChanged();
+
+private:
+    BookmarkMenu *makeMenu(const QStandardItem *item);
+};
+
+class BookmarkMenu : public QMenu
+{
+    Q_OBJECT
+public:
+    BookmarkMenu(const QString &title, QWidget *parent = nullptr);
+    BookmarkMenu(QWidget *parent = nullptr);
+
+private:
+    void initUi();
+
+private slots:
+    void onCustomContextMenuRequested(const QPoint &pos);
+};
 
 #endif // BOOKMARKMANAGER_H
