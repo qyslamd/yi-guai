@@ -30,7 +30,6 @@ signals:
 
 private:
     Ui::HistoryWidget *ui;
-    QStandardItemModel* all_model_;
     QStandardItemModel* recently_model_;
 
     StyledMenu *menu_in_all_;
@@ -50,7 +49,6 @@ private:
     void initSignalSlots();
     void setIcons();
 
-    void loadAllHistories();
     void loadRecentlyHistories();
 private slots:
     void onTreeAllHisItemClicked(const QModelIndex &index);

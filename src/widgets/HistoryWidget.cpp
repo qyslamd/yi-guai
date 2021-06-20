@@ -57,14 +57,12 @@ bool HistoryWidget::eventFilter(QObject *obj, QEvent *ev)
 void HistoryWidget::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
-    loadAllHistories();
 }
 
 void HistoryWidget::initUi()
 {
     ui->treeViewAll->setContextMenuPolicy(Qt::CustomContextMenu);
-    all_model_ = new QStandardItemModel(ui->treeViewAll);
-    ui->treeViewAll->setModel(all_model_);
+    ui->treeViewAll->setModel(HistoryMgr::gHistoryModel);
 
     ui->listViewRecently->installEventFilter(this);
     ui->listViewRecently->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -132,49 +130,6 @@ void HistoryWidget::setIcons()
     ac_add2favorite_->setIcon(QIcon(":/icons/resources/imgs/light/add_to_favorites_64px.png"));
 }
 
-void HistoryWidget::loadAllHistories()
-{
-    QElapsedTimer timer;
-    timer.start();
-
-    auto allHistories = HistoryMgr::Instance().allHistories();
-    QIcon icon(":/icons/resources/imgs/light/time_machine_64px.png");
-    QDateTime now = QDateTime::currentDateTime();
-    QDate today = QDate::currentDate();
-    QDate yestoday = today.addDays(-1);
-
-    all_model_->clear();
-
-    //一级节点，今天、昨天和过去一周
-    QStandardItem* todayItem = new QStandardItem(icon, tr("Today"));
-    todayItem->setData(false, Qt::UserRole + 1);
-    QStandardItem* yestodayItem = new QStandardItem(icon, tr("Yestoday"));
-    yestodayItem->setData(false, Qt::UserRole + 1);
-    QStandardItem* weekItem = new QStandardItem(icon, tr("last week"));
-    weekItem->setData(false, Qt::UserRole + 1);
-
-    all_model_->appendRow(todayItem);
-    all_model_->appendRow(yestodayItem);
-    all_model_->appendRow(weekItem);
-
-
-    for(auto &data : allHistories){
-        QStandardItem *item = new QStandardItem(style()->standardIcon(QStyle::SP_MessageBoxInformation), data.title);
-        item->setData(true, Qt::UserRole + 1);
-        item->setData(QVariant::fromValue(data), Qt::UserRole + 2);
-        item->setToolTip(data.title + "\n" + data.url);
-        auto datetime = QDateTime::fromSecsSinceEpoch(data.lastVisitedTime.toLongLong());
-        if(datetime.date() == today){
-            todayItem->appendRow(item);
-        }else if(datetime.date() == yestoday){
-            yestodayItem->appendRow(item);
-        }else{
-            weekItem->appendRow(item);
-        }
-    }
-    qInfo()<<"\033[32m[Execute Time]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";
-}
-
 void HistoryWidget::loadRecentlyHistories()
 {
     recently_model_->clear();
@@ -191,7 +146,7 @@ void HistoryWidget::loadRecentlyHistories()
 
 void HistoryWidget::onTreeAllHisItemClicked(const QModelIndex &index)
 {
-    auto item = all_model_->itemFromIndex(index);
+    auto item = HistoryMgr::gHistoryModel->itemFromIndex(index);
     if(!item){
         return;
     }
@@ -213,7 +168,7 @@ void HistoryWidget::onTreeAllHisContextMenu(const QPoint &)
     return;
 #endif
     auto index = ui->treeViewAll->indexAt(ui->treeViewAll->viewport()->mapFromGlobal(QCursor::pos()));
-    auto item = all_model_->itemFromIndex(index);
+    auto item = HistoryMgr::gHistoryModel->itemFromIndex(index);
     if(!item){
         return;
     }

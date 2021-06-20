@@ -4,25 +4,50 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QUrl>
+#include <QTimer>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonParseError>
+#include <QMutexLocker>
+#include <QStandardItemModel>
 
 #include "utils/util_qt.h"
+#include "FaviconManager.h"
+
+HistoryMgr * HistoryMgr::gInst = nullptr;
+QMutex HistoryMgr::gMutex;
+QStandardItemModel *HistoryMgr::gHistoryModel = nullptr;
 
 HistoryMgr::HistoryMgr(QObject *parent)
     : QObject(parent)
 {
-    auto loc = UtilQt::appDataPath();
-    record_file_path_ = QDir(loc).filePath("hisotiry");
-    loadHistories();
+    if(!gHistoryModel){
+        gHistoryModel = new QStandardItemModel(this);
+    }
+
+    worker_ = new HistoryWorker;
+    worker_->moveToThread(&worker_thread_);
+
+    connect(&worker_thread_, &QThread::finished, this, [](){qInfo()<<"HistoryWorker thread finished!";});
+    connect(this, &HistoryMgr::load, worker_, &HistoryWorker::loadFromFile);
+    connect(this, &HistoryMgr::save, worker_, &HistoryWorker::saveToFile);
+    connect(worker_, &HistoryWorker::loadFinished, this, &HistoryMgr::onWorkerLoadFinished);
+    connect(worker_, &HistoryWorker::saveFinished, this, &HistoryMgr::onWorkerSaveFinished);
+
+    QTimer::singleShot(0, this, &HistoryMgr::doLoadWork);
 }
 
-HistoryMgr &HistoryMgr::Instance()
+HistoryMgr *HistoryMgr::Instance()
 {
-    static HistoryMgr inst;
-    return inst;
+    if(gInst == nullptr){
+        QMutexLocker locker(&gMutex);
+        if(gInst == nullptr){
+            gInst = new HistoryMgr;
+        }
+    }
+    static HistoryMgr::Gc gc;
+    return gInst;
 }
 
 HistoryMgr::~HistoryMgr() {
@@ -31,23 +56,81 @@ HistoryMgr::~HistoryMgr() {
 
 void HistoryMgr::addHistoryRecord(const History &data)
 {
-    if(data.url.isEmpty()){
-        return;
+    bool find = false;
+    for (int i = 0; i< HistoryMgr::gHistoryModel->rowCount(); i++)
+    {
+        if(data.url == HistoryMgr::gHistoryModel->item(i)->data(HistoryMgr::Url).toString()){
+            auto count = HistoryMgr::gHistoryModel->item(i)->data(HistoryMgr::Count).toInt();
+            HistoryMgr::gHistoryModel->item(i)->setData(data.lastVisitedTime, HistoryMgr::LastTime);
+            HistoryMgr::gHistoryModel->item(i)->setData(count + 1, HistoryMgr::Count);
+            find = true;
+            break;
+        }
+    }
+    if(!find){
+        auto item = new QStandardItem(data.title);
+        item->setData(data.lastVisitedTime, HistoryMgr::LastTime);
+        item->setData(data.url, HistoryMgr::Url);
+        item->setData(data.title, HistoryMgr::Title);
+        item->setData(1, HistoryMgr::Count);
+        HistoryMgr::gHistoryModel->insertRow(0, item);
     }
 
-    histories_cache_.insert(0, data);
-    saveToFile();
+    doSaveWork();
 }
 
-QList<History> HistoryMgr::allHistories()
+
+bool HistoryMgr::exist(const QString &url)
 {
-    // TODO:这将是一个巨大拷贝量
-    return histories_cache_;
+    return false;
 }
 
-void HistoryMgr::loadHistories()
+void HistoryMgr::doLoadWork()
 {
-    histories_cache_.clear();
+    worker_thread_.start();
+    emit load();
+}
+
+void HistoryMgr::doSaveWork()
+{
+    worker_thread_.start();
+    emit save();
+}
+
+void HistoryMgr::onWorkerLoadFinished()
+{
+    worker_thread_.quit();
+    worker_thread_.wait();
+
+    emit historyChanged();
+}
+
+void HistoryMgr::onWorkerSaveFinished()
+{
+    worker_thread_.quit();
+    worker_thread_.wait();
+
+    qInfo()<<__FUNCTION__;
+}
+
+HistoryWorker::HistoryWorker()
+{
+    auto loc = UtilQt::appDataPath();
+    record_file_path_ = QDir(loc).filePath("hisotiry");
+    qInfo()<<__FUNCTION__<<record_file_path_;
+}
+
+HistoryWorker::~HistoryWorker()
+{
+    qInfo()<<__FUNCTION__;
+}
+
+void HistoryWorker::loadFromFile()
+{
+    qInfo()<<"\033[34m[Thread]"<<__FUNCTION__<<QThread::currentThreadId()<<"\033[0m";
+
+    QElapsedTimer timer;
+    timer.start();
 
     auto data = UtilQt::readFileUtf8(record_file_path_);
 
@@ -62,6 +145,7 @@ void HistoryMgr::loadHistories()
         }
     }
 
+    HistoryMgr::gHistoryModel->clear();
     auto it = jsonArray.begin();
     auto end = jsonArray.end();
     for(; it != end; it++)
@@ -69,30 +153,31 @@ void HistoryMgr::loadHistories()
         auto value = *it;
         if(value.isObject()){
             auto obj = value.toObject();
-            History data{
-                obj.value("lastVisitedTime").toString(),
-                obj.value("url").toString(),
-                obj.value("title").toString(),
-                obj.value("count").toInt(1)
-            };
-            histories_cache_.append(data);
+            auto title = obj.value("title").toString();
+            QStandardItem *item = new QStandardItem(FaviconMgr::systemFileIcon, title);
+            HistoryMgr::gHistoryModel->appendRow(item);
+            item->setData(obj.value("lastVisitedTime").toString(), HistoryMgr::LastTime);
+            item->setData(obj.value("url").toString(), HistoryMgr::Url);
+            item->setData(title, HistoryMgr::Title);
+            item->setData(obj.value("count").toString(), HistoryMgr::Count);
         }
     }
+    qInfo()<<"\033[32m[Execute Time]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";
+    emit loadFinished();
 }
 
-void HistoryMgr::saveToFile()
+void HistoryWorker::saveToFile()
 {
+    qInfo()<<__FUNCTION__;
     QJsonArray jsonArray;
-
-    auto citer = histories_cache_.constBegin();
-    auto cend = histories_cache_.constEnd();
-    for( ; citer != cend; citer++)
+    for( int i = 0; i < HistoryMgr::gHistoryModel->rowCount(); i++)
     {
+        auto item = HistoryMgr::gHistoryModel->item(i);
         QJsonObject jsonObj;
-        jsonObj.insert("lastVisitedTime", citer->lastVisitedTime);
-        jsonObj.insert("url", citer->url);
-        jsonObj.insert("title",citer->title);
-        jsonObj.insert("count",citer->count);
+        jsonObj.insert("lastVisitedTime",item->data(HistoryMgr::LastTime).toString());
+        jsonObj.insert("url", item->data(HistoryMgr::Url).toString());
+        jsonObj.insert("title",item->data(HistoryMgr::Title).toString());
+        jsonObj.insert("count",item->data(HistoryMgr::Count).toString());
         jsonArray.append(jsonObj);
     }
 
@@ -101,17 +186,6 @@ void HistoryMgr::saveToFile()
     QString strJson(byteArray);
 
     UtilQt::writeStringToFile(record_file_path_, strJson);
-}
 
-bool HistoryMgr::exist(const QString &url)
-{
-    auto citer = histories_cache_.constBegin();
-    auto cend = histories_cache_.constEnd();
-    for( ; citer != cend; citer++)
-    {
-        if(url.compare(citer->url, Qt::CaseInsensitive) == 0){
-            return true;
-        }
-    }
-    return false;
+    emit saveFinished();
 }

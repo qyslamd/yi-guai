@@ -53,7 +53,7 @@ BookmarkMgr::BookmarkMgr(QObject *parent)
     });
     worker_ = new BookmarkWorker;
     worker_->moveToThread(&worker_thread_);
-    connect(&worker_thread_, &QThread::finished, this, [](){qInfo()<<"worker thread finished!";});
+    connect(&worker_thread_, &QThread::finished, this, [](){qInfo()<<"BookmarkWorker thread finished!";});
     connect(this, &BookmarkMgr::load, worker_, &BookmarkWorker::loadFromFile);
     connect(this, &BookmarkMgr::save, worker_, &BookmarkWorker::saveToFile);
     connect(worker_, &BookmarkWorker::loadFinished, this, &BookmarkMgr::onWokerLoadFinished);
@@ -461,12 +461,17 @@ BookmarkMenu *ToolBarProviderWnd::makeMenu(const QStandardItem *item)
             auto name = child->data(BookmarkMgr::Name).toString();
             auto icon = type=="folder"?FaviconMgr::systemDirIcon:FaviconMgr::systemFileIcon;
             auto action = new QAction(icon, name, this);
+//            action->setText(UtilQt::getElideText(action->text(),action->font(), 300));
             menu->addAction(action);
             if(type == "folder"){
                 action->setMenu(makeMenu(child));
             }else if(type == "url"){
                 auto url = child->data(BookmarkMgr::Url).toString();
-                action->setToolTip(name + "\n" + url);
+//                auto text1 = UtilQt::getElideText(name,action->font(), 470);
+//                auto text2 = UtilQt::getElideText(QUrl(url).toDisplayString(),
+//                                                     action->font(),
+//                                                     470);
+//                action->setToolTip(text1 + "\n" + text2);
 
                 connect(action, &QAction::triggered, this, [this, url]()
                 {
@@ -497,7 +502,7 @@ void BookmarkMenu::initUi()
     setAttribute(Qt::WA_TranslucentBackground);
     setAutoFillBackground(true);
     setContextMenuPolicy(Qt::CustomContextMenu);
-    setMaximumWidth(560);
+//    setMaximumWidth(560);
     setToolTipsVisible(true);
 
     connect(this, &BookmarkMenu::customContextMenuRequested,

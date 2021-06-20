@@ -263,6 +263,7 @@ border-radius:4px;
 
 
 QPushButton#BookmarkBarOhtersButton{
+text-align:left;
 border:none;
 color:#666666;
 padding:4px;
@@ -292,6 +293,7 @@ border-radius: 6px;
 border-bottom-right-radius:0px;
 }
 BookmarkMenu::item {
+max-width: 400px;
 background-color: transparent;
  /* padding: top right bottom left*/
 padding: 4px 14px 4px 14px;
