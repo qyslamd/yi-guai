@@ -56,6 +56,6 @@ BookmarkToolBar > QToolButton{
 color:white;
 }
 
-QPushButton#BookmarkBarOhtersButton:{
+BookmarkBar > QPushButton:{
 color:white;
 }

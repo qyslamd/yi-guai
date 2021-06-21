@@ -159,7 +159,7 @@ void BookmarkWidget::initUi()
 
 void BookmarkWidget::initSignalSlots()
 {
-    connect(BookmarkMgr::Instance(), &BookmarkMgr::bookmarksChanged,
+    connect(BookmarkMgr::Instance(), &BookmarkMgr::loadFinished,
             this, &BookmarkWidget::onBookmarksChanged);
 
     connect(action_manage_bookmarks_, &QAction::triggered, this, [this]()
@@ -227,8 +227,22 @@ void BookmarkWidget::initSignalSlots()
     });
     connect(ac_open_bkmk_in_new_page_, &QAction::triggered, [this]()
     {
-        auto data = menu_trigger_item_->data(BookmarkMgr::Url);
-        emit menuCmd(BookmarkCmd::OpenInNewPage, data);
+        QList<QString> data;
+        auto type = menu_trigger_item_->data(BookmarkMgr::Type).toString();
+        if(type == "folder"){
+            for(int i = 0; i < menu_trigger_item_->rowCount(); i++){
+                auto child = menu_trigger_item_->child(i);
+                auto childType = child->data(BookmarkMgr::Type).toString();
+                if(type == "url"){
+                    data.append(child->data(BookmarkMgr::Url).toString());
+                }
+            }
+        }else if(type == "url"){
+            data.append(menu_trigger_item_->data(BookmarkMgr::Url).toString());
+        }
+        if(!data.isEmpty()){
+            emit menuCmd(BookmarkCmd::OpenInNewPage, QVariant::fromValue(data));
+        }
     });
     connect(ac_open_bkmk_in_new_window_, &QAction::triggered, [this]()
     {

@@ -21,6 +21,19 @@ typedef struct MainWindowConfig{
         , bounds_(bounds)
         , url_(url)
     {}
+    MainWindowConfig(bool inprivate,
+                     bool always_on_top,
+                     bool init_hidden,
+                     const QRect &bounds,
+                     const QString &url,
+                     const QList<QString> urls)
+        : is_inprivate_(inprivate)
+        , always_on_top_(always_on_top)
+        , initially_hidden_(init_hidden)
+        , bounds_(bounds)
+        , url_(url)
+        , load_after_created_(urls)
+    {}
 
     MainWindowConfig()
         : is_inprivate_(false)
@@ -65,6 +78,9 @@ typedef struct MainWindowConfig{
 
     // Initial URL to load.
     QString url_;
+
+    //
+    QList<QString> load_after_created_;
 }MainWndCfg;
 
 class MainWindow;

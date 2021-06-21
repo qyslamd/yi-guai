@@ -147,6 +147,10 @@ void Page::closeEvent(QCloseEvent *event)
 
 void Page::initBrowser()
 {
+    connect(browser_widget_, &CefQWidget::browserCreated, [this]()
+    {
+        emit pageCmd(PageCmd::Created, QVariant());
+    });
     connect(browser_widget_, &CefQWidget::browserClosing, [this]()
     {
         emit pageCmd(PageCmd::Closing, QVariant());

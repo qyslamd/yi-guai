@@ -2,6 +2,8 @@
 #include <QApplication>
 #include <QtDebug>
 
+#include "utils/util_qt.h"
+
 #ifdef Q_OS_WIN
 #include <windows.h>
 #include <WinUser.h>
@@ -112,10 +114,11 @@ bool QtWinFramelessWindow::nativeEvent(const QByteArray &eventType, void *messag
                 bcRect.right = bRect.right;
                 bcRect.bottom = bRect.bottom;
             }else{
-                bcRect.left = bRect.left + 8;
+                int offset = UtilQt::isWindows10() ? 8 : 4;
+                bcRect.left = bRect.left + offset;
                 bcRect.top = bRect.top + 0;
-                bcRect.right = bRect.right - 8;
-                bcRect.bottom = bRect.bottom - 8;
+                bcRect.right = bRect.right - offset;
+                bcRect.bottom = bRect.bottom - offset;
             }
 
             CopyRect(&pncsp->rgrc[0], &bcRect); // 设置改变后客户区大小

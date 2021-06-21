@@ -86,6 +86,19 @@ MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
     });
 }
 
+MainWindow::MainWindow(Page *page, QWidget *parent)
+    : QtWinFramelessWindow(parent)
+{
+    initQtShortcut();
+    initUi();
+    setAppearance();
+    initSignalSlot();
+
+    QTimer::singleShot(0, this, [=]{
+        AddNewPage(page);
+    });
+}
+
 MainWindow::~MainWindow()
 {
     qInfo()<<__FUNCTION__;
@@ -738,6 +751,19 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
     }
 
     switch(cmd){
+    case PageCmd::Created:
+    {
+        if(!first_browser_created_){
+            first_browser_created_ = true;
+            if(!created_cfg_.load_after_created_.isEmpty()){
+                for(auto item : created_cfg_.load_after_created_)
+                {
+                    AddNewPage(item, false);
+                }
+            }
+        }
+    }
+        break;
     case PageCmd::Closing:
     {
         if(page){
@@ -1096,13 +1122,43 @@ void MainWindow::onBookmarkCmd(BookmarkCmd cmd, const QVariant &para)
         NavigateInCurPage(para.toString());
         break;
     case BookmarkCmd::OpenInNewPage:
-        AddNewPage(para.toString(), true);
+    {
+        auto list = para.value<QList<QString>>();
+        if(!list.isEmpty()){
+            for (auto item : list){
+                AddNewPage(item, false);
+            }
+        }
+    }
         break;
     case BookmarkCmd::OpenInNewWnd:
-        MainWndMgr::Instance().createWindow(MainWndCfg(para.toString()));
+    {
+        MainWndCfg cfg;
+        auto list = para.value<QList<QString>>();
+        if(!list.isEmpty()){
+            cfg.url_ = list.at(0);
+            for (auto item : list){
+                cfg.load_after_created_.append(item);
+            }
+        }
+        cfg.load_after_created_.removeFirst();
+        MainWndMgr::Instance().createWindow(cfg);
+    }
         break;
     case BookmarkCmd::OpenInInprivate:
-         MainWndMgr::Instance().createWindow(MainWndCfg(true, para.toString()));
+    {
+        MainWndCfg cfg;
+        cfg.is_inprivate_ = true;
+        auto list = para.value<QList<QString>>();
+        if(!list.isEmpty()){
+            cfg.url_ = list.at(0);
+            for (auto item : list){
+                cfg.load_after_created_.append(item);
+            }
+        }
+        cfg.load_after_created_.removeFirst();
+        MainWndMgr::Instance().createWindow(cfg);
+    }
         break;
     default:
         break;
@@ -1148,14 +1204,14 @@ void MainWindow::onRefresh()
 
 void MainWindow::onAddFavorite()
 {
-    auto page = CurrentPage();
-    if(!page) return;
+//    auto page = CurrentPage();
+//    if(!page) return;
 
-    auto model = BookmarkMgr::Instance()->gBookmarkModel;
-    auto barItem = model->item(0);
-    BookmarkMgr::Instance()->addBookmarkUrl(barItem->index(),
-                                                       page->url(),
-                                                       page->title());
+//    auto model = BookmarkMgr::Instance()->gBookmarkModel;
+//    auto barItem = model->item(0);
+//    BookmarkMgr::Instance()->addBookmarkUrl(barItem->index(),
+//                                                       page->url(),
+//                                                       page->title());
     auto pos = navi_bar_->addBkmkBtnPos();
     pos.ry() += 2;
     pos.rx() -= add_favorite_popup_->width();

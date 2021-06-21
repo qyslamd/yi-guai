@@ -39,8 +39,8 @@ class MainWindow : public QtWinFramelessWindow
 {
     Q_OBJECT
 public:
-
-    MainWindow(const MainWindowConfig &cfg, QWidget *parent = nullptr);
+    explicit MainWindow(const MainWindowConfig &cfg, QWidget *parent = nullptr);
+    explicit MainWindow(Page *page, QWidget *parent = nullptr);
     ~MainWindow();
 
     int AddNewPage(const QString &url, bool switchTo = false);
@@ -119,6 +119,7 @@ private:
     static AppCfgWidget *gAppCfgWidget;
     static FullscnHint *gFullscnWidget;
 
+    bool first_browser_created_ = false; /*首个浏览器创建完成标志*/
     bool window_closing_ = false;  /*窗口正在关闭标志*/
     bool right_closing_ = false;    /*窗口正在关闭右侧标签页标志*/
 

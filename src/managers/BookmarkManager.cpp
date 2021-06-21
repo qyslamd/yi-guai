@@ -44,6 +44,40 @@ static int makeId()
    return id;
 }
 
+static QList<QString> getChildUrls(QStandardItem *item)
+{
+    QList<QString> data;
+    auto type = item->data(BookmarkMgr::Type).toString();
+    if(type == "folder"){
+        for(int i = 0; i < item->rowCount(); i++){
+            auto child = item->child(i);
+            auto childType = child->data(BookmarkMgr::Type).toString();
+            if(childType == "url"){
+                auto url = child->data(BookmarkMgr::Url).toString();
+                auto name = child->data(BookmarkMgr::Name).toString();
+                data.append(url);
+            }
+        }
+    }else if(type == "url"){
+        data.append(item->data(BookmarkMgr::Url).toString());
+    }
+    return data;
+}
+
+static bool exist(QStandardItem *item, const QString &url)
+{
+    auto type = item->data(BookmarkMgr::Type).toString();
+    if(type == "url"){
+        auto url1 = item->data(BookmarkMgr::Url).toString();
+        return url1 == url;
+    }else if(type == "folder"){
+        for(int i = 0; i < item->rowCount(); i++){
+            return exist(item->child(i), url);
+        }
+    }
+    return false;
+}
+
 BookmarkMgr* BookmarkMgr::gInst = nullptr;
 QMutex BookmarkMgr::gMutex;
 QStandardItemModel *BookmarkMgr::gBookmarkModel = nullptr;
@@ -63,7 +97,7 @@ BookmarkMgr::BookmarkMgr(QObject *parent)
     if(!gToolbarProvider){
         gToolbarProvider = new ToolBarProviderWnd;
         gToolbarProvider->hide();
-        connect(this, &BookmarkMgr::bookmarksChanged, gToolbarProvider, &ToolBarProviderWnd::onBookmarksChanged);
+        connect(this, &BookmarkMgr::loadFinished, gToolbarProvider, &ToolBarProviderWnd::onBookmarksLoaded);
         connect(gToolbarProvider, &ToolBarProviderWnd::menuActionTriggered, this, [this](const QVariant &data)
         {
            menuCmd(BookmarkCmd::Open, data);
@@ -103,24 +137,31 @@ void BookmarkMgr::initActions()
 
     connect(action_open_new_tab_, &QAction::triggered, this, [this](){
         if(menu_trigger_item_){
-            emit menuCmd(BookmarkCmd::OpenInNewPage, menu_trigger_item_->data(Url).toString());
+            QList<QString> data = getChildUrls(menu_trigger_item_);
+            if(!data.isEmpty()){
+                emit menuCmd(BookmarkCmd::OpenInNewPage, QVariant::fromValue(data));
+            }
             menu_trigger_item_ = nullptr;
         }
     });
-}
-
-bool BookmarkMgr::exist(QStandardItem *item, const QString &url)
-{
-    auto type = item->data(BookmarkMgr::Type).toString();
-    if(type == "url"){
-        auto url1 = item->data(BookmarkMgr::Url).toString();
-        return url1 == url;
-    }else if(type == "folder"){
-        for(int i = 0; i < item->rowCount(); i++){
-            return exist(item->child(i), url);
+    connect(action_open_new_wnd_, &QAction::triggered, this, [this](){
+        if(menu_trigger_item_){
+            QList<QString> data = getChildUrls(menu_trigger_item_);
+            if(!data.isEmpty()){
+                emit menuCmd(BookmarkCmd::OpenInNewWnd, QVariant::fromValue(data));
+            }
+            menu_trigger_item_ = nullptr;
         }
-    }
-    return false;
+    });
+    connect(action_open_in_private_, &QAction::triggered, this, [this](){
+        if(menu_trigger_item_){
+            QList<QString> data = getChildUrls(menu_trigger_item_);
+            if(!data.isEmpty()){
+                emit menuCmd(BookmarkCmd::OpenInInprivate, QVariant::fromValue(data));
+            }
+            menu_trigger_item_ = nullptr;
+        }
+    });
 }
 
 BookmarkMgr *BookmarkMgr::Instance()
@@ -135,10 +176,10 @@ BookmarkMgr *BookmarkMgr::Instance()
     return gInst;
 }
 
-bool BookmarkMgr::exist(const QString &url)
+bool BookmarkMgr::exists(const QString &url)
 {
     for(int i = 0; i < gBookmarkModel->rowCount(); i++){
-        if(BookmarkMgr::Instance()->exist(gBookmarkModel->item(i),url)){
+        if(exist(gBookmarkModel->item(i),url)){
             return true;
         }
     }
@@ -198,7 +239,7 @@ void BookmarkMgr::onWokerLoadFinished()
     loaded_ = true;
     worker_thread_.quit();
     worker_thread_.wait();
-    emit bookmarksChanged();
+    emit loadFinished();
 }
 
 void BookmarkMgr::onWokerSaveFinished()
@@ -456,7 +497,7 @@ ToolBarProviderWnd::~ToolBarProviderWnd()
     qInfo()<<__FUNCTION__;
 }
 
-void ToolBarProviderWnd::onBookmarksChanged()
+void ToolBarProviderWnd::onBookmarksLoaded()
 {
     if(!BookmarkMgr::Instance()->isLoaded()){
         return ;
@@ -517,17 +558,11 @@ BookmarkMenu *ToolBarProviderWnd::makeMenu(const QStandardItem *item)
             auto name = child->data(BookmarkMgr::Name).toString();
             auto icon = type=="folder"?FaviconMgr::systemDirIcon:FaviconMgr::systemFileIcon;
             auto action = new QAction(icon, name, this);
-//            action->setText(UtilQt::getElideText(action->text(),action->font(), 300));
             menu->addAction(action);
             if(type == "folder"){
                 action->setMenu(makeMenu(child));
             }else if(type == "url"){
                 auto url = child->data(BookmarkMgr::Url).toString();
-//                auto text1 = UtilQt::getElideText(name,action->font(), 470);
-//                auto text2 = UtilQt::getElideText(QUrl(url).toDisplayString(),
-//                                                     action->font(),
-//                                                     470);
-//                action->setToolTip(text1 + "\n" + text2);
 
                 connect(action, &QAction::triggered, this, [this, url]()
                 {

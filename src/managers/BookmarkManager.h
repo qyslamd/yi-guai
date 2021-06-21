@@ -37,7 +37,7 @@ public:
     };
     ~BookmarkMgr();
     static BookmarkMgr* Instance();
-    static bool exist(const QString &url);
+    static bool exists(const QString &url);
     static QStandardItemModel *gBookmarkModel;
     static ToolBarProviderWnd *gToolbarProvider;
     static QSet<quint32> gIdSet;
@@ -77,10 +77,10 @@ private:
     bool loaded_ = false;
     QStandardItem *menu_trigger_item_ = nullptr;
     void initActions();
-    bool exist(QStandardItem *item, const QString &url);
 signals:
     void load();
     void save();
+    void loadFinished();
     void bookmarksChanged();
     void menuCmd(BookmarkCmd cmd,  const QVariant &para);
 private slots:
@@ -138,7 +138,7 @@ signals:
     void menuActionTriggered(const QVariant &data);
     void loadToUiFinished();
 public slots:
-    void onBookmarksChanged();
+    void onBookmarksLoaded();
 
 private:
     QList<QMenu *> added_menu_;

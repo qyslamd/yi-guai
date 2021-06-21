@@ -21,6 +21,7 @@ namespace UtilQt {
     extern int sacleUI(int spec);
     extern float windowsDpiScaleX();
     extern float windowsDpiScaleY();
+    extern bool isWindows10();
 #endif
 
     extern const QString appDataPath();

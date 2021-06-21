@@ -30,7 +30,7 @@ protected:
 private:
     void initUi();
     QHBoxLayout *layout_;
-    QToolButton *btn_niubi_;
+    QPushButton *btn_application_;
     QLabel *label_empty_;
     BookmarkToolBar *toolbar_;
     QPushButton *btn_others_;

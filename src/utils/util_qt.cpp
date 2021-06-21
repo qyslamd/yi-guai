@@ -14,6 +14,7 @@
 #include <QPainterPath>
 #include <QtMath>
 #include <QFontMetrics>
+#include <QSysInfo>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -293,6 +294,19 @@ namespace UtilQt {
     {
         QFontMetrics fontMetrics(font);
         return fontMetrics.elidedText(origin, mode, width);
+    }
+
+    bool isWindows10()
+    {
+        auto kernelVer = QSysInfo::kernelVersion();
+        auto list = kernelVer.split(".");
+        if(!list.isEmpty()){
+            if(list.at(0).toUInt() == 10){
+                return true;
+            }
+        }
+
+        return false;
     }
 
 #endif

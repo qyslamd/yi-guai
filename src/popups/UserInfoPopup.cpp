@@ -3,6 +3,7 @@
 #include <QSysInfo>
 #include <QSettings>
 #include <QAction>
+#include <QtDebug>
 
 
 UserInfoPopup::UserInfoPopup(QWidget *parent) :

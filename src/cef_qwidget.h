@@ -38,6 +38,7 @@ public:
     CefWindowHandle BrowserWindowHandle();
     bool isDevTool() const { return is_dev_tool_; }
 signals:
+    void browserCreated();
     void browserClosing();
     void browserNewForgroundPage(CefQWidget *newPage);
     void browserAddressChange(const QString &url);

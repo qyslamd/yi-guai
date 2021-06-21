@@ -246,7 +246,7 @@ image:none;
 BookmarkToolBar > QToolButton{
 border:none;
 color:#666666;
-/*padding:2px;*/
+padding:4px;
 }
 BookmarkToolBar > QToolButton:hover{
 background: rgba(169,169,169, 30%);
@@ -262,24 +262,24 @@ border-radius:4px;
 }
 
 
-QPushButton#BookmarkBarOhtersButton{
+BookmarkBar > QPushButton{
 text-align:left;
 border:none;
 color:#666666;
 padding:4px;
 }
-QPushButton#BookmarkBarOhtersButton:menu-indicator{
+BookmarkBar > QPushButton:menu-indicator{
 image:none;
 }
 
-QPushButton#BookmarkBarOhtersButton:hover{
+BookmarkBar > QPushButton:hover{
 background: rgba(169,169,169, 30%);
 border-radius:4px;
 }
-QPushButton#BookmarkBarOhtersButton:pressed{
+BookmarkBar > QPushButton:pressed{
 background: #e8ebec;
 }
-QPushButton#BookmarkBarOhtersButton:open{
+BookmarkBar > QPushButton:open{
 background: #DCDCDC;
 border:none;
 border-radius:4px;

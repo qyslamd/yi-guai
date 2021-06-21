@@ -269,6 +269,7 @@ void CefQWidget::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
     browser_ = browser;
     browser_state_ = Created;
     resizeBorser();
+    emit browserCreated();
 }
 
 void CefQWidget::OnBrowserWindowClosing()

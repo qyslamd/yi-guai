@@ -80,13 +80,15 @@ void BookmarkBar::initUi()
     layout_->setSpacing(4);
     layout_->setContentsMargins(4,4,4,4);
 
-    btn_niubi_ = new QToolButton(this);
-    btn_niubi_->setToolTip(tr("open applications"));
-    btn_niubi_->setIcon(QIcon(":/icons/resources/imgs/gray/squared_menu_96px.png"));
-    btn_niubi_->setIconSize(QSize(26,26));
+    btn_application_ = new QPushButton(this);
+    btn_application_->setText(tr("application"));
+    btn_application_->setToolTip(tr("open applications"));
+    btn_application_->setIcon(QIcon(":/icons/resources/imgs/gray/squared_menu_96px.png"));
+    btn_application_->setIconSize(QSize(24,24));
     label_empty_ = new QLabel(QStringLiteral("你还没有书签，赶紧添加一个吧"), this);
 
     toolbar_ = new BookmarkToolBar(this);
+    toolbar_->setIconSize(QSize(16,16));
 
     btn_others_ = new QPushButton(FaviconMgr::systemDirIcon, QStringLiteral("其它书签"), this);
     btn_others_->setObjectName("BookmarkBarOhtersButton");
@@ -97,7 +99,7 @@ void BookmarkBar::initUi()
     line->setFrameShape(QFrame::VLine);
     line->setFrameShadow(QFrame::Sunken);
 
-    layout_->addWidget(btn_niubi_);
+    layout_->addWidget(btn_application_);
     layout_->addWidget(label_empty_);
     layout_->addWidget(toolbar_);
     layout_->addStretch();
@@ -139,49 +141,48 @@ BookmarkMenu *BookmarkBar::makeMenu(const QStandardItem *item)
 void BookmarkBar::onCustomContextMenuRequested(const QPoint &pos)
 {
     static StyledMenu menu;
-    auto child = childAt(pos);
-    qInfo()<<__FUNCTION__<<child;
+    menu.clear();
 
     auto action = toolbar_->actionAt(toolbar_->mapFromParent(pos));
-    if(!action){
-        qInfo()<<__FUNCTION__<<action;
-        return;
-    }
-    if(auto dataItem = (QStandardItem *)action->data().value<void *>()){
-        BookmarkMgr::Instance()->setMenuTriggerItem(dataItem);
-        auto type = dataItem->data(BookmarkMgr::Type).toString();
-        auto openAction = BookmarkMgr::Instance()->action_open_new_tab_;
-        auto openWndAction = BookmarkMgr::Instance()->action_open_new_wnd_;
-        auto openPrivateAction = BookmarkMgr::Instance()->action_open_in_private_;
+    qInfo()<<__FUNCTION__<<action;
+    if(action){
+        if(auto dataItem = (QStandardItem *)action->data().value<void *>())
+        {
+            BookmarkMgr::Instance()->setMenuTriggerItem(dataItem);
+            auto type = dataItem->data(BookmarkMgr::Type).toString();
+            auto openAction = BookmarkMgr::Instance()->action_open_new_tab_;
+            auto openWndAction = BookmarkMgr::Instance()->action_open_new_wnd_;
+            auto openPrivateAction = BookmarkMgr::Instance()->action_open_in_private_;
 
-        if(type == "folder"){
-            openAction->setText(tr("open all in new tab") + QString("(%1)").arg(dataItem->rowCount()));
-            openWndAction->setText(tr("open all in new window") + QString("(%1)").arg(dataItem->rowCount()));
-            openPrivateAction->setText(tr("open all in private window") + QString("(%1)").arg(dataItem->rowCount()));
-            menu.addAction(openAction);
-            menu.addAction(openWndAction);
-            menu.addAction(openPrivateAction);
-            menu.addSeparator();
-            menu.addAction(BookmarkMgr::Instance()->action_rename_);
+            if(type == "folder"){
+                openAction->setText(tr("open all in new tab") + QString("(%1)").arg(dataItem->rowCount()));
+                openWndAction->setText(tr("open all in new window") + QString("(%1)").arg(dataItem->rowCount()));
+                openPrivateAction->setText(tr("open all in private window") + QString("(%1)").arg(dataItem->rowCount()));
+                menu.addAction(openAction);
+                menu.addAction(openWndAction);
+                menu.addAction(openPrivateAction);
+                menu.addSeparator();
+                menu.addAction(BookmarkMgr::Instance()->action_rename_);
 
-        }else if(type == "url"){
-            openAction->setText(tr("open in new tab"));
-            openWndAction->setText(tr("open in new window"));
-            openPrivateAction->setText(tr("open in private window"));
-            menu.addAction(openAction);
-            menu.addAction(openWndAction);
-            menu.addAction(openPrivateAction);
+            }else if(type == "url"){
+                openAction->setText(tr("open in new tab"));
+                openWndAction->setText(tr("open in new window"));
+                openPrivateAction->setText(tr("open in private window"));
+                menu.addAction(openAction);
+                menu.addAction(openWndAction);
+                menu.addAction(openPrivateAction);
+                menu.addSeparator();
+                menu.addAction(BookmarkMgr::Instance()->action_modify_);
+            }
             menu.addSeparator();
-            menu.addAction(BookmarkMgr::Instance()->action_modify_);
+            menu.addAction(BookmarkMgr::Instance()->action_cut_);
+            menu.addAction(BookmarkMgr::Instance()->action_copy_);
+            menu.addAction(BookmarkMgr::Instance()->action_paste_);
+            menu.addSeparator();
+            menu.addAction(BookmarkMgr::Instance()->action_delete_);
+            menu.addSeparator();
         }
     }
-    menu.addSeparator();
-    menu.addAction(BookmarkMgr::Instance()->action_cut_);
-    menu.addAction(BookmarkMgr::Instance()->action_copy_);
-    menu.addAction(BookmarkMgr::Instance()->action_paste_);
-    menu.addSeparator();
-    menu.addAction(BookmarkMgr::Instance()->action_delete_);
-    menu.addSeparator();
     menu.addAction(BookmarkMgr::Instance()->action_add_current_);
     menu.addAction(BookmarkMgr::Instance()->action_add_folder_);
     menu.addSeparator();
