@@ -12,8 +12,8 @@
 #include <QTimer>
 
 #include "utils/util_qt.h"
-#include "managers/AddrInputManager.h"
 #include "managers/CefManager.h"
+#include "managers/BookmarkManager.h"
 
 AddressBar::AddressBar(bool inprivate, QWidget *parent)
     : QFrame(parent)
@@ -101,6 +101,18 @@ void AddressBar::initUi()
     btn_add_favorite_->setCheckable(true);
     btn_add_favorite_->setToolTip(tr("mark to favorite"));
     connect(btn_add_favorite_, &QToolButton::clicked, this, &AddressBar::addFavorite);
+    connect(btn_add_favorite_, &QToolButton::toggled, this, [this](bool checked)
+    {
+        if(checked){
+            btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/colorful/star_filled_64px.png"));
+        }else{
+            if(!inprivate_){
+                btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_64px.png"));
+            }else{
+                btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_white_48px.png"));
+            }
+        }
+    });
 
     layout_->addWidget(btn_site_info_);
     layout_->addWidget(line_edit_addr_);
@@ -110,11 +122,7 @@ void AddressBar::initUi()
 
     setFocusProxy(line_edit_addr_);
 
-
-    model_ = new QStringListModel(this);
     completer_ = new QCompleter(QStringList(), this);
-    completer_->setModel(model_);
-    model_->setStringList(AddrInputMgr::Instance().inputList());
     line_edit_addr_->setCompleter(completer_);
 
     if(!inprivate_){
@@ -147,11 +155,6 @@ void AddressBar::setZoomLevelValue(double value)
     btn_zoom_hint_->setToolTip(tr("zoomlevel:%1").arg(zoomLevel));
 }
 
-void AddressBar::updateBtnState(bool checked)
-{
-    btn_add_favorite_->setChecked(checked);
-}
-
 void AddressBar::setText(const QString &text, bool edited)
 {
     line_edit_addr_->setText(text);
@@ -163,7 +166,7 @@ void AddressBar::setText(const QString &text, bool edited)
         }else{
             btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/info_white_48px.png"));
         }
-    }
+    }    
 }
 
 void AddressBar::setCursorPosition(int pos)
@@ -178,16 +181,6 @@ QString AddressBar::text()
 
 void AddressBar::onEditingFinished()
 {
-    auto text = line_edit_addr_->text();
-    if(QString::compare(text, QString("")) != 0)
-    {
-        const auto list = AddrInputMgr::Instance().inputList();
-        if(!list.contains(text, Qt::CaseInsensitive))
-        {
-            AddrInputMgr::Instance().addRecord(text);
-            model_->setStringList(AddrInputMgr::Instance().inputList());
-        }
-    }
 }
 
 void AddressBar::onTextEdited(const QString &)

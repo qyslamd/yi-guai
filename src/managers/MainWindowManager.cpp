@@ -9,7 +9,6 @@
 #include "BookmarkManager.h"
 #include "FaviconManager.h"
 #include "HistoryManager.h"
-#include "AddrInputManager.h"
 
 int MainWndMgr::newWndOffsetX = 22;
 int MainWndMgr::newWndOffsetY = 30;
@@ -25,8 +24,6 @@ MainWndMgr::MainWndMgr(QObject *parent)
     BookmarkMgr::Instance();
     // 历史记录数据
     HistoryMgr::Instance();
-    // 地址栏输入数据
-    AddrInputMgr::Instance();
 
     connect(BookmarkMgr::Instance(), &BookmarkMgr::menuCmd, this, &MainWndMgr::onBkmkMgrMenuCmd);
 

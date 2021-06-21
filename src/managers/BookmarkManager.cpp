@@ -22,6 +22,28 @@
 #include "MainWindowManager.h"
 #include "popups/StyledMenu.h"
 
+// static 修饰全局函数，限定函数只能在本cpp中使用
+static QString makeEpochStr(bool msecond = true)
+{
+    if(!msecond){
+        return QString::number(QDateTime::currentSecsSinceEpoch());
+    }else{
+        return QString::number(QDateTime::currentMSecsSinceEpoch());
+    }
+}
+static QString makeUUidStr()
+{
+    return QUuid::createUuid().toString().remove("{").remove("}");
+}
+static int makeId()
+{
+   auto list = BookmarkMgr::gIdSet.toList();
+   std::sort(list.begin(), list.end());
+   int id = list.last() + 1;
+   BookmarkMgr::gIdSet.insert(id);
+   return id;
+}
+
 BookmarkMgr* BookmarkMgr::gInst = nullptr;
 QMutex BookmarkMgr::gMutex;
 QStandardItemModel *BookmarkMgr::gBookmarkModel = nullptr;
@@ -53,7 +75,7 @@ BookmarkMgr::BookmarkMgr(QObject *parent)
     });
     worker_ = new BookmarkWorker;
     worker_->moveToThread(&worker_thread_);
-    connect(&worker_thread_, &QThread::finished, this, [](){qInfo()<<"BookmarkWorker thread finished!";});
+//    connect(&worker_thread_, &QThread::finished, this, [](){qInfo()<<"BookmarkWorker thread finished!";});
     connect(this, &BookmarkMgr::load, worker_, &BookmarkWorker::loadFromFile);
     connect(this, &BookmarkMgr::save, worker_, &BookmarkWorker::saveToFile);
     connect(worker_, &BookmarkWorker::loadFinished, this, &BookmarkMgr::onWokerLoadFinished);
@@ -87,6 +109,20 @@ void BookmarkMgr::initActions()
     });
 }
 
+bool BookmarkMgr::exist(QStandardItem *item, const QString &url)
+{
+    auto type = item->data(BookmarkMgr::Type).toString();
+    if(type == "url"){
+        auto url1 = item->data(BookmarkMgr::Url).toString();
+        return url1 == url;
+    }else if(type == "folder"){
+        for(int i = 0; i < item->rowCount(); i++){
+            return exist(item->child(i), url);
+        }
+    }
+    return false;
+}
+
 BookmarkMgr *BookmarkMgr::Instance()
 {
     if(gInst == nullptr){
@@ -97,6 +133,38 @@ BookmarkMgr *BookmarkMgr::Instance()
     }
     static BookmarkMgr::Gc gc;
     return gInst;
+}
+
+bool BookmarkMgr::exist(const QString &url)
+{
+    for(int i = 0; i < gBookmarkModel->rowCount(); i++){
+        if(BookmarkMgr::Instance()->exist(gBookmarkModel->item(i),url)){
+            return true;
+        }
+    }
+    return false;
+}
+
+QStandardItem* BookmarkMgr::addBookmarkUrl(const QModelIndex index,
+                                 const QString &url,
+                                 const QString &title)
+{
+    if(!index.isValid()) return nullptr;
+    auto parentNode = gBookmarkModel->itemFromIndex(index);
+    if(!parentNode) return nullptr;
+
+    auto item = new QStandardItem(FaviconMgr::systemFileIcon, title);
+    parentNode->appendRow(item);
+
+    item->setData("url", BookmarkMgr::Type);
+    item->setData(makeUUidStr(), BookmarkMgr::Guid);
+    item->setData(makeId(), BookmarkMgr::Id);
+    item->setData(makeUUidStr(), BookmarkMgr::DateAdded);
+    item->setData(title, BookmarkMgr::Name);
+    item->setData(url, BookmarkMgr::Url);
+
+    doSaveWork();
+    return item;
 }
 
 void BookmarkMgr::setMenuTriggerItem(QStandardItem *item)
@@ -119,6 +187,12 @@ void BookmarkMgr::doLoadWork()
     emit load();
 }
 
+void BookmarkMgr::doSaveWork()
+{
+//    worker_thread_.start();
+//    emit save();
+}
+
 void BookmarkMgr::onWokerLoadFinished()
 {
     loaded_ = true;
@@ -129,7 +203,8 @@ void BookmarkMgr::onWokerLoadFinished()
 
 void BookmarkMgr::onWokerSaveFinished()
 {
-
+    worker_thread_.quit();
+    worker_thread_.wait();
 }
 
 BookmarkWorker::BookmarkWorker()
@@ -250,15 +325,10 @@ void BookmarkWorker::saveToFile()
     docRoot.insert("checksum", "");
     docRoot.insert("version", "1");
 
-    QJsonDocument jsonDoc;
-    jsonDoc.setObject(docRoot);
-    QFile file(R"(C:\Users\slamdd\Desktop\Bookmarks.json)");
-    if(file.open(QIODevice::WriteOnly)){
-        file.write(jsonDoc.toJson());
-        file.close();
-    }
-
+    UtilQt::writeDataToFile(R"(C:\Users\slamdd\Desktop\Bookmarks.json)",
+                            QJsonDocument(docRoot).toJson());
     emit saveFinished();
+
     qInfo()<<"\033[32m[Execute Time]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";
 }
 
@@ -322,20 +392,6 @@ void BookmarkWorker::createFileIfNotExist()
     // 写入新的内容到文件，覆盖写入
     file.write(jsonDoc.toJson());
     file.close();
-}
-
-QString BookmarkWorker::makeEpochStr(bool msecond)
-{
-    if(!msecond){
-        return QString::number(QDateTime::currentSecsSinceEpoch());
-    }else{
-        return QString::number(QDateTime::currentMSecsSinceEpoch());
-    }
-}
-
-QString BookmarkWorker::makeUUidStr()
-{
-    return QUuid::createUuid().toString().remove("{").remove("}");
 }
 
 QStandardItem *BookmarkWorker::parseObj2Item(const QJsonObject &obj)

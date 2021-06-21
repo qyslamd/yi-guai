@@ -142,13 +142,39 @@ void BookmarkBar::onCustomContextMenuRequested(const QPoint &pos)
     auto child = childAt(pos);
     qInfo()<<__FUNCTION__<<child;
 
-    menu.clear();
-    menu.addAction(BookmarkMgr::Instance()->action_open_new_tab_);
-    menu.addAction(BookmarkMgr::Instance()->action_open_new_wnd_);
-    menu.addAction(BookmarkMgr::Instance()->action_open_in_private_);
-    menu.addSeparator();
-    menu.addAction(BookmarkMgr::Instance()->action_modify_);
-    menu.addAction(BookmarkMgr::Instance()->action_rename_);
+    auto action = toolbar_->actionAt(toolbar_->mapFromParent(pos));
+    if(!action){
+        qInfo()<<__FUNCTION__<<action;
+        return;
+    }
+    if(auto dataItem = (QStandardItem *)action->data().value<void *>()){
+        BookmarkMgr::Instance()->setMenuTriggerItem(dataItem);
+        auto type = dataItem->data(BookmarkMgr::Type).toString();
+        auto openAction = BookmarkMgr::Instance()->action_open_new_tab_;
+        auto openWndAction = BookmarkMgr::Instance()->action_open_new_wnd_;
+        auto openPrivateAction = BookmarkMgr::Instance()->action_open_in_private_;
+
+        if(type == "folder"){
+            openAction->setText(tr("open all in new tab") + QString("(%1)").arg(dataItem->rowCount()));
+            openWndAction->setText(tr("open all in new window") + QString("(%1)").arg(dataItem->rowCount()));
+            openPrivateAction->setText(tr("open all in private window") + QString("(%1)").arg(dataItem->rowCount()));
+            menu.addAction(openAction);
+            menu.addAction(openWndAction);
+            menu.addAction(openPrivateAction);
+            menu.addSeparator();
+            menu.addAction(BookmarkMgr::Instance()->action_rename_);
+
+        }else if(type == "url"){
+            openAction->setText(tr("open in new tab"));
+            openWndAction->setText(tr("open in new window"));
+            openPrivateAction->setText(tr("open in private window"));
+            menu.addAction(openAction);
+            menu.addAction(openWndAction);
+            menu.addAction(openPrivateAction);
+            menu.addSeparator();
+            menu.addAction(BookmarkMgr::Instance()->action_modify_);
+        }
+    }
     menu.addSeparator();
     menu.addAction(BookmarkMgr::Instance()->action_cut_);
     menu.addAction(BookmarkMgr::Instance()->action_copy_);

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AddToFavoritePopup</class>
- <widget class="QWidget" name="AddToFavoritePopup">
+ <class>AddBkmkPopup</class>
+ <widget class="QWidget" name="AddBkmkPopup">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -83,7 +83,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="lineEdit">
+      <widget class="QLineEdit" name="lineEditName">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -100,7 +100,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QComboBox" name="comboBox">
+      <widget class="QComboBox" name="comboBoxFolder">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -120,7 +120,7 @@
       <number>12</number>
      </property>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="btnMore">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -146,7 +146,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="btnFinish">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -159,7 +159,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_3">
+      <widget class="QPushButton" name="btnRemove">
        <property name="minimumSize">
         <size>
          <width>0</width>

@@ -17,10 +17,11 @@
 #include "widgets/BookmarkWidget.h"
 #include "widgets/DownloadWidget.h"
 
+#include "managers/BookmarkManager.h"
 #include "managers/AppCfgManager.h"
 #include "managers/CefManager.h"
 
-#include "popups/AddToFavoritePopup.h"
+#include "popups/AddBookmarkPopup.h"
 #include "popups/PopupGeneral.h"
 #include "popups/InprivatePopup.h"
 #include "popups/UserInfoPopup.h"
@@ -46,6 +47,7 @@
 #include <QStyle>
 #include <QDateTime>
 #include <QLocale>
+#include <QStandardItemModel>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -157,16 +159,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         if(type == QEvent::Show || type == QEvent::Hide){
             navi_bar_->onToolWndVisibleChanged(ToolWndType::UserInfo,
                                                userinfo_popup_->isVisible());
-        }
-    }else if(obj == add_favorite_popup_){
-        if(type == QEvent::Show || type == QEvent::Hide){
-            navi_bar_->onToolWndVisibleChanged(ToolWndType::AddFavorite,
-                                               add_favorite_popup_->isVisible());
-        }
-    }else if(obj == bookmark_bar_){
-        // 临时测试用的，不能根据显示去改配置
-        if(type == QEvent::Show || type == QEvent::Hide){
-            AppCfgMgr::instance().setBookmarkBarVisible(bookmark_bar_->isVisible());
         }
     }
     return QtWinFramelessWindow::eventFilter(obj, event);
@@ -391,8 +383,7 @@ void MainWindow::initUi()
     tab_thumbnail_anime_->setPropertyName("geometry"); // 动画要动的属性
     tab_thumbnail_anime_->setDuration(50);       // 动画持续时间
 
-    add_favorite_popup_ = new AddToFavoritePopup(this);
-    add_favorite_popup_->installEventFilter(this);
+    add_favorite_popup_ = new AddBkmkPopup(this);
     add_favorite_popup_->resize(340,190);
 
     popup_history_ = new PopupGeneral(this);
@@ -1157,6 +1148,14 @@ void MainWindow::onRefresh()
 
 void MainWindow::onAddFavorite()
 {
+    auto page = CurrentPage();
+    if(!page) return;
+
+    auto model = BookmarkMgr::Instance()->gBookmarkModel;
+    auto barItem = model->item(0);
+    BookmarkMgr::Instance()->addBookmarkUrl(barItem->index(),
+                                                       page->url(),
+                                                       page->title());
     auto pos = navi_bar_->addBkmkBtnPos();
     pos.ry() += 2;
     pos.rx() -= add_favorite_popup_->width();

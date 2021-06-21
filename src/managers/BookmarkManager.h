@@ -10,6 +10,7 @@
 #include <QThread>
 #include <QWidget>
 #include <QMenu>
+#include <QModelIndex>
 
 #include "globaldef.h"
 
@@ -36,10 +37,13 @@ public:
     };
     ~BookmarkMgr();
     static BookmarkMgr* Instance();
+    static bool exist(const QString &url);
     static QStandardItemModel *gBookmarkModel;
     static ToolBarProviderWnd *gToolbarProvider;
     static QSet<quint32> gIdSet;
 
+    QStandardItem *addBookmarkUrl(const QModelIndex index, const QString &url, const QString &title);
+    QStandardItem * addBookmarkFolder(const QModelIndex index, const QString &name);
     bool isLoaded() const{return loaded_;}
     void setMenuTriggerItem(QStandardItem *item);
 public:
@@ -61,15 +65,6 @@ private:
     explicit BookmarkMgr(QObject *parent = nullptr);
     BookmarkMgr(const BookmarkMgr& other);
     BookmarkMgr& operator=(const BookmarkMgr & other);
-    void initActions();
-    bool loaded_ = false;
-    QStandardItem *menu_trigger_item_ = nullptr;
-signals:
-    void load();
-    void save();
-    void bookmarksChanged();
-    void menuCmd(BookmarkCmd cmd,  const QVariant &para);
-private:
     static QMutex gMutex;
     static BookmarkMgr *gInst;
 
@@ -78,8 +73,19 @@ private:
     };
     QThread worker_thread_;
     BookmarkWorker *worker_ = nullptr;
+
+    bool loaded_ = false;
+    QStandardItem *menu_trigger_item_ = nullptr;
+    void initActions();
+    bool exist(QStandardItem *item, const QString &url);
+signals:
+    void load();
+    void save();
+    void bookmarksChanged();
+    void menuCmd(BookmarkCmd cmd,  const QVariant &para);
 private slots:
     void doLoadWork();
+    void doSaveWork();
     void onWokerLoadFinished();
     void onWokerSaveFinished();
 };
@@ -107,8 +113,6 @@ private:
     QString file_path_;
 
     void createFileIfNotExist();
-    QString makeEpochStr(bool msecond = false);
-    QString makeUUidStr();
 
     QStandardItem* parseObj2Item(const QJsonObject &obj);
     QJsonObject paseItem2Obj(QStandardItem *item);

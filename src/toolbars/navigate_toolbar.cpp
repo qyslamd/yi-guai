@@ -132,7 +132,7 @@ void NavigateToolBar::onToolWndVisibleChanged(ToolWndType type, bool visible)
 {
     switch (type) {
     case ToolWndType::AddFavorite:
-        address_bar_->updateBtnState(visible);
+
         break;
     case ToolWndType::Favorite:
         btn_favorites_->setChecked(visible);

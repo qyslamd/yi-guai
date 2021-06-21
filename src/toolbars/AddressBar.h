@@ -34,12 +34,10 @@ signals:
 
 public:
     void setZoomLevelValue(double str);
-    void updateBtnState(bool checked);
 private:
     bool inprivate_ = false;
 
     QCompleter *completer_ = nullptr;
-    QStringListModel *model_ = nullptr;
     QHBoxLayout *layout_ = nullptr;
     QPushButton *btn_site_info_ = nullptr;    /*use pushbutton to show text and icon*/
     QLineEdit *line_edit_addr_ = nullptr;

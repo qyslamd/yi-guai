@@ -25,7 +25,6 @@ win32{
 SOURCES += \
     browser/client_switches.cc \
     browser/scheme_handler.cpp \
-    managers/AddrInputManager.cpp \
     managers/AppCfgManager.cpp \
     managers/BookmarkManager.cpp \
     managers/CefManager.cpp \
@@ -35,7 +34,7 @@ SOURCES += \
     managers/MainWindowManager.cpp \
     page.cpp \
     popup.cpp \
-    popups/AddToFavoritePopup.cpp \
+    popups/AddBookmarkPopup.cpp \
     popups/InprivatePopup.cpp \
     popups/PopupBase.cpp \
     popups/PopupGeneral.cpp \
@@ -79,7 +78,6 @@ HEADERS += \
     browser/client_switches.h \
     browser/scheme_handler.h \
     globaldef.h \
-    managers/AddrInputManager.h \
     managers/AppCfgManager.h \
     managers/BookmarkManager.h \
     managers/CefManager.h \
@@ -89,7 +87,7 @@ HEADERS += \
     managers/MainWindowManager.h \
     page.h \
     popup.h \
-    popups/AddToFavoritePopup.h \
+    popups/AddBookmarkPopup.h \
     popups/InprivatePopup.h \
     popups/PopupBase.h \
     popups/PopupGeneral.h \
@@ -130,7 +128,7 @@ HEADERS += \
 FORMS += \
     dialogs/alertdialog.ui \
     popup.ui \
-    popups/AddToFavoritePopup.ui \
+    popups/AddBookmarkPopup.ui \
     popups/InprivatePopup.ui \
     popups/PopupBase.ui \
     popups/SiteInfoPopup.ui \

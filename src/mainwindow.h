@@ -24,7 +24,7 @@ class QStatusBar;
 class Page;
 class Tab_Thumbnail_Widget;
 
-class AddToFavoritePopup;
+class AddBkmkPopup;
 class BookmarkWidget;
 class HistoryWidget;
 class DownloadWidget;
@@ -103,7 +103,7 @@ private:
     Tab_Thumbnail_Widget *tab_thumbnail_ = nullptr; /*标签页预览窗口*/
     QPropertyAnimation *tab_thumbnail_anime_ = nullptr;   /* tab预览窗口移动动画*/
 
-    AddToFavoritePopup *add_favorite_popup_;    /*添加书签 popup*/
+    AddBkmkPopup *add_favorite_popup_;    /*添加书签 popup*/
 
     PopupGeneral *popup_history_ = nullptr;
     HistoryWidget *history_widget_ = nullptr;   /*历史记录widget*/

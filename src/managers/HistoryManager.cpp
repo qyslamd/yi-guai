@@ -29,7 +29,7 @@ HistoryMgr::HistoryMgr(QObject *parent)
     worker_ = new HistoryWorker;
     worker_->moveToThread(&worker_thread_);
 
-    connect(&worker_thread_, &QThread::finished, this, [](){qInfo()<<"HistoryWorker thread finished!";});
+//    connect(&worker_thread_, &QThread::finished, this, [](){qInfo()<<"HistoryWorker thread finished!";});
     connect(this, &HistoryMgr::load, worker_, &HistoryWorker::loadFromFile);
     connect(this, &HistoryMgr::save, worker_, &HistoryWorker::saveToFile);
     connect(worker_, &HistoryWorker::loadFinished, this, &HistoryMgr::onWorkerLoadFinished);
@@ -110,14 +110,13 @@ void HistoryMgr::onWorkerSaveFinished()
     worker_thread_.quit();
     worker_thread_.wait();
 
-    qInfo()<<__FUNCTION__;
+//    qInfo()<<__FUNCTION__;
 }
 
 HistoryWorker::HistoryWorker()
 {
     auto loc = UtilQt::appDataPath();
     record_file_path_ = QDir(loc).filePath("hisotiry");
-    qInfo()<<__FUNCTION__<<record_file_path_;
 }
 
 HistoryWorker::~HistoryWorker()
@@ -168,7 +167,7 @@ void HistoryWorker::loadFromFile()
 
 void HistoryWorker::saveToFile()
 {
-    qInfo()<<__FUNCTION__;
+//    qInfo()<<__FUNCTION__;
     QJsonArray jsonArray;
     for( int i = 0; i < HistoryMgr::gHistoryModel->rowCount(); i++)
     {
