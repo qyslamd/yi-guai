@@ -214,6 +214,13 @@ void BookmarkBar::loadBookmarks()
             auto button = qobject_cast<QToolButton*>(item);
             button->setPopupMode(QToolButton::InstantPopup);
         }
+
+        //class name:QToolBarExtension
+        // object name:qt_toolbar_ext_button
+        if(item->objectName() == "qt_toolbar_ext_button"){
+            auto widget = qobject_cast<QWidget *>(item);
+            widget->setMinimumWidth(18);
+        }
     }
 
     if(providerWnd->others_menu_){
