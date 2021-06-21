@@ -9,7 +9,7 @@ win32{
     QT += winextras
     VERSION = 0.0.1.12
 
-    RC_ICONS = icon_64px.ico
+    RC_ICONS = corgi.ico
     # 公司名称
     QMAKE_TARGET_COMPANY = "zhouyohu@163.com"
     # 产品名称

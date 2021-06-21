@@ -547,7 +547,7 @@ void NavigateToolBar::setIcons()
         btn_capture_->setIcon(QIcon(":/icons/resources/imgs/dark/screenshot_64px.png"));
         btn_inprivate_->setIcon(QIcon(":/icons/resources/imgs/dark/private_64px.png"));
         btn_user_->setIcon(QIcon(":/icons/resources/imgs/dark/user_64px.png"));
-        btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/dark/more_64px.png"));
+        btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/dark/squared_menu_48px.png"));
     }else{
         btn_back_->setIcon(QIcon(":/icons/resources/imgs/light/left_64px.png"));
         btn_refresh_->setIcon(QIcon(":/icons/resources/imgs/light/refresh_64px.png"));
@@ -559,7 +559,7 @@ void NavigateToolBar::setIcons()
         btn_download_->setIcon(QIcon(":/icons/resources/imgs/light/download_64px.png"));
         btn_capture_->setIcon(QIcon(":/icons/resources/imgs/light/screenshot_64px.png"));
         btn_user_->setIcon(QIcon(":/icons/resources/imgs/light/user_64px.png"));
-        btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/light/more_64px.png"));
+        btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/light/squared_menu_48px.png"));
 
     }
     action_new_tab_->setIcon(QIcon(":/icons/resources/imgs/layout_64px.png"));

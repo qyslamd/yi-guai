@@ -41,7 +41,6 @@ CefQWidget::CefQWidget(const QString &url, QWidget *parent)
     , qwindow_containter_(nullptr)
     , layout_(new QVBoxLayout(this))
 {
-    newly_created_ = true;
     browser_window_.reset(new BrowserWindow(this, url.toStdString()));
     initUi();
 }
@@ -55,7 +54,6 @@ CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
     , qwindow_containter_(nullptr)
     , layout_(new QVBoxLayout(this))
 {
-    newly_created_ = false;
     browser_window_.reset(new BrowserWindow(this, ""));
     initUi();
 
@@ -381,6 +379,10 @@ void CefQWidget::onBrowerWindowLoadStart(CefLoadHandler::TransitionType transiti
 
 void CefQWidget::onBrowerWindowLoadEnd(int httpStatusCode)
 {
+    if(newly_created_){
+        resizeBorser();
+        newly_created_ = false;
+    }
     HistoryMgr::Instance()->addHistoryRecord(
                 History{QString::number(QDateTime::currentMSecsSinceEpoch()),
                         url_,
@@ -664,7 +666,7 @@ void CefQWidget::resizeBorser(const QSize &size)
 {
     QRect rect;
     if(size.isEmpty()){
-        rect = qwindow_containter_->rect();
+        rect = layout_->geometry();
     }else{
         rect.setX(0);
         rect.setY(0);

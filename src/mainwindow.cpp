@@ -324,12 +324,28 @@ void MainWindow::initUi()
         delete menuBar;
         menuBar = nullptr;
     }
+//    QHBoxLayout *toolBarsLayout = new QHBoxLayout;
+//    toolBarsLayout->setContentsMargins(0,0,0,0);
+//    QWidget *widgetCorgi = new QWidget;
+//    QVBoxLayout *corgiLayout = new QVBoxLayout;
+//    corgiLayout->setContentsMargins(0,0,0,0);
+//    widgetCorgi->setLayout(corgiLayout);
+
+//    QLabel *labelCorgi = new QLabel();
+//    labelCorgi->setMinimumSize(48, 48);
+//    labelCorgi->setScaledContents(true);
+//    labelCorgi->setPixmap(QPixmap(":/icons/resources/imgs/colorful/corgi_48.png"));
+//    corgiLayout->addStretch();
+//    corgiLayout->addWidget(labelCorgi);
+//    toolBarsLayout->addWidget(widgetCorgi);
+
     widget_north_ = new QWidget(this);
     widget_north_->setObjectName("mainwindow_north_widget");
+//    widget_north_->setLayout(toolBarsLayout);
+
     widget_north_layout_ = new QVBoxLayout(widget_north_);
     widget_north_layout_->setContentsMargins(0,0,0,0);
     widget_north_layout_->setSpacing(0);
-    widget_north_->setLayout(widget_north_layout_);
 
     tab_bar_ = new TabPageToolBar(created_cfg_.is_inprivate_, this);
 
@@ -347,6 +363,8 @@ void MainWindow::initUi()
     widget_north_layout_->addWidget(navi_bar_);
     widget_north_layout_->addWidget(bookmark_bar_);
     widget_north_layout_->addWidget(notify_bar_);
+
+//    toolBarsLayout->addLayout(widget_north_layout_);
 
 //    bookmark_bar_->hide();
     /*设置成自定义的 MenuBar （其实是QWidget*）*/
