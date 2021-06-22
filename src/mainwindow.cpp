@@ -109,6 +109,9 @@ int MainWindow::AddNewPage(const QString &url, bool switchTo)
         url1 =default_url;
     }
     Page *page = new Page(url1, this);
+    // stackedWidget 有bug,page的大小很小，这里限定一下，等到加载结束的时候
+    // 设置最小大小为默认值
+    page->setMinimumSize(stack_browsers_->size());
     initPage(page);
     auto index = stack_browsers_->addWidget(page);
     tab_bar_->insertTab(index, url);
@@ -828,7 +831,7 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
     case PageCmd::LoadEnd:
     {
         if(page){
-
+            page->setMinimumSize(QSize(0,0));
         }
     }
         break;
