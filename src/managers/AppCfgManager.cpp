@@ -11,6 +11,7 @@ namespace {
     const char *KeyHomePage = "HomePage";
     const char *KeyNewPageUrl = "HomePage";
     const char *KeyShowBkmkBar = "ShowBookmarkBar";
+    const char *KeyShowBkmkBtn = "ShowBookmarkBtn";
 
 
     const char *SectionDevTool = "DevTool";
@@ -33,54 +34,64 @@ AppCfgMgr::AppCfgMgr(QObject *parent)
 
 QByteArray AppCfgMgr::windowGeometry()
 {
-    return instance().value(SectionGeneral, KeyWindowGeo, "").toByteArray();
+    return Instance().value(SectionGeneral, KeyWindowGeo, "").toByteArray();
 }
 
 void AppCfgMgr::setWindowGeometry(const QByteArray &data)
 {
-    instance().setValue(SectionGeneral, KeyWindowGeo, data);
+    Instance().setValue(SectionGeneral, KeyWindowGeo, data);
 }
 
 QString AppCfgMgr::homePageUrl()
 {
-    return instance().value(SectionGeneral, KeyHomePage, "https://cn.bing.com/").toString();
+    return Instance().value(SectionGeneral, KeyHomePage, "https://cn.bing.com/").toString();
 }
 
 void AppCfgMgr::setHomePageUrl(const QString &data)
 {
-    instance().setValue(SectionGeneral, KeyHomePage, data);
+    Instance().setValue(SectionGeneral, KeyHomePage, data);
 }
 
 QString AppCfgMgr::newTabPageUrl()
 {
-    return instance().value(SectionGeneral, KeyNewPageUrl, "").toString();
+    return Instance().value(SectionGeneral, KeyNewPageUrl, "").toString();
 }
 
 void AppCfgMgr::setNewTabPageUrl(const QString &data)
 {
-    instance().setValue(SectionGeneral, KeyNewPageUrl, data);
+    Instance().setValue(SectionGeneral, KeyNewPageUrl, data);
 }
 
 QByteArray AppCfgMgr::devToolGeometry()
 {
-    return instance()
+    return Instance()
             .value(SectionDevTool, KeyDevToolGeo, "")
             .toByteArray();
 }
 
 void AppCfgMgr::setDevToolGeometry(const QByteArray &data)
 {
-    instance().setValue(SectionDevTool, KeyDevToolGeo, data);
+    Instance().setValue(SectionDevTool, KeyDevToolGeo, data);
 }
 
 bool AppCfgMgr::bookmarkBarVisible()
 {
-    return instance().value(SectionGeneral, KeyShowBkmkBar, "").toBool();
+    return Instance().value(SectionGeneral, KeyShowBkmkBar, "").toBool();
 }
 
 void AppCfgMgr::setBookmarkBarVisible(const bool &data)
 {
-    instance().setValue(SectionGeneral, KeyShowBkmkBar, data);
+    Instance().setValue(SectionGeneral, KeyShowBkmkBar, data);
+}
+
+bool AppCfgMgr::bookmarkBtnVisible()
+{
+    return Instance().value(SectionGeneral, KeyShowBkmkBtn, "").toBool();
+}
+
+void AppCfgMgr::setBookmarkBtnVisible(const bool &data)
+{
+    Instance().setValue(SectionGeneral, KeyShowBkmkBtn, data);
 }
 
 QVariant AppCfgMgr::value(const QString &group,
@@ -108,11 +119,11 @@ void AppCfgMgr::setValue(const QString &group,
     settings_->setValue(key, data);
     settings_->endGroup();
 
-    emit configChanged();
+    emit preferenceChanged();
 }
 
 void AppCfgMgr::setValue(const QString &key, const QVariant &data)
 {
     settings_->setValue(key, data);
-    emit configChanged();
+    emit preferenceChanged();
 }

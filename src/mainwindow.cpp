@@ -5,10 +5,10 @@
 #include "browser/cef_client_handler.h"
 #include "utils/util_qt.h"
 #include "utils/util_win.h"
-#include "toolbars/tabpage_toolbar.h"
-#include "toolbars/navigate_toolbar.h"
+#include "toolbars/TabPageBar.h"
+#include "toolbars/NavigationBar.h"
 #include "toolbars/BookmarkBar.h"
-#include "toolbars/notification_toolbar.h"
+#include "toolbars/NotificationBar.h"
 
 #include "widgets/TabThumbnailWidget.h"
 #include "widgets/AppConfigWidget.h"
@@ -60,10 +60,8 @@ const char default_url[] = "https://cn.bing.com/";
 const char gitee_url[] = "https://gitee.com/slamdd/yi-guai";
 }
 
-InprivatePopup* MainWindow::gInprivatePopup = nullptr;
 AppCfgWidget *MainWindow::gAppCfgWidget = nullptr;
 FullscnHint *MainWindow::gFullscnWidget = nullptr;
-QStack<History> MainWindow::RecentlyHistory;
 
 MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
     : QtWinFramelessWindow(parent)
@@ -140,14 +138,10 @@ void MainWindow::NavigateInCurPage(const QString &url)
     }
 }
 
-void MainWindow::updateInprivateCount()
+void MainWindow::updatePreference()
 {
-    if(!gInprivatePopup){
-        gInprivatePopup = new InprivatePopup;
-    }
-    auto cnt = MainWndMgr::Instance().inprivateCount();
-    gInprivatePopup->setHintText(tr(" %1 inprivate window opened")
-                                 .arg(cnt));
+    navi_bar_->updatePreference();
+    bookmark_bar_->setVisible(AppCfgMgr::bookmarkBarVisible());
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
@@ -179,7 +173,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
 void MainWindow::onInpWndCntChanged()
 {
-    MainWindow::updateInprivateCount();
     if(created_cfg_.is_inprivate_){
         navi_bar_->inpWndCntChanged();
     }
@@ -324,24 +317,9 @@ void MainWindow::initUi()
         delete menuBar;
         menuBar = nullptr;
     }
-//    QHBoxLayout *toolBarsLayout = new QHBoxLayout;
-//    toolBarsLayout->setContentsMargins(0,0,0,0);
-//    QWidget *widgetCorgi = new QWidget;
-//    QVBoxLayout *corgiLayout = new QVBoxLayout;
-//    corgiLayout->setContentsMargins(0,0,0,0);
-//    widgetCorgi->setLayout(corgiLayout);
-
-//    QLabel *labelCorgi = new QLabel();
-//    labelCorgi->setMinimumSize(48, 48);
-//    labelCorgi->setScaledContents(true);
-//    labelCorgi->setPixmap(QPixmap(":/icons/resources/imgs/colorful/corgi_48.png"));
-//    corgiLayout->addStretch();
-//    corgiLayout->addWidget(labelCorgi);
-//    toolBarsLayout->addWidget(widgetCorgi);
 
     widget_north_ = new QWidget(this);
     widget_north_->setObjectName("mainwindow_north_widget");
-//    widget_north_->setLayout(toolBarsLayout);
 
     widget_north_layout_ = new QVBoxLayout(widget_north_);
     widget_north_layout_->setContentsMargins(0,0,0,0);
@@ -364,9 +342,6 @@ void MainWindow::initUi()
     widget_north_layout_->addWidget(bookmark_bar_);
     widget_north_layout_->addWidget(notify_bar_);
 
-//    toolBarsLayout->addLayout(widget_north_layout_);
-
-//    bookmark_bar_->hide();
     /*设置成自定义的 MenuBar （其实是QWidget*）*/
     layout()->setMenuBar(widget_north_);
 
@@ -441,6 +416,8 @@ void MainWindow::initUi()
     userinfo_popup_ = new UserInfoPopup(this);
     userinfo_popup_->resize(320, 360);
     userinfo_popup_->installEventFilter(this);
+
+    bookmark_bar_->setVisible(AppCfgMgr::Instance().bookmarkBarVisible());
 }
 
 void MainWindow::setAppearance()
@@ -486,7 +463,6 @@ void MainWindow::initSignalSlot()
     connect(history_widget_, &HistoryWidget::pinOrCloseClicked, this, &MainWindow::onPinOrCloseHistoryWidget);
     connect(history_widget_, &HistoryWidget::menuCmd, this, &MainWindow::onHistoryWidgetCmd);
     connect(bookmark_widget_, &BookmarkWidget::pinOrCloseClicked, this, &MainWindow::onPinOrCloseBookmarkWidget);
-    connect(bookmark_widget_, &BookmarkWidget::menuCmd, this, &MainWindow::onBookmarkCmd);
 }
 
 void MainWindow::initPage(Page *page)
@@ -699,7 +675,11 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         MainWndMgr::Instance().createWindow(MainWndCfg());
         break;
     case NaviBarCmd::NewInprivateWindow:
-        MainWndMgr::Instance().createWindow(MainWndCfg(true));
+    {
+        MainWndCfg cfg;
+        cfg.is_inprivate_ = true;
+        MainWndMgr::Instance().createWindow(cfg);
+    }
         break;
     case NaviBarCmd::ZoomOut:
         onZoomOut();
@@ -769,6 +749,10 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
     }
 
     switch(cmd){
+    case PageCmd::NeedSize:
+    {
+    }
+        break;
     case PageCmd::Created:
     {
         if(!first_browser_created_){
@@ -1033,7 +1017,9 @@ void MainWindow::onBrowserShortcut(const CefKeyEvent &event,
     // 新建InPrivate浏览器窗口
     if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_SHIFT_DOWN)
             && event.windows_key_code == 'N'){
-        MainWndMgr::Instance().createWindow(MainWndCfg(true));
+        MainWndCfg cfg;
+        cfg.is_inprivate_ = true;
+        MainWndMgr::Instance().createWindow(cfg);
     }
 
     // Ctrl + Shift + I
@@ -1101,10 +1087,19 @@ void MainWindow::onHistoryWidgetCmd(HistoryCmd cmd, const QVariant &para)
         AddNewPage(para.toString(), false);
         break;
     case HistoryCmd::OpenInNewWnd:
-        MainWndMgr::Instance().createWindow(MainWndCfg(para.toString()));
+    {
+        MainWndCfg cfg;
+        cfg.url_ = para.toString();
+        MainWndMgr::Instance().createWindow(cfg);
+    }
         break;
     case HistoryCmd::OpenInInprivate:
-         MainWndMgr::Instance().createWindow(MainWndCfg(true, para.toString()));
+    {
+        MainWndCfg cfg;
+        cfg.is_inprivate_ = true;
+        cfg.url_ = para.toString();
+        MainWndMgr::Instance().createWindow(cfg);
+    }
         break;
     default:
         break;
@@ -1325,16 +1320,17 @@ void MainWindow::onShowDownload()
 
 void MainWindow::onShowInprivate()
 {
-    if(!gInprivatePopup){
-        gInprivatePopup = new InprivatePopup;
+    auto wnd = MainWndMgr::gInprivatePopup;
+    if(!wnd){
+        wnd = new InprivatePopup;
     }
 
     auto pos = navi_bar_->inprivateBtnPos();
     pos.ry() += 2;
-    pos.rx() -= gInprivatePopup->width();
-    pos.rx() += gInprivatePopup->shadowRightWidth();
-    gInprivatePopup->move(pos);
-    gInprivatePopup->setVisible(!gInprivatePopup->isVisible());
+    pos.rx() -= wnd->width();
+    pos.rx() += wnd->shadowRightWidth();
+    wnd->move(pos);
+    wnd->setVisible(!wnd->isVisible());
 }
 
 void MainWindow::onShowUser()
@@ -1409,16 +1405,16 @@ void MainWindow::onTabSwitch()
     }
 }
 
-void MainWindow::addRecently(Page *page)
+void MainWindow::addRecently(Page *)
 {
-    for(auto item : RecentlyHistory){
-        if(item.url == page->url()){
-            return;
-        }
-    }
-    History data{QString::number(QDateTime::currentSecsSinceEpoch()),
-                page->url(),
-                page->title(),
-                0};
-    RecentlyHistory.push(data);
+//    for(auto item : RecentlyHistory){
+//        if(item.url == page->url()){
+//            return;
+//        }
+//    }
+//    History data{QString::number(QDateTime::currentSecsSinceEpoch()),
+//                page->url(),
+//                page->title(),
+//                0};
+//    RecentlyHistory.push(data);
 }

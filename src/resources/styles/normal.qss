@@ -239,14 +239,13 @@ QPushButton#InprivateCloseBtn:hover{
 background-color:rgba(0,108,190, 70%);
 }
 
-
 BookmarkToolBar > QToolButton:menu-indicator{
 image:none;
 }
 BookmarkToolBar > QToolButton{
 border:none;
 color:#666666;
-padding:4px;
+padding:3px;
 }
 BookmarkToolBar > QToolButton:hover{
 background: rgba(169,169,169, 30%);

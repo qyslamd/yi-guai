@@ -14,16 +14,18 @@
 #include <QFontMetrics>
 #include <QToolBar>
 #include <QChildEvent>
+#include <QPainterPath>
+#include <QTimer>
 
 #include "managers/BookmarkManager.h"
 #include "managers/FaviconManager.h"
+#include "utils/util_qt.h"
 
 BookmarkBar::BookmarkBar(QWidget *parent)
     : QFrame(parent)
 {
     initUi();
-    connect(BookmarkMgr::gToolbarProvider, &ToolBarProviderWnd::loadToUiFinished,
-            this, &BookmarkBar::loadBookmarks);
+    QTimer::singleShot(0, this, &BookmarkBar::loadBookmarks);
 }
 
 void BookmarkBar::paintEvent(QPaintEvent *event)
@@ -38,41 +40,49 @@ void BookmarkBar::paintEvent(QPaintEvent *event)
     p.drawLine(0.0, height() - penWidth, width(), height() - penWidth);
     p.restore();
 
-    p.save();
     if(!loaded_){
+        p.save();
         QString hint = QStringLiteral("正在加载书签");
         QFontMetrics fm(this->font());
-        fm.horizontalAdvance(hint);
-        auto pixelsHigh = fm.height();
+        auto width = fm.horizontalAdvance(hint);
 
         auto pos = this->rect().center();
-        pos.ry() += pixelsHigh / 2;
+        pos.ry() += fm.xHeight();
         p.drawText(pos, hint);
+        p.restore();
+
+        p.save();
+        p.setRenderHint(QPainter::Antialiasing);
+        QPainterPath path;
+        auto ww = 6;
+        auto y = rect().center().y() - ww;
+        auto rect1 = QRect(pos.x() + width + ww, y, 2 * ww, 2 * ww);
+        auto rect2 = QRect(rect1.topRight().x() + ww, y, 2 * ww, 2 * ww);
+        auto rect3 = QRect(rect2.topRight().x() + ww, y, 2 * ww, 2 * ww);
+        auto rect4 = QRect(rect3.topRight().x() + ww, y, 2 * ww, 2 * ww);
+        if(test_int_ == 1){
+            path.addEllipse(rect1);
+        }else if(test_int_ == 2){
+            path.addEllipse(rect2);
+        }else if(test_int_ == 3){
+            path.addEllipse(rect3);
+        }else{
+            path.addEllipse(rect4);
+        }
+        p.fillPath(path, test_color_);
+        p.restore();
     }
-    p.restore();
 }
 
 void BookmarkBar::showEvent(QShowEvent *event)
 {
-    /*本类的首个对象标志*/
-    static bool first_wnd = true;
-    if(first_wnd){
-        first_wnd = false;
-        return QFrame::showEvent(event);
-    }
-    /*
-     * 每个对象显示的时候，均判断是否是首次显示
-     * 如果是首次显示，加载书签
-     */
-    if(first_shown_){
-        loadBookmarks();
-        first_shown_ = false;
-    }
     QFrame::showEvent(event);
 }
 
 void BookmarkBar::initUi()
 {
+    connect(BookmarkMgr::gToolbarProvider, &ToolBarProviderWnd::loadToUiFinished,
+            this, &BookmarkBar::loadBookmarks);
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, &QFrame::customContextMenuRequested, this, &BookmarkBar::onCustomContextMenuRequested);
 
@@ -80,18 +90,15 @@ void BookmarkBar::initUi()
     layout_->setSpacing(4);
     layout_->setContentsMargins(4,4,4,4);
 
-    btn_application_ = new QPushButton(this);
-    btn_application_->setText(tr("application"));
+    btn_application_ = new QPushButton(FaviconMgr::systemDirIcon, tr("application"));
     btn_application_->setToolTip(tr("open applications"));
     btn_application_->setIcon(QIcon(":/icons/resources/imgs/gray/squared_menu_96px.png"));
-    btn_application_->setIconSize(QSize(24,24));
     label_empty_ = new QLabel(QStringLiteral("你还没有书签，赶紧添加一个吧"), this);
 
     toolbar_ = new BookmarkToolBar(this);
     toolbar_->setIconSize(QSize(16,16));
 
     btn_others_ = new QPushButton(FaviconMgr::systemDirIcon, QStringLiteral("其它书签"), this);
-    btn_others_->setObjectName("BookmarkBarOhtersButton");
     QFrame* line = new QFrame(this);
     line->setStyleSheet("margin-top:4px;margin-bottom:4px;");
     line->setObjectName("line");
@@ -107,6 +114,15 @@ void BookmarkBar::initUi()
     layout_->addWidget(btn_others_);
 
     label_empty_->hide();
+    auto timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, [this]()
+    {
+        test_color_ = QColor(UtilQt::getRandomColor());
+        test_int_++;
+        if(test_int_ > 4) test_int_ = 1;
+        update();
+    });
+    timer->start(300);
 }
 
 BookmarkMenu *BookmarkBar::makeMenu(const QStandardItem *item)
@@ -142,6 +158,10 @@ void BookmarkBar::onCustomContextMenuRequested(const QPoint &pos)
 {
     static StyledMenu menu;
     menu.clear();
+    if(auto child = childAt(pos))
+    {
+        if(child == btn_application_) return;
+    }
 
     auto action = toolbar_->actionAt(toolbar_->mapFromParent(pos));
     qInfo()<<__FUNCTION__<<action;
@@ -187,7 +207,7 @@ void BookmarkBar::onCustomContextMenuRequested(const QPoint &pos)
     menu.addAction(BookmarkMgr::Instance()->action_add_folder_);
     menu.addSeparator();
     menu.addAction(BookmarkMgr::Instance()->action_show_bookmark_bar_);
-    menu.addAction(BookmarkMgr::Instance()->action_show_bookmakr_btn_);
+    menu.addAction(BookmarkMgr::Instance()->action_show_bookmark_btn_);
     menu.addAction(BookmarkMgr::Instance()->action_manage_bookmarks_);
     menu.exec(QCursor::pos());
 }
@@ -201,6 +221,10 @@ void BookmarkBar::loadBookmarks()
     if(!providerWnd){
         return;
     }
+    if(!providerWnd->loaded()){
+        return;
+    }
+    // 加载书签栏
     for (auto item : providerWnd->buttons){
         toolbar_->addAction(item);
     }
@@ -223,6 +247,7 @@ void BookmarkBar::loadBookmarks()
         }
     }
 
+    // 加载其它书签
     if(providerWnd->others_menu_){
         btn_others_->setMenu(providerWnd->others_menu_);
     }
@@ -252,4 +277,7 @@ void BookmarkToolBar::initUi()
 {
     setFloatable(false);
     setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    auto margins = contentsMargins();
+    margins.setRight(8);
+    setContentsMargins(margins);
 }

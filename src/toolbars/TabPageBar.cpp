@@ -1,4 +1,4 @@
-#include "tabpage_toolbar.h"
+#include "TabPageBar.h"
 
 #include <QtDebug>
 #include <QHBoxLayout>
@@ -7,6 +7,7 @@
 #include <QMouseEvent>
 #include <QHelpEvent>
 #include <QToolTip>
+#include <QLabel>
 
 #include "TabBar.h"
 #include "utils/util_qt.h"

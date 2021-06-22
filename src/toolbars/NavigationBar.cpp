@@ -1,10 +1,11 @@
-#include "navigate_toolbar.h"
+#include "NavigationBar.h"
 #include "AddressBar.h"
 #include "utils/util_qt.h"
 
 #include "managers/AppCfgManager.h"
 #include "managers/CefManager.h"
 #include "managers/MainWindowManager.h"
+#include "managers/BookmarkManager.h"
 #include "popups/ZoomPopup.h"
 #include "popups/StyledMenu.h"
 
@@ -128,6 +129,11 @@ void NavigateToolBar::inpWndCntChanged()
     }
 }
 
+void NavigateToolBar::updatePreference()
+{
+    btn_favorites_->setVisible(AppCfgMgr::bookmarkBtnVisible());
+}
+
 void NavigateToolBar::onToolWndVisibleChanged(ToolWndType type, bool visible)
 {
     switch (type) {
@@ -155,7 +161,7 @@ void NavigateToolBar::paintEvent(QPaintEvent *event)
 {
     QFrame::paintEvent(event);
 
-    if(!AppCfgMgr::instance().bookmarkBarVisible()){
+    if(!AppCfgMgr::Instance().bookmarkBarVisible()){
         QPainter p(this);
         p.save();
         qreal penWidth = 0.5f;
@@ -226,6 +232,8 @@ void NavigateToolBar::initUi()
     menu_more_options_->installEventFilter(this);
     menu_more_tools_ = new StyledMenu;
     menu_help_ = new StyledMenu;
+    menu_favorite_ = new StyledMenu(this);
+
     action_new_tab_ = new QAction;
     action_new_tab_->setText(tr("create new tab page"));
     action_new_tab_->setShortcut(QKeySequence("Ctrl+T"));
@@ -271,6 +279,14 @@ void NavigateToolBar::initUi()
 
     action_favorates_ = new QAction;
     action_favorates_->setText(tr("favorates"));
+    menu_favorite_->addAction(BookmarkMgr::Instance()->action_add_current_);
+    menu_favorite_->addAction(BookmarkMgr::Instance()->action_add_all_);
+    menu_favorite_->addSeparator();
+    menu_favorite_->addAction(BookmarkMgr::Instance()->action_show_bookmark_bar_);
+    menu_favorite_->addAction(BookmarkMgr::Instance()->action_show_bookmark_btn_);
+    menu_favorite_->addAction(BookmarkMgr::Instance()->action_manage_bookmarks_);
+    action_favorates_->setMenu(menu_favorite_);
+
     action_history_ = new QAction;
     action_history_->setText(tr("histories"));
     action_history_->setShortcut(QKeySequence("Ctrl+H"));
@@ -362,6 +378,8 @@ void NavigateToolBar::initUi()
     layout_->addWidget(btn_inprivate_);
     layout_->addWidget(btn_user_);
     layout_->addWidget(btn_more_options_);
+
+    btn_favorites_->setVisible(AppCfgMgr::bookmarkBtnVisible());
 }
 
 void NavigateToolBar::initSignalSlot()
@@ -587,7 +605,7 @@ void NavigateToolBar::setIcons()
     action_quit_->setIcon(QIcon());
 
     QSize iconSize(24,24);
-    QSize btnSize(42,30);
+    QSize btnSize(36,28);
     for(auto item : this->children()){
         if(item->isWidgetType() &&
                 item->metaObject()->className() == QString("QToolButton"))

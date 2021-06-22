@@ -10,14 +10,19 @@
 #include "FaviconManager.h"
 #include "HistoryManager.h"
 
+#include "popups/InprivatePopup.h"
+
 int MainWndMgr::newWndOffsetX = 22;
 int MainWndMgr::newWndOffsetY = 30;
+InprivatePopup* MainWndMgr::gInprivatePopup = nullptr;
 
 MainWndMgr::MainWndMgr(QObject *parent)
     : QObject(parent)
 {
     // 窗口创建之前需要准备好所有的数据
 
+    // 配置数据
+    AppCfgMgr::Instance();
     // icon数据
     FaviconMgr::Instance();
     // 书签数据
@@ -26,7 +31,7 @@ MainWndMgr::MainWndMgr(QObject *parent)
     HistoryMgr::Instance();
 
     connect(BookmarkMgr::Instance(), &BookmarkMgr::menuCmd, this, &MainWndMgr::onBkmkMgrMenuCmd);
-
+    connect(&AppCfgMgr::Instance(), &AppCfgMgr::preferenceChanged, this, &MainWndMgr::onAppCfgChanged);
 }
 
 
@@ -94,6 +99,7 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
     windows_.insert(window);
     wnd_map_.insert(wnd_index++, window);
     if(cfg.is_inprivate_){
+        updatePrivateWndCount();
         emit inprivateWndCntChanged();
     }
 
@@ -171,11 +177,35 @@ MainWindow *MainWndMgr::activeWindow()
     return nullptr;
 }
 
+
+void MainWndMgr::updatePrivateWndCount()
+{
+    if(!gInprivatePopup){
+        gInprivatePopup = new InprivatePopup;
+    }
+    auto cnt = MainWndMgr::Instance().inprivateCount();
+    gInprivatePopup->setHintText(tr(" %1 inprivate window opened")
+                                 .arg(cnt));
+}
+
 void MainWndMgr::onBkmkMgrMenuCmd(BookmarkCmd cmd, const QVariant &data)
 {
     auto wnd = activeWindow();
     if(wnd){
         activeWindow()->onBookmarkCmd(cmd, data);
     }else{
+    }
+}
+
+void MainWndMgr::onAppCfgChanged()
+{
+    auto it = windows_.begin();
+    auto end = windows_.end();
+    for(; it != end; ++it)
+    {
+        if( *it )
+        {
+            (*it)->updatePreference();
+        }
     }
 }

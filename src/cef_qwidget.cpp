@@ -188,11 +188,10 @@ CefWindowHandle CefQWidget::BrowserWindowHandle()
     return 0;
 }
 
-void CefQWidget::onTopLevelWindowStateChanged(Qt::WindowStates state, const QVariant &data)
+void CefQWidget::onTopLevelWindowStateChanged(Qt::WindowStates state,
+                                              const QVariant &data)
 {
-    resizeBorser(data.toSize());
-//    if(state.testFlag(Qt::WindowMaximized) || state.testFlag(Qt::WindowNoState)){
-//    }
+//    resizeBorser(data.toSize());
 }
 
 void CefQWidget::onBrowserWndNewForgroundPage(CefWindowInfo &windowInfo,
@@ -380,7 +379,7 @@ void CefQWidget::onBrowerWindowLoadStart(CefLoadHandler::TransitionType transiti
 void CefQWidget::onBrowerWindowLoadEnd(int httpStatusCode)
 {
     if(newly_created_){
-        resizeBorser();
+        emit browserNeedSize();
         newly_created_ = false;
     }
     HistoryMgr::Instance()->addHistoryRecord(
@@ -607,7 +606,6 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
 
 void CefQWidget::resizeEvent(QResizeEvent *event)
 {
-    QWidget::resizeEvent(event);
     switch(browser_state_){
     case Empty:
     {
@@ -624,10 +622,10 @@ void CefQWidget::resizeEvent(QResizeEvent *event)
     case Creating:
         break;
     case Created:
-        resizeBorser();
+        resizeBorser(event->size());
         break;
     }
-
+    event->accept();
 }
 
 void CefQWidget::closeEvent(QCloseEvent *event)
@@ -649,10 +647,10 @@ void CefQWidget::closeEvent(QCloseEvent *event)
 
 void CefQWidget::initUi()
 {
-    window_->setFlag(Qt::FramelessWindowHint, true);
+//    window_->setFlag(Qt::FramelessWindowHint, true);
 
     if(!qwindow_containter_){
-        qwindow_containter_ = QWidget::createWindowContainer(window_, this, Qt::Widget);
+        qwindow_containter_ = QWidget::createWindowContainer(window_/*, this, Qt::Widget*/);
     }
 
     layout_->setContentsMargins(0,0,0,0);

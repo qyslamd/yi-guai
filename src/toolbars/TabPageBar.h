@@ -1,5 +1,5 @@
-#ifndef TABPAGE_TOOLBAR_H
-#define TABPAGE_TOOLBAR_H
+#ifndef TABPAGEBAR_H
+#define TABPAGEBAR_H
 
 #include <QFrame>
 #include "globaldef.h"
@@ -59,6 +59,7 @@ private:
     void clearButtonHover();
 };
 
+class QLabel;
 class QToolButton;
 class TabBar;
 class QHBoxLayout;
@@ -108,4 +109,4 @@ private:
     void setIcons();
 };
 
-#endif // TABPAGE_TOOLBAR_H
+#endif // TABPAGEBAR_H

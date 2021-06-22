@@ -10,60 +10,10 @@
 #include "globaldef.h"
 
 typedef struct MainWindowConfig{
-    MainWindowConfig(bool inprivate,
-                     bool always_on_top,
-                     bool init_hidden,
-                     const QRect &bounds,
-                     const QString &url)
-        : is_inprivate_(inprivate)
-        , always_on_top_(always_on_top)
-        , initially_hidden_(init_hidden)
-        , bounds_(bounds)
-        , url_(url)
-    {}
-    MainWindowConfig(bool inprivate,
-                     bool always_on_top,
-                     bool init_hidden,
-                     const QRect &bounds,
-                     const QString &url,
-                     const QList<QString> urls)
-        : is_inprivate_(inprivate)
-        , always_on_top_(always_on_top)
-        , initially_hidden_(init_hidden)
-        , bounds_(bounds)
-        , url_(url)
-        , load_after_created_(urls)
-    {}
-
     MainWindowConfig()
-        : is_inprivate_(false)
-        , always_on_top_(false)
-        , initially_hidden_(false)
-        , bounds_(QRect())
-        , url_("")
-    {}
-    MainWindowConfig(const QString &url)
-        : is_inprivate_(false)
-        , always_on_top_(false)
-        , initially_hidden_(false)
-        , bounds_(QRect())
-        , url_(url)
-    {}
-    MainWindowConfig(bool is_inprivate)
-        : is_inprivate_(is_inprivate)
-        , always_on_top_(false)
-        , initially_hidden_(false)
-        , bounds_(QRect())
-        , url_("")
-    {}
-    MainWindowConfig(bool is_inprivate, const QString &url)
-        : is_inprivate_(is_inprivate)
-        , always_on_top_(false)
-        , initially_hidden_(false)
-        , bounds_(QRect())
-        , url_(url)
-    {}
-
+        : is_inprivate_(false), always_on_top_(false), initially_hidden_(false)
+    {
+    }
     // If true the window will be marked as inprivate window.
     bool is_inprivate_;
 
@@ -84,6 +34,7 @@ typedef struct MainWindowConfig{
 }MainWndCfg;
 
 class MainWindow;
+class InprivatePopup;
 class MainWndMgr : public QObject
 {
     Q_OBJECT
@@ -100,6 +51,7 @@ public:
 
     static int newWndOffsetX;
     static int newWndOffsetY;
+    static InprivatePopup *gInprivatePopup; /*隐私窗口 popup*/
 signals:
     void inprivateWndCntChanged();
 private:
@@ -112,8 +64,11 @@ private:
     explicit MainWndMgr(QObject *parent = nullptr);
     MainWndMgr(const MainWndMgr& other);
     MainWndMgr& operator=(const MainWndMgr & other);
+
+    void updatePrivateWndCount();
 private slots:
     void onBkmkMgrMenuCmd(BookmarkCmd cmd, const QVariant &data);
+    void onAppCfgChanged();
 };
 
 #endif // MAINWINDOWMANAGER_H

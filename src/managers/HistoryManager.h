@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QList>
+#include <QStack>
 #include <memory>
 #include <QMutex>
 #include <QThread>
@@ -24,9 +25,11 @@ public:
     };
 
     static QStandardItemModel *gHistoryModel;
+    static QStack<History> RecentlyHistory;
     static HistoryMgr* Instance();
     ~HistoryMgr();
 
+    bool isLoaded() const{return loaded_;}
     void addHistoryRecord(const History &data);
 signals:
     void load();
@@ -44,9 +47,8 @@ private:
     };
     QThread worker_thread_;
     HistoryWorker *worker_;
-
-    bool exist(const QString &url);
-
+    bool loaded_ = false;
+    QList<History> pending_list_;
 private slots:
     void doLoadWork();
     void doSaveWork();

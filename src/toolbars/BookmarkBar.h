@@ -35,7 +35,8 @@ private:
     BookmarkToolBar *toolbar_;
     QPushButton *btn_others_;
 
-    bool first_shown_ = true;   /*本类任何对象第一次显示的标记*/
+    QColor test_color_;
+    int test_int_ = 1;
     bool loaded_ = false;
 
     BookmarkMenu *makeMenu(const QStandardItem *item);

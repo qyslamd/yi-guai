@@ -20,6 +20,7 @@
 #include "utils/util_qt.h"
 #include "FaviconManager.h"
 #include "MainWindowManager.h"
+#include "AppCfgManager.h"
 #include "popups/StyledMenu.h"
 
 // static 修饰全局函数，限定函数只能在本cpp中使用
@@ -120,19 +121,27 @@ BookmarkMgr::BookmarkMgr(QObject *parent)
 
 void BookmarkMgr::initActions()
 {
-    action_open_new_tab_ = new QAction(QIcon(), tr("open"), this);
-    action_open_new_wnd_ = new QAction(QIcon(), tr("open in new window"), this);
-    action_open_in_private_ = new QAction(QIcon(), tr("open in private window"), this);
+    action_open_new_tab_ = new QAction(QIcon(":/icons/resources/imgs/light/add_tab_64px.png"), tr("open"), this);
+    action_open_new_wnd_ = new QAction(QIcon(":/icons/resources/imgs/light/new_window_64px.png"), tr("open in new window"), this);
+    action_open_in_private_ = new QAction(QIcon(":/icons/resources/imgs/light/window_secured_64px.png"), tr("open in private window"), this);
     action_modify_ = new QAction(QIcon(), tr("modify"), this);
     action_rename_ = new QAction(QIcon(), tr("rename"), this);
     action_cut_ = new QAction(QIcon(), tr("cut"), this);
     action_copy_ = new QAction(QIcon(), tr("copy"), this);
     action_paste_ = new QAction(QIcon(), tr("paste"), this);
-    action_delete_ = new QAction(QIcon(), tr("delete"), this);
+    action_delete_ = new QAction(QIcon(":/icons/resources/imgs/light/trash_64px.png"), tr("delete"), this);
     action_add_current_ = new QAction(QIcon(), tr("add current tab to favorite"), this);
+    action_add_all_ = new QAction(QIcon(), tr("add all page to favorite"), this);
     action_add_folder_ = new QAction(QIcon(), tr("add folder"), this);
+    action_import_bookmarks_  = new QAction(QIcon(), tr("import favorites"), this);
+    action_export_bookmarks_  = new QAction(QIcon(), tr("export favorites"), this);
+    action_delete_duplicate_  = new QAction(QIcon(), tr("delete duplicate favorites"), this);
     action_show_bookmark_bar_ = new QAction(QIcon(), tr("show bookmark bar"), this);
-    action_show_bookmakr_btn_ = new QAction(QIcon(), tr("show bookmark button"), this);
+    action_show_bookmark_bar_->setCheckable(true);
+    action_show_bookmark_bar_->setChecked(AppCfgMgr::Instance().bookmarkBarVisible());
+    action_show_bookmark_btn_ = new QAction(QIcon(), tr("show bookmark button in toolbar"), this);
+    action_show_bookmark_btn_->setCheckable(true);
+    action_show_bookmark_btn_->setChecked(AppCfgMgr::Instance().bookmarkBtnVisible());
     action_manage_bookmarks_ = new QAction(QIcon(), tr("open bookmark manager"), this);
 
     connect(action_open_new_tab_, &QAction::triggered, this, [this](){
@@ -161,6 +170,15 @@ void BookmarkMgr::initActions()
             }
             menu_trigger_item_ = nullptr;
         }
+    });
+
+    connect(action_show_bookmark_bar_, &QAction::toggled, this, [](bool checked)
+    {
+        AppCfgMgr::setBookmarkBarVisible(checked);
+    });
+    connect(action_show_bookmark_btn_, &QAction::toggled, this, [](bool checked)
+    {
+        AppCfgMgr::setBookmarkBtnVisible(checked);
     });
 }
 
@@ -499,13 +517,12 @@ ToolBarProviderWnd::~ToolBarProviderWnd()
 
 void ToolBarProviderWnd::onBookmarksLoaded()
 {
+    loaded_ = false;
     if(!BookmarkMgr::Instance()->isLoaded()){
         return ;
     }
-
     QElapsedTimer timer;
     timer.start();
-
     auto model = BookmarkMgr::Instance()->gBookmarkModel;
     auto barItem = model->item(0);
     if(barItem){
@@ -543,6 +560,7 @@ void ToolBarProviderWnd::onBookmarksLoaded()
     if(otherItem){
         others_menu_ = makeMenu(otherItem);
     }
+    loaded_ = true;
     emit loadToUiFinished();
     qInfo()<<"\033[32m[Execute Time]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";
 }
@@ -551,6 +569,13 @@ BookmarkMenu *ToolBarProviderWnd::makeMenu(const QStandardItem *item)
 {
     auto name = item->data(BookmarkMgr::Name).toString();
     BookmarkMenu *menu = new BookmarkMenu(name, this);
+    if(!item->hasChildren())
+    {
+        auto action = new QAction(tr("empty"), this);
+        action->setEnabled(false);
+        menu->addAction(action);
+        return menu;
+    }
     for (int i = 0; i< item->rowCount(); i++){
         auto child = item->child(i);
         if(child){
@@ -640,19 +665,19 @@ void BookmarkMenu::onCustomContextMenuRequested(const QPoint &pos)
             menu.addSeparator();
             menu.addAction(BookmarkMgr::Instance()->action_modify_);
         }
+        menu.addSeparator();
+        menu.addAction(BookmarkMgr::Instance()->action_cut_);
+        menu.addAction(BookmarkMgr::Instance()->action_copy_);
+        menu.addAction(BookmarkMgr::Instance()->action_paste_);
+        menu.addSeparator();
+        menu.addAction(BookmarkMgr::Instance()->action_delete_);
+        menu.addSeparator();
     }
-    menu.addSeparator();
-    menu.addAction(BookmarkMgr::Instance()->action_cut_);
-    menu.addAction(BookmarkMgr::Instance()->action_copy_);
-    menu.addAction(BookmarkMgr::Instance()->action_paste_);
-    menu.addSeparator();
-    menu.addAction(BookmarkMgr::Instance()->action_delete_);
-    menu.addSeparator();
     menu.addAction(BookmarkMgr::Instance()->action_add_current_);
     menu.addAction(BookmarkMgr::Instance()->action_add_folder_);
     menu.addSeparator();
     menu.addAction(BookmarkMgr::Instance()->action_show_bookmark_bar_);
-    menu.addAction(BookmarkMgr::Instance()->action_show_bookmakr_btn_);
+    menu.addAction(BookmarkMgr::Instance()->action_show_bookmark_btn_);
     menu.addAction(BookmarkMgr::Instance()->action_manage_bookmarks_);
     menu.exec(QCursor::pos());
 }

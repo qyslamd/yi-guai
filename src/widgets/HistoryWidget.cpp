@@ -134,7 +134,7 @@ void HistoryWidget::loadRecentlyHistories()
 {
     recently_model_->clear();
 
-    for (auto data : MainWindow::RecentlyHistory){
+    for (auto data : HistoryMgr::RecentlyHistory){
         QStandardItem *item = new QStandardItem(style()->standardIcon(QStyle::SP_MessageBoxInformation),
                                                 data.title);
         item->setData(true, Qt::UserRole + 1);

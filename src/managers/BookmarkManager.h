@@ -57,9 +57,13 @@ public:
     QAction *action_paste_;
     QAction *action_delete_;
     QAction *action_add_current_;
+    QAction *action_add_all_;
     QAction *action_add_folder_;
+    QAction *action_import_bookmarks_;
+    QAction *action_export_bookmarks_;
+    QAction *action_delete_duplicate_;
     QAction *action_show_bookmark_bar_;
-    QAction *action_show_bookmakr_btn_;
+    QAction *action_show_bookmark_btn_;
     QAction *action_manage_bookmarks_;
 private:
     explicit BookmarkMgr(QObject *parent = nullptr);
@@ -133,6 +137,7 @@ public:
 
     QList<QAction *> buttons;
     QMenu *others_menu_;
+    bool  loaded() const {return loaded_;}
 
 signals:
     void menuActionTriggered(const QVariant &data);
@@ -141,6 +146,7 @@ public slots:
     void onBookmarksLoaded();
 
 private:
+    bool loaded_ = false;
     QList<QMenu *> added_menu_;
     BookmarkMenu *makeMenu(const QStandardItem *item);
 };

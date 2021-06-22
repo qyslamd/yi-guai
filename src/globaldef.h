@@ -102,6 +102,7 @@ enum class HistoryCmd{
 ///
 enum class PageCmd{
     None = -1,
+    NeedSize,
     Created,
     Closing,
     Address,

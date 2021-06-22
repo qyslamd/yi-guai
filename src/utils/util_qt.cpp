@@ -15,6 +15,7 @@
 #include <QtMath>
 #include <QFontMetrics>
 #include <QSysInfo>
+#include <QDateTime>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -160,6 +161,20 @@ namespace UtilQt {
     //    }
         //    return rate;
     }
+    bool isWindows10()
+    {
+        auto kernelVer = QSysInfo::kernelVersion();
+        auto list = kernelVer.split(".");
+        if(!list.isEmpty()){
+            if(list.at(0).toUInt() == 10){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+#endif
 
     const QString appDataPath()
     {
@@ -296,19 +311,40 @@ namespace UtilQt {
         return fontMetrics.elidedText(origin, mode, width);
     }
 
-    bool isWindows10()
+    QString getRandomColor()
     {
-        auto kernelVer = QSysInfo::kernelVersion();
-        auto list = kernelVer.split(".");
-        if(!list.isEmpty()){
-            if(list.at(0).toUInt() == 10){
-                return true;
+        int r = 0;
+            int g = 0;
+            int b = 0;
+
+            QString color = "";
+            QString strR = "";
+            QString strG = "";
+            QString strB = "";
+
+            qsrand(QTime(0,0,0).msecsTo(QTime::currentTime()));
+
+            r = rand() % 256;
+            g = rand() % 256;
+            b = rand() % 256;
+
+            bool ok = true;
+            strR.setNum(r,16);
+            if(strR.toInt(&ok,16)<16)
+            {
+                strR.prepend("0");
             }
-        }
-
-        return false;
+            strG.setNum(g,16);
+            if(strG.toInt(&ok,16)<16)
+            {
+                strG.prepend("0");
+            }
+            strB.setNum(b,16);
+            if(strB.toInt(&ok,16)<16)
+            {
+                strB.prepend("0");
+            }
+            color.append("#"+strR+strG+strB);
+            return color;
     }
-
-#endif
-
 }

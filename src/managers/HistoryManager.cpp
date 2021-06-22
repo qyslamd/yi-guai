@@ -15,9 +15,35 @@
 #include "utils/util_qt.h"
 #include "FaviconManager.h"
 
+// 就只想在这个cpp文件中使用，又不想把这个函数作为类的成员函数，
+// static 的全局函数就是一个好办法
+static void addToModel(const History &data)
+{
+    bool find = false;
+    for (int i = 0; i< HistoryMgr::gHistoryModel->rowCount(); i++)
+    {
+        if(data.url == HistoryMgr::gHistoryModel->item(i)->data(HistoryMgr::Url).toString()){
+            auto count = HistoryMgr::gHistoryModel->item(i)->data(HistoryMgr::Count).toInt();
+            HistoryMgr::gHistoryModel->item(i)->setData(data.lastVisitedTime, HistoryMgr::LastTime);
+            HistoryMgr::gHistoryModel->item(i)->setData(count + 1, HistoryMgr::Count);
+            find = true;
+            break;
+        }
+    }
+    if(!find){
+        auto item = new QStandardItem(data.title);
+        item->setData(data.lastVisitedTime, HistoryMgr::LastTime);
+        item->setData(data.url, HistoryMgr::Url);
+        item->setData(data.title, HistoryMgr::Title);
+        item->setData(1, HistoryMgr::Count);
+        HistoryMgr::gHistoryModel->insertRow(0, item);
+    }
+}
+
 HistoryMgr * HistoryMgr::gInst = nullptr;
 QMutex HistoryMgr::gMutex;
 QStandardItemModel *HistoryMgr::gHistoryModel = nullptr;
+QStack<History> HistoryMgr::RecentlyHistory;
 
 HistoryMgr::HistoryMgr(QObject *parent)
     : QObject(parent)
@@ -50,39 +76,23 @@ HistoryMgr *HistoryMgr::Instance()
     return gInst;
 }
 
-HistoryMgr::~HistoryMgr() {
+HistoryMgr::~HistoryMgr()
+{
     qInfo()<<__FUNCTION__;
+    worker_thread_.quit();
+    worker_thread_.wait();
+
+    delete worker_;
 }
 
 void HistoryMgr::addHistoryRecord(const History &data)
 {
-    bool find = false;
-    for (int i = 0; i< HistoryMgr::gHistoryModel->rowCount(); i++)
-    {
-        if(data.url == HistoryMgr::gHistoryModel->item(i)->data(HistoryMgr::Url).toString()){
-            auto count = HistoryMgr::gHistoryModel->item(i)->data(HistoryMgr::Count).toInt();
-            HistoryMgr::gHistoryModel->item(i)->setData(data.lastVisitedTime, HistoryMgr::LastTime);
-            HistoryMgr::gHistoryModel->item(i)->setData(count + 1, HistoryMgr::Count);
-            find = true;
-            break;
-        }
+    if(!loaded_){
+        pending_list_.append(data);
+        return;
     }
-    if(!find){
-        auto item = new QStandardItem(data.title);
-        item->setData(data.lastVisitedTime, HistoryMgr::LastTime);
-        item->setData(data.url, HistoryMgr::Url);
-        item->setData(data.title, HistoryMgr::Title);
-        item->setData(1, HistoryMgr::Count);
-        HistoryMgr::gHistoryModel->insertRow(0, item);
-    }
-
+    addToModel(data);
     doSaveWork();
-}
-
-
-bool HistoryMgr::exist(const QString &url)
-{
-    return false;
 }
 
 void HistoryMgr::doLoadWork()
@@ -99,8 +109,16 @@ void HistoryMgr::doSaveWork()
 
 void HistoryMgr::onWorkerLoadFinished()
 {
-    worker_thread_.quit();
-    worker_thread_.wait();
+    loaded_ = true;
+    if(pending_list_.isEmpty()){
+        worker_thread_.quit();
+        worker_thread_.wait();
+    }else{
+        for(auto item : pending_list_){
+            addToModel(item);
+        }
+        doSaveWork();
+    }
 
     emit historyChanged();
 }
@@ -126,6 +144,7 @@ HistoryWorker::~HistoryWorker()
 
 void HistoryWorker::loadFromFile()
 {
+    qRegisterMetaType<QVector<int>>();
     qInfo()<<"\033[34m[Thread]"<<__FUNCTION__<<QThread::currentThreadId()<<"\033[0m";
 
     QElapsedTimer timer;

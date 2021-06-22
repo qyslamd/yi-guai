@@ -37,7 +37,9 @@ public:
 
     CefWindowHandle BrowserWindowHandle();
     bool isDevTool() const { return is_dev_tool_; }
+
 signals:
+    void browserNeedSize();
     void browserCreated();
     void browserClosing();
     void browserNewForgroundPage(CefQWidget *newPage);
@@ -114,7 +116,6 @@ private:
 private:
     void initUi();
     void resizeBorser(const QSize &size = QSize());
-
     void dealCefKeyEvent(const CefKeyEvent &event,
                          CefEventHandle os_event,
                          bool *is_keyboard_shortcut,

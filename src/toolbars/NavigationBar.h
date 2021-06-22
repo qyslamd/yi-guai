@@ -1,5 +1,5 @@
-#ifndef NAVIGATE_TOOLBAR_H
-#define NAVIGATE_TOOLBAR_H
+#ifndef NAVIGATIONBAR_H
+#define NAVIGATIONBAR_H
 
 #include <QFrame>
 #include "globaldef.h"
@@ -35,6 +35,7 @@ public:
     QPoint userBtnPos() const;
     QPoint zoomBtnPos() const;
     void inpWndCntChanged();
+    void updatePreference();
 signals:
     void naviBarCmd(NaviBarCmd cmd, const QVariant &para);
 public slots:
@@ -63,6 +64,7 @@ private:
     QFrame *frame_tools_;
 
     StyledMenu *menu_more_options_ = nullptr;
+    StyledMenu *menu_favorite_ = nullptr;
     StyledMenu *menu_more_tools_ = nullptr;
     StyledMenu *menu_help_ = nullptr;
 
@@ -103,4 +105,4 @@ private:
 
 };
 
-#endif // NAVIGATE_TOOLBAR_H
+#endif // NAVIGATIONBAR_H

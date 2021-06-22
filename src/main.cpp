@@ -80,12 +80,8 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    MainWindowConfig cfg{
-        false,
-        false,
-        false,
-        QRect(),
-        QString("https://cn.bing.com/")};
+    MainWindowConfig cfg;
+    cfg.url_ = "https://cn.bing.com/";
     MainWndMgr::Instance().createWindow(cfg);
 
 //    FramelessWidget w;

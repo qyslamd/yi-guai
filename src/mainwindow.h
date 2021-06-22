@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QMap>
 #include <QFrame>
-#include <QStack>
 
 #include "browser/cef_client_handler.h"
 #include "managers/MainWindowManager.h"
@@ -47,10 +46,7 @@ public:
     int AddNewPage(Page *page);
     void NavigateInCurPage(const QString &url);
     bool isInprivate() const {return created_cfg_.is_inprivate_;}
-
-    static void updateInprivateCount();
-    static QStack<History> RecentlyHistory;
-
+    void updatePreference();
 signals:
     void windowStateChanged(Qt::WindowStates state, const QVariant &data);
 #ifdef Q_OS_WIN
@@ -80,7 +76,7 @@ private:
     QAction *ac_shortcut_fullscn_;
     QAction *ac_shortcut_devtool_;
 
-    MainWindowConfig created_cfg_{false, false, false, QRect(), ""};
+    MainWindowConfig created_cfg_;
 
     /*参见：QLayout::setMenuBar(QWidget *menuBar)，*/
     QWidget *widget_north_ = nullptr;
@@ -114,7 +110,6 @@ private:
     PopupGeneral *popup_download_ = nullptr;
     DownloadWidget *download_widget_ = nullptr;   /*下载 widget*/
 
-    static InprivatePopup *gInprivatePopup; /*隐私窗口 popup*/
     UserInfoPopup *userinfo_popup_ = nullptr; /*用户信息 popup*/
     static AppCfgWidget *gAppCfgWidget;
     static FullscnHint *gFullscnWidget;

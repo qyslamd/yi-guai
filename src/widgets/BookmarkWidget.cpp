@@ -23,8 +23,6 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) :
     QWidget(parent)
   , ui(new Ui::BookmarkWidget)
   , menu_more_(new StyledMenu(this))
-  , menu_tree_bkmk_(new StyledMenu(this))
-  , menu_tree_bkmk_dir_(new StyledMenu(this))
 {
     ui->setupUi(this);
     initUi();
@@ -48,11 +46,6 @@ void BookmarkWidget::onShowModeChanged(ToolWndShowMode mode)
     ui->buttonPinOrClose->setToolTip(tooltip);
 }
 
-void BookmarkWidget::onBkmkBarVisibleChanged()
-{
-    action_show_bookmark_bar_->setChecked(AppCfgMgr::bookmarkBarVisible());
-}
-
 bool BookmarkWidget::eventFilter(QObject *watched, QEvent *event)
 {
     if(watched == menu_more_){
@@ -72,83 +65,23 @@ void BookmarkWidget::initUi()
 {
     ui->treeView->setModel(BookmarkMgr::gBookmarkModel);
     /* *****************General Page*************************/
-    // 更多按钮菜单
-    action_manage_bookmarks_  = new QAction(QIcon(), tr("bookmark manage"), this);
-    action_add_current_       = new QAction(QIcon(), tr("add current to favorites"), this);
-    action_add_all_           = new QAction(QIcon(), tr("add all to favorites"), this);
-    action_import_bookmarks_  = new QAction(QIcon(), tr("import favorites"), this);
-    action_export_bookmarks_  = new QAction(QIcon(), tr("export favorites"), this);
-    action_delete_duplicate_  = new QAction(QIcon(), tr("delete duplicate favorites"), this);
-    action_show_bookmark_bar_ = new QAction(QIcon(), tr("show bookmark bar"), this);
-    action_show_bookmark_bar_->setCheckable(true);
-    action_show_bookmark_bar_->setChecked(AppCfgMgr::bookmarkBarVisible());
-    action_show_bookmark_btn_ = new QAction(QIcon(), tr("show bookmark button in toolbar"), this);
-
     menu_more_->installEventFilter(this);
-    menu_more_->addAction(action_manage_bookmarks_);
+    menu_more_->addAction(BookmarkMgr::Instance()->action_manage_bookmarks_);
     menu_more_->addSeparator();
-    menu_more_->addAction(action_add_current_);
-    menu_more_->addAction(action_add_all_);
+    menu_more_->addAction(BookmarkMgr::Instance()->action_add_current_);
+    menu_more_->addAction(BookmarkMgr::Instance()->action_add_all_);
     menu_more_->addSeparator();
-    menu_more_->addAction(action_import_bookmarks_);
-    menu_more_->addAction(action_export_bookmarks_);
-    menu_more_->addAction(action_delete_duplicate_);
+    menu_more_->addAction(BookmarkMgr::Instance()->action_import_bookmarks_);
+    menu_more_->addAction(BookmarkMgr::Instance()->action_export_bookmarks_);
+    menu_more_->addAction(BookmarkMgr::Instance()->action_delete_duplicate_);
     menu_more_->addSeparator();
-    menu_more_->addAction(action_show_bookmark_bar_);
-    menu_more_->addAction(action_show_bookmark_btn_);
+    menu_more_->addAction(BookmarkMgr::Instance()->action_show_bookmark_bar_);
+    menu_more_->addAction(BookmarkMgr::Instance()->action_show_bookmark_btn_);
 
     ui->buttonMore->setPopupMode(QToolButton::InstantPopup);
     ui->buttonMore->setMenu(menu_more_);
 
     ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
-    ac_details_ = new QAction(tr("show details"), this);
-
-    ac_open_bkmk_in_new_page_    = new QAction(QIcon(), tr("open in new page"), this);
-    ac_open_bkmk_in_new_window_  = new QAction(QIcon(), tr("open in new window"), this);
-    ac_open_in_inprivate_ = new QAction(QIcon(), tr("open in inprivate"), this);
-
-    ac_rename_bkmk_       = new QAction(QIcon(), tr("rename"), this);
-    ac_copy_link_         = new QAction(QIcon(), tr("copy link"), this);
-    ac_modify_bkmk_       = new QAction(QIcon(), tr("modify"), this);
-    ac_delte_bkmk_        = new QAction(QIcon(":/Resources/imgs/others/normal_remove.png"), tr("delete"), this);
-
-    menu_tree_bkmk_->addAction(ac_details_);
-    menu_tree_bkmk_->addSeparator();
-    menu_tree_bkmk_->addAction(ac_open_bkmk_in_new_page_);
-    menu_tree_bkmk_->addAction(ac_open_bkmk_in_new_window_);
-    menu_tree_bkmk_->addAction(ac_open_in_inprivate_);
-    menu_tree_bkmk_->addSeparator();
-    menu_tree_bkmk_->addAction(ac_rename_bkmk_);
-    menu_tree_bkmk_->addAction(ac_copy_link_);
-    menu_tree_bkmk_->addAction(ac_modify_bkmk_);
-    menu_tree_bkmk_->addAction(ac_delte_bkmk_);
-
-
-    ac_open_all_bkmk_page_    = new QAction(QIcon(), tr("open all"), this);
-    ac_open_all_bkmk_window_  = new QAction(QIcon(), tr("open all in new window"), this);
-    ac_open_all_in_inprivate_ = new QAction(QIcon(), tr("open all in inprivate"), this);
-
-    ac_sort_as_name_          = new QAction(QIcon(), tr("sort as name"), this);
-    ac_rename_folder_         = new QAction(QIcon(), tr("rename"), this);
-    ac_delte_folder_          = new QAction(QIcon(), tr("delete"), this);
-
-    ac_add_cur_to_folder_     = new QAction(QIcon(), tr("add current to this folder"), this);
-    ac_add_all_to_folder_     = new QAction(QIcon(), tr("add all to this folder"), this);
-
-    menu_tree_bkmk_dir_->addAction(ac_details_);
-    menu_tree_bkmk_dir_->addSeparator();
-    menu_tree_bkmk_dir_->addAction(ac_open_all_bkmk_page_);
-    menu_tree_bkmk_dir_->addAction(ac_open_all_bkmk_window_);
-    menu_tree_bkmk_dir_->addAction(ac_open_all_in_inprivate_);
-    menu_tree_bkmk_dir_->addSeparator();
-    menu_tree_bkmk_dir_->addAction(ac_sort_as_name_);
-    menu_tree_bkmk_dir_->addAction(ac_rename_folder_);
-    menu_tree_bkmk_dir_->addAction(ac_delte_folder_);
-    menu_tree_bkmk_dir_->addSeparator();
-    menu_tree_bkmk_dir_->addAction(ac_add_cur_to_folder_);
-    menu_tree_bkmk_dir_->addAction(ac_add_all_to_folder_);
-
-
 
     /* *****************Search Page*************************/
     QAction *ac_serch_left_icon = new QAction(QIcon(":/Resources/imgs/others/normal_search.png"),
@@ -161,38 +94,6 @@ void BookmarkWidget::initSignalSlots()
 {
     connect(BookmarkMgr::Instance(), &BookmarkMgr::loadFinished,
             this, &BookmarkWidget::onBookmarksChanged);
-
-    connect(action_manage_bookmarks_, &QAction::triggered, this, [this]()
-    {
-        qInfo()<<"TODO:";
-    });
-    connect(action_add_current_, &QAction::triggered, this, [this]()
-    {
-
-    });
-    connect(action_add_all_, &QAction::triggered, this, [this]()
-    {
-
-    });
-    connect(action_import_bookmarks_, &QAction::triggered, this, [this]()
-    {
-
-    });
-    connect(action_export_bookmarks_, &QAction::triggered, this, [this]()
-    {
-    });
-    connect(action_delete_duplicate_, &QAction::triggered, this, [this]()
-    {
-
-    });
-    connect(action_show_bookmark_bar_, &QAction::triggered, this, [this]()
-    {
-//         emit cmdTriggered(static_cast<int>(BkmkWidget_ShowBkmkBar), QVariant());
-    });
-    connect(action_show_bookmark_btn_, &QAction::triggered, this, [this]()
-    {
-
-    });
 
     // 搜索按钮点击，跳转到搜索专属界面
     connect(ui->buttonSearch, &QToolButton::clicked, [this](){
@@ -208,67 +109,6 @@ void BookmarkWidget::initSignalSlots()
     connect(ui->buttonPinOrClose, &QToolButton::clicked, [this]()
     {
         emit pinOrCloseClicked();
-    });
-    connect(ac_details_, &QAction::triggered, this, [this](){
-        auto name = menu_trigger_item_->data(BookmarkMgr::Name).toString();
-        auto type = menu_trigger_item_->data(BookmarkMgr::Type).toString();
-        QString hint = QString("type:%1\nname:%2\nid:%3\nGUID:%4\ndateAdded:%5\n")
-                .arg(menu_trigger_item_->data(BookmarkMgr::Type).toString())
-                .arg(menu_trigger_item_->data(BookmarkMgr::Name).toString())
-                .arg(menu_trigger_item_->data(BookmarkMgr::Id).toString())
-                .arg(menu_trigger_item_->data(BookmarkMgr::Guid).toString())
-                .arg(menu_trigger_item_->data(BookmarkMgr::DateAdded).toString());
-        if(type == "folder"){
-            hint.append(QString("children:%1\n").arg(menu_trigger_item_->rowCount()));
-        }else if(type == "url"){
-            hint.append(QString("url:%1\n").arg(menu_trigger_item_->data(BookmarkMgr::Url).toString()));
-        }
-        QMessageBox::information(this, name, hint);
-    });
-    connect(ac_open_bkmk_in_new_page_, &QAction::triggered, [this]()
-    {
-        QList<QString> data;
-        auto type = menu_trigger_item_->data(BookmarkMgr::Type).toString();
-        if(type == "folder"){
-            for(int i = 0; i < menu_trigger_item_->rowCount(); i++){
-                auto child = menu_trigger_item_->child(i);
-                auto childType = child->data(BookmarkMgr::Type).toString();
-                if(type == "url"){
-                    data.append(child->data(BookmarkMgr::Url).toString());
-                }
-            }
-        }else if(type == "url"){
-            data.append(menu_trigger_item_->data(BookmarkMgr::Url).toString());
-        }
-        if(!data.isEmpty()){
-            emit menuCmd(BookmarkCmd::OpenInNewPage, QVariant::fromValue(data));
-        }
-    });
-    connect(ac_open_bkmk_in_new_window_, &QAction::triggered, [this]()
-    {
-        auto data = menu_trigger_item_->data(BookmarkMgr::Url);
-        emit menuCmd(BookmarkCmd::OpenInNewWnd, data);
-    });
-    connect(ac_open_in_inprivate_, &QAction::triggered, [this]()
-    {
-        auto data = menu_trigger_item_->data(BookmarkMgr::Url);
-        emit menuCmd(BookmarkCmd::OpenInInprivate, data);
-    });
-    connect(ac_rename_bkmk_, &QAction::triggered, [this]()
-    {
-
-    });
-    connect(ac_copy_link_, &QAction::triggered, [this]()
-    {
-
-    });
-    connect(ac_modify_bkmk_, &QAction::triggered, [this]()
-    {
-
-    });
-    connect(ac_delte_bkmk_, &QAction::triggered, [this]()
-    {
-
     });
     // QTreeWidget 右键菜单
     connect(ui->treeView, &QTreeWidget::customContextMenuRequested,
@@ -288,6 +128,8 @@ void BookmarkWidget::onBookmarksChanged()
 
 void BookmarkWidget::onAllBkmkTreeCustomContextMenu(const QPoint &)
 {
+    static StyledMenu menu;
+    menu.clear();
     auto index = ui->treeView->indexAt(ui->treeView->viewport()->mapFromGlobal(QCursor::pos()));
     if(!index.isValid()){
         return;
@@ -296,11 +138,46 @@ void BookmarkWidget::onAllBkmkTreeCustomContextMenu(const QPoint &)
     if(item == nullptr){
         return;
     }
-    menu_trigger_item_ = item;
-    auto type = item->data(BookmarkMgr::Type).toString();
-    if(type == "folder"){
-        menu_tree_bkmk_dir_->exec(QCursor::pos());
-    }else if(type == "url"){
-        menu_tree_bkmk_->exec(QCursor::pos());
+    if(item){
+        BookmarkMgr::Instance()->setMenuTriggerItem(item);
+        auto type = item->data(BookmarkMgr::Type).toString();
+        auto openAction = BookmarkMgr::Instance()->action_open_new_tab_;
+        auto openWndAction = BookmarkMgr::Instance()->action_open_new_wnd_;
+        auto openPrivateAction = BookmarkMgr::Instance()->action_open_in_private_;
+
+        if(type == "folder"){
+            openAction->setText(tr("open all in new tab") + QString("(%1)").arg(item->rowCount()));
+            openWndAction->setText(tr("open all in new window") + QString("(%1)").arg(item->rowCount()));
+            openPrivateAction->setText(tr("open all in private window") + QString("(%1)").arg(item->rowCount()));
+            menu.addAction(openAction);
+            menu.addAction(openWndAction);
+            menu.addAction(openPrivateAction);
+            menu.addSeparator();
+            menu.addAction(BookmarkMgr::Instance()->action_rename_);
+
+        }else if(type == "url"){
+            openAction->setText(tr("open in new tab"));
+            openWndAction->setText(tr("open in new window"));
+            openPrivateAction->setText(tr("open in private window"));
+            menu.addAction(openAction);
+            menu.addAction(openWndAction);
+            menu.addAction(openPrivateAction);
+            menu.addSeparator();
+            menu.addAction(BookmarkMgr::Instance()->action_modify_);
+        }
+        menu.addSeparator();
+        menu.addAction(BookmarkMgr::Instance()->action_cut_);
+        menu.addAction(BookmarkMgr::Instance()->action_copy_);
+        menu.addAction(BookmarkMgr::Instance()->action_paste_);
+        menu.addSeparator();
+        menu.addAction(BookmarkMgr::Instance()->action_delete_);
+        menu.addSeparator();
     }
+    menu.addAction(BookmarkMgr::Instance()->action_add_current_);
+    menu.addAction(BookmarkMgr::Instance()->action_add_folder_);
+    menu.addSeparator();
+    menu.addAction(BookmarkMgr::Instance()->action_show_bookmark_bar_);
+    menu.addAction(BookmarkMgr::Instance()->action_show_bookmark_btn_);
+    menu.addAction(BookmarkMgr::Instance()->action_manage_bookmarks_);
+    menu.exec(QCursor::pos());
 }

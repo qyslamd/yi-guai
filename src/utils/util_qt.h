@@ -39,6 +39,7 @@ namespace UtilQt {
                                 const QFont &font,
                                 const int width,
                                 Qt::TextElideMode mode = Qt::ElideRight);
+    QString getRandomColor();
 }
 
 #endif // UTIL_QT_H

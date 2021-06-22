@@ -25,8 +25,11 @@ public:
     static bool bookmarkBarVisible();
     static void setBookmarkBarVisible(const bool &data);
 
+    static bool bookmarkBtnVisible();
+    static void setBookmarkBtnVisible(const bool &data);
+
 public:
-    static AppCfgMgr& instance(){
+    static AppCfgMgr& Instance(){
         static AppCfgMgr inst;
         return inst;
     }
@@ -34,7 +37,7 @@ public:
         qInfo()<<__FUNCTION__;
     }
 signals:
-    void configChanged();
+    void preferenceChanged();
 private:
     QSettings *settings_ = nullptr;
 
