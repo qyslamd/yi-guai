@@ -5,7 +5,6 @@
 #include <QRect>
 #include <QtDebug>
 #include <QSet>
-#include <QSharedPointer>
 
 #include "globaldef.h"
 
@@ -35,6 +34,8 @@ typedef struct MainWindowConfig{
 
 class MainWindow;
 class InprivatePopup;
+class AppCfgWidget;
+class FullscnHint;
 class MainWndMgr : public QObject
 {
     Q_OBJECT
@@ -51,7 +52,9 @@ public:
 
     static int newWndOffsetX;
     static int newWndOffsetY;
-    static InprivatePopup *gInprivatePopup; /*隐私窗口 popup*/
+    static InprivatePopup* gInprivatePopup;
+    static AppCfgWidget* gAppCfgWidget;
+    static FullscnHint* gFullscrnWidget;
 signals:
     void inprivateWndCntChanged();
 private:

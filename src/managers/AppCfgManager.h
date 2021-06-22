@@ -10,6 +10,8 @@ class AppCfgMgr : public QObject
 {
     Q_OBJECT
 public:
+    static QString gDefautlUrl;
+    static QString gProjectUrl;
     static QByteArray windowGeometry();
     static void setWindowGeometry(const QByteArray &data);
 

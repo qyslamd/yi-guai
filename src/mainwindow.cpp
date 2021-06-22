@@ -55,14 +55,6 @@
 #pragma comment(lib, "Gdi32.lib")
 #endif
 
-namespace  {
-const char default_url[] = "https://cn.bing.com/";
-const char gitee_url[] = "https://gitee.com/slamdd/yi-guai";
-}
-
-AppCfgWidget *MainWindow::gAppCfgWidget = nullptr;
-FullscnHint *MainWindow::gFullscnWidget = nullptr;
-
 MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
     : QtWinFramelessWindow(parent)
     , created_cfg_(cfg)
@@ -75,7 +67,7 @@ MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
     if(url.isEmpty()){
         url = AppCfgMgr::homePageUrl();
         if(url.isEmpty()){
-            url = default_url;
+            url = AppCfgMgr::gDefautlUrl;
         }
     }
     // 如果立即创建浏览器的话，此时窗口的大小是不确定的
@@ -106,7 +98,7 @@ int MainWindow::AddNewPage(const QString &url, bool switchTo)
 {
     auto url1 = url;
     if(url1.isEmpty()){
-        url1 =default_url;
+        url1 = AppCfgMgr::gDefautlUrl;
     }
     Page *page = new Page(url1, this);
     // stackedWidget 有bug,page的大小很小，这里限定一下，等到加载结束的时候
@@ -718,13 +710,13 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         onSettings();
         break;
     case NaviBarCmd::About:
-        AddNewPage(gitee_url, true);
+        AddNewPage(AppCfgMgr::gProjectUrl, true);
         break;
     case NaviBarCmd::Feedback:
-        AddNewPage(gitee_url, true);
+        AddNewPage(AppCfgMgr::gProjectUrl, true);
         break;
     case  NaviBarCmd::Like:
-        AddNewPage(gitee_url, true);
+        AddNewPage(AppCfgMgr::gProjectUrl, true);
         break;
     case NaviBarCmd::AboutQt:
         QMessageBox::aboutQt(this, tr("About Qt"));
@@ -1324,9 +1316,6 @@ void MainWindow::onShowDownload()
 void MainWindow::onShowInprivate()
 {
     auto wnd = MainWndMgr::gInprivatePopup;
-    if(!wnd){
-        wnd = new InprivatePopup;
-    }
 
     auto pos = navi_bar_->inprivateBtnPos();
     pos.ry() += 2;
@@ -1356,10 +1345,7 @@ void MainWindow::onPrint()
 
 void MainWindow::onSettings()
 {
-    if(!gAppCfgWidget){
-        gAppCfgWidget = new AppCfgWidget(this);
-    }
-    gAppCfgWidget->show();
+    MainWndMgr::gAppCfgWidget->show();
 }
 
 void MainWindow::onWindowStateChanged()
@@ -1368,18 +1354,17 @@ void MainWindow::onWindowStateChanged()
                             stack_browsers_->currentWidget()->size());
     if(windowState() & Qt::WindowFullScreen){
         widget_north_->hide();
-        if(!gFullscnWidget){
-            gFullscnWidget = new FullscnHint;
-        }
-        gFullscnWidget->setKeyStr("F11");
-        int x = this->x() + (this->width() - gFullscnWidget->width()) / 2;
+        auto fullscrnWnd = MainWndMgr::gFullscrnWidget;
+        fullscrnWnd->setKeyStr("F11");
+        int x = this->x() + (this->width() - fullscrnWnd->width()) / 2;
         int y = this->y() + 50;
-        gFullscnWidget->move(x, y);
-        gFullscnWidget->show();
+        fullscrnWnd->move(x, y);
+        fullscrnWnd->show();
         QTimer::singleShot(5000, [=](){
-           gFullscnWidget->hide();
+           fullscrnWnd->hide();
         });
     }else{
+        MainWndMgr::gFullscrnWidget->hide();
         widget_north_->show();
     }
 }

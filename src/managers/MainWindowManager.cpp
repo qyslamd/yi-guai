@@ -4,22 +4,29 @@
 #include <QApplication>
 #include <QScreen>
 #include <QElapsedTimer>
+#include <QApplication>
 
 #include "AppCfgManager.h"
 #include "BookmarkManager.h"
 #include "FaviconManager.h"
 #include "HistoryManager.h"
 
+#include "widgets/AppConfigWidget.h"
+#include "widgets/FullscnHint.h"
 #include "popups/InprivatePopup.h"
 
 int MainWndMgr::newWndOffsetX = 22;
 int MainWndMgr::newWndOffsetY = 30;
-InprivatePopup* MainWndMgr::gInprivatePopup = nullptr;
+InprivatePopup* MainWndMgr::gInprivatePopup;
+AppCfgWidget* MainWndMgr::gAppCfgWidget;
+FullscnHint* MainWndMgr::gFullscrnWidget;
 
 MainWndMgr::MainWndMgr(QObject *parent)
     : QObject(parent)
 {
-    // 窗口创建之前需要准备好所有的数据
+    gInprivatePopup = new InprivatePopup;
+    gAppCfgWidget =   new AppCfgWidget;
+    gFullscrnWidget = new FullscnHint;
 
     // 配置数据
     AppCfgMgr::Instance();
@@ -30,6 +37,9 @@ MainWndMgr::MainWndMgr(QObject *parent)
     // 历史记录数据
     HistoryMgr::Instance();
 
+    connect(qApp, &QApplication::aboutToQuit, gInprivatePopup, &InprivatePopup::deleteLater);
+    connect(qApp, &QApplication::aboutToQuit, gAppCfgWidget, &AppCfgWidget::deleteLater);
+    connect(qApp, &QApplication::aboutToQuit, gFullscrnWidget, &FullscnHint::deleteLater);
     connect(BookmarkMgr::Instance(), &BookmarkMgr::menuCmd, this, &MainWndMgr::onBkmkMgrMenuCmd);
     connect(&AppCfgMgr::Instance(), &AppCfgMgr::preferenceChanged, this, &MainWndMgr::onAppCfgChanged);
 }
@@ -180,9 +190,6 @@ MainWindow *MainWndMgr::activeWindow()
 
 void MainWndMgr::updatePrivateWndCount()
 {
-    if(!gInprivatePopup){
-        gInprivatePopup = new InprivatePopup;
-    }
     auto cnt = MainWndMgr::Instance().inprivateCount();
     gInprivatePopup->setHintText(tr(" %1 inprivate window opened")
                                  .arg(cnt));

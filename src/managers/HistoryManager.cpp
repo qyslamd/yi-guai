@@ -11,6 +11,7 @@
 #include <QJsonParseError>
 #include <QMutexLocker>
 #include <QStandardItemModel>
+#include <QDateTime>
 
 #include "utils/util_qt.h"
 #include "FaviconManager.h"
@@ -92,7 +93,7 @@ void HistoryMgr::addHistoryRecord(const History &data)
         return;
     }
     addToModel(data);
-    doSaveWork();
+//    doSaveWork();
 }
 
 void HistoryMgr::doLoadWork()
@@ -164,6 +165,18 @@ void HistoryWorker::loadFromFile()
     }
 
     HistoryMgr::gHistoryModel->clear();
+    if(jsonArray.isEmpty()) return;
+    QStandardItem *todayItem = new QStandardItem(FaviconMgr::systemFileIcon, QStringLiteral("今天"));
+    HistoryMgr::gHistoryModel->appendRow(todayItem);
+    QStandardItem *yestodayItem = new QStandardItem(FaviconMgr::systemFileIcon, QStringLiteral("昨天"));
+    HistoryMgr::gHistoryModel->appendRow(yestodayItem);
+    QStandardItem *lastWeekItem = new QStandardItem(FaviconMgr::systemFileIcon, QStringLiteral("上周"));
+    HistoryMgr::gHistoryModel->appendRow(lastWeekItem);
+    QStandardItem *otherItem = new QStandardItem(FaviconMgr::systemFileIcon, QStringLiteral("很久以前"));
+    HistoryMgr::gHistoryModel->appendRow(otherItem);
+
+
+    auto today = QDate::currentDate();
     auto it = jsonArray.begin();
     auto end = jsonArray.end();
     for(; it != end; it++)
@@ -172,12 +185,26 @@ void HistoryWorker::loadFromFile()
         if(value.isObject()){
             auto obj = value.toObject();
             auto title = obj.value("title").toString();
+            auto time = obj.value("lastVisitedTime").toString();
             QStandardItem *item = new QStandardItem(FaviconMgr::systemFileIcon, title);
-            HistoryMgr::gHistoryModel->appendRow(item);
-            item->setData(obj.value("lastVisitedTime").toString(), HistoryMgr::LastTime);
+            item->setData(time, HistoryMgr::LastTime);
             item->setData(obj.value("url").toString(), HistoryMgr::Url);
             item->setData(title, HistoryMgr::Title);
             item->setData(obj.value("count").toString(), HistoryMgr::Count);
+
+            QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(time.toLongLong());
+
+            auto date = dateTime.date();
+            if(date == today){
+                todayItem->appendRow(item);
+            }else if(date == today.addDays(-1))
+            {
+               yestodayItem->appendRow(item);
+            }else if(date > today.addDays(-7) && date < date.addDays(-1)){
+                lastWeekItem->appendRow(item);
+            }else{
+                otherItem->appendRow(item);
+            }
         }
     }
     qInfo()<<"\033[32m[Execute Time]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";

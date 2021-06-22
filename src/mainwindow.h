@@ -30,9 +30,7 @@ class DownloadWidget;
 class PopupGeneral;
 class UserInfoPopup;
 class InprivatePopup;
-class AppCfgWidget;
 class QPropertyAnimation;
-class FullscnHint;
 
 class MainWindow : public QtWinFramelessWindow
 {
@@ -111,8 +109,6 @@ private:
     DownloadWidget *download_widget_ = nullptr;   /*下载 widget*/
 
     UserInfoPopup *userinfo_popup_ = nullptr; /*用户信息 popup*/
-    static AppCfgWidget *gAppCfgWidget;
-    static FullscnHint *gFullscnWidget;
 
     bool first_browser_created_ = false; /*首个浏览器创建完成标志*/
     bool window_closing_ = false;  /*窗口正在关闭标志*/

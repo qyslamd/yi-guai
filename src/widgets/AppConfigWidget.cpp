@@ -3,12 +3,13 @@
 
 #include <QGraphicsDropShadowEffect>
 #include <QButtonGroup>
+#include <QtDebug>
 
 AppCfgWidget::AppCfgWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AppCfgWidget)
 {
-    setWindowFlags(Qt::Widget | Qt::Tool);
+//    setWindowFlags(Qt::Widget | Qt::Tool);
     ui->setupUi(this);
 
     QButtonGroup *naviBtnGroup = new QButtonGroup(this);
@@ -35,6 +36,7 @@ AppCfgWidget::AppCfgWidget(QWidget *parent) :
 
 AppCfgWidget::~AppCfgWidget()
 {
+    qInfo()<<__FUNCTION__;
     delete ui;
 }
 

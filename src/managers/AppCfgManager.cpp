@@ -19,6 +19,8 @@ namespace {
 
 }
 
+QString AppCfgMgr::gDefautlUrl = "https://cn.bing.com/";
+QString AppCfgMgr::gProjectUrl = "https://gitee.com/slamdd/yi-guai";
 AppCfgMgr::AppCfgMgr(QObject *parent)
     : QObject(parent)
 {

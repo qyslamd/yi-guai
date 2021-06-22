@@ -28,7 +28,6 @@ SOURCES += \
     managers/AppCfgManager.cpp \
     managers/BookmarkManager.cpp \
     managers/CefManager.cpp \
-    managers/EventManager.cpp \
     managers/FaviconManager.cpp \
     managers/HistoryManager.cpp \
     managers/MainWindowManager.cpp \
@@ -81,7 +80,6 @@ HEADERS += \
     managers/AppCfgManager.h \
     managers/BookmarkManager.h \
     managers/CefManager.h \
-    managers/EventManager.h \
     managers/FaviconManager.h \
     managers/HistoryManager.h \
     managers/MainWindowManager.h \

@@ -2,6 +2,7 @@
 #include "ui_FullscnHint.h"
 #include <QPaintEvent>
 #include <QPainter>
+#include <QtDebug>
 
 FullscnHint::FullscnHint(QWidget *parent) :
     QFrame(parent),
@@ -14,6 +15,7 @@ FullscnHint::FullscnHint(QWidget *parent) :
 
 FullscnHint::~FullscnHint()
 {
+    qInfo()<<__FUNCTION__;
     delete ui;
 }
 
