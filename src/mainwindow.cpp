@@ -452,6 +452,7 @@ void MainWindow::initSignalSlot()
     connect(tab_bar_, &TabPageToolBar::tabbarMenuTriggered, this, &MainWindow::onTabBarMenuTriggered);
 #ifdef Q_OS_WIN
     connect(this, &MainWindow::dwmColorChanged, tab_bar_, &TabPageToolBar::onDwmColorChanged);
+    connect(this, &MainWindow::windowStateChanged, tab_bar_, &TabPageToolBar::onWndStateChanged);
 #endif
     connect(navi_bar_, &NavigateToolBar::naviBarCmd, this, &MainWindow::onNaviBarCmd);
     connect(bookmark_bar_, &BookmarkBar::cmdTriggered, this, &MainWindow::onBookmarkCmd);

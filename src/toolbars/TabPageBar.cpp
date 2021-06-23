@@ -148,7 +148,7 @@ void TabPageToolBar::initUi()
     line->setFrameShadow(QFrame::Sunken);
 
     setLayout(layout_);
-    layout_->setContentsMargins(6, 8, 0, 0);
+    layout_->setContentsMargins(6, 6, 0, 0);
     layout_->setSpacing(2);
     layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
     layout_->addWidget(btn_dock_tabs_);
@@ -242,6 +242,10 @@ bool CaptionFrame::event(QEvent *ev)
     return QFrame::event(ev);
 }
 
+void CaptionFrame::onWndStateChanged(Qt::WindowStates state, const QVariant &data)
+{
+    update();
+}
 void CaptionFrame::paintEvent(QPaintEvent *event)
 {
     QFrame::paintEvent(event);
@@ -321,8 +325,8 @@ void CaptionFrame::leaveEvent(QEvent *event)
 
 QRectF CaptionFrame::btnRect(CaptionFrame::CaptionButtons button)
 {
-    QRect captionRect{0, 1, width(), height()};
-    int y = captionRect.y();
+    auto y = window()->isMaximized() ? 8 : 1;
+    QRect captionRect{0, y, width(), height()};
     QRectF rectClose(captionRect.x() + captionRect.width() - BtnWidth,
                      y,
                      BtnWidth,

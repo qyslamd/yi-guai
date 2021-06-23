@@ -18,6 +18,8 @@ signals:
     void minBtnClicked();
     void normalMaxBtnClicked();
     void closeBtnClicked();
+public slots:
+    void onWndStateChanged(Qt::WindowStates state, const QVariant &data);
 protected:
     virtual void paintEvent(QPaintEvent *event) override;
     virtual void mouseMoveEvent(QMouseEvent *event) override;
