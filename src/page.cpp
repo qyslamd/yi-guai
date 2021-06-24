@@ -98,11 +98,8 @@ QString Page::url() const
 
 void Page::setEditedText(const QString &txt)
 {
-    if(url_.compare(txt, Qt::CaseInsensitive) == 0){
-        return;
-    }
-    if(txt.isEmpty())
-    {
+    if(url_.compare(txt, Qt::CaseInsensitive) == 0 || txt.isEmpty()){
+        edited_flag_ = false;
         return;
     }
     edited_flag_ = true;
@@ -189,18 +186,18 @@ void Page::initBrowser()
     });
     connect(browser_widget_, &CefQWidget::browserLoadEnd, [this](int httpStatusCode)
     {
-        const QStringList customSchemes{QString("about"),"chrome"};
-        auto parts = url_.split(":");
-        if(parts.count()  > 0){
-            auto scheme = parts.at(0).toLower();
-            if(customSchemes.contains(scheme)){
-                emit pageCmd(PageCmd::Favicon, style()->standardPixmap(QStyle::SP_MessageBoxInformation));
-            }
-        }
+//        const QStringList customSchemes{QString("about"),"chrome"};
+//        auto parts = url_.split(":");
+//        if(parts.count()  > 0){
+//            auto scheme = parts.at(0).toLower();
+//            if(customSchemes.contains(scheme)){
+//                emit pageCmd(PageCmd::Favicon, style()->standardPixmap(QStyle::SP_MessageBoxInformation));
+//            }
+//        }
 
-        if(url_.startsWith("file://",Qt::CaseInsensitive)){
-            emit pageCmd(PageCmd::Favicon, style()->standardPixmap(QStyle::SP_FileIcon));
-        }
+//        if(url_.startsWith("file://",Qt::CaseInsensitive)){
+//            emit pageCmd(PageCmd::Favicon, style()->standardPixmap(QStyle::SP_FileIcon));
+//        }
         emit pageCmd(PageCmd::LoadEnd, httpStatusCode);
     });
     connect(browser_widget_, &CefQWidget::browserLoadingStateChange, [this](bool a, bool b, bool c)

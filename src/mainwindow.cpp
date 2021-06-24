@@ -639,7 +639,6 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         onAddFavorite();
         break;
     case NaviBarCmd::AddressEdited:
-        qInfo()<<"AddressEdited";
         if(page){
             page->setEditedText(para.toString());
         }
@@ -789,6 +788,7 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
     case PageCmd::Address:
     {
         if(page && page == CurrentPage()){
+            page->setEditedText("");
             navi_bar_->setAddress(QUrl(page->url()).toDisplayString());
         }
     }
@@ -824,6 +824,7 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
     case PageCmd::LoadEnd:
     {
         if(page){
+            page->setEditedText("");
             page->setMinimumSize(QSize(0,0));
         }
     }
