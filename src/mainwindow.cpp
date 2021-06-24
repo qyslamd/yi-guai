@@ -818,22 +818,37 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
         break;
     case PageCmd::LoadStart:
     {
-
+        auto index = stack_browsers_->indexOf(page);
+        tab_bar_->setTabData(index, 0.0);
     }
         break;
     case PageCmd::LoadEnd:
     {
         if(page){
-            page->setEditedText("");
-            page->setMinimumSize(QSize(0,0));
+            auto index = stack_browsers_->indexOf(page);
+            static bool ok  = false;
+            ok = !ok;
+            tab_bar_->setTabHasAudio(index, ok);
         }
     }
         break;
+    case PageCmd::LoadingProgress:
+    {
+
+    }
     case PageCmd::LoadingState:
     {
-        if(page && page == CurrentPage()){
-            QUrl url(para.toString());
-            navi_bar_->setLoadingState(page->isLoading(),page->canGoBack(), page->canGoForward());
+        if(page){
+            auto index = stack_browsers_->indexOf(page);
+            tab_bar_->setTabData(index, page->isLoading());
+
+            if(page == CurrentPage())
+            {
+                QUrl url(para.toString());
+                navi_bar_->setLoadingState(page->isLoading(),
+                                           page->canGoBack(),
+                                           page->canGoForward());
+            }
         }
     }
         break;

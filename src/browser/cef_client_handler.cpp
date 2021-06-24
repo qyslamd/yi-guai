@@ -328,19 +328,23 @@ bool CefClientHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
                                         const CefString &source,
                                         int line)
 {
+//    qInfo()<<__FUNCTION__<<QString::fromStdString(message);
     return false;
 }
 
 bool CefClientHandler::OnAutoResize(CefRefPtr<CefBrowser> browser,
                                     const CefSize &new_size)
 {
+    qInfo()<<__FUNCTION__<<QSize(new_size.width, new_size.height);
     return false;
 }
 
 void CefClientHandler::OnLoadingProgressChange(CefRefPtr<CefBrowser> browser,
                                                double progress)
 {
-
+    if(delegate_){
+        delegate_->onBrowserLoadingProgressChange(browser, progress);
+    }
 }
 
 bool CefClientHandler::OnJSDialog(CefRefPtr<CefBrowser> browser,
@@ -367,6 +371,8 @@ void CefClientHandler::OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
                                            CefRefPtr<CefContextMenuParams> params,
                                            CefRefPtr<CefMenuModel> model)
 {
+    Q_UNUSED(browser);
+    Q_UNUSED(frame);
     if ((params->GetTypeFlags() & (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_FRAME)) != 0)
     {
         // 在 Page 上
@@ -533,6 +539,8 @@ void CefClientHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
                                             bool canGoBack,
                                             bool canGoForward)
 {
+    CEF_REQUIRE_UI_THREAD();
+    Q_UNUSED(browser);
     if (delegate_)
         delegate_->onBrowserLoadingStateChange(isLoading,
                                                canGoBack,
@@ -544,6 +552,8 @@ void CefClientHandler::OnLoadStart(CefRefPtr<CefBrowser> browser,
                                    CefLoadHandler::TransitionType transition_type)
 {
     CEF_REQUIRE_UI_THREAD();
+    Q_UNUSED(browser);
+    Q_UNUSED(frame);
 
     if(delegate_){
         delegate_->onBrowerLoadStart(transition_type);
@@ -555,6 +565,8 @@ void CefClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser,
                                  int httpStatusCode)
 {
     CEF_REQUIRE_UI_THREAD();
+    Q_UNUSED(browser);
+    Q_UNUSED(frame);
 
     if(delegate_){
         delegate_->onBrowerLoadEnd(httpStatusCode);
@@ -567,17 +579,26 @@ void CefClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
                                    const CefString &errorText,
                                    const CefString &failedUrl)
 {
-
+    CEF_REQUIRE_UI_THREAD();
+    Q_UNUSED(browser);
+    Q_UNUSED(frame);
+    qInfo()<<__FUNCTION__<<"errorCode:"<<errorCode<<"errorText:"<<QString::fromStdString(errorText)
+          <<"failedUrl:"<<QString::fromStdString(failedUrl);
 }
 
 void CefClientHandler::OnTakeFocus(CefRefPtr<CefBrowser> browser, bool next)
 {
-
+    CEF_REQUIRE_UI_THREAD();
+    Q_UNUSED(browser);
+    qInfo()<<__FUNCTION__<<next;
 }
 
 bool CefClientHandler::OnSetFocus(CefRefPtr<CefBrowser> browser,
                                   CefFocusHandler::FocusSource source)
 {
+    CEF_REQUIRE_UI_THREAD();
+    Q_UNUSED(browser);
+
     return false;
 }
 

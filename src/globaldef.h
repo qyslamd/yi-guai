@@ -113,6 +113,7 @@ enum class PageCmd{
     LoadStart,
     LoadEnd,
     LoadingState,
+    LoadingProgress,
     FocusChange,
     ZoomOut,
     ZoomIn,

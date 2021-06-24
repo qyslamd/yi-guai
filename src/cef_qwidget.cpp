@@ -390,6 +390,12 @@ void CefQWidget::onBrowerWindowLoadEnd(int httpStatusCode)
     emit browserLoadEnd(httpStatusCode);
 }
 
+void CefQWidget::onBrowserWndLoadingProgressChange(double progress)
+{
+    emit browserLoadingProgress(progress);
+//    qInfo()<<__FUNCTION__<<progress;
+}
+
 void CefQWidget::onBrowserWindowLoadingStateChange(bool isLoading,
                                                    bool canGoBack,
                                                    bool canGoForward)

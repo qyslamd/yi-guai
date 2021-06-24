@@ -19,7 +19,6 @@ TabBar::TabBar(bool inprivate, QWidget *parent)
     initUi();
     initSignalSlots();
     setIcons();
-//    check_pos_timer_id_ = startTimer(1000);
 }
 
 bool TabBar::event(QEvent *e)
@@ -51,29 +50,72 @@ bool TabBar::event(QEvent *e)
 int TabBar::insertTab(int index, const QString &text)
 {
     int ret = QTabBar::insertTab(index, style()->standardIcon(QStyle::SP_FileIcon), text);
-//    QToolButton *btn = new QToolButton;
-//    btn->setToolTip(tr("mute this page"));
-//    btn->setIcon(QIcon(":/icons/resources/newIcons/sound.png"));
-//    setTabButton(ret, QTabBar::LeftSide, btn);
     return ret;
+}
+
+void TabBar::getAngle(int &startAngle, int &spanAngle) const
+{
+    startAngle = m_nStartAngle;
+    spanAngle = m_nSpanAngle;
+}
+
+void TabBar::setTabHasAudio(int index, bool has)
+{
+    if(has){
+        QToolButton *btn = new QToolButton;
+        btn->setMinimumSize(18, 18);
+        btn->setToolTip(tr("mute this page"));
+        if(!inprivate_){
+            btn->setIcon(QIcon(":/icons/resources/imgs/light/sound_64px.png"));
+        }else{
+            btn->setIcon(QIcon(":/icons/resources/imgs/dark/sound_64px.png"));
+        }
+        setTabButton(index, QTabBar::LeftSide, btn);
+
+        auto tabWidth = tabRect(index);
+        if(!tabWidth.isEmpty()){
+           btn->setVisible(tabWidth.width() > LHideW);
+        }
+    }else{
+        if(auto btn = tabButton(index, QTabBar::LeftSide))
+        {
+            setTabButton(index, QTabBar::LeftSide, nullptr);
+            delete btn;
+            btn = nullptr;
+        }
+    }
 }
 
 void TabBar::timerEvent(QTimerEvent *event)
 {
     QTabBar::timerEvent(event);
-    if(event->timerId() == check_pos_timer_id_){
+    auto timeId = event->timerId();
+    if(timeId == check_pos_timer_id_){
         auto pos = QCursor::pos();
         pos = mapFromGlobal(pos);
         if(tabAt(pos) == -1)
             emit showPreview(QPoint(), -1);
+    }else if (timeId == load_progress_timer_id_){
+        m_nStartAngle += 10 * 16;
+        if(m_nStartAngle == 360 * 16)
+        {
+            m_nStartAngle = 0;
+        }
+        update();
     }
+}
+
+void TabBar::resizeEvent(QResizeEvent *event)
+{
+    QTabBar::resizeEvent(event);
+    showHideTabButton();
 }
 
 void TabBar::tabInserted(int index)
 {
-    auto closeBtn = tabButton(index, QTabBar::RightSide);
-    if(closeBtn){
-        closeBtn->setMinimumSize(20, 20);
+    update();
+    if(auto closeBtn = tabButton(index, QTabBar::RightSide)){
+        closeBtn->setMinimumSize(18, 18);
         if(auto btn = qobject_cast<QAbstractButton *>(closeBtn))
         {
             if(inprivate_){
@@ -83,6 +125,13 @@ void TabBar::tabInserted(int index)
             }
         }
     }
+    showHideTabButton();
+}
+
+void TabBar::tabRemoved(int index)
+{
+    Q_UNUSED(index);
+    showHideTabButton();
 }
 
 void TabBar::initUi()
@@ -122,6 +171,9 @@ void TabBar::initUi()
     menu_->addAction(act_vertical_tab_mode_);
     menu_->addAction(act_reopen_closed_);
     menu_->addAction(act_add_all_favorates_);
+
+    //    check_pos_timer_id_ = startTimer(1000);
+    load_progress_timer_id_ = startTimer(40);
 }
 
 void TabBar::initSignalSlots()
@@ -154,6 +206,24 @@ void TabBar::setIcons()
     act_reload_->setIcon(QIcon(":/icons/resources/imgs/light/refresh_64px.png"));
     act_mute_->setIcon(QIcon(":/icons/resources/imgs/light/no_audio_64px.png"));
     act_close_this_->setIcon(QIcon(":/icons/resources/imgs/light/delete_64px.png"));
+}
+
+void TabBar::showHideTabButton()
+{
+    auto tabWidth = tabRect(0);
+    if(tabWidth.isEmpty()){
+        return;
+    }
+
+    for(int i =0; i< count(); i++){
+        if(auto lBtn = tabButton(i, QTabBar::LeftSide)){
+            lBtn->setVisible(tabWidth.width() > LHideW);
+        }
+
+        if(auto rBtn = tabButton(i, QTabBar::RightSide)){
+            rBtn->setVisible(tabWidth.width() > RHideW);
+        }
+    }
 }
 
 void TabBar::mousePressEvent(QMouseEvent *event)

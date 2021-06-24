@@ -41,6 +41,8 @@ public:
         virtual void onBrowserStatusMessage(const std::string &msg) = 0;
         virtual void onBrowserFaviconChange(CefRefPtr<CefImage> image,
                                             const std::string &url) = 0;
+        virtual void onBrowserLoadingProgressChange(CefRefPtr<CefBrowser> browser,
+                                                    double progress) = 0;
 
         virtual void onBrowserLoadingStateChange(bool isLoading,
                                                  bool canGoBack,

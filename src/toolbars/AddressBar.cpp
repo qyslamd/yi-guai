@@ -74,7 +74,7 @@ void AddressBar::initUi()
     ShaowEffect *shadow = new ShaowEffect(this);
     shadow->setOffset(0, 0);
     shadow->setColor(Qt::gray);
-    shadow->setBlurRadius(10);
+    shadow->setBlurRadius(6);
     setGraphicsEffect(shadow);
 
     layout_ = new QHBoxLayout;

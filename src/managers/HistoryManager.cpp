@@ -18,26 +18,43 @@
 
 // 就只想在这个cpp文件中使用，又不想把这个函数作为类的成员函数，
 // static 的全局函数就是一个好办法
+static bool addToItem(QStandardItem *item, const History &data)
+{
+    if(data.url == item->data(HistoryMgr::Url).toString())
+    {
+        auto count = item->data(HistoryMgr::Count).toInt();
+        item->setData(data.lastVisitedTime, HistoryMgr::LastTime);
+        item->setData(count + 1, HistoryMgr::Count);
+        return true;
+    }else{
+        bool find = false;
+        for(int i = 0; i < item->rowCount(); i++){
+            find = addToItem(item->child(i), data);
+            if(find) break;
+        }
+        return find;
+    }
+    return false;
+}
+
 static void addToModel(const History &data)
 {
+    auto model = HistoryMgr::gHistoryModel;
     bool find = false;
-    for (int i = 0; i< HistoryMgr::gHistoryModel->rowCount(); i++)
-    {
-        if(data.url == HistoryMgr::gHistoryModel->item(i)->data(HistoryMgr::Url).toString()){
-            auto count = HistoryMgr::gHistoryModel->item(i)->data(HistoryMgr::Count).toInt();
-            HistoryMgr::gHistoryModel->item(i)->setData(data.lastVisitedTime, HistoryMgr::LastTime);
-            HistoryMgr::gHistoryModel->item(i)->setData(count + 1, HistoryMgr::Count);
-            find = true;
-            break;
-        }
+    for(int i = 0; i < model->rowCount(); i++){
+        find = addToItem(model->item(i), data);
+        if(find) break;
     }
     if(!find){
         auto item = new QStandardItem(data.title);
-        item->setData(data.lastVisitedTime, HistoryMgr::LastTime);
         item->setData(data.url, HistoryMgr::Url);
         item->setData(data.title, HistoryMgr::Title);
+        item->setData(data.lastVisitedTime, HistoryMgr::LastTime);
         item->setData(1, HistoryMgr::Count);
-        HistoryMgr::gHistoryModel->insertRow(0, item);
+        auto todayItem = model->item(0);
+        if(todayItem){
+            todayItem->insertRow(0,item);
+        }
     }
 }
 

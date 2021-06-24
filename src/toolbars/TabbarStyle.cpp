@@ -10,6 +10,8 @@
 
 #include "utils/util_qt.h"
 
+#include "toolbars/TabBar.h"
+
 TabbarStyle::TabbarStyle(bool isInPrivate)
     : isInprivate_(isInPrivate)
 {
@@ -85,8 +87,6 @@ void TabbarStyle::drawTabBarTabLabel(const QStyleOption *option,
                                      QPainter *painter,
                                      const QWidget *w) const
 {
-    if(option->rect.width() <= 60) return;
-
     auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
     auto tabRect = tabOption->rect;
     auto textRect = subElementRect(QStyle::SE_TabBarTabText, tabOption, w);
@@ -106,7 +106,40 @@ void TabbarStyle::drawTabBarTabLabel(const QStyleOption *option,
                          iconRect.width(),
                          iconRect.height());
     }
-    painter->drawPixmap(iconRect, pixmap);
+    if(const auto tabbar = qobject_cast<const TabBar *>(w)){
+        auto index = tabbar->tabAt(tabRect.center());
+        auto isLoading = tabbar->tabData(index).toBool();
+        if(isLoading)   //加载状态
+        {
+            painter->save();
+
+            painter->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+            QLinearGradient gradient(iconRect.topLeft(), iconRect.bottomRight());
+            if(isInprivate_){
+                gradient.setColorAt(0, Qt::white);
+                gradient.setColorAt(0.7, 0x40E0D0);
+                gradient.setColorAt(1, 0xADD8E6);
+            }else{
+                gradient.setColorAt(0, 0x00008B);//006CBE //Qt::blue
+                gradient.setColorAt(0.7, Qt::gray);
+                gradient.setColorAt(1, Qt::white);
+            }
+            painter->setPen(QPen(QBrush(gradient),
+                                 2.0,
+                                 Qt::DotLine,
+                                 Qt::RoundCap,
+                                 Qt::RoundJoin));
+
+            int startAngle(0), spanAngle(0);
+            tabbar->getAngle(startAngle, spanAngle);
+            painter->drawArc(iconRect,startAngle,spanAngle);
+            painter->restore();
+        }else{
+            painter->drawPixmap(iconRect, pixmap);
+        }
+    }
+
+    if(option->rect.width() <= 60) return;
 
     auto drawLabel = [=](const QLinearGradient &grident){
         painter->save();
@@ -116,6 +149,7 @@ void TabbarStyle::drawTabBarTabLabel(const QStyleOption *option,
         QTextOption option(Qt::AlignLeft | Qt::AlignVCenter);
         option.setWrapMode(QTextOption::NoWrap);
 
+//        drawItemText(painter, textRect.marginsAdded(QMargins(-5,0,0,0)),0,w->palette(),true, tabOption->text);
         painter->drawText(textRect.marginsAdded(QMargins(-5,0,0,0)), tabOption->text, option);
         painter->restore();
     };

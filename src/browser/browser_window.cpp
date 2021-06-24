@@ -195,6 +195,14 @@ void BrowserWindow::onBrowerLoadEnd(int httpStatusCode)
     delegate_->onBrowerWindowLoadEnd(httpStatusCode);
 }
 
+void BrowserWindow::onBrowserLoadingProgressChange(CefRefPtr<CefBrowser> browser,
+                                                   double progress)
+{
+    REQUIRE_MAIN_THREAD();
+    Q_UNUSED(browser);
+    delegate_->onBrowserWndLoadingProgressChange(progress);
+}
+
 void BrowserWindow::onBrowserLoadingStateChange(bool isLoading,
                                                 bool canGoBack,
                                                 bool canGoForward)

@@ -139,6 +139,7 @@
         <file>resources/imgs/dark/squared_menu_48px.png</file>
         <file>resources/imgs/light/squared_menu_48px.png</file>
         <file>resources/imgs/colorful/corgi_48.png</file>
+        <file>resources/imgs/dark/sound_64px.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file>resources/styles/normal.qss</file>

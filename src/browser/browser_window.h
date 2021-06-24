@@ -38,6 +38,7 @@ public:
                                                   const std::string &url) = 0;
         virtual void onBrowerWindowLoadStart(CefLoadHandler::TransitionType transition_type) = 0;
         virtual void onBrowerWindowLoadEnd(int code) = 0;
+        virtual void onBrowserWndLoadingProgressChange(double progress) = 0;
         virtual void onBrowserWindowLoadingStateChange(bool isLoading,
                                                        bool canGoBack,
                                                        bool canGoForward) = 0;
@@ -109,6 +110,8 @@ protected:
                                 const std::string &url) override;
     void onBrowerLoadStart(CefLoadHandler::TransitionType transition_type) override;
     void onBrowerLoadEnd(int httpStatusCode) override;
+    void onBrowserLoadingProgressChange(CefRefPtr<CefBrowser> browser,
+                                        double progress) override;
     void onBrowserLoadingStateChange(bool isLoading,
                                      bool canGoBack,
                                      bool canGoForward) override;

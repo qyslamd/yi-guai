@@ -81,6 +81,10 @@ public:
     void setTabText(int index, const QString &text);
     QString tabText(int index) const;
     void setTabToolTip(int index, const QString &tip);
+    void setTabData(int index, const QVariant &data);
+    QVariant tabData(int index) const;
+
+    void setTabHasAudio(int index, bool has);
 
     bool hitTestCaption(const QPoint &gPos);
 

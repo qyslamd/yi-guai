@@ -17,6 +17,8 @@ class TabBar final: public QTabBar
 public:
     bool event(QEvent *e) override;
     int insertTab(int index, const QString &text);
+    void getAngle(int &startAngle, int &spanAngle) const;
+    void setTabHasAudio(int index, bool has);
 signals:
     void menuTriggered(TabBarCmd cmd, const QVariant &data);
     void showPreview(const QPoint &g_pos, const int index);
@@ -24,12 +26,14 @@ protected:
     // QTabBar interface
     QSize tabSizeHint(int index) const override;
     QSize minimumTabSizeHint(int index) const override;
+    void tabInserted(int index) override;
+    void tabRemoved(int index) override;
 
     // QWidget interface
     void contextMenuEvent(QContextMenuEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void timerEvent(QTimerEvent* event) override;
-    void tabInserted(int index) override;
+    void resizeEvent(QResizeEvent *event) override;
 private:
     bool inprivate_;
     StyledMenu *menu_;
@@ -43,12 +47,19 @@ private:
     act_vertical_tab_mode_,
     act_add_all_favorates_;
 
+    int m_nStartAngle{ 0 };
+    int m_nSpanAngle{ 4320 };
     int check_pos_timer_id_;
+    int load_progress_timer_id_;
     int menu_triggered_index_;
+
+    const int LHideW = 80;
+    const int RHideW = 40;
 
     void initUi();
     void initSignalSlots();
     void setIcons();
+    void showHideTabButton();
 };
 
 #endif // TABBAR_H

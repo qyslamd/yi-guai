@@ -78,6 +78,21 @@ void TabPageToolBar::setTabToolTip(int index, const QString &tip)
     tab_bar_->setTabToolTip(index, tip);
 }
 
+void TabPageToolBar::setTabData(int index, const QVariant &data)
+{
+    tab_bar_->setTabData(index, data);
+}
+
+QVariant TabPageToolBar::tabData(int index) const
+{
+    return tab_bar_->tabData(index);
+}
+
+void TabPageToolBar::setTabHasAudio(int index, bool has)
+{
+    tab_bar_->setTabHasAudio(index, has);
+}
+
 bool TabPageToolBar::hitTestCaption(const QPoint &gPos)
 {
     // 映射全局坐标当前区域中

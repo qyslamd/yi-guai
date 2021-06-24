@@ -164,6 +164,7 @@ void Page::initBrowser()
 
     connect(browser_widget_, &CefQWidget::browserAddressChange, [this](const QString &url)
     {
+        setEditedText("");
         url_ = url;
         emit pageCmd(PageCmd::Address, url);
     });
@@ -182,6 +183,7 @@ void Page::initBrowser()
     });
     connect(browser_widget_, &CefQWidget::browserLoadStart, [this](CefLoadHandler::TransitionType transition_type)
     {
+        setMinimumSize(QSize(0,0));
         emit pageCmd(PageCmd::LoadStart, (int)transition_type);
     });
     connect(browser_widget_, &CefQWidget::browserLoadEnd, [this](int httpStatusCode)
@@ -198,10 +200,17 @@ void Page::initBrowser()
 //        if(url_.startsWith("file://",Qt::CaseInsensitive)){
 //            emit pageCmd(PageCmd::Favicon, style()->standardPixmap(QStyle::SP_FileIcon));
 //        }
+        setMinimumSize(QSize(0,0));
         emit pageCmd(PageCmd::LoadEnd, httpStatusCode);
+    });
+    connect(browser_widget_, &CefQWidget::browserLoadingProgress, [this](double progress)
+    {
+        emit pageCmd(PageCmd::LoadingProgress, progress);
     });
     connect(browser_widget_, &CefQWidget::browserLoadingStateChange, [this](bool a, bool b, bool c)
     {
+        setMinimumSize(QSize(0,0));
+
         isLoading_ = a;
         canGoBack_ = b;
         canGoForward_ = c;
