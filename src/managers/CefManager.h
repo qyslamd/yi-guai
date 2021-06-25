@@ -14,14 +14,11 @@ public:
     static std::string cefVersion();
     void populateSettings(CefSettings &settings, int argc, char *argv[]);
 
+    static bool seperate_sub_process;
     ///
     /// \brief 分离式时，除了浏览器进程之外的进程可执行体路径
     ///
 	static CefString browser_sub_process_path;
-#ifdef OS_MAC
-    static CefString framework_dir_path;
-    static CefString main_bundle_path;
-#endif
 
     static int chrome_runtime;
 

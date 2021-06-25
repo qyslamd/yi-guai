@@ -19,6 +19,20 @@ ClientApp::ClientApp()
 {
 }
 
+std::string ClientApp::processTypeToString(ClientApp::ProcessType type)
+{
+    switch (type) {
+    case BrowserProcess:
+        return "BrowserProcess";
+    case RendererProcess:
+        return "RendererProcess";
+    case ZygoteProcess:
+        return "ZygoteProcess";
+    case OtherProcess:
+        return "OtherProcess";
+    }
+}
+
 // static
 ClientApp::ProcessType ClientApp::GetProcessType(CefRefPtr<CefCommandLine> command_line) {
     // The command-line flag won't be specified for the browser process.

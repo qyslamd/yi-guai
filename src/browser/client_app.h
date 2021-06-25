@@ -17,6 +17,8 @@ public:
         OtherProcess,
     };
 
+    static std::string processTypeToString(ProcessType type);
+
     // Determine the process type based on command-line arguments.
     static ProcessType GetProcessType(CefRefPtr<CefCommandLine> command_line);
 
