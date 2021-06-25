@@ -1,9 +1,12 @@
 ﻿#include "cef_qwidget.h"
 
-#ifdef Q_OS_WIN
+#if defined Q_OS_WIN
 #include <Windows.h>
 #include <SHlObj.h>
 #include <WinUser.h>
+#else
+#include "utils/windowskeyboardcodes.h"
+#include "browser/client_types.h"
 #endif
 
 #include <QtDebug>
@@ -35,6 +38,32 @@
 #include "dialogs/alertdialog.h"
 
 
+#ifdef OS_LINUX
+#include <X11/Xlib.h>
+#undef Success     // Definition conflicts with cef_message_router.h
+#undef RootWindow  // Definition conflicts with root_window.h
+#undef Bool // Definition conflicts with X11/Xlib.h
+
+namespace  {
+void SetXWindowBounds(::Window xwindow,
+                      int x,
+                      int y,
+                      size_t width,
+                      size_t height) {
+    ::Display* xdisplay = cef_get_xdisplay();
+    XWindowChanges changes = {0};
+    changes.x = x;
+    changes.y = y;
+    changes.width = static_cast<int>(width);
+    changes.height = static_cast<int>(height);
+    XConfigureWindow(xdisplay, xwindow, CWX | CWY | CWHeight | CWWidth, &changes);
+}
+
+}  // namespace
+
+#endif
+
+
 CefQWidget::CefQWidget(const QString &url, QWidget *parent)
     : QWidget(parent)
     , window_(new QWindow)
@@ -57,7 +86,7 @@ CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
     browser_window_.reset(new BrowserWindow(this, ""));
     initUi();
 
-    auto handle = (HWND)window_->winId();
+    auto handle = (ClientWindowHandle)window_->winId();
     browser_window_->GetPopupConfig(handle, windowInfo, client, settings);
     browser_state_ = Creating;
 }
@@ -429,7 +458,7 @@ bool CefQWidget::onBrowserWndKeyEvent(const CefKeyEvent &event,
                                       CefEventHandle os_event)
 {
     if(is_dev_tool_){
-        emit devToolShortcut(event, os_event);
+//        emit devToolShortcut(event, os_event);
     }else{
         // return true represent you deal the event, otherwise return false
         dealCefKeyEvent(event, os_event, nullptr, false);
@@ -599,7 +628,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(event, os_event);
+//            emit browserShortcut(event, os_event);
         }
     }
 }
@@ -609,7 +638,7 @@ void CefQWidget::resizeEvent(QResizeEvent *event)
     switch(browser_state_){
     case Empty:
     {
-        auto handle = (HWND)window_->winId();
+        auto handle = (ClientWindowHandle)window_->winId();
         CefRect rect{x(), y(), event->size().width(), event->size().height()};
         CefBrowserSettings browser_settings;
         browser_window_->CreateBrowser(handle,
@@ -681,12 +710,11 @@ void CefQWidget::resizeBorser(const QSize &size)
 //        EndDeferWindowPos(hdwp);
         ::MoveWindow(windowHandle, rect.x(), rect.y(), rect.width(), rect.height(), false);
 #elif defined(OS_LINUX)
-        // todo:
-#else
         ::Window xwindow = windowHandle;
         SetXWindowBounds(xwindow, 0, 0,
-                         static_cast<size_t>(size.width()),
-                         static_cast<size_t>(size.height()));
+                         static_cast<size_t>(rect.width()),
+                         static_cast<size_t>(rect.height()));
+#else
 #endif
     }
 }

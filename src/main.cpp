@@ -13,7 +13,11 @@
 
 #include <include/base/cef_scoped_ptr.h>
 #include <include/cef_command_line.h>
+
+#ifdef Q_OS_WIN
 #include <include/cef_sandbox_win.h>
+#include "browser/message_loop/main_message_loop_multithreaded_win.h"
+#endif
 
 #include "managers/MainWindowManager.h"
 #include "managers/CefManager.h"
@@ -21,12 +25,11 @@
 #include "browser/cef_app_browser.h"
 #include "browser/scheme_handler.h"
 #include "browser/message_loop/main_message_loop.h"
-#include "browser/message_loop/main_message_loop_multithreaded_win.h"
 #include "browser/message_loop/main_message_loop_external_pump.h"
 
 #include "cef_qwidget.h"
 #include "utils/util_qt.h"
-#include "widgets/FramelessWidget.h"
+#include "widgets/QtFramelessWnd.h"
 
 #if defined(CEF_USE_SANDBOX)
 // The cef_sandbox.lib static library may not link successfully with all VS
@@ -84,7 +87,7 @@ int main(int argc, char *argv[])
     cfg.url_ = "https://cn.bing.com/";
     MainWndMgr::Instance().createWindow(cfg);
 
-//    FramelessWidget w;
+//    QtFrameLessWnd w;
 //    MainWindow widget(MainWindowConfig{});
 //    w.setWidget(&widget);
 //    w.show();
@@ -120,6 +123,12 @@ void intializeQtApp(QApplication *app)
 
 int initializeCef(int argc, char *argv[])
 {
+#ifdef Q_OS_LINUX
+    CefScopedArgArray scoped_arg_array(argc, argv);
+    char** argv_copy = scoped_arg_array.array();
+    Q_UNUSED(argv_copy);
+#endif
+
     // Parse command-line arguments for use in this method.
     CefRefPtr<CefCommandLine> command_line = CefCommandLine::CreateCommandLine();
 #ifdef OS_WIN
@@ -154,6 +163,8 @@ int initializeCef(int argc, char *argv[])
 #if !defined(CEF_USE_SANDBOX)
     settings.no_sandbox = true;
 #endif
+
+#if defined(Q_OS_WIN)
     //Create the main message loop
     if (settings.multi_threaded_message_loop)
     {
@@ -170,6 +181,10 @@ int initializeCef(int argc, char *argv[])
         qInfo()<<"MainMessageLoopStd";
         message_loop.reset(new client::MainMessageLoopStd);
     }
+#else
+    qInfo()<<"MainMessageLoopStd";
+    message_loop.reset(new client::MainMessageLoopStd);
+#endif
 
     // Initialize CEF.
     CefRefPtr<CefApp> app(new CefAppBrowser);

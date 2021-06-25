@@ -56,6 +56,7 @@ void UserInfoPopup::showEvent(QShowEvent *)
                                  .toString()
                                  );
 #else
-    ui->lineEditCPU->setText("unknown");
+    ui->editCPU->clear();
+    ui->editCPU->appendPlainText("unknown");
 #endif
 }

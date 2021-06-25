@@ -78,19 +78,6 @@ void TabPageToolBar::setTabToolTip(int index, const QString &tip)
     tab_bar_->setTabToolTip(index, tip);
 }
 
-bool TabPageToolBar::hitTestCaption(const QPoint &gPos)
-{
-    // 映射全局坐标当前区域中
-    auto pos = mapFromGlobal(gPos);
-    // 如果映射过来的坐标不在当前范围内，不能处理 HITCAPTION
-    if(!this->rect().contains(pos))
-    {
-        return false;
-    }
-    // 如果在，且没有子窗口且不在绘制的按钮范围内，就是 HITCAPTION
-    return !childAt(pos) && !windowBtnRect().contains(pos);
-}
-
 void TabPageToolBar::setCurrentIndex(int index)
 {
     tab_bar_->setCurrentIndex(index);
@@ -117,12 +104,14 @@ void TabPageToolBar::initUi()
         inActiveColor = activeColor;
         inActiveColor.setAlphaF(0.7);
     }else{
+#ifdef Q_OS_WIN
         if(UtilQt::dwmColorPrevalence()){
             activeColor = QtWin::realColorizationColor();
             activeColor.setAlphaF(1);
             inActiveColor = activeColor;
             inActiveColor.setAlphaF(0.7);
         }
+#endif
     }
     setStyleSheet(QString(
                 ".TabPageToolBar{"
@@ -186,6 +175,7 @@ void TabPageToolBar::setIcons()
     }
 }
 
+#ifdef Q_OS_WIN
 CaptionFrame::CaptionFrame(bool inprivate, QWidget *parent)
     : QFrame(parent)
     , inprivate_(inprivate)
@@ -205,6 +195,19 @@ QRect CaptionFrame::windowBtnRect()
 
     return QRect(rect1.topLeft().toPoint(),
                  rect3.bottomRight().toPoint());
+}
+
+bool CaptionFrame::hitTestCaption(const QPoint &gPos)
+{
+    // 映射全局坐标当前区域中
+    auto pos = mapFromGlobal(gPos);
+    // 如果映射过来的坐标不在当前范围内，不能处理 HITCAPTION
+    if(!this->rect().contains(pos))
+    {
+        return false;
+    }
+    // 如果在，且没有子窗口且不在绘制的按钮范围内，就是 HITCAPTION
+    return !childAt(pos) && !windowBtnRect().contains(pos);
 }
 
 bool CaptionFrame::event(QEvent *ev)
@@ -528,3 +531,4 @@ void CaptionFrame::clearButtonHover()
     close_button_hover_ = false;
     update();
 }
+#endif

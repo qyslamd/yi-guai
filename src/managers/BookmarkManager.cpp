@@ -16,6 +16,7 @@
 #include <QStandardItemModel>
 #include <QPushButton>
 #include <QApplication>
+#include <QDateTime>
 
 #include "utils/util_qt.h"
 #include "FaviconManager.h"

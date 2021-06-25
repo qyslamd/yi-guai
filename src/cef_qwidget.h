@@ -53,10 +53,10 @@ signals:
     void browserLoadingStateChange(bool isLoading, bool canGoBack, bool canGoForward);
     void browserFocusChange(bool getfucos);
     void browserDevTool(CefQWidget *devTool);
-    void browserShortcut(const CefKeyEvent &event,
-                         CefEventHandle os_event);
-    void devToolShortcut(const CefKeyEvent &event,
-                         CefEventHandle os_event);
+//    void browserShortcut(const CefKeyEvent &event,
+//                         CefEventHandle os_event);
+//    void devToolShortcut(const CefKeyEvent &event,
+//                         CefEventHandle os_event);
 
 public slots:
     void onTopLevelWindowStateChanged(Qt::WindowStates state, const QVariant &data);

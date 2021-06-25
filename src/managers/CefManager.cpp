@@ -37,7 +37,7 @@ int CefManager::persist_user_preferences = 1;
 
 CefString CefManager::locale;
 
-int CefManager::remote_debugging_port = 12233;
+uint CefManager::remote_debugging_port = 12233;
 
 cef_color_t CefManager::background_color;
 
@@ -95,6 +95,9 @@ void CefManager::populateSettings(CefSettings &settings, int argc, char *argv[])
         settings.remote_debugging_port = remote_debugging_port;
     }
     settings.log_severity = LOGSEVERITY_WARNING;
+#ifdef Q_OS_LINUX
+    settings.log_severity = LOGSEVERITY_ERROR;
+#endif
     settings.background_color = background_color;
     settings.persist_session_cookies = persist_session_cookies;
     settings.persist_user_preferences = persist_user_preferences;

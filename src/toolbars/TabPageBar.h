@@ -4,6 +4,7 @@
 #include <QFrame>
 #include "globaldef.h"
 
+#ifdef Q_OS_WIN
 class CaptionFrame : public QFrame
 {
     Q_OBJECT
@@ -14,6 +15,7 @@ public:
 
     int reservedWidth() const;
     QRect windowBtnRect();
+    bool hitTestCaption(const QPoint &gPos);
 signals:
     void minBtnClicked();
     void normalMaxBtnClicked();
@@ -60,7 +62,17 @@ private:
 
     void clearButtonHover();
 };
-
+#else
+class CaptionFrame : public QFrame
+{
+    Q_OBJECT
+public:
+    explicit CaptionFrame(bool inprivate, QWidget *parent = nullptr)
+        : QFrame(parent), inprivate_(inprivate){}
+private:
+    bool inprivate_ = false;
+};
+#endif
 class QLabel;
 class QToolButton;
 class TabBar;
@@ -81,8 +93,6 @@ public:
     void setTabText(int index, const QString &text);
     QString tabText(int index) const;
     void setTabToolTip(int index, const QString &tip);
-
-    bool hitTestCaption(const QPoint &gPos);
 
     const int rightReserved = 180;
 signals:

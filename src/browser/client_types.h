@@ -8,14 +8,15 @@
 
 #include "include/cef_base.h"
 
-#if defined(OS_LINUX)
-#include <gtk/gtk.h>
-
-// The Linux client uses GTK instead of the underlying platform type (X11).
-#define ClientWindowHandle GtkWidget*
-#else
 #define ClientWindowHandle CefWindowHandle
-#endif
+//#if defined(OS_LINUX)
+//#include <gtk/gtk.h>
+
+//// The Linux client uses GTK instead of the underlying platform type (X11).
+//#define ClientWindowHandle GtkWidget*
+//#else
+//#define ClientWindowHandle CefWindowHandle
+//#endif
 
 #if defined(OS_MAC)
 #define ClientNativeMacWindow void*

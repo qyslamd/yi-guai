@@ -13,7 +13,7 @@ class FullscnHint : public QFrame
 
 public:
     explicit FullscnHint(QWidget *parent = nullptr);
-    ~FullscnHint();
+    ~FullscnHint() override;
 
     void setKeyStr(const QString &str);
 protected:

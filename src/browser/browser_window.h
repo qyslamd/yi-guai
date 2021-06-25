@@ -1,8 +1,8 @@
 ﻿#ifndef BROWSERWINDOW_H
 #define BROWSERWINDOW_H
 
-#include "cef_client_handler.h"
 #include "client_types.h"
+#include "cef_client_handler.h"
 
 // Represents a native child window hosting a single browser instance. The
 // methods of this class must be called on the main thread unless otherwise
@@ -28,7 +28,7 @@ public:
         virtual void OnBrowserCreated(CefRefPtr<CefBrowser> browser) = 0;
 
         // Called when the BrowserWindow is closing.
-        virtual void OnBrowserWindowClosing() {};
+        virtual void OnBrowserWindowClosing() {}
 
         virtual void onBrowserWindowAddressChange(const std::string& url) = 0;
         virtual void onBrowserWindowTitleChange(const std::string& title) = 0;
@@ -41,7 +41,7 @@ public:
         virtual void onBrowserWindowLoadingStateChange(bool isLoading,
                                                        bool canGoBack,
                                                        bool canGoForward) = 0;
-        virtual void OnBrowserGotFocus() {};
+        virtual void OnBrowserGotFocus() {}
         virtual bool onBrowserWndPreKeyEvent(const CefKeyEvent &event,
                                              CefEventHandle os_event,
                                              bool *is_keyboard_shortcut) = 0;

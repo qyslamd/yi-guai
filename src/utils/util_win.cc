@@ -6,9 +6,9 @@
 
 #include "include/base/cef_logging.h"
 
-#ifdef OS_WIN
 
 namespace client {
+#ifdef OS_WIN
 
 namespace {
 

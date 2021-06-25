@@ -49,10 +49,12 @@
 #include <QLocale>
 #include <QStandardItemModel>
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
 #include <Windows.h>
 #include <QtWin>
 #pragma comment(lib, "Gdi32.lib")
+#else
+#include "utils/windowskeyboardcodes.h"
 #endif
 
 MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
@@ -258,10 +260,12 @@ void MainWindow::paintEvent(QPaintEvent *event)
     //    p.restore();
 }
 
+#ifdef Q_OS_WIN
 bool MainWindow::hitTestCaption(const QPoint &gPos)
 {
     return tab_bar_->hitTestCaption(gPos);
 }
+#endif
 
 void MainWindow::initQtShortcut()
 {
@@ -428,9 +432,11 @@ void MainWindow::setAppearance()
 
 void MainWindow::initSignalSlot()
 {
+#ifdef Q_OS_WIN
     connect(tab_bar_, &TabPageToolBar::minBtnClicked, this, &MainWindow::showMinimized);
     connect(tab_bar_, &TabPageToolBar::normalMaxBtnClicked, this, &MainWindow::onNormalMax);
     connect(tab_bar_, &TabPageToolBar::closeBtnClicked, this, &MainWindow::close);
+#endif
     connect(tab_bar_, &TabPageToolBar::currentChanged, this, &MainWindow::onTabBarCurrentChanged);
     connect(tab_bar_, &TabPageToolBar::tabCloseRequested,this, &MainWindow::onTabBarCloseRequested);
     connect(tab_bar_, &TabPageToolBar::tabMoved, this, &MainWindow::onTabBarTabMoved);
@@ -471,7 +477,7 @@ void MainWindow::initPage(Page *page)
         page->getBrowserWidget()->onTopLevelWindowStateChanged(state, data);
     });
 
-    connect(page, &Page::browserShortcut, this, &MainWindow::onBrowserShortcut);
+//    connect(page, &Page::browserShortcut, this, &MainWindow::onBrowserShortcut);
 }
 
 Page *MainWindow::CurrentPage()
@@ -904,174 +910,174 @@ void MainWindow::onShowTabThumnail(const QPoint &g_pos, const int index)
     }
 }
 
-void MainWindow::onBrowserShortcut(const CefKeyEvent &event,
-                                   CefEventHandle os_event)
-{
-    Q_UNUSED(os_event);
+//void MainWindow::onBrowserShortcut(const CefKeyEvent &event,
+//                                   CefEventHandle os_event)
+//{
+//    Q_UNUSED(os_event);
 
-    // F5
-    // 刷新当前标签页
-    if (event.modifiers == EVENTFLAG_NONE
-            && event.windows_key_code == VK_F5
-            && event.type == KEYEVENT_RAWKEYDOWN)
-    {
-        onRefresh();
-    }
+//    // F5
+//    // 刷新当前标签页
+//    if (event.modifiers == EVENTFLAG_NONE
+//            && event.windows_key_code == VK_F5
+//            && event.type == KEYEVENT_RAWKEYDOWN)
+//    {
+//        onRefresh();
+//    }
 
-    // F11
-    // 改变浏览器的全屏模式
-    if(event.modifiers == EVENTFLAG_NONE
-            && event.windows_key_code == VK_F11){
-        onFullScreen();
-    }
+//    // F11
+//    // 改变浏览器的全屏模式
+//    if(event.modifiers == EVENTFLAG_NONE
+//            && event.windows_key_code == VK_F11){
+//        onFullScreen();
+//    }
 
-    // F12
-    // 打开/关闭开发者工具
-    if(event.modifiers == EVENTFLAG_NONE
-            && event.windows_key_code == VK_F12){
-        onDevTool();
-    }
+//    // F12
+//    // 打开/关闭开发者工具
+//    if(event.modifiers == EVENTFLAG_NONE
+//            && event.windows_key_code == VK_F12){
+//        onDevTool();
+//    }
 
-    // Ctrl + -(- 位于 主键盘 按键 0 右侧)
-    // 缩小
-    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == VK_OEM_MINUS)
-    {
-        onZoomOut();
-    }
-    // Ctrl + -(- 位于 小键盘 )
-    // 缩小
-    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
-            && event.windows_key_code == VK_SUBTRACT ){
-        onZoomOut();
-    }
-    /* from WinUser.h
-     * VK_0 - VK_9 are the same as ASCII '0' - '9' (0x30 - 0x39)
-     * 0x3A - 0x40 : unassigned
-     * VK_A - VK_Z are the same as ASCII 'A' - 'Z' (0x41 - 0x5A)
-     */
-    // Ctrl + 0(0 位于 主键盘)
-    // 恢复缩放比例
-    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == '0'){
-        onZoomReset();
-    }
+//    // Ctrl + -(- 位于 主键盘 按键 0 右侧)
+//    // 缩小
+//    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
+//            && event.windows_key_code == VK_OEM_MINUS)
+//    {
+//        onZoomOut();
+//    }
+//    // Ctrl + -(- 位于 小键盘 )
+//    // 缩小
+//    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
+//            && event.windows_key_code == VK_SUBTRACT ){
+//        onZoomOut();
+//    }
+//    /* from WinUser.h
+//     * VK_0 - VK_9 are the same as ASCII '0' - '9' (0x30 - 0x39)
+//     * 0x3A - 0x40 : unassigned
+//     * VK_A - VK_Z are the same as ASCII 'A' - 'Z' (0x41 - 0x5A)
+//     */
+//    // Ctrl + 0(0 位于 主键盘)
+//    // 恢复缩放比例
+//    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
+//            && event.windows_key_code == '0'){
+//        onZoomReset();
+//    }
 
-    // Ctrl + 0(0 位于 小键盘 )
-    // 恢复缩放比例
-    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
-            && event.windows_key_code == VK_NUMPAD0)
-    {
-        onZoomReset();
-    }
+//    // Ctrl + 0(0 位于 小键盘 )
+//    // 恢复缩放比例
+//    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
+//            && event.windows_key_code == VK_NUMPAD0)
+//    {
+//        onZoomReset();
+//    }
 
-    // Ctrl + +(+ 位于 backspace 左侧)
-    // 放大
-    if( event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == VK_OEM_PLUS)
-    {
-        onZoomIn();
-    }
-    // Ctrl + +(+ 位于 小键盘 )
-    // 放大
-    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
-            && event.windows_key_code == VK_ADD){
-        onZoomIn();
-    }
+//    // Ctrl + +(+ 位于 backspace 左侧)
+//    // 放大
+//    if( event.modifiers == EVENTFLAG_CONTROL_DOWN
+//            && event.windows_key_code == VK_OEM_PLUS)
+//    {
+//        onZoomIn();
+//    }
+//    // Ctrl + +(+ 位于 小键盘 )
+//    // 放大
+//    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
+//            && event.windows_key_code == VK_ADD){
+//        onZoomIn();
+//    }
 
-    // Ctrl + P
-    // 打印
-    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == 'P'){
-        onPrint();
-    }
+//    // Ctrl + P
+//    // 打印
+//    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
+//            && event.windows_key_code == 'P'){
+//        onPrint();
+//    }
 
-    // Ctrl + R
-    // 刷新当前标签页
-    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == 'R'
-            && event.type == KEYEVENT_RAWKEYDOWN)
-    {
-        onRefresh();
-    }
+//    // Ctrl + R
+//    // 刷新当前标签页
+//    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
+//            && event.windows_key_code == 'R'
+//            && event.type == KEYEVENT_RAWKEYDOWN)
+//    {
+//        onRefresh();
+//    }
 
-    // Ctrl + T
-    // 新建标签页
-    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == 'T'){
-        AddNewPage("", true);
-    }
+//    // Ctrl + T
+//    // 新建标签页
+//    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
+//            && event.windows_key_code == 'T'){
+//        AddNewPage("", true);
+//    }
 
-    // Ctrl + N
-    // 新建浏览器窗口
-    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == 'N'){
-        MainWndMgr::Instance().createWindow(MainWndCfg());
-    }
+//    // Ctrl + N
+//    // 新建浏览器窗口
+//    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
+//            && event.windows_key_code == 'N'){
+//        MainWndMgr::Instance().createWindow(MainWndCfg());
+//    }
 
-    // Ctrl + Shift + N
-    // 新建InPrivate浏览器窗口
-    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_SHIFT_DOWN)
-            && event.windows_key_code == 'N'){
-        MainWndCfg cfg;
-        cfg.is_inprivate_ = true;
-        MainWndMgr::Instance().createWindow(cfg);
-    }
+//    // Ctrl + Shift + N
+//    // 新建InPrivate浏览器窗口
+//    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_SHIFT_DOWN)
+//            && event.windows_key_code == 'N'){
+//        MainWndCfg cfg;
+//        cfg.is_inprivate_ = true;
+//        MainWndMgr::Instance().createWindow(cfg);
+//    }
 
-    // Ctrl + Shift + I
-    // 打开开发者工具
-    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_SHIFT_DOWN)
-            && event.windows_key_code == 'I'){
-        onDevTool();
-    }
+//    // Ctrl + Shift + I
+//    // 打开开发者工具
+//    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_SHIFT_DOWN)
+//            && event.windows_key_code == 'I'){
+//        onDevTool();
+//    }
 
-    // Ctrl + H
-    // 查看历史记录
-    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == 'H'){
-        onShowHistory();
-    }
-    // Ctrl + J
-    // 查看下载
-    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == 'J'
-            && event.type == KEYEVENT_RAWKEYDOWN)
-    {
-        onShowDownload();
-    }
-    // Ctrl + W
-    // 关闭当前标签页
-    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == 'W'
-            && event.type == KEYEVENT_RAWKEYDOWN)
-    {
-        onTabBarCloseRequested(CurrentPageIndex());
-    }
+//    // Ctrl + H
+//    // 查看历史记录
+//    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
+//            && event.windows_key_code == 'H'){
+//        onShowHistory();
+//    }
+//    // Ctrl + J
+//    // 查看下载
+//    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
+//            && event.windows_key_code == 'J'
+//            && event.type == KEYEVENT_RAWKEYDOWN)
+//    {
+//        onShowDownload();
+//    }
+//    // Ctrl + W
+//    // 关闭当前标签页
+//    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
+//            && event.windows_key_code == 'W'
+//            && event.type == KEYEVENT_RAWKEYDOWN)
+//    {
+//        onTabBarCloseRequested(CurrentPageIndex());
+//    }
 
-    // Ctrl + Tab
-    // 标签页切换
-    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == VK_TAB
-            && event.type == KEYEVENT_RAWKEYDOWN)
-    {
-        onTabSwitch();
-    }
+//    // Ctrl + Tab
+//    // 标签页切换
+//    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
+//            && event.windows_key_code == VK_TAB
+//            && event.type == KEYEVENT_RAWKEYDOWN)
+//    {
+//        onTabSwitch();
+//    }
 
-    // Alt + <--(左箭头)
-    if(event.modifiers == EVENTFLAG_ALT_DOWN
-            && event.windows_key_code == VK_LEFT
-            && event.type == KEYEVENT_RAWKEYDOWN)
-    {
-        onGoBack();
-    }
-    // Alt + -->(右箭头)
-    if(event.modifiers == EVENTFLAG_ALT_DOWN
-            && event.windows_key_code == VK_RIGHT
-            && event.type == KEYEVENT_RAWKEYDOWN)
-    {
-        onGoForward();
-    }
-}
+//    // Alt + <--(左箭头)
+//    if(event.modifiers == EVENTFLAG_ALT_DOWN
+//            && event.windows_key_code == VK_LEFT
+//            && event.type == KEYEVENT_RAWKEYDOWN)
+//    {
+//        onGoBack();
+//    }
+//    // Alt + -->(右箭头)
+//    if(event.modifiers == EVENTFLAG_ALT_DOWN
+//            && event.windows_key_code == VK_RIGHT
+//            && event.type == KEYEVENT_RAWKEYDOWN)
+//    {
+//        onGoForward();
+//    }
+//}
 
 void MainWindow::onHistoryWidgetCmd(HistoryCmd cmd, const QVariant &para)
 {

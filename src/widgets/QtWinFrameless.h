@@ -28,10 +28,10 @@ private:
     bool maximized_ = false;
 };
 #else
-class CFramelessWindow : public QMainWindow
+class QtWinFramelessWindow : public QMainWindow
 {
 public:
-    explicit CFramelessWindow(QWidget * parent = nullptr) : QMainWindow(parent){}
+    explicit QtWinFramelessWindow(QWidget * parent = nullptr) : QMainWindow(parent){}
 };
 #endif
 
