@@ -13,20 +13,25 @@
 
 #include <include/base/cef_scoped_ptr.h>
 #include <include/cef_command_line.h>
+
+#ifdef Q_OS_WIN
 #include <include/cef_sandbox_win.h>
+#include "browser/message_loop/main_message_loop_multithreaded_win.h"
+#endif
 
 #include "managers/MainWindowManager.h"
 #include "managers/CefManager.h"
 #include "managers/AppCfgManager.h"
 #include "browser/cef_app_browser.h"
+#include "browser/cef_app_render.h"
+#include "browser/cef_app_other.h"
 #include "browser/scheme_handler.h"
 #include "browser/message_loop/main_message_loop.h"
-#include "browser/message_loop/main_message_loop_multithreaded_win.h"
 #include "browser/message_loop/main_message_loop_external_pump.h"
 
 #include "cef_qwidget.h"
 #include "utils/util_qt.h"
-#include "widgets/FramelessWidget.h"
+#include "widgets/QtFramelessWnd.h"
 
 #if defined(CEF_USE_SANDBOX)
 // The cef_sandbox.lib static library may not link successfully with all VS
@@ -45,15 +50,6 @@ int main(int argc, char *argv[])
     // Enable High-DPI support on Windows 7 or newer.
     CefEnableHighDPISupport();
 
-    void* sandbox_info = nullptr;
-
-#if defined(CEF_USE_SANDBOX)
-    // Manage the life span of the sandbox information object. This is necessary
-    // for sandbox support on Windows. See cef_sandbox_win.h for complete details.
-    CefScopedSandboxInfo scoped_sandbox;
-    sandbox_info = scoped_sandbox.sandbox_info();
-#endif
-
 #if defined(Q_OS_WIN)
     // Provide CEF with command-line arguments.
     auto hInstance = GetModuleHandle(NULL);
@@ -62,10 +58,46 @@ int main(int argc, char *argv[])
     CefMainArgs main_args(argc, argv);
 #endif
 
+    // Parse command-line arguments for use in this method.
+    CefRefPtr<CefCommandLine> command_line = CefCommandLine::CreateCommandLine();
+#ifdef OS_WIN
+    Q_UNUSED(argc);
+    Q_UNUSED(argv);
+    command_line->InitFromString(::GetCommandLineW());
+#else
+    command_line->InitFromArgv(argc, argv);
+#endif
+    ClientApp::ProcessType process_type = ClientApp::GetProcessType(command_line);
+    CefRefPtr<ClientApp> app;
+    qInfo()<<__FUNCTION__<<"ClientApp::BrowserProcess : "<<process_type;
+    if (process_type == ClientApp::BrowserProcess)
+    {
+        app = new CefAppBrowser();
+    }
+    else if (process_type == ClientApp::RendererProcess
+             || process_type == ClientApp::ZygoteProcess)
+    {
+        // On Linux the zygote process is used to spawn other process types. Since
+        // we don't know what type of process it will be give it the renderer
+        // client.
+        app = new CefAppRender();
+    }
+    else if (process_type == ClientApp::OtherProcess)
+    {
+        app = new CefAppOther();
+    }
+    void* sandboxInfo = nullptr;
+#if defined(CEF_USE_SANDBOX)
+    // Manage the life span of the sandbox information object. This is necessary
+    // for sandbox support on Windows. See cef_sandbox_win.h for complete details.
+    CefScopedSandboxInfo scoped_sandbox;
+    sandboxInfo = scoped_sandbox.sandbox_info();
+#endif
+
     // CEF applications have multiple sub-processes (render, plugin, GPU, etc)
     // that share the same executable. This function checks the command-line and,
     // if this is a sub-process, executes the appropriate logic.
-    int exit_code = CefExecuteProcess(main_args, nullptr, sandbox_info);
+    int exit_code = CefExecuteProcess(main_args, app, sandboxInfo);
     if (exit_code >= 0) {
         // The sub-process has completed so return here.
         return exit_code;
@@ -84,7 +116,7 @@ int main(int argc, char *argv[])
     cfg.url_ = "https://cn.bing.com/";
     MainWndMgr::Instance().createWindow(cfg);
 
-//    FramelessWidget w;
+//    QtFrameLessWnd w;
 //    MainWindow widget(MainWindowConfig{});
 //    w.setWidget(&widget);
 //    w.show();
@@ -120,6 +152,12 @@ void intializeQtApp(QApplication *app)
 
 int initializeCef(int argc, char *argv[])
 {
+#ifdef Q_OS_LINUX
+    CefScopedArgArray scoped_arg_array(argc, argv);
+    char** argv_copy = scoped_arg_array.array();
+    Q_UNUSED(argv_copy);
+#endif
+
     // Parse command-line arguments for use in this method.
     CefRefPtr<CefCommandLine> command_line = CefCommandLine::CreateCommandLine();
 #ifdef OS_WIN
@@ -154,6 +192,8 @@ int initializeCef(int argc, char *argv[])
 #if !defined(CEF_USE_SANDBOX)
     settings.no_sandbox = true;
 #endif
+
+#if defined(Q_OS_WIN)
     //Create the main message loop
     if (settings.multi_threaded_message_loop)
     {
@@ -170,6 +210,10 @@ int initializeCef(int argc, char *argv[])
         qInfo()<<"MainMessageLoopStd";
         message_loop.reset(new client::MainMessageLoopStd);
     }
+#else
+    qInfo()<<"MainMessageLoopStd";
+    message_loop.reset(new client::MainMessageLoopStd);
+#endif
 
     // Initialize CEF.
     CefRefPtr<CefApp> app(new CefAppBrowser);

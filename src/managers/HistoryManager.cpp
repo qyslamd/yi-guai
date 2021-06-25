@@ -12,6 +12,7 @@
 #include <QMutexLocker>
 #include <QStandardItemModel>
 #include <QDateTime>
+#include <QElapsedTimer>
 
 #include "utils/util_qt.h"
 #include "FaviconManager.h"

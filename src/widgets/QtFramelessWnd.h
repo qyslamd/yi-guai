@@ -1,15 +1,16 @@
-#ifndef FRAMELESSWIDGET_H
-#define FRAMELESSWIDGET_H
+#ifndef QTFRAMELESS_WND_H
+#define QTFRAMELESS_WND_H
 
 #include <QWidget>
+#include <QObject>
+#include <QHBoxLayout>
 
-class QHBoxLayout;
-class FramelessWidget : public QWidget
+class QtFrameLessWnd : public QWidget
 {
     Q_OBJECT
 public:
-    explicit FramelessWidget(QWidget *parent = nullptr);
-    ~FramelessWidget();
+    QtFrameLessWnd(QWidget *parent = nullptr);
+
     bool event(QEvent *ev) override;
 
     ///
@@ -50,13 +51,6 @@ private:
         HT_Client
     };
 
-    bool mouse_left_btn_pressed_ = false;
-    QPoint mouse_left_btn_press_pos_;
-    Region region_;
-
-    // Determine the area and change the shape during the mouse movement
-    void judgeRegion(const QPoint &windowPos);
-
     ///
     /// \brief The CaptionButtons enum
     ///
@@ -67,6 +61,13 @@ private:
         Button_Close,
     };
 
+    bool mouse_left_btn_pressed_ = false;
+    QPoint mouse_left_btn_press_pos_;
+    Region region_;
+
+    // Determine the area and change the shape during the mouse movement
+    void judgeRegion(const QPoint &windowPos);
+
     bool min_button_hover_ = false,
     max_button_hover_ = false,
     close_button_hover_ = false;
@@ -75,6 +76,7 @@ private:
     max_buttton_press_ = false,
     close_button_press_ = false;
 
+    QWidget *central_widget = nullptr;
     QHBoxLayout *layout_ = nullptr;
 
     void setFrameWidth(int width);
@@ -88,7 +90,6 @@ private:
     void drawButtons(QPainter *p);
 
     void clearButtonHover();
-
 };
 
-#endif // FRAMELESSWIDGET_H
+#endif // QTFRAMELESS_WND_H

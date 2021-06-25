@@ -1,4 +1,4 @@
-#include "framelesswidget.h"
+#include "QtFramelessWnd.h"
 
 #include <QtDebug>
 #include <QPalette>
@@ -17,28 +17,26 @@
 #pragma comment(lib, "User32.lib")
 #endif
 
-FramelessWidget::FramelessWidget(QWidget *parent) :
-    QWidget(parent),
-    layout_(new QHBoxLayout(this))
+QtFrameLessWnd::QtFrameLessWnd(QWidget *parent)
+    : QWidget(parent)
 {
     setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
     setAttribute(Qt::WA_TranslucentBackground);
     setMouseTracking(true);
     setMinimumSize(300,300);
 
+    central_widget = new QWidget(this);
+    central_widget->setAttribute(Qt::WA_NativeWindow);
+    layout_ = new QHBoxLayout(central_widget);
     layout_->setContentsMargins(FrameWidth,
                                 FrameWidth + CaptionHeight,
                                 FrameWidth,
                                 FrameWidth);
     layout_->setSpacing(0);
+    central_widget->setLayout(layout_);
 }
 
-FramelessWidget::~FramelessWidget()
-{
-
-}
-
-bool FramelessWidget::event(QEvent *e)
+bool QtFrameLessWnd::event(QEvent *e)
 {
     if (e->type() == QEvent::ToolTip)
     {
@@ -73,7 +71,7 @@ bool FramelessWidget::event(QEvent *e)
     return QWidget::event(e);
 }
 
-void FramelessWidget::setWidget(QWidget *widget)
+void QtFrameLessWnd::setWidget(QWidget *widget)
 {
     // 如果有了，移除并删除
     if(this->widget()){
@@ -87,7 +85,7 @@ void FramelessWidget::setWidget(QWidget *widget)
     layout_->addWidget(widget);
 }
 
-QWidget *FramelessWidget::widget()
+QWidget *QtFrameLessWnd::widget()
 {
     auto item = layout_->itemAt(0);
     if(item){
@@ -96,7 +94,7 @@ QWidget *FramelessWidget::widget()
     return nullptr;
 }
 
-bool FramelessWidget::nativeEvent(const QByteArray &eventType, void *message, long *result)
+bool QtFrameLessWnd::nativeEvent(const QByteArray &eventType, void *message, long *result)
 {
 #ifdef Q_OS_WIN
     //Workaround for known bug -> check Qt forum : https://forum.qt.io/topic/93141/qtablewidget-itemselectionchanged/13
@@ -137,7 +135,7 @@ bool FramelessWidget::nativeEvent(const QByteArray &eventType, void *message, lo
     return QWidget::nativeEvent(eventType, message, result);
 }
 
-void FramelessWidget::paintEvent(QPaintEvent *event)
+void QtFrameLessWnd::paintEvent(QPaintEvent *event)
 {
     QWidget::paintEvent(event);
     QPainter p(this);
@@ -177,7 +175,7 @@ void FramelessWidget::paintEvent(QPaintEvent *event)
     drawButtons(&p);
 }
 
-void FramelessWidget::mousePressEvent(QMouseEvent *event)
+void QtFrameLessWnd::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton)
     {
@@ -209,7 +207,7 @@ void FramelessWidget::mousePressEvent(QMouseEvent *event)
     }
 }
 
-void FramelessWidget::mouseMoveEvent(QMouseEvent *event)
+void QtFrameLessWnd::mouseMoveEvent(QMouseEvent *event)
 {
     if(!mouse_left_btn_pressed_){
         judgeRegion(event->pos());
@@ -297,7 +295,7 @@ void FramelessWidget::mouseMoveEvent(QMouseEvent *event)
     QWidget::mouseMoveEvent(event);
 }
 
-void FramelessWidget::mouseReleaseEvent(QMouseEvent *event)
+void QtFrameLessWnd::mouseReleaseEvent(QMouseEvent *event)
 {
     QWidget::mouseReleaseEvent(event);
     if(event->button() == Qt::LeftButton)
@@ -333,14 +331,14 @@ void FramelessWidget::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
-void FramelessWidget::leaveEvent(QEvent *event)
+void QtFrameLessWnd::leaveEvent(QEvent *event)
 {
     clearButtonHover();
     setCursor(Qt::ArrowCursor);
     QWidget::leaveEvent(event);
 }
 
-void FramelessWidget::changeEvent(QEvent *event)
+void QtFrameLessWnd::changeEvent(QEvent *event)
 {
     if(event->type() == QEvent::WindowStateChange){
         auto windowState = this->windowState();
@@ -352,7 +350,7 @@ void FramelessWidget::changeEvent(QEvent *event)
     }
 }
 
-void FramelessWidget::setFrameWidth(int width)
+void QtFrameLessWnd::setFrameWidth(int width)
 {
     if(width < 0){
         FrameWidth = 0;
@@ -365,7 +363,7 @@ void FramelessWidget::setFrameWidth(int width)
                                 FrameWidth);
 }
 
-void FramelessWidget::judgeRegion(const QPoint &windowPos)
+void QtFrameLessWnd::judgeRegion(const QPoint &windowPos)
 {
     clearButtonHover();
 
@@ -433,7 +431,7 @@ void FramelessWidget::judgeRegion(const QPoint &windowPos)
     }
 }
 
-QRectF FramelessWidget::btnRect(FramelessWidget::CaptionButtons button)
+QRectF QtFrameLessWnd::btnRect(QtFrameLessWnd::CaptionButtons button)
 {
     int BtnWidth = 45;
     int BtnHeight = 28;
@@ -492,7 +490,7 @@ QRectF FramelessWidget::btnRect(FramelessWidget::CaptionButtons button)
 
 }
 
-QPixmap FramelessWidget::btnPixmap(FramelessWidget::CaptionButtons button)
+QPixmap QtFrameLessWnd::btnPixmap(QtFrameLessWnd::CaptionButtons button)
 {
     QColor color(Qt::black);
     QSize size(10, 10);
@@ -549,7 +547,7 @@ QPixmap FramelessWidget::btnPixmap(FramelessWidget::CaptionButtons button)
     return pix;
 }
 
-FramelessWidget::CaptionButtons FramelessWidget::buttonAt(const QPoint &pos)
+QtFrameLessWnd::CaptionButtons QtFrameLessWnd::buttonAt(const QPoint &pos)
 {
     if(btnRect(CaptionButtons::Button_Mini).contains(pos)){
         return CaptionButtons::Button_Mini;
@@ -561,7 +559,7 @@ FramelessWidget::CaptionButtons FramelessWidget::buttonAt(const QPoint &pos)
     return CaptionButtons::Button_None;
 }
 
-void FramelessWidget::drawShadow(QPainter *p)
+void QtFrameLessWnd::drawShadow(QPainter *p)
 {
     if(FrameWidth == 0){
         return;
@@ -570,7 +568,7 @@ void FramelessWidget::drawShadow(QPainter *p)
     QColor color(100, 100, 100, 30);
     for (int i = 0; i < FrameWidth; i++)
     {
-        color.setAlpha(120 - qSqrt(i) * 40);
+        color.setAlpha(static_cast<int>(120 - qSqrt(i) * 40));
         p->setPen(color);
         p->drawRoundedRect(FrameWidth - i,
                                 FrameWidth - i,
@@ -582,7 +580,7 @@ void FramelessWidget::drawShadow(QPainter *p)
     p->restore();
 }
 
-void FramelessWidget::drawButtons(QPainter *p)
+void QtFrameLessWnd::drawButtons(QPainter *p)
 {
     p->save();
     QRectF rectMini = btnRect(CaptionButtons::Button_Mini);
@@ -617,7 +615,7 @@ void FramelessWidget::drawButtons(QPainter *p)
     p->restore();
 }
 
-void FramelessWidget::clearButtonHover()
+void QtFrameLessWnd::clearButtonHover()
 {
     min_button_hover_ = false;
     max_button_hover_ = false;

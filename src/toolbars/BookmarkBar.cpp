@@ -44,7 +44,11 @@ void BookmarkBar::paintEvent(QPaintEvent *event)
         p.save();
         QString hint = QStringLiteral("正在加载书签");
         QFontMetrics fm(this->font());
+#if (QT_VERSION == QT_VERSION_CHECK(5, 11, 1))
         auto width = fm.horizontalAdvance(hint);
+#else
+        auto width = fm.width(hint);
+#endif
 
         auto pos = this->rect().center();
         pos.ry() += fm.xHeight();
@@ -166,6 +170,7 @@ void BookmarkBar::onCustomContextMenuRequested(const QPoint &pos)
     auto action = toolbar_->actionAt(toolbar_->mapFromParent(pos));
     qInfo()<<__FUNCTION__<<action;
     if(action){
+#if 0
         if(auto dataItem = (QStandardItem *)action->data().value<void *>())
         {
             BookmarkMgr::Instance()->setMenuTriggerItem(dataItem);
@@ -202,6 +207,7 @@ void BookmarkBar::onCustomContextMenuRequested(const QPoint &pos)
             menu.addAction(BookmarkMgr::Instance()->action_delete_);
             menu.addSeparator();
         }
+#endif
     }
     menu.addAction(BookmarkMgr::Instance()->action_add_current_);
     menu.addAction(BookmarkMgr::Instance()->action_add_folder_);

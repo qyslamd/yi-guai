@@ -45,8 +45,8 @@ public:
 signals:
     void pageCmd(PageCmd cmd, const QVariant &data);
     void newPage(Page *page);
-    void browserShortcut(const CefKeyEvent &event,
-                         CefEventHandle os_event);
+//    void browserShortcut(const CefKeyEvent &event,
+//                         CefEventHandle os_event);
 protected:
     void closeEvent(QCloseEvent *event) override;
 private:
@@ -73,8 +73,8 @@ private slots:
     void onBrowserDevTool(CefQWidget *devTool);
     void onDockDevToolTopLevelChanged(bool isFloating);
     void onDockDevToolLocChanged(Qt::DockWidgetArea area);
-    void onDevToolShortcut(const CefKeyEvent &event,
-                           CefEventHandle);
+//    void onDevToolShortcut(const CefKeyEvent &event,
+//                           CefEventHandle);
 
 private slots:
     void onZoomBarTimer();

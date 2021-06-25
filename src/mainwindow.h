@@ -133,8 +133,8 @@ private slots:
     void onNaviBarCmd(NaviBarCmd cmd, const QVariant &para);
     void onPageCmd(PageCmd cmd, const QVariant &para);
     void onShowTabThumnail(const QPoint &g_pos, const int index);
-    void onBrowserShortcut(const CefKeyEvent &event,
-                           CefEventHandle os_event);
+//    void onBrowserShortcut(const CefKeyEvent &event,
+//                           CefEventHandle os_event);
     void onHistoryWidgetCmd(HistoryCmd cmd, const QVariant &para);
     void onPinOrCloseHistoryWidget();
     void onPinOrCloseBookmarkWidget();

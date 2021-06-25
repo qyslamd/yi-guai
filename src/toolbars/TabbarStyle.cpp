@@ -1,8 +1,11 @@
 #include "TabbarStyle.h"
 
+#ifdef Q_OS_WIN
+#include <QtWin>
+#endif
+
 #include <QStyleOptionTab>
 #include <QPainter>
-#include <QtWin>
 #include <QPainterPath>
 #include <QApplication>
 #include <QScreen>
@@ -55,7 +58,6 @@ QRect TabbarStyle::subElementRect(QStyle::SubElement subElement,
         rect.setHeight(16);
         return rect;
     }
-        break;
 //    case QStyle::SE_TabBarTabText:
 //    {
 //        auto leftButtonRect = subElementRect(QStyle::SE_TabBarTabLeftButton, option, widget);
@@ -76,7 +78,6 @@ QRect TabbarStyle::subElementRect(QStyle::SubElement subElement,
 //         qInfo()<<ret;
 //         return ret;
 //    }
-        break;
     default:
         break;
     }

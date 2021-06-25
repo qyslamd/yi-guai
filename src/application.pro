@@ -23,6 +23,9 @@ win32{
 }
 
 SOURCES += \
+    browser/cef_app_other.cpp \
+    browser/cef_app_render.cpp \
+    browser/client_app.cpp \
     browser/client_switches.cc \
     browser/scheme_handler.cpp \
     managers/AppCfgManager.cpp \
@@ -57,8 +60,6 @@ SOURCES += \
     main.cpp \
     browser/message_loop/main_message_loop.cc \
     browser/message_loop/main_message_loop_external_pump.cc \
-    browser/message_loop/main_message_loop_external_pump_win.cc \
-    browser/message_loop/main_message_loop_multithreaded_win.cc \
     browser/message_loop/main_message_loop_std.cc \
     mainwindow.cpp \
     utils/util_qt.cpp \
@@ -66,14 +67,17 @@ SOURCES += \
     widgets/AppConfigWidget.cpp \
     widgets/BookmarkWidget.cpp \
     widgets/DownloadWidget.cpp \
-    widgets/FramelessWidget.cpp \
+    widgets/QtFramelessWnd.cpp \
     widgets/HistoryWidget.cpp \
-    widgets/FullscnHint.cpp \
+    widgets/FullScnHint.cpp \
     widgets/QtWinFrameless.cpp \
     widgets/TabThumbnailWidget.cpp
 
 
 HEADERS += \
+    browser/cef_app_other.h \
+    browser/cef_app_render.h \
+    browser/client_app.h \
     browser/client_switches.h \
     browser/scheme_handler.h \
     globaldef.h \
@@ -109,11 +113,9 @@ HEADERS += \
     browser/client_types.h \
     browser/message_loop/main_message_loop.h \
     browser/message_loop/main_message_loop_external_pump.h \
-    browser/message_loop/main_message_loop_multithreaded_win.h \
     browser/message_loop/main_message_loop_std.h \
     mainwindow.h \
     utils/util_qt.h \
-    utils/util_win.h \
     widgets/BookmarkWidget.h \
     widgets/DownloadWidget.h \
     widgets/HistoryWidget.h \
@@ -121,7 +123,8 @@ HEADERS += \
     widgets/QtWinFrameless.h \
     widgets/TabThumbnailWidget.h \
     widgets/AppConfigWidget.h \
-    widgets/framelesswidget.h
+    widgets/QtFramelessWnd.h \
+    utils/windowskeyboardcodes.h
 
 FORMS += \
     dialogs/alertdialog.ui \
@@ -151,6 +154,15 @@ msvc {
     QMAKE_CXXFLAGS += /utf-8
 }
 win32{
+
+    SOURCES +=\
+    browser/message_loop/main_message_loop_external_pump_win.cc \
+    browser/message_loop/main_message_loop_multithreaded_win.cc
+
+    HEADERS +=\
+    browser/message_loop/main_message_loop_multithreaded_win.h \
+    utils/util_win.h
+
     equals(QT_ARCH,i386){
         CEF_DEP_PATH = $$PWD/../../cef_depends/cef_4240_chromium_86/x86
     }else{
@@ -184,6 +196,36 @@ win32{
         QMAKE_POST_LINK +=\
         xcopy $$WIN32_CEF_DEP_PATH\\bin\\Release $$WIN32_BIN_DIR /y /e /h &&\
         xcopy $$WIN32_CEF_DEP_PATH\\Resources  $$WIN32_BIN_DIR /y /e /h
+    }
+}
+
+unix:!macx{
+    CONFIG += link_pkgconfig
+    PKGCONFIG += x11
+    PKGCONFIG += glib-2.0
+    PKGCONFIG += gmodule-2.0 gtk+-2.0 gthread-2.0 gtk+-unix-print-2.0 gtkglext-1.0
+
+    CEF_DEP_PATH = $$PWD/../../cef_binary_86.0.21+g6a2c8e7+chromium-86.0.4240.183_linux64
+    OUTPUT_BIN_DIR = $$OUT_PWD/bin
+
+    QMAKE_LFLAGS += -Wl,-rpath,\'$$OUT_PWD/bin\'
+
+    INCLUDEPATH += $$CEF_DEP_PATH
+    CONFIG(debug, debug|release){
+        LIBS += -L$$CEF_DEP_PATH/Debug -lcef
+        LIBS += -L$$CEF_DEP_PATH/DebugBuild/libcef_dll_wrapper -lcef_dll_wrapper
+
+        QMAKE_POST_LINK += \
+        cp -R $$CEF_DEP_PATH/Debug/* $$OUTPUT_BIN_DIR  &&\
+        cp -R $$CEF_DEP_PATH/Resources/*  $$OUTPUT_BIN_DIR
+
+    }else:CONFIG(release, debug|release){
+        LIBS += -L$$CEF_DEP_PATH/Release -lcef
+        LIBS += -L$$CEF_DEP_PATH/ReleaseBuild/libcef_dll_wrapper -lcef_dll_wrapper
+
+        QMAKE_POST_LINK += \
+        cp -R $$CEF_DEP_PATH/Release/* $$OUTPUT_BIN_DIR  &&\
+        cp -R $$CEF_DEP_PATH/Resources/*  $$OUTPUT_BIN_DIR
     }
 }
 

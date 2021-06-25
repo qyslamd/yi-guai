@@ -2,8 +2,9 @@
 #define CEFAPPBROWSER_H
 
 #include <include/cef_app.h>
+#include "client_app.h"
 
-class CefAppBrowser : public CefApp , public CefBrowserProcessHandler
+class CefAppBrowser : public ClientApp , public CefBrowserProcessHandler
 {
 public:
     CefAppBrowser();
