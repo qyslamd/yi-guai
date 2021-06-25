@@ -68,7 +68,8 @@ SOURCES += \
     widgets/HistoryWidget.cpp \
     widgets/FullScnHint.cpp \
     widgets/QtWinFrameless.cpp \
-    widgets/TabThumbnailWidget.cpp
+    widgets/TabThumbnailWidget.cpp \
+    browser/clientapp.cpp
 
 
 HEADERS += \
@@ -118,7 +119,8 @@ HEADERS += \
     widgets/TabThumbnailWidget.h \
     widgets/AppConfigWidget.h \
     widgets/QtFramelessWnd.h \
-    utils/windowskeyboardcodes.h
+    utils/windowskeyboardcodes.h \
+    browser/clientapp.h
 
 FORMS += \
     dialogs/alertdialog.ui \

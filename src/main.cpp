@@ -23,6 +23,7 @@
 #include "managers/CefManager.h"
 #include "managers/AppCfgManager.h"
 #include "browser/cef_app_browser.h"
+#include "browser/clientapp.h"
 #include "browser/scheme_handler.h"
 #include "browser/message_loop/main_message_loop.h"
 #include "browser/message_loop/main_message_loop_external_pump.h"
@@ -65,10 +66,40 @@ int main(int argc, char *argv[])
     CefMainArgs main_args(argc, argv);
 #endif
 
+    // Parse command-line arguments for use in this method.
+    CefRefPtr<CefCommandLine> command_line = CefCommandLine::CreateCommandLine();
+#ifdef OS_WIN
+    Q_UNUSED(argc);
+    Q_UNUSED(argv);
+    command_line->InitFromString(::GetCommandLineW());
+#else
+    command_line->InitFromArgv(argc, argv);
+#endif
+    ClientApp::ProcessType process_type = ClientApp::GetProcessType(command_line);
+    CefRefPtr<ClientApp> app;
+    qInfo()<<__FUNCTION__<<"ClientApp::BrowserProcess : "<<process_type;
+    if (process_type == ClientApp::BrowserProcess)
+    {
+        app = new CefAppBrowser();
+    }
+    else if (process_type == ClientApp::RendererProcess
+             || process_type == ClientApp::ZygoteProcess)
+    {
+        // On Linux the zygote process is used to spawn other process types. Since
+        // we don't know what type of process it will be give it the renderer
+        // client.
+        app = new ClientApp();
+    }
+    else if (process_type == ClientApp::OtherProcess)
+    {
+        app = new ClientApp();
+    }
+    void* sandboxInfo = nullptr;
+
     // CEF applications have multiple sub-processes (render, plugin, GPU, etc)
     // that share the same executable. This function checks the command-line and,
     // if this is a sub-process, executes the appropriate logic.
-    int exit_code = CefExecuteProcess(main_args, nullptr, sandbox_info);
+    int exit_code = CefExecuteProcess(main_args, app, sandbox_info);
     if (exit_code >= 0) {
         // The sub-process has completed so return here.
         return exit_code;
