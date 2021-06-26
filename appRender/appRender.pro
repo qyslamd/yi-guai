@@ -21,7 +21,7 @@ unix:!macx{
 
     CEF_DEP_PATH = $$PWD/../../cef_binary_86.0.21+g6a2c8e7+chromium-86.0.4240.183_linux64
 
-    QMAKE_LFLAGS += -Wl,-rpath,\'$$OUT_PWD/../src/bin\'
+#    QMAKE_LFLAGS += -Wl,-rpath,\'$$OUT_PWD/../src/bin\'
 
     INCLUDEPATH += $$CEF_DEP_PATH
     CONFIG(debug, debug|release){

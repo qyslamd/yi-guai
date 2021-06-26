@@ -101,6 +101,7 @@ void CefManager::populateSettings(CefSettings &settings, int argc, char *argv[])
     settings.log_severity = LOGSEVERITY_ERROR;
     seperate_sub_process = true;
 //    CefString(&settings.browser_subprocess_path) = browser_sub_process_path;
+    CefString(&settings.resources_dir_path) = resource_directory_path;
 #endif
     settings.background_color = background_color;
     settings.persist_session_cookies = persist_session_cookies;
@@ -128,7 +129,9 @@ CefManager::CefManager()
     // render process path
     auto path = qApp->applicationDirPath();
     browser_sub_process_path.FromString(path.toStdString());
-    qInfo()<<__FUNCTION__<<path;
+
+    // resource file path
+    resource_directory_path.FromString(path.toStdString());
 
     // cef 缩放对照表
     zoom_map.insert(-7, "25%");

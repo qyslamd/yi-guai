@@ -59,19 +59,43 @@ void SetXWindowBounds(::Window xwindow,
     XConfigureWindow(xdisplay, xwindow, CWX | CWY | CWHeight | CWWidth, &changes);
 }
 
+//::Window GetXWindowForWidget(GtkWidget* widget) {
+//  ScopedGdkThreadsEnter scoped_gdk_threads;
+
+//  // The GTK window must be visible before we can retrieve the XID.
+//  ::Window xwindow = GDK_WINDOW_XID(gtk_widget_get_window(widget));
+//  DCHECK(xwindow);
+//  return xwindow;
+//}
+
 }  // namespace
 
-#endif
+#endif  // OS_LINUX
 
 
 CefQWidget::CefQWidget(const QString &url, QWidget *parent)
     : QWidget(parent)
-    , window_(new QWindow)
     , qwindow_containter_(nullptr)
     , layout_(new QVBoxLayout(this))
 {
+    window_ = new QWindow(windowHandle());
     browser_window_.reset(new BrowserWindow(this, url.toStdString()));
-    initUi();
+
+    auto handle = /*(ClientWindowHandle)*/window_->winId();
+    CefRect rect{x(), y(), window_->size().width(), window_->size().height()};
+    CefBrowserSettings browser_settings;
+    browser_window_->CreateBrowser(handle,
+                                   rect,
+                                   browser_settings,
+                                   nullptr,
+                                   nullptr);
+    //    window_->setFlag(Qt::FramelessWindowHint, true);
+    qwindow_containter_ = QWidget::createWindowContainer(window_/*, this, Qt::Widget*/);
+
+    layout_->setContentsMargins(0,0,0,0);
+    layout_->setSpacing(0);
+    layout_->addWidget(qwindow_containter_);
+    setLayout(layout_);
 }
 
 CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
@@ -79,16 +103,25 @@ CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
                        CefBrowserSettings &settings,
                        QWidget *parent)
     : QWidget(parent)
-    , window_(new QWindow)
     , qwindow_containter_(nullptr)
     , layout_(new QVBoxLayout(this))
 {
+    window_ = new QWindow(windowHandle());
     browser_window_.reset(new BrowserWindow(this, ""));
-    initUi();
 
-    auto handle = (ClientWindowHandle)window_->winId();
+    auto handle = /*(ClientWindowHandle)*/window_->winId();
     browser_window_->GetPopupConfig(handle, windowInfo, client, settings);
-    browser_state_ = Creating;
+
+    //    window_->setFlag(Qt::FramelessWindowHint, true);
+
+    if(!qwindow_containter_){
+        qwindow_containter_ = QWidget::createWindowContainer(window_/*, this, Qt::Widget*/);
+    }
+
+    layout_->setContentsMargins(0,0,0,0);
+    layout_->setSpacing(0);
+    layout_->addWidget(qwindow_containter_);
+    setLayout(layout_);
 }
 
 CefQWidget::~CefQWidget()
@@ -292,6 +325,7 @@ void CefQWidget::onBrowserWndDevTools(CefWindowInfo &windowInfo,
 
 void CefQWidget::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
 {
+    qInfo()<<__FUNCTION__;
     browser_ = browser;
     browser_state_ = Created;
     resizeBorser();
@@ -641,6 +675,8 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
 
 void CefQWidget::resizeEvent(QResizeEvent *event)
 {
+    resizeBorser(event->size());
+    return;
     switch(browser_state_){
     case Empty:
     {
@@ -678,21 +714,6 @@ void CefQWidget::closeEvent(QCloseEvent *event)
         // Cancel the close.
         event->ignore();
     }
-}
-
-void CefQWidget::initUi()
-{
-//    window_->setFlag(Qt::FramelessWindowHint, true);
-
-    if(!qwindow_containter_){
-        qwindow_containter_ = QWidget::createWindowContainer(window_/*, this, Qt::Widget*/);
-    }
-
-    layout_->setContentsMargins(0,0,0,0);
-    layout_->setSpacing(0);
-
-    layout_->addWidget(qwindow_containter_);
-    setLayout(layout_);
 }
 
 void CefQWidget::resizeBorser(const QSize &size)
