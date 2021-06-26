@@ -81,6 +81,7 @@ CefQWidget::CefQWidget(const QString &url, QWidget *parent)
     window_ = new QWindow(windowHandle());
     browser_window_.reset(new BrowserWindow(this, url.toStdString()));
 
+#if defined(Q_OS_LINUX)
     auto handle = /*(ClientWindowHandle)*/window_->winId();
     CefRect rect{x(), y(), window_->size().width(), window_->size().height()};
     CefBrowserSettings browser_settings;
@@ -89,7 +90,10 @@ CefQWidget::CefQWidget(const QString &url, QWidget *parent)
                                    browser_settings,
                                    nullptr,
                                    nullptr);
+#elif defined(Q_OS_WIN)
     //    window_->setFlag(Qt::FramelessWindowHint, true);
+
+#endif
     qwindow_containter_ = QWidget::createWindowContainer(window_/*, this, Qt::Widget*/);
 
     layout_->setContentsMargins(0,0,0,0);
@@ -106,13 +110,18 @@ CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
     , qwindow_containter_(nullptr)
     , layout_(new QVBoxLayout(this))
 {
-    window_ = new QWindow(windowHandle());
     browser_window_.reset(new BrowserWindow(this, ""));
 
+#if defined(Q_OS_LINUX)
+    window_ = new QWindow(windowHandle());
     auto handle = /*(ClientWindowHandle)*/window_->winId();
+#elif defined(Q_OS_WIN)
+    window_ = new QWindow();
+    window_->setFlag(Qt::FramelessWindowHint, true);
+    auto handle = (HWND)window_->winId();
+#endif
     browser_window_->GetPopupConfig(handle, windowInfo, client, settings);
 
-    //    window_->setFlag(Qt::FramelessWindowHint, true);
 
     if(!qwindow_containter_){
         qwindow_containter_ = QWidget::createWindowContainer(window_/*, this, Qt::Widget*/);
@@ -122,6 +131,8 @@ CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
     layout_->setSpacing(0);
     layout_->addWidget(qwindow_containter_);
     setLayout(layout_);
+
+    browser_state_ = Creating;
 }
 
 CefQWidget::~CefQWidget()
@@ -675,8 +686,9 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
 
 void CefQWidget::resizeEvent(QResizeEvent *event)
 {
+#if defined (Q_OS_LINUX)
     resizeBorser(event->size());
-    return;
+#elif defined(Q_OS_WIN)
     switch(browser_state_){
     case Empty:
     {
@@ -697,6 +709,7 @@ void CefQWidget::resizeEvent(QResizeEvent *event)
         break;
     }
     event->accept();
+#endif
 }
 
 void CefQWidget::closeEvent(QCloseEvent *event)

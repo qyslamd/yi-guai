@@ -21,19 +21,17 @@ QtFrameLessWnd::QtFrameLessWnd(QWidget *parent)
     : QWidget(parent)
 {
     setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
-    setAttribute(Qt::WA_TranslucentBackground);
+//    setAttribute(Qt::WA_TranslucentBackground);
     setMouseTracking(true);
     setMinimumSize(300,300);
 
-    central_widget = new QWidget(this);
-    central_widget->setAttribute(Qt::WA_NativeWindow);
-    layout_ = new QHBoxLayout(central_widget);
+    layout_ = new QHBoxLayout(this);
     layout_->setContentsMargins(FrameWidth,
                                 FrameWidth + CaptionHeight,
                                 FrameWidth,
                                 FrameWidth);
     layout_->setSpacing(0);
-    central_widget->setLayout(layout_);
+    setLayout(layout_);
 }
 
 bool QtFrameLessWnd::event(QEvent *e)
@@ -83,6 +81,7 @@ void QtFrameLessWnd::setWidget(QWidget *widget)
     }
     // 重新添加
     layout_->addWidget(widget);
+    widget->show();
 }
 
 QWidget *QtFrameLessWnd::widget()

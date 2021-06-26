@@ -130,15 +130,17 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+#if 1
     MainWindowConfig cfg;
     cfg.url_ = "https://cn.bing.com/";
     MainWndMgr::Instance().createWindow(cfg);
-
-//    QtFrameLessWnd w;
-//    MainWindow widget(MainWindowConfig{});
-//    w.setWidget(&widget);
-//    w.resize(1024,768);
-//    w.show();
+#else
+    QtFrameLessWnd w;
+    MainWindow widget(MainWindowConfig{});
+    w.setWidget(&widget);
+    w.resize(1024,768);
+    w.show();
+#endif
 
     message_loop->Run();
 
@@ -247,6 +249,7 @@ int initializeCef(int argc, char *argv[])
         qInfo()<<"CefInitialize initialized succeed!";
     }
 
+#if defined(Q_OS_LINUX)
     // The Chromium sandbox requires that there only be a single thread during
     // initialization. Therefore initialize GTK after CEF.
     gtk_init(&argc, &argv_copy);
@@ -262,6 +265,7 @@ int initializeCef(int argc, char *argv[])
     // Install a signal handler so we clean up after ourselves.
     signal(SIGINT, TerminationSignalHandler);
     signal(SIGTERM, TerminationSignalHandler);
+#endif
 
     custom_scheme::RegisterSchemeHandlers();
     return 0;
