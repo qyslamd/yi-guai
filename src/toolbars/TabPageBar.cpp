@@ -165,7 +165,7 @@ void TabPageToolBar::initUi()
     btn_dock_tabs_->setToolTip(tr("open vertical tabs"));
     btn_add_page_->setToolTip(tr("Add a tab page"));
 
-    QSize iconSize(22,22);
+    QSize iconSize(20,20);
     btn_dock_tabs_->setIconSize(iconSize);
     btn_add_page_->setIconSize(iconSize);
 
@@ -177,6 +177,8 @@ void TabPageToolBar::initUi()
 
     connect(btn_add_page_, &QToolButton::clicked, this, &TabPageToolBar::addPage);
     connect(btn_dock_tabs_, &QToolButton::clicked, this, &TabPageToolBar::showDockPage);
+
+    btn_dock_tabs_->hide();
 }
 
 void TabPageToolBar::setIcons()
@@ -185,8 +187,13 @@ void TabPageToolBar::setIcons()
         btn_dock_tabs_->setIcon(QIcon(":/icons/resources/imgs/dark/left_docking_64px.png"));
         btn_add_page_->setIcon(QIcon(":/icons/resources/imgs/dark/plus_math_64px.png"));
     }else{
+#if BLACK_BOLD
         btn_dock_tabs_->setIcon(QIcon(":/icons/resources/imgs/light/left_docking_64px.png"));
         btn_add_page_->setIcon(QIcon(":/icons/resources/imgs/light/plus_math_64px.png"));
+#else
+        btn_dock_tabs_->setIcon(QIcon(":/icons/resources/imgs/ios7/left_docking_50px.png"));
+        btn_add_page_->setIcon(QIcon(":/icons/resources/imgs/ios7/add_50px.png"));
+#endif
     }
 }
 

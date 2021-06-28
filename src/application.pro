@@ -49,6 +49,7 @@ SOURCES += \
     toolbars/BookmarkBar.cpp \
     toolbars/NavigationBar.cpp \
     toolbars/NotificationBar.cpp \
+    toolbars/SearchBar.cpp \
     toolbars/TabBar.cpp \
     toolbars/TabPageBar.cpp \
     toolbars/TabbarStyle.cpp \
@@ -102,6 +103,7 @@ HEADERS += \
     toolbars/BookmarkBar.h \
     toolbars/NavigationBar.h \
     toolbars/NotificationBar.h \
+    toolbars/SearchBar.h \
     toolbars/TabBar.h \
     toolbars/TabPageBar.h \
     toolbars/TabbarStyle.h \

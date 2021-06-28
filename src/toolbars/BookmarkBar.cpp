@@ -170,7 +170,6 @@ void BookmarkBar::onCustomContextMenuRequested(const QPoint &pos)
     auto action = toolbar_->actionAt(toolbar_->mapFromParent(pos));
     qInfo()<<__FUNCTION__<<action;
     if(action){
-#if 0
         if(auto dataItem = (QStandardItem *)action->data().value<void *>())
         {
             BookmarkMgr::Instance()->setMenuTriggerItem(dataItem);
@@ -207,7 +206,6 @@ void BookmarkBar::onCustomContextMenuRequested(const QPoint &pos)
             menu.addAction(BookmarkMgr::Instance()->action_delete_);
             menu.addSeparator();
         }
-#endif
     }
     menu.addAction(BookmarkMgr::Instance()->action_add_current_);
     menu.addAction(BookmarkMgr::Instance()->action_add_folder_);

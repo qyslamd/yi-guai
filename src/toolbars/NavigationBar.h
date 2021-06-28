@@ -8,6 +8,7 @@ class QHBoxLayout;
 class QToolButton;
 class QPushButton;
 class AddressBar;
+class SearchBar;
 class QMenu;
 class QAction;
 class QLabel;
@@ -60,6 +61,7 @@ private:
     QToolButton *btn_more_options_;
 
     AddressBar *address_bar_;
+    SearchBar *search_bar_;
     QFrame *frame_extensions_;
     QFrame *frame_tools_;
 

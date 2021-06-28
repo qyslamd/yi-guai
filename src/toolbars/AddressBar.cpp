@@ -107,9 +107,9 @@ void AddressBar::initUi()
             btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/colorful/star_filled_64px.png"));
         }else{
             if(!inprivate_){
-                btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_64px.png"));
+                btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/light/star_64px.png"));
             }else{
-                btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_white_48px.png"));
+                btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/dark/star_64px.png"));
             }
         }
     });
@@ -127,7 +127,7 @@ void AddressBar::initUi()
 
     if(!inprivate_){
         btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/alert_circle_64px.png"));
-        btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_64px.png"));
+        btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/light/star_64px.png"));
     }else{
         btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/info_white_48px.png"));
         btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_white_48px.png"));

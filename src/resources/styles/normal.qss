@@ -217,6 +217,34 @@ background: #CFCFCF;
 border:none;
 }
 
+.SearchBar{
+border:none;
+border-radius:6px;
+background-color:#F0F0F4;
+}
+.SearchBar:hover{
+border:1px solid #D2D2D2;
+}
+.SearchBar:focus{
+background-color:white;
+border:2px solid #A3CFEC;
+}
+.SearchBar > QLineEdit{
+border:none;
+background-color:transparent;
+}
+.SearchBar > QToolButton{
+border:none;
+border-radius:4px;
+padding:4px;
+}
+.SearchBar > QToolButton:hover{
+background-color:rgba(169,169,169, 30%);
+}
+.SearchBar > QToolButton:open{
+background: #CFCFCF;
+border:none;
+}
 
 .TabBar::close-button{
     image: url(:/icons/resources/imgs/light/delete_64px.png);

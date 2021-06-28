@@ -32,6 +32,27 @@ border:none;
 background-color:transparent;
 }
 
+.SearchBar{
+border:none;
+border-radius:6px;
+background-color: #242424;
+}
+.SearchBar:hover{
+    border:1px solid #DCDCDC;
+}
+.SearchBar:focus{
+    border:2px solid #DCDCDC;
+}
+.SearchBar > QLineEdit{
+color:white;
+border:none;
+background: #242424;
+}
+.SearchBar > QLineEdit:focus{
+border:none;
+background-color:transparent;
+}
+
 QPushButton#NaviBarInprivateBtn{
 border:none;
 border-radius:8px;

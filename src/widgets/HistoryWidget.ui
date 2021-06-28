@@ -235,7 +235,7 @@ QToolButton::menu-indicator{
             </property>
             <property name="icon">
              <iconset resource="../resource.qrc">
-              <normaloff>:/icons/resources/imgs/more_horizontal_64px.png</normaloff>:/icons/resources/imgs/more_horizontal_64px.png</iconset>
+              <normaloff>:/icons/resources/imgs/ios7/more_50px.png</normaloff>:/icons/resources/imgs/ios7/more_50px.png</iconset>
             </property>
             <property name="iconSize">
              <size>
