@@ -154,7 +154,11 @@ bool CefClientHandler::DoClose(CefRefPtr<CefBrowser> browser)
     // Return false to allow the close. For windowed browsers this will result in the OS close
     // event being sent.
     // and return true to pevent sending close signal to the toplevel window
+#ifdef Q_OS_LINUX
+    return false;
+#else
     return true;
+#endif
 }
 
 void CefClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
