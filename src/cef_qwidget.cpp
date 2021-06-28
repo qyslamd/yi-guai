@@ -113,7 +113,7 @@ CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
     browser_window_.reset(new BrowserWindow(this, ""));
 
 #if defined(Q_OS_LINUX)
-    window_ = new QWindow(windowHandle());
+    window_ = new QWindow(windowHandle()); // 很明显，Linux的QWindow需要指定父窗口
     auto handle = /*(ClientWindowHandle)*/window_->winId();
 #elif defined(Q_OS_WIN)
     window_ = new QWindow();

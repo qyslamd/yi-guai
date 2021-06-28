@@ -21,7 +21,7 @@ QtFrameLessWnd::QtFrameLessWnd(QWidget *parent)
     : QWidget(parent)
 {
     setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
-//    setAttribute(Qt::WA_TranslucentBackground);
+    setAttribute(Qt::WA_TranslucentBackground);
     setMouseTracking(true);
     setMinimumSize(300,300);
 
@@ -32,6 +32,8 @@ QtFrameLessWnd::QtFrameLessWnd(QWidget *parent)
                                 FrameWidth);
     layout_->setSpacing(0);
     setLayout(layout_);
+
+//    setStyleSheet(".QtFrameLessWnd{border:8px solid red;border-radius:8px;}");
 }
 
 bool QtFrameLessWnd::event(QEvent *e)

@@ -2,6 +2,7 @@
 #define QTFRAMELESS_WND_H
 
 #include <QWidget>
+#include <QFrame>
 #include <QObject>
 #include <QHBoxLayout>
 
@@ -31,7 +32,7 @@ protected:
     virtual void leaveEvent(QEvent *event) override;
     virtual void changeEvent(QEvent *event) override;
 private:
-    int FrameWidth = 10;
+    int FrameWidth = 8;
     const int CaptionHeight = 30;
 
     enum class Region{
