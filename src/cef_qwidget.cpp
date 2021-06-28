@@ -339,7 +339,7 @@ void CefQWidget::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
     qInfo()<<__FUNCTION__;
     browser_ = browser;
     browser_state_ = Created;
-    resizeBorser();
+    resizeBrowser();
     emit browserCreated();
 }
 
@@ -705,7 +705,7 @@ void CefQWidget::resizeEvent(QResizeEvent *event)
     case Creating:
         break;
     case Created:
-        resizeBorser(event->size());
+        resizeBrowser(event->size());
         break;
     }
     event->accept();
@@ -729,7 +729,7 @@ void CefQWidget::closeEvent(QCloseEvent *event)
     }
 }
 
-void CefQWidget::resizeBorser(const QSize &size)
+void CefQWidget::resizeBrowser(const QSize &size)
 {
     QRect rect;
     if(size.isEmpty()){

@@ -117,7 +117,7 @@ private:
 
 private:
     void initUi();
-    void resizeBorser(const QSize &size = QSize());
+    void resizeBrowser(const QSize &size = QSize());
     void dealCefKeyEvent(const CefKeyEvent &event,
                          CefEventHandle os_event,
                          bool *is_keyboard_shortcut,
