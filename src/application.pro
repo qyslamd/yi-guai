@@ -2,7 +2,6 @@ QT       += core gui network widgets sql
 
 CONFIG += c++11
 
-#DESTDIR = $$OUT_PWD/bin
 TARGET = YiGuai
 
 win32{
@@ -156,6 +155,7 @@ msvc {
     QMAKE_CXXFLAGS += /utf-8
 }
 win32{
+    DESTDIR = $$OUT_PWD/bin
 
     SOURCES +=\
     browser/message_loop/main_message_loop_external_pump_win.cc \
@@ -202,6 +202,9 @@ win32{
 }
 
 unix:!macx{
+    OBJECTS_DIR = .obj
+    MOC_DIR = .moc
+
     CONFIG += link_pkgconfig
     PKGCONFIG += x11
     PKGCONFIG += glib-2.0
