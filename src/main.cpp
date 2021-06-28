@@ -249,7 +249,7 @@ int initializeCef(int argc, char *argv[])
         qInfo()<<"CefInitialize initialized succeed!";
     }
 
-#if defined(Q_OS_LINUX)
+#if defined(Q_OS_LINUX1)
     // The Chromium sandbox requires that there only be a single thread during
     // initialization. Therefore initialize GTK after CEF.
     gtk_init(&argc, &argv_copy);
