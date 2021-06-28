@@ -462,6 +462,15 @@ void MainWindow::initSignalSlot()
 #endif
     connect(navi_bar_, &NavigateToolBar::naviBarCmd, this, &MainWindow::onNaviBarCmd);
     connect(bookmark_bar_, &BookmarkBar::cmdTriggered, this, &MainWindow::onBookmarkCmd);
+    connect(bookmark_bar_, &BookmarkBar::appBtnClicked, this, [](const QVariant &data)
+    {
+        auto pos = data.toPoint();
+        CefQWidget *w = new CefQWidget("cn.bing.com");
+        w->setAttribute(Qt::WA_DeleteOnClose);
+        w->move(pos);
+        w->resize(512, 364);
+        w->show();
+    });
     connect(history_widget_, &HistoryWidget::pinOrCloseClicked, this, &MainWindow::onPinOrCloseHistoryWidget);
     connect(history_widget_, &HistoryWidget::menuCmd, this, &MainWindow::onHistoryWidgetCmd);
     connect(bookmark_widget_, &BookmarkWidget::pinOrCloseClicked, this, &MainWindow::onPinOrCloseBookmarkWidget);

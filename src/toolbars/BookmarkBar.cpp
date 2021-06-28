@@ -97,6 +97,10 @@ void BookmarkBar::initUi()
     btn_application_ = new QPushButton(FaviconMgr::systemDirIcon, tr("application"));
     btn_application_->setToolTip(tr("open applications"));
     btn_application_->setIcon(QIcon(":/icons/resources/imgs/gray/squared_menu_96px.png"));
+    connect(btn_application_, &QPushButton::clicked, this, [this]()
+    {
+        emit appBtnClicked(mapToGlobal(btn_application_->geometry().bottomRight()));
+    });
     label_empty_ = new QLabel(QStringLiteral("你还没有书签，赶紧添加一个吧"), this);
 
     toolbar_ = new BookmarkToolBar(this);

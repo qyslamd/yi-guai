@@ -24,6 +24,7 @@ public:
 
 signals:
     void cmdTriggered(BookmarkCmd cmd, const QVariant &data);
+    void appBtnClicked(const QVariant &data);
 protected:
     void paintEvent(QPaintEvent *event) override;
     void showEvent(QShowEvent *event) override;
