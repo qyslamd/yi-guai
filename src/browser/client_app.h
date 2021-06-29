@@ -1,9 +1,9 @@
-#ifndef CLIENT_APP_H
-#define CLIENT_APP_H
+#ifndef CEF_CLIENT_APP_H
+#define CEF_CLIENT_APP_H
 
 #include <vector>
-
 #include <include/cef_app.h>
+#include <string>
 
 // Base class for customizing process-type-based behavior.
 class ClientApp : public CefApp {
@@ -33,4 +33,4 @@ private:
     DISALLOW_COPY_AND_ASSIGN(ClientApp);
 };
 
-#endif // CLIENT_APP_H
+#endif // CEF_CLIENT_APP_H
