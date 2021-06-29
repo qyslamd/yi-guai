@@ -75,6 +75,8 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
         // if quit application flag is set and window set is empty,quit the application
         if(quit_app_flag_ && windows_.isEmpty())
         {
+            qInfo()<<"AAA";
+            qApp->closeAllWindows();
             qApp->quit();
         }
     });

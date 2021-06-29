@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
     message_loop->Run();
 
     int result = qt_app.exec();
-
+    qInfo()<<__FUNCTION__<<"after qt message loop end:"<<result;
     // Shut down CEF.
     CefShutdown();
 

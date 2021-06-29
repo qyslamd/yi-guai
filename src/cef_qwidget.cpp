@@ -799,7 +799,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
 void CefQWidget::resizeEvent(QResizeEvent *event)
 {
 #if defined (Q_OS_LINUX)
-    resizeBorser(event->size());
+    resizeBrowser(event->size());
 #elif defined(Q_OS_WIN)
     switch(browser_state_){
     case Empty:
