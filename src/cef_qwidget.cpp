@@ -346,6 +346,7 @@ void CefQWidget::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
 void CefQWidget::OnBrowserWindowClosing()
 {
     emit browserClosing();
+
     close();
 }
 
