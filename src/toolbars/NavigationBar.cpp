@@ -177,7 +177,7 @@ void NavigateToolBar::initUi()
 {
     layout_ = new QHBoxLayout;
     layout_->setContentsMargins(4,4,4,4);
-    layout_->setSpacing(2);
+    layout_->setSpacing(4);
     setLayout(layout_);
 
     btn_back_ = new QToolButton;

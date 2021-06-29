@@ -169,4 +169,23 @@ typedef enum UserMenuId{
     MENU_ID_USER_EMOJI,
 }cef_menu_id_t_user;
 
+enum class CefShortcutCmd{
+    Refresh,
+    Fullscreen,
+    DevTool,
+    ZoomIn,
+    ZoomReset,
+    ZoomOut,
+    Print,
+    NewTab,
+    NewWnd,
+    NewPrivateWnd,
+    History,
+    Download,
+    CloseTab,
+    SwitchTab,
+    NaviBack,
+    NaviForward,
+};
+
 #endif // GLOBALDEF_H

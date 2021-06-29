@@ -500,6 +500,7 @@ bool CefQWidget::onBrowserWndPreKeyEvent(const CefKeyEvent &event,
         <<"windows_key_code:"<<QString::number(event.windows_key_code,16).toUpper().prepend("0x")
        <<"native_key_code:"<<QString::number(event.native_key_code,16).toUpper().prepend("0x");
 #endif
+    // 开发者工具的 browser如果在PreKeyEvent注册了快捷键，那么onKeyEvent就会失效。
     if(!is_dev_tool_){
         dealCefKeyEvent(event, os_event, is_keyboard_shortcut);
     }
@@ -509,13 +510,7 @@ bool CefQWidget::onBrowserWndPreKeyEvent(const CefKeyEvent &event,
 bool CefQWidget::onBrowserWndKeyEvent(const CefKeyEvent &event,
                                       CefEventHandle os_event)
 {
-    if(is_dev_tool_){
-//        emit devToolShortcut(event, os_event);
-    }else{
-        // return true represent you deal the event, otherwise return false
-        dealCefKeyEvent(event, os_event, nullptr, false);
-    }
-
+    dealCefKeyEvent(event, os_event, nullptr, false);
     return false;
 }
 
@@ -524,163 +519,279 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
                                  bool *is_keyboard_shortcut,
                                  bool isPre)
 {
-    bool is_shortcut_and_need_to_be_done = false;
+    Q_UNUSED(os_event);
+
     // F5
+    // 刷新当前标签页
     if (event.modifiers == EVENTFLAG_NONE
             && event.windows_key_code == VK_F5
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+            if(isPre && is_keyboard_shortcut){
+                *is_keyboard_shortcut = true;
+            }else{
+                emit browserShortcut(CefShortcutCmd::Refresh);
+            }
     }
+
     // F11
+    // 改变浏览器的全屏模式
     if (event.modifiers == EVENTFLAG_NONE
             && event.windows_key_code == VK_F11
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::Fullscreen);
+        }
     }
+
     // F12
+    // 打开/关闭开发者工具
     if (event.modifiers == EVENTFLAG_NONE
             && event.windows_key_code == VK_F12
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::DevTool);
+        }
     }
-    // Ctrl + -(- 位于 主键盘 0 右侧)
+
+    // Ctrl + -(- 位于 主键盘 按键 0 右侧)
+    // 缩小
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == VK_OEM_MINUS
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::ZoomOut);
+        }
     }
+
     // Ctrl + -(- 位于 小键盘 )
+    // 缩小
     if (event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
             && event.windows_key_code == VK_SUBTRACT
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::ZoomOut);
+        }
     }
+
+    /* from WinUser.h
+     * VK_0 - VK_9 are the same as ASCII '0' - '9' (0x30 - 0x39)
+     * 0x3A - 0x40 : unassigned
+     * VK_A - VK_Z are the same as ASCII 'A' - 'Z' (0x41 - 0x5A)
+     */
     // Ctrl + 0(0 位于 主键盘)
+    // 恢复缩放比例
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == '0'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::ZoomReset);
+        }
     }
+
     // Ctrl + 0(0 位于 小键盘 )
+    // 恢复缩放比例
     if (event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
             && event.windows_key_code == VK_NUMPAD0
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::ZoomReset);
+        }
     }
+
     // Ctrl + +(+ 位于 backspace 左侧)
+    // 放大
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == VK_OEM_PLUS
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::ZoomIn);
+        }
     }
+
     // Ctrl + +(+ 位于 小键盘 )
+    // 放大
     if (event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
             && event.windows_key_code == VK_ADD
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::ZoomIn);
+        }
     }
+
     // Ctrl + P
+    // 打印
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'P'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::Print);
+        }
     }
+
     // Ctrl + R
+    // 刷新当前标签页
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'R'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::Refresh);
+        }
     }
+
     // Ctrl + T
+    // 新建标签页
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'T'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::NewTab);
+        }
     }
+
     // Ctrl + N
+    // 新建浏览器窗口
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'N'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::NewWnd);
+        }
     }
+
     // Ctrl + Shift + N
+    // 新建InPrivate浏览器窗口
     if (event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_SHIFT_DOWN)
             && event.windows_key_code == 'N'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::NewPrivateWnd);
+        }
     }
+
     // Ctrl + Shift + I
+    // 打开开发者工具
     if (event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_SHIFT_DOWN)
             && event.windows_key_code == 'I'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::DevTool);
+        }
     }
+
     // Ctrl + H
+    // 查看历史记录
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'H'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::History);
+        }
     }
+
     // Ctrl + J
+    // 查看下载
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'J'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::Download);
+        }
     }
+
     // Ctrl + W
+    // 关闭当前标签页
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'W'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::CloseTab);
+        }
     }
+
     // Ctrl + Tab
+    // 标签页切换
     if(event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == VK_TAB
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::SwitchTab);
+        }
     }
     // Alt + <--(左箭头)
     if(event.modifiers == EVENTFLAG_ALT_DOWN
             && event.windows_key_code == VK_LEFT
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::NaviBack);
+        }
     }
     // Alt + -->(右箭头)
     if(event.modifiers == EVENTFLAG_ALT_DOWN
             && event.windows_key_code == VK_RIGHT
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
-    }
-
-
-    // 统一处理，不写多份儿
-    if(is_shortcut_and_need_to_be_done)
-    {
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-//            emit browserShortcut(event, os_event);
+            emit browserShortcut(CefShortcutCmd::NaviForward);
         }
     }
 }

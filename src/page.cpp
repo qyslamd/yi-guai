@@ -230,8 +230,11 @@ void Page::initBrowser()
         emit pageCmd(PageCmd::Favicon, pix);
     });
 
-//    connect(browser_widget_, &CefQWidget::browserShortcut,
-//            this, &Page::browserShortcut);
+    connect(browser_widget_, &CefQWidget::browserShortcut, this, [=](CefShortcutCmd cmd){
+        if(!browser_widget_->isDevTool()){
+            emit browserShortcut(cmd);
+        }
+    });
 }
 
 void Page::initOthers()
@@ -264,8 +267,9 @@ void Page::initOthers()
 void Page::onBrowserDevTool(CefQWidget *devTool)
 {
     qInfo()<<__FUNCTION__<<devTool;
-//    connect(devTool, &CefQWidget::devToolShortcut, this, &Page::onDevToolShortcut);
-
+    connect(devTool, &CefQWidget::browserShortcut, this, [=](CefShortcutCmd cmd){
+        onDevToolShortcut(devTool, cmd);
+    });
     dock_dev_tool_->setAllowedAreas(Qt::AllDockWidgetAreas);
     dock_dev_tool_->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable);
     dock_dev_tool_->setWidget(devTool);
@@ -312,87 +316,39 @@ void Page::onDockDevToolLocChanged(Qt::DockWidgetArea area)
     }
 }
 
-//void Page::onDevToolShortcut(const CefKeyEvent &event, CefEventHandle)
-//{
-//    qInfo()<<__FUNCTION__;
-//    auto sender = QObject::sender();
-//    auto devTool = qobject_cast<CefQWidget*>(sender);
-//    // 开发者工具 browser中的快捷键处理，这里按下了 F12，表明关闭开发者工具
-//    if(event.modifiers == EVENTFLAG_NONE
-//            && event.windows_key_code == VK_F12
-//            && event.type == KEYEVENT_RAWKEYDOWN)
-//    {
-//        if(devTool && devTool == dock_dev_tool_->widget())
-//        {
-//            dock_dev_tool_->close();
-//        }
-//    }
-
-//    // Ctrl + -(- 位于 主键盘 按键 0 右侧)
-//    // 缩小
-//    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
-//            && event.windows_key_code == VK_OEM_MINUS)
-//    {
-//        if(devTool && devTool == dock_dev_tool_->widget())
-//        {
-//            devTool->ZoomOut();
-//        }
-//    }
-
-//    // Ctrl + -(- 位于 小键盘 )
-//    // 缩小
-//    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
-//            && event.windows_key_code == VK_SUBTRACT ){
-//        if(devTool && devTool == dock_dev_tool_->widget())
-//        {
-//            devTool->ZoomOut();
-//        }
-//    }
-//    /* from WinUser.h
-//     * VK_0 - VK_9 are the same as ASCII '0' - '9' (0x30 - 0x39)
-//     * 0x3A - 0x40 : unassigned
-//     * VK_A - VK_Z are the same as ASCII 'A' - 'Z' (0x41 - 0x5A)
-//     */
-//    // Ctrl + 0(0 位于 主键盘)
-//    // 恢复缩放比例
-//    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
-//            && event.windows_key_code == '0'){
-//        if(devTool && devTool == dock_dev_tool_->widget())
-//        {
-//            devTool->ZoomReset();
-//        }
-//    }
-//    // Ctrl + 0(0 位于 小键盘 )
-//    // 恢复缩放比例
-//    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
-//            && event.windows_key_code == VK_NUMPAD0)
-//    {
-//        if(devTool && devTool == dock_dev_tool_->widget())
-//        {
-//            devTool->ZoomReset();
-//        }
-//    }
-
-//    // Ctrl + +(+ 位于 backspace 左侧)
-//    // 放大
-//    if( event.modifiers == EVENTFLAG_CONTROL_DOWN
-//            && event.windows_key_code == VK_OEM_PLUS)
-//    {
-//        if(devTool && devTool == dock_dev_tool_->widget())
-//        {
-//            devTool->ZoomIn();
-//        }
-//    }
-//    // Ctrl + +(+ 位于 小键盘 )
-//    // 放大
-//    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
-//            && event.windows_key_code == VK_ADD){
-//        if(devTool && devTool == dock_dev_tool_->widget())
-//        {
-//            devTool->ZoomIn();
-//        }
-//    }
-//}
+void Page::onDevToolShortcut(CefQWidget *devTool, CefShortcutCmd cmd)
+{
+    qInfo()<<__FUNCTION__;
+    switch (cmd){
+    case CefShortcutCmd::DevTool:
+        // 开发者工具 browser中的快捷键处理，这里按下了 F12，表明关闭开发者工具
+        if(devTool && devTool == dock_dev_tool_->widget())
+        {
+            dock_dev_tool_->close();
+        }
+        break;
+    case CefShortcutCmd::ZoomOut:
+        if(devTool && devTool == dock_dev_tool_->widget())
+        {
+            devTool->ZoomOut();
+        }
+        break;
+    case CefShortcutCmd::ZoomReset:
+        if(devTool && devTool == dock_dev_tool_->widget())
+        {
+            devTool->ZoomReset();
+        }
+        break;
+    case CefShortcutCmd::ZoomIn:
+        if(devTool && devTool == dock_dev_tool_->widget())
+        {
+            devTool->ZoomIn();
+        }
+        break;
+    default:
+        break;
+    }
+}
 
 void Page::onZoomBarTimer()
 {
