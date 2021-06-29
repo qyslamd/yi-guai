@@ -24,6 +24,7 @@
 #include <QDateTime>
 #include <QPixmap>
 #include <QBuffer>
+#include <QScreen>
 
 #include <include/base/cef_logging.h>
 #include "mainwindow.h"
@@ -80,26 +81,8 @@ CefQWidget::CefQWidget(const QString &url, QWidget *parent)
 {
     window_ = new QWindow(windowHandle());
     browser_window_.reset(new BrowserWindow(this, url.toStdString()));
+    initUi();
 
-#if defined(Q_OS_LINUX)
-    auto handle = /*(ClientWindowHandle)*/window_->winId();
-    CefRect rect{x(), y(), window_->size().width(), window_->size().height()};
-    CefBrowserSettings browser_settings;
-    browser_window_->CreateBrowser(handle,
-                                   rect,
-                                   browser_settings,
-                                   nullptr,
-                                   nullptr);
-#elif defined(Q_OS_WIN)
-    //    window_->setFlag(Qt::FramelessWindowHint, true);
-
-#endif
-    qwindow_containter_ = QWidget::createWindowContainer(window_/*, this, Qt::Widget*/);
-
-    layout_->setContentsMargins(0,0,0,0);
-    layout_->setSpacing(0);
-    layout_->addWidget(qwindow_containter_);
-    setLayout(layout_);
 }
 
 CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
@@ -110,27 +93,14 @@ CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
     , qwindow_containter_(nullptr)
     , layout_(new QVBoxLayout(this))
 {
-    browser_window_.reset(new BrowserWindow(this, ""));
-
-#if defined(Q_OS_LINUX)
-    window_ = new QWindow(windowHandle()); // 很明显，Linux的QWindow需要指定父窗口
-    auto handle = /*(ClientWindowHandle)*/window_->winId();
-#elif defined(Q_OS_WIN)
-    window_ = new QWindow();
-    window_->setFlag(Qt::FramelessWindowHint, true);
-    auto handle = (HWND)window_->winId();
+    window_ = new QWindow(windowHandle());
+#ifdef Q_OS_WIN
+    window_->setFlag(Qt::FramelessWindowHint);
 #endif
-    browser_window_->GetPopupConfig(handle, windowInfo, client, settings);
-
-
-    if(!qwindow_containter_){
-        qwindow_containter_ = QWidget::createWindowContainer(window_/*, this, Qt::Widget*/);
-    }
-
-    layout_->setContentsMargins(0,0,0,0);
-    layout_->setSpacing(0);
-    layout_->addWidget(qwindow_containter_);
-    setLayout(layout_);
+    browser_window_.reset(new BrowserWindow(this, ""));
+    browser_window_->GetPopupConfig((ClientWindowHandle)window_->winId(),
+                                    windowInfo, client, settings);
+    initUi();
 
     browser_state_ = Creating;
 }
@@ -797,11 +767,13 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
     }
 }
 
+void CefQWidget::onScreenChanged(QScreen *)
+{
+    resizeBrowser();
+}
+
 void CefQWidget::resizeEvent(QResizeEvent *event)
 {
-#if defined (Q_OS_LINUX)
-    resizeBrowser(event->size());
-#elif defined(Q_OS_WIN)
     switch(browser_state_){
     case Empty:
     {
@@ -822,7 +794,6 @@ void CefQWidget::resizeEvent(QResizeEvent *event)
         break;
     }
     event->accept();
-#endif
 }
 
 void CefQWidget::closeEvent(QCloseEvent *event)
@@ -840,6 +811,20 @@ void CefQWidget::closeEvent(QCloseEvent *event)
         // Cancel the close.
         event->ignore();
     }
+}
+
+void CefQWidget::initUi()
+{
+    if(!qwindow_containter_){
+        qwindow_containter_ = QWidget::createWindowContainer(window_);
+    }
+
+    layout_->setContentsMargins(0,0,0,0);
+    layout_->setSpacing(0);
+    layout_->addWidget(qwindow_containter_);
+    setLayout(layout_);
+
+    connect(window_, &QWindow::screenChanged, this, &CefQWidget::onScreenChanged);
 }
 
 void CefQWidget::resizeBrowser(const QSize &size)

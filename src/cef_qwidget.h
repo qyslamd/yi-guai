@@ -113,13 +113,14 @@ private:
     QWidget *qwindow_containter_;
     QVBoxLayout *layout_;
 
-private:
     void initUi();
     void resizeBrowser(const QSize &size = QSize());
     void dealCefKeyEvent(const CefKeyEvent &event,
                          CefEventHandle os_event,
                          bool *is_keyboard_shortcut,
                          bool isPre = true);
+private slots:
+    void onScreenChanged(QScreen *);
 };
 
 #endif // CEF_QWIDGET_H
