@@ -176,7 +176,7 @@ void NavigateToolBar::paintEvent(QPaintEvent *event)
 void NavigateToolBar::initUi()
 {
     layout_ = new QHBoxLayout;
-    layout_->setContentsMargins(4,4,4,4);
+    layout_->setContentsMargins(4,4,4,2);
     layout_->setSpacing(4);
     setLayout(layout_);
 
@@ -633,7 +633,7 @@ void NavigateToolBar::setIcons()
     action_quit_->setIcon(QIcon());
 
     QSize iconSize(20,20);
-    QSize btnSize(30,30);
+    QSize btnSize(36,28);
     for(auto item : this->children()){
         if(item->isWidgetType() &&
                 item->metaObject()->className() == QString("QToolButton"))

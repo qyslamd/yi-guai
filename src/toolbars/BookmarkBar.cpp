@@ -92,7 +92,7 @@ void BookmarkBar::initUi()
 
     layout_ = new QHBoxLayout(this);
     layout_->setSpacing(4);
-    layout_->setContentsMargins(4,4,4,4);
+    layout_->setContentsMargins(4,2,4,2);
 
     btn_application_ = new QPushButton(FaviconMgr::systemDirIcon, tr("application"));
     btn_application_->setToolTip(tr("open applications"));

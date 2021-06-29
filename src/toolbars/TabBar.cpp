@@ -238,7 +238,7 @@ QSize TabBar::tabSizeHint(int index) const
     int dpi = this->logicalDpiX();
     switch (dpi) {
     case 96:
-        return QSize(240, 34);
+        return QSize(240, 32);
     case 120:
         return QSize(300, 40);
     case 144:
@@ -256,7 +256,7 @@ QSize TabBar::tabSizeHint(int index) const
 
 QSize TabBar::minimumTabSizeHint(int index) const
 {
-    return QSize(36,36);
+    return QSize(36, 32);
     Q_UNUSED(index)
 }
 
