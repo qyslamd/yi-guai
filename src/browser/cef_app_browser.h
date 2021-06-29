@@ -14,8 +14,7 @@ public:
         return this;
     }
     void OnBeforeCommandLineProcessing(const CefString& process_type,
-                                       CefRefPtr<CefCommandLine> command_line)
-    override;
+                                       CefRefPtr<CefCommandLine> command_line) override;
     // CefBrowserProcessHandler methods
     void OnScheduleMessagePumpWork(int64 delay) override;
 

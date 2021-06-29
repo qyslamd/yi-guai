@@ -111,7 +111,7 @@ private:
     UserInfoPopup *userinfo_popup_ = nullptr; /*用户信息 popup*/
 
     bool first_browser_created_ = false; /*首个浏览器创建完成标志*/
-    bool window_closing_ = false;  /*窗口正在关闭标志*/
+    bool window_closing_ = false;   /*窗口正在关闭标志*/
     bool right_closing_ = false;    /*窗口正在关闭右侧标签页标志*/
 
 private:
