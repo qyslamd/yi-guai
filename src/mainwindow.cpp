@@ -49,10 +49,12 @@
 #include <QLocale>
 #include <QStandardItemModel>
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
 #include <Windows.h>
 #include <QtWin>
 #pragma comment(lib, "Gdi32.lib")
+#else
+#include "utils/windowskeyboardcodes.h"
 #endif
 
 MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
@@ -258,10 +260,12 @@ void MainWindow::paintEvent(QPaintEvent *event)
     //    p.restore();
 }
 
+#ifdef Q_OS_WIN
 bool MainWindow::hitTestCaption(const QPoint &gPos)
 {
     return tab_bar_->hitTestCaption(gPos);
 }
+#endif
 
 void MainWindow::initQtShortcut()
 {
@@ -428,9 +432,11 @@ void MainWindow::setAppearance()
 
 void MainWindow::initSignalSlot()
 {
+#ifdef Q_OS_WIN
     connect(tab_bar_, &TabPageToolBar::minBtnClicked, this, &MainWindow::showMinimized);
     connect(tab_bar_, &TabPageToolBar::normalMaxBtnClicked, this, &MainWindow::onNormalMax);
     connect(tab_bar_, &TabPageToolBar::closeBtnClicked, this, &MainWindow::close);
+#endif
     connect(tab_bar_, &TabPageToolBar::currentChanged, this, &MainWindow::onTabBarCurrentChanged);
     connect(tab_bar_, &TabPageToolBar::tabCloseRequested,this, &MainWindow::onTabBarCloseRequested);
     connect(tab_bar_, &TabPageToolBar::tabMoved, this, &MainWindow::onTabBarTabMoved);
@@ -456,6 +462,15 @@ void MainWindow::initSignalSlot()
 #endif
     connect(navi_bar_, &NavigateToolBar::naviBarCmd, this, &MainWindow::onNaviBarCmd);
     connect(bookmark_bar_, &BookmarkBar::cmdTriggered, this, &MainWindow::onBookmarkCmd);
+    connect(bookmark_bar_, &BookmarkBar::appBtnClicked, this, [](const QVariant &data)
+    {
+        auto pos = data.toPoint();
+        CefQWidget *w = new CefQWidget("cn.bing.com");
+        w->setAttribute(Qt::WA_DeleteOnClose);
+        w->move(pos);
+        w->resize(512, 364);
+        w->show();
+    });
     connect(history_widget_, &HistoryWidget::pinOrCloseClicked, this, &MainWindow::onPinOrCloseHistoryWidget);
     connect(history_widget_, &HistoryWidget::menuCmd, this, &MainWindow::onHistoryWidgetCmd);
     connect(bookmark_widget_, &BookmarkWidget::pinOrCloseClicked, this, &MainWindow::onPinOrCloseBookmarkWidget);
@@ -639,7 +654,6 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         onAddFavorite();
         break;
     case NaviBarCmd::AddressEdited:
-        qInfo()<<"AddressEdited";
         if(page){
             page->setEditedText(para.toString());
         }
@@ -789,6 +803,7 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
     case PageCmd::Address:
     {
         if(page && page == CurrentPage()){
+            page->setEditedText("");
             navi_bar_->setAddress(QUrl(page->url()).toDisplayString());
         }
     }
@@ -818,21 +833,37 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
         break;
     case PageCmd::LoadStart:
     {
-
+        auto index = stack_browsers_->indexOf(page);
+        tab_bar_->setTabData(index, 0.0);
     }
         break;
     case PageCmd::LoadEnd:
     {
         if(page){
-            page->setMinimumSize(QSize(0,0));
+            auto index = stack_browsers_->indexOf(page);
+            static bool ok  = false;
+            ok = !ok;
+            tab_bar_->setTabHasAudio(index, ok);
         }
     }
         break;
+    case PageCmd::LoadingProgress:
+    {
+
+    }
     case PageCmd::LoadingState:
     {
-        if(page && page == CurrentPage()){
-            QUrl url(para.toString());
-            navi_bar_->setLoadingState(page->isLoading(),page->canGoBack(), page->canGoForward());
+        if(page){
+            auto index = stack_browsers_->indexOf(page);
+            tab_bar_->setTabData(index, page->isLoading());
+
+            if(page == CurrentPage())
+            {
+                QUrl url(para.toString());
+                navi_bar_->setLoadingState(page->isLoading(),
+                                           page->canGoBack(),
+                                           page->canGoForward());
+            }
         }
     }
         break;
@@ -904,173 +935,62 @@ void MainWindow::onShowTabThumnail(const QPoint &g_pos, const int index)
     }
 }
 
-void MainWindow::onBrowserShortcut(const CefKeyEvent &event,
-                                   CefEventHandle os_event)
+void MainWindow::onBrowserShortcut(CefShortcutCmd cmd)
 {
-    Q_UNUSED(os_event);
-
-    // F5
-    // 刷新当前标签页
-    if (event.modifiers == EVENTFLAG_NONE
-            && event.windows_key_code == VK_F5
-            && event.type == KEYEVENT_RAWKEYDOWN)
-    {
-        onRefresh();
-    }
-
-    // F11
-    // 改变浏览器的全屏模式
-    if(event.modifiers == EVENTFLAG_NONE
-            && event.windows_key_code == VK_F11){
-        onFullScreen();
-    }
-
-    // F12
-    // 打开/关闭开发者工具
-    if(event.modifiers == EVENTFLAG_NONE
-            && event.windows_key_code == VK_F12){
-        onDevTool();
-    }
-
-    // Ctrl + -(- 位于 主键盘 按键 0 右侧)
-    // 缩小
-    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == VK_OEM_MINUS)
-    {
+   switch (cmd){
+   case CefShortcutCmd::Refresh:
+       onRefresh();
+       break;
+   case CefShortcutCmd::Fullscreen:
+       onFullScreen();
+       break;
+   case CefShortcutCmd::DevTool:
+       onDevTool();
+       break;
+   case CefShortcutCmd::ZoomIn:
+       onZoomIn();
+       break;
+   case CefShortcutCmd::ZoomReset:
+       onZoomReset();
+       break;
+   case CefShortcutCmd::ZoomOut:
         onZoomOut();
-    }
-    // Ctrl + -(- 位于 小键盘 )
-    // 缩小
-    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
-            && event.windows_key_code == VK_SUBTRACT ){
-        onZoomOut();
-    }
-    /* from WinUser.h
-     * VK_0 - VK_9 are the same as ASCII '0' - '9' (0x30 - 0x39)
-     * 0x3A - 0x40 : unassigned
-     * VK_A - VK_Z are the same as ASCII 'A' - 'Z' (0x41 - 0x5A)
-     */
-    // Ctrl + 0(0 位于 主键盘)
-    // 恢复缩放比例
-    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == '0'){
-        onZoomReset();
-    }
-
-    // Ctrl + 0(0 位于 小键盘 )
-    // 恢复缩放比例
-    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
-            && event.windows_key_code == VK_NUMPAD0)
-    {
-        onZoomReset();
-    }
-
-    // Ctrl + +(+ 位于 backspace 左侧)
-    // 放大
-    if( event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == VK_OEM_PLUS)
-    {
-        onZoomIn();
-    }
-    // Ctrl + +(+ 位于 小键盘 )
-    // 放大
-    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
-            && event.windows_key_code == VK_ADD){
-        onZoomIn();
-    }
-
-    // Ctrl + P
-    // 打印
-    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == 'P'){
-        onPrint();
-    }
-
-    // Ctrl + R
-    // 刷新当前标签页
-    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == 'R'
-            && event.type == KEYEVENT_RAWKEYDOWN)
-    {
-        onRefresh();
-    }
-
-    // Ctrl + T
-    // 新建标签页
-    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == 'T'){
-        AddNewPage("", true);
-    }
-
-    // Ctrl + N
-    // 新建浏览器窗口
-    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == 'N'){
+       break;
+   case CefShortcutCmd::Print:
+       onPrint();
+       break;
+   case CefShortcutCmd::NewTab:
+       AddNewPage("", true);
+       break;
+   case CefShortcutCmd::NewWnd:
         MainWndMgr::Instance().createWindow(MainWndCfg());
-    }
-
-    // Ctrl + Shift + N
-    // 新建InPrivate浏览器窗口
-    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_SHIFT_DOWN)
-            && event.windows_key_code == 'N'){
-        MainWndCfg cfg;
-        cfg.is_inprivate_ = true;
-        MainWndMgr::Instance().createWindow(cfg);
-    }
-
-    // Ctrl + Shift + I
-    // 打开开发者工具
-    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_SHIFT_DOWN)
-            && event.windows_key_code == 'I'){
-        onDevTool();
-    }
-
-    // Ctrl + H
-    // 查看历史记录
-    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == 'H'){
-        onShowHistory();
-    }
-    // Ctrl + J
-    // 查看下载
-    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == 'J'
-            && event.type == KEYEVENT_RAWKEYDOWN)
-    {
-        onShowDownload();
-    }
-    // Ctrl + W
-    // 关闭当前标签页
-    if (event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == 'W'
-            && event.type == KEYEVENT_RAWKEYDOWN)
-    {
-        onTabBarCloseRequested(CurrentPageIndex());
-    }
-
-    // Ctrl + Tab
-    // 标签页切换
-    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == VK_TAB
-            && event.type == KEYEVENT_RAWKEYDOWN)
-    {
-        onTabSwitch();
-    }
-
-    // Alt + <--(左箭头)
-    if(event.modifiers == EVENTFLAG_ALT_DOWN
-            && event.windows_key_code == VK_LEFT
-            && event.type == KEYEVENT_RAWKEYDOWN)
-    {
-        onGoBack();
-    }
-    // Alt + -->(右箭头)
-    if(event.modifiers == EVENTFLAG_ALT_DOWN
-            && event.windows_key_code == VK_RIGHT
-            && event.type == KEYEVENT_RAWKEYDOWN)
-    {
-        onGoForward();
-    }
+       break;
+   case CefShortcutCmd::NewPrivateWnd:
+   {
+       MainWndCfg cfg;
+       cfg.is_inprivate_ = true;
+       MainWndMgr::Instance().createWindow(cfg);
+   }
+       break;
+   case CefShortcutCmd::History:
+       onShowHistory();
+       break;
+   case CefShortcutCmd::Download:
+       onShowDownload();
+       break;
+   case CefShortcutCmd::CloseTab:
+       onTabBarCloseRequested(CurrentPageIndex());
+       break;
+   case CefShortcutCmd::SwitchTab:
+       onTabSwitch();
+       break;
+   case CefShortcutCmd::NaviBack:
+       onGoBack();
+       break;
+   case CefShortcutCmd::NaviForward:
+       onGoForward();
+       break;
+   }
 }
 
 void MainWindow::onHistoryWidgetCmd(HistoryCmd cmd, const QVariant &para)

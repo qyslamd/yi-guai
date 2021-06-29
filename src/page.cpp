@@ -15,6 +15,10 @@
 #include "managers/AppCfgManager.h"
 #include "managers/CefManager.h"
 
+#ifndef Q_OS_WIN
+#include "utils/windowskeyboardcodes.h"
+#endif
+
 Page::Page(const QString &url, QWidget *parent)
     : QMainWindow(parent)
     , main_layout_(new QVBoxLayout)
@@ -98,11 +102,8 @@ QString Page::url() const
 
 void Page::setEditedText(const QString &txt)
 {
-    if(url_.compare(txt, Qt::CaseInsensitive) == 0){
-        return;
-    }
-    if(txt.isEmpty())
-    {
+    if(url_.compare(txt, Qt::CaseInsensitive) == 0 || txt.isEmpty()){
+        edited_flag_ = false;
         return;
     }
     edited_flag_ = true;
@@ -167,6 +168,7 @@ void Page::initBrowser()
 
     connect(browser_widget_, &CefQWidget::browserAddressChange, [this](const QString &url)
     {
+        setEditedText("");
         url_ = url;
         emit pageCmd(PageCmd::Address, url);
     });
@@ -185,26 +187,34 @@ void Page::initBrowser()
     });
     connect(browser_widget_, &CefQWidget::browserLoadStart, [this](CefLoadHandler::TransitionType transition_type)
     {
+        setMinimumSize(QSize(0,0));
         emit pageCmd(PageCmd::LoadStart, (int)transition_type);
     });
     connect(browser_widget_, &CefQWidget::browserLoadEnd, [this](int httpStatusCode)
     {
-        const QStringList customSchemes{QString("about"),"chrome"};
-        auto parts = url_.split(":");
-        if(parts.count()  > 0){
-            auto scheme = parts.at(0).toLower();
-            if(customSchemes.contains(scheme)){
-                emit pageCmd(PageCmd::Favicon, style()->standardPixmap(QStyle::SP_MessageBoxInformation));
-            }
-        }
+//        const QStringList customSchemes{QString("about"),"chrome"};
+//        auto parts = url_.split(":");
+//        if(parts.count()  > 0){
+//            auto scheme = parts.at(0).toLower();
+//            if(customSchemes.contains(scheme)){
+//                emit pageCmd(PageCmd::Favicon, style()->standardPixmap(QStyle::SP_MessageBoxInformation));
+//            }
+//        }
 
-        if(url_.startsWith("file://",Qt::CaseInsensitive)){
-            emit pageCmd(PageCmd::Favicon, style()->standardPixmap(QStyle::SP_FileIcon));
-        }
+//        if(url_.startsWith("file://",Qt::CaseInsensitive)){
+//            emit pageCmd(PageCmd::Favicon, style()->standardPixmap(QStyle::SP_FileIcon));
+//        }
+        setMinimumSize(QSize(0,0));
         emit pageCmd(PageCmd::LoadEnd, httpStatusCode);
+    });
+    connect(browser_widget_, &CefQWidget::browserLoadingProgress, [this](double progress)
+    {
+        emit pageCmd(PageCmd::LoadingProgress, progress);
     });
     connect(browser_widget_, &CefQWidget::browserLoadingStateChange, [this](bool a, bool b, bool c)
     {
+        setMinimumSize(QSize(0,0));
+
         isLoading_ = a;
         canGoBack_ = b;
         canGoForward_ = c;
@@ -220,8 +230,11 @@ void Page::initBrowser()
         emit pageCmd(PageCmd::Favicon, pix);
     });
 
-    connect(browser_widget_, &CefQWidget::browserShortcut,
-            this, &Page::browserShortcut);
+    connect(browser_widget_, &CefQWidget::browserShortcut, this, [=](CefShortcutCmd cmd){
+        if(!browser_widget_->isDevTool()){
+            emit browserShortcut(cmd);
+        }
+    });
 }
 
 void Page::initOthers()
@@ -254,8 +267,9 @@ void Page::initOthers()
 void Page::onBrowserDevTool(CefQWidget *devTool)
 {
     qInfo()<<__FUNCTION__<<devTool;
-    connect(devTool, &CefQWidget::devToolShortcut, this, &Page::onDevToolShortcut);
-
+    connect(devTool, &CefQWidget::browserShortcut, this, [=](CefShortcutCmd cmd){
+        onDevToolShortcut(devTool, cmd);
+    });
     dock_dev_tool_->setAllowedAreas(Qt::AllDockWidgetAreas);
     dock_dev_tool_->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable);
     dock_dev_tool_->setWidget(devTool);
@@ -302,85 +316,37 @@ void Page::onDockDevToolLocChanged(Qt::DockWidgetArea area)
     }
 }
 
-void Page::onDevToolShortcut(const CefKeyEvent &event, CefEventHandle)
+void Page::onDevToolShortcut(CefQWidget *devTool, CefShortcutCmd cmd)
 {
     qInfo()<<__FUNCTION__;
-    auto sender = QObject::sender();
-    auto devTool = qobject_cast<CefQWidget*>(sender);
-    // 开发者工具 browser中的快捷键处理，这里按下了 F12，表明关闭开发者工具
-    if(event.modifiers == EVENTFLAG_NONE
-            && event.windows_key_code == VK_F12
-            && event.type == KEYEVENT_RAWKEYDOWN)
-    {
+    switch (cmd){
+    case CefShortcutCmd::DevTool:
+        // 开发者工具 browser中的快捷键处理，这里按下了 F12，表明关闭开发者工具
         if(devTool && devTool == dock_dev_tool_->widget())
         {
             dock_dev_tool_->close();
         }
-    }
-
-    // Ctrl + -(- 位于 主键盘 按键 0 右侧)
-    // 缩小
-    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == VK_OEM_MINUS)
-    {
+        break;
+    case CefShortcutCmd::ZoomOut:
         if(devTool && devTool == dock_dev_tool_->widget())
         {
             devTool->ZoomOut();
         }
-    }
-
-    // Ctrl + -(- 位于 小键盘 )
-    // 缩小
-    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
-            && event.windows_key_code == VK_SUBTRACT ){
-        if(devTool && devTool == dock_dev_tool_->widget())
-        {
-            devTool->ZoomOut();
-        }
-    }
-    /* from WinUser.h
-     * VK_0 - VK_9 are the same as ASCII '0' - '9' (0x30 - 0x39)
-     * 0x3A - 0x40 : unassigned
-     * VK_A - VK_Z are the same as ASCII 'A' - 'Z' (0x41 - 0x5A)
-     */
-    // Ctrl + 0(0 位于 主键盘)
-    // 恢复缩放比例
-    if(event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == '0'){
+        break;
+    case CefShortcutCmd::ZoomReset:
         if(devTool && devTool == dock_dev_tool_->widget())
         {
             devTool->ZoomReset();
         }
-    }
-    // Ctrl + 0(0 位于 小键盘 )
-    // 恢复缩放比例
-    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
-            && event.windows_key_code == VK_NUMPAD0)
-    {
-        if(devTool && devTool == dock_dev_tool_->widget())
-        {
-            devTool->ZoomReset();
-        }
-    }
-
-    // Ctrl + +(+ 位于 backspace 左侧)
-    // 放大
-    if( event.modifiers == EVENTFLAG_CONTROL_DOWN
-            && event.windows_key_code == VK_OEM_PLUS)
-    {
+        break;
+    case CefShortcutCmd::ZoomIn:
         if(devTool && devTool == dock_dev_tool_->widget())
         {
             devTool->ZoomIn();
         }
-    }
-    // Ctrl + +(+ 位于 小键盘 )
-    // 放大
-    if(event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
-            && event.windows_key_code == VK_ADD){
-        if(devTool && devTool == dock_dev_tool_->widget())
-        {
-            devTool->ZoomIn();
-        }
+        break;
+    default:
+        break;
     }
 }
 

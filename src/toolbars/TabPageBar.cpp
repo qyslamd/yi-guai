@@ -78,17 +78,19 @@ void TabPageToolBar::setTabToolTip(int index, const QString &tip)
     tab_bar_->setTabToolTip(index, tip);
 }
 
-bool TabPageToolBar::hitTestCaption(const QPoint &gPos)
+void TabPageToolBar::setTabData(int index, const QVariant &data)
 {
-    // 映射全局坐标当前区域中
-    auto pos = mapFromGlobal(gPos);
-    // 如果映射过来的坐标不在当前范围内，不能处理 HITCAPTION
-    if(!this->rect().contains(pos))
-    {
-        return false;
-    }
-    // 如果在，且没有子窗口且不在绘制的按钮范围内，就是 HITCAPTION
-    return !childAt(pos) && !windowBtnRect().contains(pos);
+    tab_bar_->setTabData(index, data);
+}
+
+QVariant TabPageToolBar::tabData(int index) const
+{
+    return tab_bar_->tabData(index);
+}
+
+void TabPageToolBar::setTabHasAudio(int index, bool has)
+{
+    tab_bar_->setTabHasAudio(index, has);
 }
 
 void TabPageToolBar::setCurrentIndex(int index)
@@ -117,12 +119,14 @@ void TabPageToolBar::initUi()
         inActiveColor = activeColor;
         inActiveColor.setAlphaF(0.7);
     }else{
+#ifdef Q_OS_WIN
         if(UtilQt::dwmColorPrevalence()){
             activeColor = QtWin::realColorizationColor();
             activeColor.setAlphaF(1);
             inActiveColor = activeColor;
             inActiveColor.setAlphaF(0.7);
         }
+#endif
     }
     setStyleSheet(QString(
                 ".TabPageToolBar{"
@@ -149,7 +153,7 @@ void TabPageToolBar::initUi()
 
     setLayout(layout_);
     layout_->setContentsMargins(6, 6, 0, 0);
-    layout_->setSpacing(2);
+    layout_->setSpacing(1);
     layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
     layout_->addWidget(btn_dock_tabs_);
     layout_->addWidget(line);
@@ -161,9 +165,9 @@ void TabPageToolBar::initUi()
     btn_dock_tabs_->setToolTip(tr("open vertical tabs"));
     btn_add_page_->setToolTip(tr("Add a tab page"));
 
-    QSize iconSize(22,22);
+    QSize iconSize(20,20);
     btn_dock_tabs_->setIconSize(iconSize);
-    btn_add_page_->setIconSize(iconSize);
+    btn_add_page_->setIconSize(QSize(22, 22));
 
     connect(tab_bar_, &TabBar::currentChanged, this, &TabPageToolBar::currentChanged);
     connect(tab_bar_, &TabBar::tabCloseRequested, this, &TabPageToolBar::tabCloseRequested);
@@ -173,6 +177,8 @@ void TabPageToolBar::initUi()
 
     connect(btn_add_page_, &QToolButton::clicked, this, &TabPageToolBar::addPage);
     connect(btn_dock_tabs_, &QToolButton::clicked, this, &TabPageToolBar::showDockPage);
+
+    btn_dock_tabs_->hide();
 }
 
 void TabPageToolBar::setIcons()
@@ -181,11 +187,17 @@ void TabPageToolBar::setIcons()
         btn_dock_tabs_->setIcon(QIcon(":/icons/resources/imgs/dark/left_docking_64px.png"));
         btn_add_page_->setIcon(QIcon(":/icons/resources/imgs/dark/plus_math_64px.png"));
     }else{
+#if BLACK_BOLD
         btn_dock_tabs_->setIcon(QIcon(":/icons/resources/imgs/light/left_docking_64px.png"));
         btn_add_page_->setIcon(QIcon(":/icons/resources/imgs/light/plus_math_64px.png"));
+#else
+        btn_dock_tabs_->setIcon(QIcon(":/icons/resources/imgs/ios7/left_docking_50px.png"));
+        btn_add_page_->setIcon(QIcon(":/icons/resources/imgs/ios7/add_50px.png"));
+#endif
     }
 }
 
+#ifdef Q_OS_WIN
 CaptionFrame::CaptionFrame(bool inprivate, QWidget *parent)
     : QFrame(parent)
     , inprivate_(inprivate)
@@ -205,6 +217,19 @@ QRect CaptionFrame::windowBtnRect()
 
     return QRect(rect1.topLeft().toPoint(),
                  rect3.bottomRight().toPoint());
+}
+
+bool CaptionFrame::hitTestCaption(const QPoint &gPos)
+{
+    // 映射全局坐标当前区域中
+    auto pos = mapFromGlobal(gPos);
+    // 如果映射过来的坐标不在当前范围内，不能处理 HITCAPTION
+    if(!this->rect().contains(pos))
+    {
+        return false;
+    }
+    // 如果在，且没有子窗口且不在绘制的按钮范围内，就是 HITCAPTION
+    return !childAt(pos) && !windowBtnRect().contains(pos);
 }
 
 bool CaptionFrame::event(QEvent *ev)
@@ -528,3 +553,4 @@ void CaptionFrame::clearButtonHover()
     close_button_hover_ = false;
     update();
 }
+#endif

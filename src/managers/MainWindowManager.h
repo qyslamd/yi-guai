@@ -72,6 +72,7 @@ private:
 private slots:
     void onBkmkMgrMenuCmd(BookmarkCmd cmd, const QVariant &data);
     void onAppCfgChanged();
+    void onWndDestroyed(MainWindow *obj);
 };
 
 #endif // MAINWINDOWMANAGER_H

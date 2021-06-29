@@ -31,7 +31,11 @@ bool BrowserWindow::CreateBrowser(ClientWindowHandle parent_handle,
     REQUIRE_MAIN_THREAD();
 
     CefWindowInfo window_info;
+#if defined Q_OS_WIN
     RECT wnd_rect = {rect.x, rect.y, rect.x + rect.width, rect.y + rect.height};
+#else
+    CefRect wnd_rect{rect.x, rect.y, rect.x + rect.width, rect.y + rect.height};
+#endif
     window_info.SetAsChild(parent_handle, wnd_rect);
 
     return CefBrowserHost::CreateBrowser(window_info, client_handler_,
@@ -130,6 +134,7 @@ void BrowserWindow::onBrowserDeveTools(CefWindowInfo &windowInfo,
 void BrowserWindow::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
 {
     REQUIRE_MAIN_THREAD();
+    qInfo()<<__FUNCTION__;
     DCHECK(!browser_);
 
     browser_ = browser;
@@ -193,6 +198,14 @@ void BrowserWindow::onBrowerLoadEnd(int httpStatusCode)
 {
     REQUIRE_MAIN_THREAD();
     delegate_->onBrowerWindowLoadEnd(httpStatusCode);
+}
+
+void BrowserWindow::onBrowserLoadingProgressChange(CefRefPtr<CefBrowser> browser,
+                                                   double progress)
+{
+    REQUIRE_MAIN_THREAD();
+    Q_UNUSED(browser);
+    delegate_->onBrowserWndLoadingProgressChange(progress);
 }
 
 void BrowserWindow::onBrowserLoadingStateChange(bool isLoading,

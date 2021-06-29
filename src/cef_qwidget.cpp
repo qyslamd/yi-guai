@@ -1,9 +1,12 @@
 ﻿#include "cef_qwidget.h"
 
-#ifdef Q_OS_WIN
+#if defined Q_OS_WIN
 #include <Windows.h>
 #include <SHlObj.h>
 #include <WinUser.h>
+#else
+#include "utils/windowskeyboardcodes.h"
+#include "browser/client_types.h"
 #endif
 
 #include <QtDebug>
@@ -35,14 +38,68 @@
 #include "dialogs/alertdialog.h"
 
 
+#ifdef OS_LINUX
+#include <X11/Xlib.h>
+#undef Success     // Definition conflicts with cef_message_router.h
+#undef RootWindow  // Definition conflicts with root_window.h
+#undef Bool // Definition conflicts with X11/Xlib.h
+
+namespace  {
+void SetXWindowBounds(::Window xwindow,
+                      int x,
+                      int y,
+                      size_t width,
+                      size_t height) {
+    ::Display* xdisplay = cef_get_xdisplay();
+    XWindowChanges changes = {0};
+    changes.x = x;
+    changes.y = y;
+    changes.width = static_cast<int>(width);
+    changes.height = static_cast<int>(height);
+    XConfigureWindow(xdisplay, xwindow, CWX | CWY | CWHeight | CWWidth, &changes);
+}
+
+//::Window GetXWindowForWidget(GtkWidget* widget) {
+//  ScopedGdkThreadsEnter scoped_gdk_threads;
+
+//  // The GTK window must be visible before we can retrieve the XID.
+//  ::Window xwindow = GDK_WINDOW_XID(gtk_widget_get_window(widget));
+//  DCHECK(xwindow);
+//  return xwindow;
+//}
+
+}  // namespace
+
+#endif  // OS_LINUX
+
+
 CefQWidget::CefQWidget(const QString &url, QWidget *parent)
     : QWidget(parent)
-    , window_(new QWindow)
     , qwindow_containter_(nullptr)
     , layout_(new QVBoxLayout(this))
 {
+    window_ = new QWindow(windowHandle());
     browser_window_.reset(new BrowserWindow(this, url.toStdString()));
-    initUi();
+
+#if defined(Q_OS_LINUX)
+    auto handle = /*(ClientWindowHandle)*/window_->winId();
+    CefRect rect{x(), y(), window_->size().width(), window_->size().height()};
+    CefBrowserSettings browser_settings;
+    browser_window_->CreateBrowser(handle,
+                                   rect,
+                                   browser_settings,
+                                   nullptr,
+                                   nullptr);
+#elif defined(Q_OS_WIN)
+    //    window_->setFlag(Qt::FramelessWindowHint, true);
+
+#endif
+    qwindow_containter_ = QWidget::createWindowContainer(window_/*, this, Qt::Widget*/);
+
+    layout_->setContentsMargins(0,0,0,0);
+    layout_->setSpacing(0);
+    layout_->addWidget(qwindow_containter_);
+    setLayout(layout_);
 }
 
 CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
@@ -50,15 +107,31 @@ CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
                        CefBrowserSettings &settings,
                        QWidget *parent)
     : QWidget(parent)
-    , window_(new QWindow)
     , qwindow_containter_(nullptr)
     , layout_(new QVBoxLayout(this))
 {
     browser_window_.reset(new BrowserWindow(this, ""));
-    initUi();
 
+#if defined(Q_OS_LINUX)
+    window_ = new QWindow(windowHandle()); // 很明显，Linux的QWindow需要指定父窗口
+    auto handle = /*(ClientWindowHandle)*/window_->winId();
+#elif defined(Q_OS_WIN)
+    window_ = new QWindow();
+    window_->setFlag(Qt::FramelessWindowHint, true);
     auto handle = (HWND)window_->winId();
+#endif
     browser_window_->GetPopupConfig(handle, windowInfo, client, settings);
+
+
+    if(!qwindow_containter_){
+        qwindow_containter_ = QWidget::createWindowContainer(window_/*, this, Qt::Widget*/);
+    }
+
+    layout_->setContentsMargins(0,0,0,0);
+    layout_->setSpacing(0);
+    layout_->addWidget(qwindow_containter_);
+    setLayout(layout_);
+
     browser_state_ = Creating;
 }
 
@@ -263,15 +336,18 @@ void CefQWidget::onBrowserWndDevTools(CefWindowInfo &windowInfo,
 
 void CefQWidget::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
 {
+    qInfo()<<__FUNCTION__;
     browser_ = browser;
     browser_state_ = Created;
-    resizeBorser();
+    resizeBrowser();
     emit browserCreated();
 }
 
 void CefQWidget::OnBrowserWindowClosing()
 {
     emit browserClosing();
+
+    close();
 }
 
 void CefQWidget::onBrowserWindowAddressChange(const std::string &url)
@@ -390,6 +466,12 @@ void CefQWidget::onBrowerWindowLoadEnd(int httpStatusCode)
     emit browserLoadEnd(httpStatusCode);
 }
 
+void CefQWidget::onBrowserWndLoadingProgressChange(double progress)
+{
+    emit browserLoadingProgress(progress);
+//    qInfo()<<__FUNCTION__<<progress;
+}
+
 void CefQWidget::onBrowserWindowLoadingStateChange(bool isLoading,
                                                    bool canGoBack,
                                                    bool canGoForward)
@@ -419,6 +501,7 @@ bool CefQWidget::onBrowserWndPreKeyEvent(const CefKeyEvent &event,
         <<"windows_key_code:"<<QString::number(event.windows_key_code,16).toUpper().prepend("0x")
        <<"native_key_code:"<<QString::number(event.native_key_code,16).toUpper().prepend("0x");
 #endif
+    // 开发者工具的 browser如果在PreKeyEvent注册了快捷键，那么onKeyEvent就会失效。
     if(!is_dev_tool_){
         dealCefKeyEvent(event, os_event, is_keyboard_shortcut);
     }
@@ -428,13 +511,7 @@ bool CefQWidget::onBrowserWndPreKeyEvent(const CefKeyEvent &event,
 bool CefQWidget::onBrowserWndKeyEvent(const CefKeyEvent &event,
                                       CefEventHandle os_event)
 {
-    if(is_dev_tool_){
-        emit devToolShortcut(event, os_event);
-    }else{
-        // return true represent you deal the event, otherwise return false
-        dealCefKeyEvent(event, os_event, nullptr, false);
-    }
-
+    dealCefKeyEvent(event, os_event, nullptr, false);
     return false;
 }
 
@@ -443,173 +520,292 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
                                  bool *is_keyboard_shortcut,
                                  bool isPre)
 {
-    bool is_shortcut_and_need_to_be_done = false;
+    Q_UNUSED(os_event);
+
     // F5
+    // 刷新当前标签页
     if (event.modifiers == EVENTFLAG_NONE
             && event.windows_key_code == VK_F5
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+            if(isPre && is_keyboard_shortcut){
+                *is_keyboard_shortcut = true;
+            }else{
+                emit browserShortcut(CefShortcutCmd::Refresh);
+            }
     }
+
     // F11
+    // 改变浏览器的全屏模式
     if (event.modifiers == EVENTFLAG_NONE
             && event.windows_key_code == VK_F11
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::Fullscreen);
+        }
     }
+
     // F12
+    // 打开/关闭开发者工具
     if (event.modifiers == EVENTFLAG_NONE
             && event.windows_key_code == VK_F12
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::DevTool);
+        }
     }
-    // Ctrl + -(- 位于 主键盘 0 右侧)
+
+    // Ctrl + -(- 位于 主键盘 按键 0 右侧)
+    // 缩小
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == VK_OEM_MINUS
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::ZoomOut);
+        }
     }
+
     // Ctrl + -(- 位于 小键盘 )
+    // 缩小
     if (event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
             && event.windows_key_code == VK_SUBTRACT
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::ZoomOut);
+        }
     }
+
+    /* from WinUser.h
+     * VK_0 - VK_9 are the same as ASCII '0' - '9' (0x30 - 0x39)
+     * 0x3A - 0x40 : unassigned
+     * VK_A - VK_Z are the same as ASCII 'A' - 'Z' (0x41 - 0x5A)
+     */
     // Ctrl + 0(0 位于 主键盘)
+    // 恢复缩放比例
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == '0'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::ZoomReset);
+        }
     }
+
     // Ctrl + 0(0 位于 小键盘 )
+    // 恢复缩放比例
     if (event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
             && event.windows_key_code == VK_NUMPAD0
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::ZoomReset);
+        }
     }
+
     // Ctrl + +(+ 位于 backspace 左侧)
+    // 放大
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == VK_OEM_PLUS
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::ZoomIn);
+        }
     }
+
     // Ctrl + +(+ 位于 小键盘 )
+    // 放大
     if (event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_IS_KEY_PAD)
             && event.windows_key_code == VK_ADD
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::ZoomIn);
+        }
     }
+
     // Ctrl + P
+    // 打印
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'P'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::Print);
+        }
     }
+
     // Ctrl + R
+    // 刷新当前标签页
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'R'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::Refresh);
+        }
     }
+
     // Ctrl + T
+    // 新建标签页
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'T'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::NewTab);
+        }
     }
+
     // Ctrl + N
+    // 新建浏览器窗口
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'N'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::NewWnd);
+        }
     }
+
     // Ctrl + Shift + N
+    // 新建InPrivate浏览器窗口
     if (event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_SHIFT_DOWN)
             && event.windows_key_code == 'N'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::NewPrivateWnd);
+        }
     }
+
     // Ctrl + Shift + I
+    // 打开开发者工具
     if (event.modifiers == (EVENTFLAG_CONTROL_DOWN | EVENTFLAG_SHIFT_DOWN)
             && event.windows_key_code == 'I'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::DevTool);
+        }
     }
+
     // Ctrl + H
+    // 查看历史记录
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'H'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::History);
+        }
     }
+
     // Ctrl + J
+    // 查看下载
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'J'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::Download);
+        }
     }
+
     // Ctrl + W
+    // 关闭当前标签页
     if (event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == 'W'
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::CloseTab);
+        }
     }
+
     // Ctrl + Tab
+    // 标签页切换
     if(event.modifiers == EVENTFLAG_CONTROL_DOWN
             && event.windows_key_code == VK_TAB
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::SwitchTab);
+        }
     }
     // Alt + <--(左箭头)
     if(event.modifiers == EVENTFLAG_ALT_DOWN
             && event.windows_key_code == VK_LEFT
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
+        if(isPre && is_keyboard_shortcut){
+            *is_keyboard_shortcut = true;
+        }else{
+            emit browserShortcut(CefShortcutCmd::NaviBack);
+        }
     }
     // Alt + -->(右箭头)
     if(event.modifiers == EVENTFLAG_ALT_DOWN
             && event.windows_key_code == VK_RIGHT
             && event.type == KEYEVENT_RAWKEYDOWN)
     {
-        is_shortcut_and_need_to_be_done = true;
-    }
-
-
-    // 统一处理，不写多份儿
-    if(is_shortcut_and_need_to_be_done)
-    {
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(event, os_event);
+            emit browserShortcut(CefShortcutCmd::NaviForward);
         }
     }
 }
 
 void CefQWidget::resizeEvent(QResizeEvent *event)
 {
+#if defined (Q_OS_LINUX)
+    resizeBrowser(event->size());
+#elif defined(Q_OS_WIN)
     switch(browser_state_){
     case Empty:
     {
-        auto handle = (HWND)window_->winId();
+        auto handle = (ClientWindowHandle)window_->winId();
         CefRect rect{x(), y(), event->size().width(), event->size().height()};
         CefBrowserSettings browser_settings;
         browser_window_->CreateBrowser(handle,
@@ -622,10 +818,11 @@ void CefQWidget::resizeEvent(QResizeEvent *event)
     case Creating:
         break;
     case Created:
-        resizeBorser(event->size());
+        resizeBrowser(event->size());
         break;
     }
     event->accept();
+#endif
 }
 
 void CefQWidget::closeEvent(QCloseEvent *event)
@@ -645,22 +842,7 @@ void CefQWidget::closeEvent(QCloseEvent *event)
     }
 }
 
-void CefQWidget::initUi()
-{
-//    window_->setFlag(Qt::FramelessWindowHint, true);
-
-    if(!qwindow_containter_){
-        qwindow_containter_ = QWidget::createWindowContainer(window_/*, this, Qt::Widget*/);
-    }
-
-    layout_->setContentsMargins(0,0,0,0);
-    layout_->setSpacing(0);
-
-    layout_->addWidget(qwindow_containter_);
-    setLayout(layout_);
-}
-
-void CefQWidget::resizeBorser(const QSize &size)
+void CefQWidget::resizeBrowser(const QSize &size)
 {
     QRect rect;
     if(size.isEmpty()){
@@ -681,12 +863,11 @@ void CefQWidget::resizeBorser(const QSize &size)
 //        EndDeferWindowPos(hdwp);
         ::MoveWindow(windowHandle, rect.x(), rect.y(), rect.width(), rect.height(), false);
 #elif defined(OS_LINUX)
-        // todo:
-#else
         ::Window xwindow = windowHandle;
         SetXWindowBounds(xwindow, 0, 0,
-                         static_cast<size_t>(size.width()),
-                         static_cast<size_t>(size.height()));
+                         static_cast<size_t>(rect.width()),
+                         static_cast<size_t>(rect.height()));
+#else
 #endif
     }
 }

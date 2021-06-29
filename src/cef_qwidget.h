@@ -50,13 +50,12 @@ signals:
     void browserFaviconChange(const QPixmap &pix);
     void browserLoadStart(CefLoadHandler::TransitionType transition_type);
     void browserLoadEnd(int httpStatusCode);
+    void browserLoadingProgress(double progress);
     void browserLoadingStateChange(bool isLoading, bool canGoBack, bool canGoForward);
     void browserFocusChange(bool getfucos);
     void browserDevTool(CefQWidget *devTool);
-    void browserShortcut(const CefKeyEvent &event,
-                         CefEventHandle os_event);
-    void devToolShortcut(const CefKeyEvent &event,
-                         CefEventHandle os_event);
+    void browserShortcut(CefShortcutCmd cmd);
+    void devToolShortcut(CefShortcutCmd cmd);
 
 public slots:
     void onTopLevelWindowStateChanged(Qt::WindowStates state, const QVariant &data);
@@ -81,6 +80,7 @@ protected:
     void onBrowserWindowFaviconChange(CefRefPtr<CefImage> image, const std::string &url) override;
     void onBrowerWindowLoadStart(CefLoadHandler::TransitionType transition_type) override;
     void onBrowerWindowLoadEnd(int httpStatusCode) override;
+    void onBrowserWndLoadingProgressChange(double progress) override;
     void onBrowserWindowLoadingStateChange(bool isLoading, bool canGoBack, bool canGoForward) override;
     void OnBrowserGotFocus() override;
     // browser keyboard event
@@ -115,7 +115,7 @@ private:
 
 private:
     void initUi();
-    void resizeBorser(const QSize &size = QSize());
+    void resizeBrowser(const QSize &size = QSize());
     void dealCefKeyEvent(const CefKeyEvent &event,
                          CefEventHandle os_event,
                          bool *is_keyboard_shortcut,

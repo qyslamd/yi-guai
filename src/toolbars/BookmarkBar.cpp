@@ -44,7 +44,11 @@ void BookmarkBar::paintEvent(QPaintEvent *event)
         p.save();
         QString hint = QStringLiteral("正在加载书签");
         QFontMetrics fm(this->font());
+#if (QT_VERSION == QT_VERSION_CHECK(5, 11, 1))
         auto width = fm.horizontalAdvance(hint);
+#else
+        auto width = fm.width(hint);
+#endif
 
         auto pos = this->rect().center();
         pos.ry() += fm.xHeight();
@@ -88,11 +92,15 @@ void BookmarkBar::initUi()
 
     layout_ = new QHBoxLayout(this);
     layout_->setSpacing(4);
-    layout_->setContentsMargins(4,4,4,4);
+    layout_->setContentsMargins(4,2,4,2);
 
     btn_application_ = new QPushButton(FaviconMgr::systemDirIcon, tr("application"));
     btn_application_->setToolTip(tr("open applications"));
     btn_application_->setIcon(QIcon(":/icons/resources/imgs/gray/squared_menu_96px.png"));
+    connect(btn_application_, &QPushButton::clicked, this, [this]()
+    {
+        emit appBtnClicked(mapToGlobal(btn_application_->geometry().bottomRight()));
+    });
     label_empty_ = new QLabel(QStringLiteral("你还没有书签，赶紧添加一个吧"), this);
 
     toolbar_ = new BookmarkToolBar(this);

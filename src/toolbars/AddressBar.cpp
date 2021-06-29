@@ -74,19 +74,17 @@ void AddressBar::initUi()
     ShaowEffect *shadow = new ShaowEffect(this);
     shadow->setOffset(0, 0);
     shadow->setColor(Qt::gray);
-    shadow->setBlurRadius(10);
+    shadow->setBlurRadius(6);
     setGraphicsEffect(shadow);
 
     layout_ = new QHBoxLayout;
-    layout_->setContentsMargins(2,2,2,2);
+    layout_->setContentsMargins(2, 2, 2, 2);
     layout_->setSpacing(1);
     btn_site_info_ = new QPushButton;
-//    btn_site_info_->setIconSize(QSize(18,18));
     btn_site_info_->setToolTip(tr("view website infomation"));
     connect(btn_site_info_, &QPushButton::clicked, this, &AddressBar::viewSiteInfo);
 
     line_edit_addr_ = new QLineEdit;
-//    line_edit_addr_->setMinimumHeight(28);
     line_edit_addr_->installEventFilter(this);
     line_edit_addr_->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     connect(line_edit_addr_, &QLineEdit::returnPressed, this, &AddressBar::returnPressed);
@@ -97,7 +95,6 @@ void AddressBar::initUi()
     btn_zoom_hint_ = new QToolButton;
     connect(btn_zoom_hint_, &QToolButton::clicked, this, &AddressBar::showZoomBar);
     btn_add_favorite_ = new QToolButton;
-//    btn_add_favorite_->setIconSize(QSize(18,18));
     btn_add_favorite_->setCheckable(true);
     btn_add_favorite_->setToolTip(tr("mark to favorite"));
     connect(btn_add_favorite_, &QToolButton::clicked, this, &AddressBar::addFavorite);
@@ -107,9 +104,9 @@ void AddressBar::initUi()
             btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/colorful/star_filled_64px.png"));
         }else{
             if(!inprivate_){
-                btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_64px.png"));
+                btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/light/star_64px.png"));
             }else{
-                btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_white_48px.png"));
+                btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/dark/star_64px.png"));
             }
         }
     });
@@ -127,7 +124,7 @@ void AddressBar::initUi()
 
     if(!inprivate_){
         btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/alert_circle_64px.png"));
-        btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_64px.png"));
+        btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/light/star_64px.png"));
     }else{
         btn_site_info_->setIcon(QIcon(":/icons/resources/imgs/info_white_48px.png"));
         btn_add_favorite_->setIcon(QIcon(":/icons/resources/imgs/star_white_48px.png"));

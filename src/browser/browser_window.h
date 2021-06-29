@@ -1,8 +1,8 @@
 ﻿#ifndef BROWSERWINDOW_H
 #define BROWSERWINDOW_H
 
-#include "cef_client_handler.h"
 #include "client_types.h"
+#include "cef_client_handler.h"
 
 // Represents a native child window hosting a single browser instance. The
 // methods of this class must be called on the main thread unless otherwise
@@ -28,7 +28,7 @@ public:
         virtual void OnBrowserCreated(CefRefPtr<CefBrowser> browser) = 0;
 
         // Called when the BrowserWindow is closing.
-        virtual void OnBrowserWindowClosing() {};
+        virtual void OnBrowserWindowClosing() {}
 
         virtual void onBrowserWindowAddressChange(const std::string& url) = 0;
         virtual void onBrowserWindowTitleChange(const std::string& title) = 0;
@@ -38,10 +38,11 @@ public:
                                                   const std::string &url) = 0;
         virtual void onBrowerWindowLoadStart(CefLoadHandler::TransitionType transition_type) = 0;
         virtual void onBrowerWindowLoadEnd(int code) = 0;
+        virtual void onBrowserWndLoadingProgressChange(double progress) = 0;
         virtual void onBrowserWindowLoadingStateChange(bool isLoading,
                                                        bool canGoBack,
                                                        bool canGoForward) = 0;
-        virtual void OnBrowserGotFocus() {};
+        virtual void OnBrowserGotFocus() {}
         virtual bool onBrowserWndPreKeyEvent(const CefKeyEvent &event,
                                              CefEventHandle os_event,
                                              bool *is_keyboard_shortcut) = 0;
@@ -109,6 +110,8 @@ protected:
                                 const std::string &url) override;
     void onBrowerLoadStart(CefLoadHandler::TransitionType transition_type) override;
     void onBrowerLoadEnd(int httpStatusCode) override;
+    void onBrowserLoadingProgressChange(CefRefPtr<CefBrowser> browser,
+                                        double progress) override;
     void onBrowserLoadingStateChange(bool isLoading,
                                      bool canGoBack,
                                      bool canGoForward) override;

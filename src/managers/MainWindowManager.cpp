@@ -3,6 +3,7 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QScreen>
+#include <QWindow>
 #include <QElapsedTimer>
 #include <QApplication>
 
@@ -42,6 +43,10 @@ MainWndMgr::MainWndMgr(QObject *parent)
     connect(qApp, &QApplication::aboutToQuit, gFullscrnWidget, &FullscnHint::deleteLater);
     connect(BookmarkMgr::Instance(), &BookmarkMgr::menuCmd, this, &MainWndMgr::onBkmkMgrMenuCmd);
     connect(&AppCfgMgr::Instance(), &AppCfgMgr::preferenceChanged, this, &MainWndMgr::onAppCfgChanged);
+    connect(qApp, &QApplication::lastWindowClosed, this,[]()
+    {
+        qInfo()<<"AAAA the last window closed!";
+    });
 }
 
 
@@ -68,15 +73,7 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
 
     // if window destroyed,remove reference in set and map.
     connect(window, &MainWindow::destroyed, this, [=](QObject *){
-        windows_.remove(window);
-        wnd_map_.remove( wnd_map_.key(window));
-        emit inprivateWndCntChanged();
-
-        // if quit application flag is set and window set is empty,quit the application
-        if(quit_app_flag_ && windows_.isEmpty())
-        {
-            qApp->quit();
-        }
+        onWndDestroyed(window);
     });
     // 先改变位置，再记录，不然获取到的记录是空的
     const QRect availableScrnGeometry =  qApp->primaryScreen()->availableGeometry();
@@ -214,5 +211,18 @@ void MainWndMgr::onAppCfgChanged()
         {
             (*it)->updatePreference();
         }
+    }
+}
+
+void MainWndMgr::onWndDestroyed(MainWindow *window)
+{
+    windows_.remove(window);
+    wnd_map_.remove( wnd_map_.key(window));
+    emit inprivateWndCntChanged();
+
+    // if quit application flag is set and window set is empty,quit the application
+    if(quit_app_flag_ && windows_.isEmpty())
+    {
+        qApp->quit();
     }
 }

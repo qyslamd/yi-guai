@@ -6,6 +6,7 @@
 #include <QFileInfo>
 #include <stdlib.h>
 #include <string>
+#include <QApplication>
 
 #include "utils/util_qt.h"
 #include <include/internal/cef_types.h>
@@ -15,6 +16,7 @@
 
 #include "browser/client_switches.h"
 
+bool CefManager::seperate_sub_process;
 CefString CefManager::browser_sub_process_path;
 
 CefString CefManager::resource_directory_path;
@@ -37,7 +39,7 @@ int CefManager::persist_user_preferences = 1;
 
 CefString CefManager::locale;
 
-int CefManager::remote_debugging_port = 12233;
+uint CefManager::remote_debugging_port = 12233;
 
 cef_color_t CefManager::background_color;
 
@@ -95,6 +97,12 @@ void CefManager::populateSettings(CefSettings &settings, int argc, char *argv[])
         settings.remote_debugging_port = remote_debugging_port;
     }
     settings.log_severity = LOGSEVERITY_WARNING;
+#ifdef Q_OS_LINUX
+    settings.log_severity = LOGSEVERITY_ERROR;
+    seperate_sub_process = true;
+//    CefString(&settings.browser_subprocess_path) = browser_sub_process_path;
+    CefString(&settings.resources_dir_path) = resource_directory_path;
+#endif
     settings.background_color = background_color;
     settings.persist_session_cookies = persist_session_cookies;
     settings.persist_user_preferences = persist_user_preferences;
@@ -117,6 +125,13 @@ CefManager::CefManager()
     locale.FromString("zh-CN");
     accept_language_list.FromString("zh-CN");
     background_color = CefColorSetARGB(255, 163, 198, 218);    //163,198,218
+
+    // render process path
+    auto path = qApp->applicationDirPath();
+    browser_sub_process_path.FromString(path.toStdString());
+
+    // resource file path
+    resource_directory_path.FromString(path.toStdString());
 
     // cef 缩放对照表
     zoom_map.insert(-7, "25%");

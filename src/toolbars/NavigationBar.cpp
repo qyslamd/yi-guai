@@ -1,5 +1,6 @@
 #include "NavigationBar.h"
 #include "AddressBar.h"
+#include "SearchBar.h"
 #include "utils/util_qt.h"
 
 #include "managers/AppCfgManager.h"
@@ -175,8 +176,8 @@ void NavigateToolBar::paintEvent(QPaintEvent *event)
 void NavigateToolBar::initUi()
 {
     layout_ = new QHBoxLayout;
-    layout_->setContentsMargins(4,4,4,4);
-    layout_->setSpacing(1);
+    layout_->setContentsMargins(4,4,4,2);
+    layout_->setSpacing(4);
     setLayout(layout_);
 
     btn_back_ = new QToolButton;
@@ -195,6 +196,17 @@ void NavigateToolBar::initUi()
     btn_home_->setToolTip(tr("homepage"));
 
     address_bar_ = new AddressBar(inprivate_);
+
+    QFrame* line = new QFrame(this);
+//    line->setStyleSheet("margin-top:4px;margin-bottom:4px;");
+    line->setStyleSheet("margin:4px;");
+    line->setObjectName("line");
+    line->setMaximumWidth(2);
+    line->setFrameShape(QFrame::VLine);
+    line->setFrameShadow(QFrame::Sunken);
+
+    search_bar_ = new SearchBar(inprivate_);
+
     frame_extensions_ = new QFrame;
     frame_tools_ = new QFrame;
 
@@ -366,9 +378,11 @@ void NavigateToolBar::initUi()
     layout_->addWidget(btn_refresh_);
     layout_->addWidget(btn_stop_);
     layout_->addWidget(btn_home_);
-    layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
     layout_->addWidget(address_bar_);
-    layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
+    layout_->addSpacerItem(new QSpacerItem(4,10,QSizePolicy::Fixed));
+    layout_->addWidget(line);
+    layout_->addSpacerItem(new QSpacerItem(4,10,QSizePolicy::Fixed));
+    layout_->addWidget(search_bar_);
     layout_->addWidget(frame_extensions_);
     layout_->addWidget(frame_tools_);
     layout_->addWidget(btn_favorites_);
@@ -567,6 +581,7 @@ void NavigateToolBar::setIcons()
         btn_user_->setIcon(QIcon(":/icons/resources/imgs/dark/user_64px.png"));
         btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/dark/squared_menu_48px.png"));
     }else{
+#if BLACK_BOLD
         btn_back_->setIcon(QIcon(":/icons/resources/imgs/light/left_64px.png"));
         btn_refresh_->setIcon(QIcon(":/icons/resources/imgs/light/refresh_64px.png"));
         btn_stop_->setIcon(QIcon(":/icons/resources/imgs/light/delete_64px.png"));
@@ -578,6 +593,19 @@ void NavigateToolBar::setIcons()
         btn_capture_->setIcon(QIcon(":/icons/resources/imgs/light/screenshot_64px.png"));
         btn_user_->setIcon(QIcon(":/icons/resources/imgs/light/user_64px.png"));
         btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/light/squared_menu_48px.png"));
+#else
+        btn_back_->setIcon(QIcon(":/icons/resources/imgs/ios7/left_50px.png"));
+        btn_refresh_->setIcon(QIcon(":/icons/resources/imgs/ios7/refresh_50px.png"));
+        btn_stop_->setIcon(QIcon(":/icons/resources/imgs/ios7/delete_50px.png"));
+        btn_forward_->setIcon(QIcon(":/icons/resources/imgs/ios7/right_50px.png"));
+        btn_home_->setIcon(QIcon(":/icons/resources/imgs/ios7/home_50px.png"));
+        btn_favorites_->setIcon(QIcon(":/icons/resources/imgs/ios7/favorite_window_50px.png"));
+        btn_history_->setIcon(QIcon(":/icons/resources/imgs/ios7/time_machine_50px.png"));
+        btn_download_->setIcon(QIcon(":/icons/resources/imgs/ios7/download_50px.png"));
+        btn_capture_->setIcon(QIcon(":/icons/resources/imgs/ios7/capture_50px.png"));
+        btn_user_->setIcon(QIcon(":/icons/resources/imgs/ios7/account_50px.png"));
+        btn_more_options_->setIcon(QIcon(":/icons/resources/imgs/ios7/circled_menu_50px.png"));
+#endif
 
     }
     action_new_tab_->setIcon(QIcon(":/icons/resources/imgs/layout_64px.png"));
@@ -604,7 +632,7 @@ void NavigateToolBar::setIcons()
     action_about_cef_->setIcon(QIcon(":/icons/resources/imgs/cef.png"));
     action_quit_->setIcon(QIcon());
 
-    QSize iconSize(24,24);
+    QSize iconSize(20,20);
     QSize btnSize(36,28);
     for(auto item : this->children()){
         if(item->isWidgetType() &&
@@ -616,4 +644,7 @@ void NavigateToolBar::setIcons()
         }
     }
     btn_inprivate_->setIconSize(iconSize);
+
+    btn_back_->setIconSize(QSize(26,26));
+    btn_forward_->setIconSize(QSize(26,26));
 }

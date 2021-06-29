@@ -36,7 +36,6 @@
         <file>resources/imgs/alert_circle_64px.png</file>
         <file>resources/imgs/alert_triangle_64px.png</file>
         <file>resources/imgs/close_64px_2.png</file>
-        <file>resources/imgs/star_64px.png</file>
         <file>resources/imgs/cef.png</file>
         <file>resources/imgs/laughing_64px.png</file>
         <file>resources/imgs/qt_64px.png</file>
@@ -57,7 +56,6 @@
         <file>resources/imgs/printer2_64px.png</file>
         <file>resources/imgs/reload_64px.png</file>
         <file>resources/imgs/search2_64px.png</file>
-        <file>resources/imgs/sound_64px.png</file>
         <file>resources/imgs/zoom_in2_64px.png</file>
         <file>resources/imgs/zoom_out2_64px.png</file>
         <file>resources/imgs/close_white_16px.png</file>
@@ -104,7 +102,6 @@
         <file>resources/imgs/light/refresh_64px.png</file>
         <file>resources/imgs/light/right_64px.png</file>
         <file>resources/imgs/light/screenshot_64px.png</file>
-        <file>resources/imgs/light/star_64px.png</file>
         <file>resources/imgs/light/system_task_64px.png</file>
         <file>resources/imgs/light/time_machine_64px.png</file>
         <file>resources/imgs/light/user_64px.png</file>
@@ -139,6 +136,32 @@
         <file>resources/imgs/dark/squared_menu_48px.png</file>
         <file>resources/imgs/light/squared_menu_48px.png</file>
         <file>resources/imgs/colorful/corgi_48.png</file>
+        <file>resources/imgs/dark/sound_64px.png</file>
+        <file>resources/imgs/light/star_64px.png</file>
+        <file>resources/imgs/ios7/account_50px.png</file>
+        <file>resources/imgs/ios7/add_50px.png</file>
+        <file>resources/imgs/ios7/capture_50px.png</file>
+        <file>resources/imgs/ios7/delete_50px.png</file>
+        <file>resources/imgs/ios7/download_50px.png</file>
+        <file>resources/imgs/ios7/error_50px.png</file>
+        <file>resources/imgs/ios7/favorite_window_50px.png</file>
+        <file>resources/imgs/ios7/home_50px.png</file>
+        <file>resources/imgs/ios7/info_50px.png</file>
+        <file>resources/imgs/ios7/left_50px.png</file>
+        <file>resources/imgs/ios7/notification_50px.png</file>
+        <file>resources/imgs/ios7/protect_50px.png</file>
+        <file>resources/imgs/ios7/refresh_50px.png</file>
+        <file>resources/imgs/ios7/right_50px.png</file>
+        <file>resources/imgs/ios7/search_50px.png</file>
+        <file>resources/imgs/ios7/star_50px.png</file>
+        <file>resources/imgs/ios7/time_machine_50px.png</file>
+        <file>resources/imgs/ios7/left_docking_50px.png</file>
+        <file>resources/imgs/ios7/circled_menu_50px.png</file>
+        <file>resources/imgs/ios7/expand_arrow_50px.png</file>
+        <file>resources/imgs/ios7/more_50px.png</file>
+        <file>resources/imgs/colorful/baidu_96px.png</file>
+        <file>resources/imgs/colorful/bing_96px.png</file>
+        <file>resources/imgs/colorful/google_96px.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file>resources/styles/normal.qss</file>
