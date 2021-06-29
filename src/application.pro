@@ -205,6 +205,9 @@ unix:!macx{
     OBJECTS_DIR = .obj
     MOC_DIR = .moc
 
+    SOURCES += \
+    browser/message_loop/main_message_loop_external_pump_linux.cc
+
     CONFIG += link_pkgconfig
     PKGCONFIG += x11
     PKGCONFIG += glib-2.0
