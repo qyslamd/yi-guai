@@ -153,7 +153,7 @@ void TabPageToolBar::initUi()
 
     setLayout(layout_);
     layout_->setContentsMargins(6, 6, 0, 0);
-    layout_->setSpacing(2);
+    layout_->setSpacing(1);
     layout_->addSpacerItem(new QSpacerItem(6,10,QSizePolicy::Fixed));
     layout_->addWidget(btn_dock_tabs_);
     layout_->addWidget(line);
@@ -167,7 +167,7 @@ void TabPageToolBar::initUi()
 
     QSize iconSize(20,20);
     btn_dock_tabs_->setIconSize(iconSize);
-    btn_add_page_->setIconSize(iconSize);
+    btn_add_page_->setIconSize(QSize(22, 22));
 
     connect(tab_bar_, &TabBar::currentChanged, this, &TabPageToolBar::currentChanged);
     connect(tab_bar_, &TabBar::tabCloseRequested, this, &TabPageToolBar::tabCloseRequested);

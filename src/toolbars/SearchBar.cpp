@@ -34,10 +34,10 @@ void SearchBar::initUi()
     setGraphicsEffect(shadow);
 
 //    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    setMaximumWidth(200);
+    setMaximumWidth(180);
 
     layout_ = new QHBoxLayout;
-    layout_->setContentsMargins(2,2,2,2);
+    layout_->setContentsMargins(2, 2, 2, 2);
     layout_->setSpacing(1);
 
     btn_search_engine_ = new QToolButton(this);
