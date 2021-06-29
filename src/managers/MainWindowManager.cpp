@@ -3,6 +3,7 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QScreen>
+#include <QWindow>
 #include <QElapsedTimer>
 #include <QApplication>
 

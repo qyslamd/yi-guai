@@ -60,7 +60,7 @@ int XIOErrorHandlerImpl(Display* display) {
 
 void TerminationSignalHandler(int signatl) {
     LOG(ERROR) << "Received termination signal: " << signatl;
-    //  MainContext::Get()->GetRootWindowManager()->CloseAllWindows(true);
+//  MainContext::Get()->GetRootWindowManager()->CloseAllWindows(true);
 }
 #endif
 
@@ -204,8 +204,8 @@ int initializeCef(int argc, char *argv[])
                 command_line->HasSwitch("external-message-pump");
 
     }
-    settings.external_message_pump = true;
 #endif
+    settings.external_message_pump = true;
     if (command_line->HasSwitch("enable-chrome-runtime")) {
         // Enable experimental Chrome runtime. See issue #2969 for details.
         settings.chrome_runtime = true;
@@ -229,8 +229,7 @@ int initializeCef(int argc, char *argv[])
         message_loop.reset(new client::MainMessageLoopStd);
     }
 #else
-    qInfo()<<"MainMessageLoopStd";
-    message_loop.reset(new client::MainMessageLoopStd);
+    message_loop = client::MainMessageLoopExternalPump::Create();
 #endif
 
     // Initialize CEF.
