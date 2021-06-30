@@ -166,7 +166,7 @@ void CefClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
     CEF_REQUIRE_UI_THREAD();
     gBrowserCount --;
     browser_count_--;
-    qInfo()<<__FUNCTION__<<"Total browser count:"<<gBrowserCount;
+    qInfo()<<__FUNCTION__<<browser<<"closed."<<"browser remain count:"<<gBrowserCount;
 }
 
 void CefClientHandler::NotifyBrowserCreated(CefRefPtr<CefBrowser> browser)
