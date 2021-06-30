@@ -68,7 +68,7 @@ void Worker::doWork()
     for(int i = 0; i < 101; i++){
         i++;
         emit progressChanged(i);
-        QThread::usleep(1000);
+        QThread::msleep(500);
     }
 
     emit finished();
