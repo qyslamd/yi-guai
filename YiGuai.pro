@@ -1,7 +1,6 @@
 TEMPLATE = subdirs
 
 SUBDIRS = 3rdparty \
-src/application.pro\
-          zxcv \ 
-    appRender
+          src/application.pro\
+          zxcv
           
