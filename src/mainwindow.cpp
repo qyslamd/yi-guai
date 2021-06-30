@@ -310,6 +310,9 @@ void MainWindow::initQtShortcut()
 
 void MainWindow::initUi()
 {
+//#if defined (Q_OS_LINUX)
+//    setWindowFlag(Qt::FramelessWindowHint);
+//#endif
     /*删除QLayout原来的 Menubar */
     auto menuBar = this->layout()->menuBar();
     if(menuBar){

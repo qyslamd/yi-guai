@@ -43,10 +43,10 @@ MainWndMgr::MainWndMgr(QObject *parent)
     connect(qApp, &QApplication::aboutToQuit, gFullscrnWidget, &FullscnHint::deleteLater);
     connect(BookmarkMgr::Instance(), &BookmarkMgr::menuCmd, this, &MainWndMgr::onBkmkMgrMenuCmd);
     connect(&AppCfgMgr::Instance(), &AppCfgMgr::preferenceChanged, this, &MainWndMgr::onAppCfgChanged);
-    connect(qApp, &QApplication::lastWindowClosed, this,[]()
-    {
-        qInfo()<<"AAAA the last window closed!";
-    });
+
+#if defined (Q_OS_LINUX)
+    qApp->setWindowIcon(QIcon(":/icons/resources/imgs/colorful/corgi_48.png"));
+#endif
 }
 
 
@@ -65,43 +65,15 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
     timer.start();
 
     MainWindow *window = new MainWindow(cfg);
-    connect(this, &MainWndMgr::inprivateWndCntChanged, window, &MainWindow::onInpWndCntChanged);
-
     // The Qt::WA_DeleteOnClose attribute must be set,
     // otherwise the resource will not be released
     window->setAttribute(Qt::WA_DeleteOnClose, true);
-
+    connect(this, &MainWndMgr::inprivateWndCntChanged, window, &MainWindow::onInpWndCntChanged);
     // if window destroyed,remove reference in set and map.
-    connect(window, &MainWindow::destroyed, this, [=](QObject *){
-        onWndDestroyed(window);
-    });
+    connect(window, &MainWindow::destroyed, this, [=](QObject *){ onWndDestroyed(window);});
     // 先改变位置，再记录，不然获取到的记录是空的
-    const QRect availableScrnGeometry =  qApp->primaryScreen()->availableGeometry();
-    if(windows_.isEmpty()){
-        // 首个窗口还原配置中保存的位置大小信息
-        auto geo = AppCfgMgr::windowGeometry();
-        if(geo.isEmpty() || !window->restoreGeometry(geo)){
+    relocateWindow(window, cfg.bounds_);
 
-            const QSize size = (availableScrnGeometry.size() * 4) / 5;
-            auto pos = availableScrnGeometry.center() - QPoint(size.width(), size.height()) / 2;
-            window->setGeometry(pos.x(),pos.y(),
-                                size.width(), size.height());
-        }
-    }else{
-        QRect targetRect = cfg.bounds_;
-        if(cfg.bounds_.isEmpty())
-        {
-            auto rect = MainWndMgr::Instance().lastWindowGeometry();
-            targetRect = QRect{rect.x() + newWndOffsetX,
-                                      rect.y() + newWndOffsetY,
-                                      rect.width(),
-                                      rect.height()};
-
-        }
-        window->setGeometry(targetRect);
-    }
-
-    //
     static int wnd_index = 0;
     windows_.insert(window);
     wnd_map_.insert(wnd_index++, window);
@@ -190,6 +162,35 @@ void MainWndMgr::updatePrivateWndCount()
     auto cnt = MainWndMgr::Instance().inprivateCount();
     gInprivatePopup->setHintText(tr(" %1 inprivate window opened")
                                  .arg(cnt));
+}
+
+void MainWndMgr::relocateWindow(MainWindow *window, const QRect &bounds)
+{
+    // 先改变位置，再记录，不然获取到的记录是空的
+    const QRect availableScrnGeometry =  qApp->primaryScreen()->availableGeometry();
+    if(windows_.isEmpty()){
+        // 首个窗口还原配置中保存的位置大小信息
+        auto geo = AppCfgMgr::windowGeometry();
+        if(geo.isEmpty() || !window->restoreGeometry(geo)){
+
+            const QSize size = (availableScrnGeometry.size() * 4) / 5;
+            auto pos = availableScrnGeometry.center() - QPoint(size.width(), size.height()) / 2;
+            window->setGeometry(pos.x(),pos.y(),
+                                size.width(), size.height());
+        }
+    }else{
+        QRect targetRect = bounds;
+        if(bounds.isEmpty())
+        {
+            auto rect = MainWndMgr::Instance().lastWindowGeometry();
+            targetRect = QRect{rect.x() + newWndOffsetX,
+                                      rect.y() + newWndOffsetY,
+                                      rect.width(),
+                                      rect.height()};
+
+        }
+        window->setGeometry(targetRect);
+    }
 }
 
 void MainWndMgr::onBkmkMgrMenuCmd(BookmarkCmd cmd, const QVariant &data)

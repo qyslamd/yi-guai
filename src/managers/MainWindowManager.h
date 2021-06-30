@@ -69,6 +69,7 @@ private:
     MainWndMgr& operator=(const MainWndMgr & other);
 
     void updatePrivateWndCount();
+    void relocateWindow(MainWindow *window, const QRect &bounds);
 private slots:
     void onBkmkMgrMenuCmd(BookmarkCmd cmd, const QVariant &data);
     void onAppCfgChanged();

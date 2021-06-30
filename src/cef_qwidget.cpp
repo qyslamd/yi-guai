@@ -81,8 +81,16 @@ CefQWidget::CefQWidget(const QString &url, QWidget *parent)
 {
     window_ = new QWindow(windowHandle());
     browser_window_.reset(new BrowserWindow(this, url.toStdString()));
+#if defined (Q_OS_LINUX)
+    CefRect rect{x(), y(), window_->size().width(), window_->size().height()};
+    CefBrowserSettings browser_settings;
+    browser_window_->CreateBrowser(window_->winId(),
+                                   rect,
+                                   browser_settings,
+                                   nullptr,
+                                   nullptr);
+#endif
     initUi();
-
 }
 
 CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
@@ -101,7 +109,6 @@ CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
     browser_window_->GetPopupConfig((ClientWindowHandle)window_->winId(),
                                     windowInfo, client, settings);
     initUi();
-
     browser_state_ = Creating;
 }
 
@@ -306,7 +313,6 @@ void CefQWidget::onBrowserWndDevTools(CefWindowInfo &windowInfo,
 
 void CefQWidget::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
 {
-    qInfo()<<__FUNCTION__;
     browser_ = browser;
     browser_state_ = Created;
     resizeBrowser();
@@ -774,6 +780,9 @@ void CefQWidget::onScreenChanged(QScreen *)
 
 void CefQWidget::resizeEvent(QResizeEvent *event)
 {
+#ifdef Q_OS_LINUX
+    resizeBrowser(event->size());
+#else
     switch(browser_state_){
     case Empty:
     {
@@ -793,7 +802,7 @@ void CefQWidget::resizeEvent(QResizeEvent *event)
         resizeBrowser(event->size());
         break;
     }
-    event->accept();
+#endif
 }
 
 void CefQWidget::closeEvent(QCloseEvent *event)

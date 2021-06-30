@@ -8,6 +8,7 @@
 #include "browser/cef_client_handler.h"
 #include "managers/MainWindowManager.h"
 #include "widgets/QtWinFrameless.h"
+#include "widgets/QtFramelessWnd.h"
 #include "globaldef.h"
 
 class QFrame;

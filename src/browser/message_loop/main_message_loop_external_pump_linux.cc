@@ -196,6 +196,9 @@ int MainMessageLoopExternalPumpLinux::Run() {
   // first iteration of the loop.
   bool more_work_is_plausible = true;
 
+  // add by zyh, same as windows platform,we don't need to block there,
+  // just use qt's main message loop
+#ifdef ZYH
   // We run our own loop instead of using g_main_loop_quit in one of the
   // callbacks. This is so we only quit our own loops, and we don't quit
   // nested loops run by others.
@@ -207,6 +210,7 @@ int MainMessageLoopExternalPumpLinux::Run() {
     if (should_quit_)
       break;
   }
+#endif
 
   // We need to run the message pump until it is idle. However we don't have
   // that information here so we run the message loop "for a while".
