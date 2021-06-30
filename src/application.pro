@@ -43,7 +43,6 @@ SOURCES += \
     popups/StyledMenu.cpp \
     popups/UserInfoPopup.cpp \
     popups/ZoomPopup.cpp \
-    q_cef_window.cpp \
     test/test.cpp \
     toolbars/AddressBar.cpp \
     toolbars/BookmarkBar.cpp \
@@ -98,7 +97,6 @@ HEADERS += \
     popups/StyledMenu.h \
     popups/UserInfoPopup.h \
     popups/ZoomPopup.h \
-    q_cef_window.h \
     test/test.h \
     toolbars/AddressBar.h \
     toolbars/BookmarkBar.h \
