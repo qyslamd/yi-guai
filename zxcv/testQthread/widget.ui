@@ -13,38 +13,40 @@
   <property name="windowTitle">
    <string>Widget</string>
   </property>
-  <widget class="QProgressBar" name="progressBar">
-   <property name="geometry">
-    <rect>
-     <x>60</x>
-     <y>150</y>
-     <width>551</width>
-     <height>101</height>
-    </rect>
-   </property>
-   <property name="maximum">
-    <number>101</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
-   <property name="invertedAppearance">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButton">
-   <property name="geometry">
-    <rect>
-     <x>50</x>
-     <y>30</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>PushButton</string>
-   </property>
-  </widget>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>622</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QSlider" name="verticalSlider">
+     <property name="minimum">
+      <number>50</number>
+     </property>
+     <property name="maximum">
+      <number>500</number>
+     </property>
+     <property name="singleStep">
+      <number>2</number>
+     </property>
+     <property name="value">
+      <number>100</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>
