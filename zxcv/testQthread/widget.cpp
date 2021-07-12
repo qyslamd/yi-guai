@@ -7,6 +7,8 @@
 #include <QPainter>
 #include <QtMath>
 
+#include "searchbar.h"
+
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
@@ -17,11 +19,37 @@ Widget::Widget(QWidget *parent)
     {
         update();
     });
+
+    search_bar_ = new SearchBar(this);
 }
 
 Widget::~Widget()
 {
     delete ui;
+    delete search_bar_;
+}
+
+bool Widget::event(QEvent *ev)
+{
+    switch (ev->type())
+    {
+    case QEvent::Resize:
+    case QEvent::Move: {
+        if (search_bar_ && search_bar_->isVisible()) {
+            auto pos = /*mapToGlobal*/(ui->pushButton->pos());
+            search_bar_->move(pos + QPoint(0, ui->pushButton->height()));
+        }
+    }
+    default:
+        break;
+    }
+
+    return QWidget::event(ev);
+}
+
+bool Widget::eventFilter(QObject *obj, QEvent *event)
+{
+    return QWidget::eventFilter(obj, event);
 }
 
 void Widget::paintEvent(QPaintEvent *)
@@ -81,6 +109,9 @@ void Widget::paintEvent(QPaintEvent *)
     p.restore();
 }
 
-
-
-
+void Widget::on_pushButton_clicked()
+{
+    auto pos = /*mapToGlobal*/(ui->pushButton->pos());
+    search_bar_->move(pos + QPoint(0, ui->pushButton->height()));
+    search_bar_->show();
+}

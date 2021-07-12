@@ -1,5 +1,5 @@
 TEMPLATE = subdirs
-#SUBDIRS = test \
-#    testList \
-#	QListViewDemo\
-#    testQthread
+SUBDIRS = test \
+    testList \
+        QListViewDemo\
+    testQthread

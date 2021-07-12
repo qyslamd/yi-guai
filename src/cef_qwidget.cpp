@@ -783,6 +783,7 @@ void CefQWidget::resizeEvent(QResizeEvent *event)
 #ifdef Q_OS_LINUX
     resizeBrowser(event->size());
 #else
+    return;
     switch(browser_state_){
     case Empty:
     {
@@ -856,6 +857,7 @@ void CefQWidget::resizeBrowser(const QSize &size)
 //                              rect.width(), rect.height(), SWP_SHOWWINDOW); // SWP_NOZORDER SWP_SHOWWINDOW
 //        EndDeferWindowPos(hdwp);
         ::MoveWindow(windowHandle, rect.x(), rect.y(), rect.width(), rect.height(), false);
+        ::SetWindowPos(windowHandle, HWND_BOTTOM,rect.x(), rect.y(), rect.width(), rect.height(), SWP_NOACTIVATE);
 #elif defined(OS_LINUX)
         ::Window xwindow = windowHandle;
         SetXWindowBounds(xwindow, 0, 0,

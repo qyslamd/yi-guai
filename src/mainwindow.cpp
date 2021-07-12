@@ -76,6 +76,11 @@ MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
     QTimer::singleShot(0, this, [=]{
         AddNewPage(url);
     });
+
+    QFrame *f = new QFrame(this);
+    f->setStyleSheet("background-color:red;");
+    f->resize(500,200);
+    f->raise();
 }
 
 MainWindow::MainWindow(Page *page, QWidget *parent)
@@ -310,6 +315,7 @@ void MainWindow::initQtShortcut()
 
 void MainWindow::initUi()
 {
+
 //#if defined (Q_OS_LINUX)
 //    setWindowFlag(Qt::FramelessWindowHint);
 //#endif

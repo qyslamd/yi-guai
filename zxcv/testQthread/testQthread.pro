@@ -10,12 +10,15 @@ CONFIG += c++11
 
 SOURCES += \
     main.cpp \
+    searchbar.cpp \
     widget.cpp
 
 HEADERS += \
+    searchbar.h \
     widget.h
 
 FORMS += \
+    searchbar.ui \
     widget.ui
 
 # Default rules for deployment.
