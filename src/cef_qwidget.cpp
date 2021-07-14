@@ -783,7 +783,6 @@ void CefQWidget::resizeEvent(QResizeEvent *event)
 #ifdef Q_OS_LINUX
     resizeBrowser(event->size());
 #else
-    return;
     switch(browser_state_){
     case Empty:
     {
