@@ -36,7 +36,7 @@ bool Widget::event(QEvent *ev)
     case QEvent::Resize:
     case QEvent::Move: {
         if (search_bar_ && search_bar_->isVisible()) {
-            auto pos = /*mapToGlobal*/(ui->pushButton->pos());
+            auto pos = ui->pushButton->mapToGlobal(ui->pushButton->rect().topLeft());
             search_bar_->move(pos + QPoint(0, ui->pushButton->height()));
         }
     }
@@ -54,6 +54,11 @@ bool Widget::eventFilter(QObject *obj, QEvent *event)
 
 void Widget::paintEvent(QPaintEvent *)
 {
+    if (search_bar_ && search_bar_->isVisible()) {
+        auto pos = ui->pushButton->mapToGlobal(ui->pushButton->rect().topLeft());
+        search_bar_->move(pos + QPoint(0, ui->pushButton->height()));
+    }
+
     auto DD = ui->verticalSlider->value() * 1.0;
     auto RR = DD / 2.0;
     QPainter p(this);
@@ -111,7 +116,7 @@ void Widget::paintEvent(QPaintEvent *)
 
 void Widget::on_pushButton_clicked()
 {
-    auto pos = /*mapToGlobal*/(ui->pushButton->pos());
+    auto pos = ui->pushButton->mapToGlobal(ui->pushButton->rect().topLeft());
     search_bar_->move(pos + QPoint(0, ui->pushButton->height()));
     search_bar_->show();
 }

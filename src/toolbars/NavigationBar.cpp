@@ -195,6 +195,7 @@ void NavigateToolBar::initUi()
     btn_home_ = new QToolButton;
     btn_home_->setToolTip(tr("homepage"));
 
+
     address_bar_ = new AddressBar(inprivate_);
 
     QFrame* line = new QFrame(this);

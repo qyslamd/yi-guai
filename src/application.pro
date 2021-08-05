@@ -27,6 +27,7 @@ SOURCES += \
     browser/client_app.cpp \
     browser/client_switches.cc \
     browser/scheme_handler.cpp \
+    dialogs/pagedialog.cpp \
     managers/AppCfgManager.cpp \
     managers/BookmarkManager.cpp \
     managers/CefManager.cpp \
@@ -80,6 +81,7 @@ HEADERS += \
     browser/client_app.h \
     browser/client_switches.h \
     browser/scheme_handler.h \
+    dialogs/pagedialog.h \
     globaldef.h \
     managers/AppCfgManager.h \
     managers/BookmarkManager.h \
@@ -129,6 +131,7 @@ HEADERS += \
 
 FORMS += \
     dialogs/alertdialog.ui \
+    dialogs/pagedialog.ui \
     popup.ui \
     popups/AddBookmarkPopup.ui \
     popups/InprivatePopup.ui \

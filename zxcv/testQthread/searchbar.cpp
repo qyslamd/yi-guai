@@ -8,7 +8,7 @@ SearchBar::SearchBar(QWidget *parent) :
     ui(new Ui::SearchBar)
 {
     ui->setupUi(this);
-    setWindowFlag(Qt::FramelessWindowHint);
+    setWindowFlags(Qt::FramelessWindowHint | Qt::ToolTip | Qt::SubWindow);
     setAttribute(Qt::WA_TranslucentBackground);
 
     using Shadow = QGraphicsDropShadowEffect;

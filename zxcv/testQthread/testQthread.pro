@@ -9,15 +9,21 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    frame.cpp \
+    frame2.cpp \
     main.cpp \
     searchbar.cpp \
     widget.cpp
 
 HEADERS += \
+    frame.h \
+    frame2.h \
     searchbar.h \
     widget.h
 
 FORMS += \
+    frame.ui \
+    frame2.ui \
     searchbar.ui \
     widget.ui
 

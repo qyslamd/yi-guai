@@ -15,7 +15,7 @@ void CefAppBrowser::OnBeforeCommandLineProcessing(
         CefRefPtr<CefCommandLine> command_line)
 {
     using namespace client;
-    /// 关闭同源策略
+    // 关闭同源策略
     command_line->AppendSwitch("--disable-web-security");
     command_line->AppendSwitch("--allow-file-access-from-files");
 
@@ -26,6 +26,11 @@ void CefAppBrowser::OnBeforeCommandLineProcessing(
 
     // 合并渲染进程
     command_line->AppendSwitch("process-per-site");
+
+    // 开启打印预览
+    if(!command_line->HasSwitch("enable-print-preview")){
+      command_line->AppendSwitch("enable-print-preview");
+    }
 
     // Pass additional command-line flags to the browser process.
     if (process_type.empty()) {
