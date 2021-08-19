@@ -1,6 +1,7 @@
 ﻿#include "QtWinFrameless.h"
 #include <QApplication>
 #include <QtDebug>
+#include <QScreen>
 
 #include "utils/util_qt.h"
 

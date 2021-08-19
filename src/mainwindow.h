@@ -127,6 +127,7 @@ private:
     Page *GetPage(int index);
 
 private slots:
+    void onScreenChanged(QScreen *screen);
     void onTabBarCurrentChanged(int index);
     void onTabBarCloseRequested(int index);
     void onTabBarTabMoved(int from, int to);

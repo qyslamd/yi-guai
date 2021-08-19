@@ -6,6 +6,7 @@
 
 #if defined(Q_OS_WIN)
 
+class QScreen;
 class QtWinFramelessWindow : public QMainWindow
 {
     Q_OBJECT
@@ -15,6 +16,7 @@ public:
 signals:
     void DwmCompsitionChanged();
     void dpiChanged(const int dpi);
+    void screenChanged(QScreen *screen);
 protected:
     virtual bool nativeEvent(const QByteArray &eventType,
                              void *message, long *result) override;
