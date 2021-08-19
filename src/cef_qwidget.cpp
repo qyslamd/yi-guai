@@ -24,6 +24,7 @@
 #include <QDateTime>
 #include <QPixmap>
 #include <QBuffer>
+#include <QScreen>
 
 #include <include/base/cef_logging.h>
 #include "mainwindow.h"
@@ -80,26 +81,16 @@ CefQWidget::CefQWidget(const QString &url, QWidget *parent)
 {
     window_ = new QWindow(windowHandle());
     browser_window_.reset(new BrowserWindow(this, url.toStdString()));
-
-#if defined(Q_OS_LINUX)
-    auto handle = /*(ClientWindowHandle)*/window_->winId();
+#if defined (Q_OS_LINUX)
     CefRect rect{x(), y(), window_->size().width(), window_->size().height()};
     CefBrowserSettings browser_settings;
-    browser_window_->CreateBrowser(handle,
+    browser_window_->CreateBrowser(window_->winId(),
                                    rect,
                                    browser_settings,
                                    nullptr,
                                    nullptr);
-#elif defined(Q_OS_WIN)
-    //    window_->setFlag(Qt::FramelessWindowHint, true);
-
 #endif
-    qwindow_containter_ = QWidget::createWindowContainer(window_/*, this, Qt::Widget*/);
-
-    layout_->setContentsMargins(0,0,0,0);
-    layout_->setSpacing(0);
-    layout_->addWidget(qwindow_containter_);
-    setLayout(layout_);
+    initUi();
 }
 
 CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
@@ -110,28 +101,14 @@ CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
     , qwindow_containter_(nullptr)
     , layout_(new QVBoxLayout(this))
 {
-    browser_window_.reset(new BrowserWindow(this, ""));
-
-#if defined(Q_OS_LINUX)
-    window_ = new QWindow(windowHandle()); // 很明显，Linux的QWindow需要指定父窗口
-    auto handle = /*(ClientWindowHandle)*/window_->winId();
-#elif defined(Q_OS_WIN)
-    window_ = new QWindow();
-    window_->setFlag(Qt::FramelessWindowHint, true);
-    auto handle = (HWND)window_->winId();
+    window_ = new QWindow(windowHandle());
+#ifdef Q_OS_WIN
+    window_->setFlag(Qt::FramelessWindowHint);
 #endif
-    browser_window_->GetPopupConfig(handle, windowInfo, client, settings);
-
-
-    if(!qwindow_containter_){
-        qwindow_containter_ = QWidget::createWindowContainer(window_/*, this, Qt::Widget*/);
-    }
-
-    layout_->setContentsMargins(0,0,0,0);
-    layout_->setSpacing(0);
-    layout_->addWidget(qwindow_containter_);
-    setLayout(layout_);
-
+    browser_window_.reset(new BrowserWindow(this, ""));
+    browser_window_->GetPopupConfig((ClientWindowHandle)window_->winId(),
+                                    windowInfo, client, settings);
+    initUi();
     browser_state_ = Creating;
 }
 
@@ -336,7 +313,6 @@ void CefQWidget::onBrowserWndDevTools(CefWindowInfo &windowInfo,
 
 void CefQWidget::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
 {
-    qInfo()<<__FUNCTION__;
     browser_ = browser;
     browser_state_ = Created;
     resizeBrowser();
@@ -797,11 +773,16 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
     }
 }
 
+void CefQWidget::onScreenChanged(QScreen *)
+{
+    resizeBrowser();
+}
+
 void CefQWidget::resizeEvent(QResizeEvent *event)
 {
-#if defined (Q_OS_LINUX)
+#ifdef Q_OS_LINUX
     resizeBrowser(event->size());
-#elif defined(Q_OS_WIN)
+#else
     switch(browser_state_){
     case Empty:
     {
@@ -821,7 +802,6 @@ void CefQWidget::resizeEvent(QResizeEvent *event)
         resizeBrowser(event->size());
         break;
     }
-    event->accept();
 #endif
 }
 
@@ -840,6 +820,20 @@ void CefQWidget::closeEvent(QCloseEvent *event)
         // Cancel the close.
         event->ignore();
     }
+}
+
+void CefQWidget::initUi()
+{
+    if(!qwindow_containter_){
+        qwindow_containter_ = QWidget::createWindowContainer(window_);
+    }
+
+    layout_->setContentsMargins(0,0,0,0);
+    layout_->setSpacing(0);
+    layout_->addWidget(qwindow_containter_);
+    setLayout(layout_);
+
+    connect(window_, &QWindow::screenChanged, this, &CefQWidget::onScreenChanged);
 }
 
 void CefQWidget::resizeBrowser(const QSize &size)
@@ -862,6 +856,7 @@ void CefQWidget::resizeBrowser(const QSize &size)
 //                              rect.width(), rect.height(), SWP_SHOWWINDOW); // SWP_NOZORDER SWP_SHOWWINDOW
 //        EndDeferWindowPos(hdwp);
         ::MoveWindow(windowHandle, rect.x(), rect.y(), rect.width(), rect.height(), false);
+        ::SetWindowPos(windowHandle, HWND_BOTTOM,rect.x(), rect.y(), rect.width(), rect.height(), SWP_NOACTIVATE);
 #elif defined(OS_LINUX)
         ::Window xwindow = windowHandle;
         SetXWindowBounds(xwindow, 0, 0,

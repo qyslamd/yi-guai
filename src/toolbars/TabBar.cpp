@@ -6,7 +6,7 @@
 #include <QAction>
 #include <QContextMenuEvent>
 #include <QToolButton>
-#include <QGraphicsBlurEffect>
+#include <QGraphicsDropShadowEffect>
 #include <QChildEvent>
 #include <QAbstractButton>
 
@@ -136,6 +136,13 @@ void TabBar::tabRemoved(int index)
 
 void TabBar::initUi()
 {
+    // shadow
+    auto effect = new QGraphicsDropShadowEffect(this);
+    effect->setBlurRadius(10);
+    effect->setOffset(0);
+    effect->setColor(QColor(0,0,0, 100));
+    setGraphicsEffect(effect);
+
     setDrawBase(false);
     setTabsClosable(true);
     setMovable(true);
@@ -238,7 +245,7 @@ QSize TabBar::tabSizeHint(int index) const
     int dpi = this->logicalDpiX();
     switch (dpi) {
     case 96:
-        return QSize(240, 32);
+        return QSize(240, 34);
     case 120:
         return QSize(300, 40);
     case 144:

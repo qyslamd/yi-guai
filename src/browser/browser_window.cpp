@@ -134,7 +134,6 @@ void BrowserWindow::onBrowserDeveTools(CefWindowInfo &windowInfo,
 void BrowserWindow::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
 {
     REQUIRE_MAIN_THREAD();
-    qInfo()<<__FUNCTION__;
     DCHECK(!browser_);
 
     browser_ = browser;

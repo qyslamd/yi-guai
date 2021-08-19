@@ -8,6 +8,7 @@
 #include "browser/cef_client_handler.h"
 #include "managers/MainWindowManager.h"
 #include "widgets/QtWinFrameless.h"
+#include "widgets/QtFramelessWnd.h"
 #include "globaldef.h"
 
 class QFrame;
@@ -126,6 +127,7 @@ private:
     Page *GetPage(int index);
 
 private slots:
+    void onScreenChanged(QScreen *screen);
     void onTabBarCurrentChanged(int index);
     void onTabBarCloseRequested(int index);
     void onTabBarTabMoved(int from, int to);

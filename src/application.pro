@@ -27,9 +27,11 @@ SOURCES += \
     browser/client_app.cpp \
     browser/client_switches.cc \
     browser/scheme_handler.cpp \
+    dialogs/pagedialog.cpp \
     managers/AppCfgManager.cpp \
     managers/BookmarkManager.cpp \
     managers/CefManager.cpp \
+    managers/DisplayMgr.cpp \
     managers/FaviconManager.cpp \
     managers/HistoryManager.cpp \
     managers/MainWindowManager.cpp \
@@ -43,7 +45,6 @@ SOURCES += \
     popups/StyledMenu.cpp \
     popups/UserInfoPopup.cpp \
     popups/ZoomPopup.cpp \
-    q_cef_window.cpp \
     test/test.cpp \
     toolbars/AddressBar.cpp \
     toolbars/BookmarkBar.cpp \
@@ -81,10 +82,12 @@ HEADERS += \
     browser/client_app.h \
     browser/client_switches.h \
     browser/scheme_handler.h \
+    dialogs/pagedialog.h \
     globaldef.h \
     managers/AppCfgManager.h \
     managers/BookmarkManager.h \
     managers/CefManager.h \
+    managers/DisplayMgr.h \
     managers/FaviconManager.h \
     managers/HistoryManager.h \
     managers/MainWindowManager.h \
@@ -98,7 +101,6 @@ HEADERS += \
     popups/StyledMenu.h \
     popups/UserInfoPopup.h \
     popups/ZoomPopup.h \
-    q_cef_window.h \
     test/test.h \
     toolbars/AddressBar.h \
     toolbars/BookmarkBar.h \
@@ -131,6 +133,7 @@ HEADERS += \
 
 FORMS += \
     dialogs/alertdialog.ui \
+    dialogs/pagedialog.ui \
     popup.ui \
     popups/AddBookmarkPopup.ui \
     popups/InprivatePopup.ui \
@@ -241,3 +244,16 @@ RESOURCES += \
     resource.qrc
 
 TRANSLATIONS +=$$PWD/resources/i18n/$$TARGET"_zh.ts"
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../3rdparty/qt-material-widgets/components/release/ -lcomponents
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../3rdparty/qt-material-widgets/components/debug/ -lcomponents
+else:unix:!macx: LIBS += -L$$OUT_PWD/../3rdparty/qt-material-widgets/components/ -lcomponents
+
+INCLUDEPATH += $$PWD/../3rdparty/qt-material-widgets/components
+DEPENDPATH += $$PWD/../3rdparty/qt-material-widgets/components
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../3rdparty/qt-material-widgets/components/release/libcomponents.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../3rdparty/qt-material-widgets/components/debug/libcomponents.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../3rdparty/qt-material-widgets/components/release/components.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../3rdparty/qt-material-widgets/components/debug/components.lib
+else:unix:!macx: PRE_TARGETDEPS += $$OUT_PWD/../3rdparty/qt-material-widgets/components/libcomponents.a

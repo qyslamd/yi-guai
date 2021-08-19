@@ -48,6 +48,7 @@
 #include <QDateTime>
 #include <QLocale>
 #include <QStandardItemModel>
+#include <QScreen>
 
 #if defined(Q_OS_WIN)
 #include <Windows.h>
@@ -310,6 +311,9 @@ void MainWindow::initQtShortcut()
 
 void MainWindow::initUi()
 {
+    if(auto window = this->windowHandle()){
+        connect(window, &QWindow::screenChanged, this, &MainWindow::onScreenChanged);
+    }
     /*删除QLayout原来的 Menubar */
     auto menuBar = this->layout()->menuBar();
     if(menuBar){
@@ -506,6 +510,11 @@ int MainWindow::CurrentPageIndex()
 Page *MainWindow::GetPage(int index)
 {
     return qobject_cast<Page*>(stack_browsers_->widget(index));
+}
+
+void MainWindow::onScreenChanged(QScreen *screen)
+{
+    qInfo()<<__FUNCTION__<<screen;
 }
 
 void MainWindow::onStatusMessage(const QString &msg)

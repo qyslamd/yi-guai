@@ -155,7 +155,6 @@ void TabbarStyle::drawTabBarTabLabel(const QStyleOption *option,
         painter->restore();
     };
 
-    QStyle::State state = tabOption->state;
     QLinearGradient linearGrad(QPointF(textRect.x(), textRect.y() + textRect.height() / 2),
                                QPointF(textRect.x() + textRect.width(), textRect.y() + textRect.height() / 2));
     const qreal startPercent = 0.8f;
@@ -163,7 +162,7 @@ void TabbarStyle::drawTabBarTabLabel(const QStyleOption *option,
     linearGrad.setColorAt(startPercent, color);
     QColor color2 = isInprivate_ ? QColor(0,0,0,0) : QColor(255,255,255,0);
     linearGrad.setColorAt(1, color2);
-    if (state.testFlag(QStyle::State_Selected))
+    if (tabOption->state.testFlag(QStyle::State_Selected))
     {
         drawLabel(linearGrad);
     }

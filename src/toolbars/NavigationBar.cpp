@@ -195,6 +195,7 @@ void NavigateToolBar::initUi()
     btn_home_ = new QToolButton;
     btn_home_->setToolTip(tr("homepage"));
 
+
     address_bar_ = new AddressBar(inprivate_);
 
     QFrame* line = new QFrame(this);
@@ -633,13 +634,11 @@ void NavigateToolBar::setIcons()
     action_quit_->setIcon(QIcon());
 
     QSize iconSize(20,20);
-    QSize btnSize(36,28);
     for(auto item : this->children()){
         if(item->isWidgetType() &&
                 item->metaObject()->className() == QString("QToolButton"))
         {
             auto btn = qobject_cast<QToolButton*>(item);
-            btn->setMinimumSize(btnSize);
             btn->setIconSize(iconSize);
         }
     }

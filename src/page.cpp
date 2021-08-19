@@ -11,9 +11,13 @@
 #include <QUrl>
 #include <QStyle>
 #include <QTimer>
+#include <QStackedLayout>
+#include <QToolBar>
+#include <QToolButton>
 
 #include "managers/AppCfgManager.h"
 #include "managers/CefManager.h"
+#include "dialogs/pagedialog.h"
 
 #ifndef Q_OS_WIN
 #include "utils/windowskeyboardcodes.h"

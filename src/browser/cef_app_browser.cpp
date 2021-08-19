@@ -36,6 +36,11 @@ void CefAppBrowser::OnBeforeCommandLineProcessing(
     // 合并渲染进程
     command_line->AppendSwitch("process-per-site");
 
+    // 开启打印预览
+    if(!command_line->HasSwitch("enable-print-preview")){
+      command_line->AppendSwitch("enable-print-preview");
+    }
+
     // Pass additional command-line flags to the browser process.
     if (process_type.empty()) {
         // Pass additional command-line flags when off-screen rendering is enabled.
