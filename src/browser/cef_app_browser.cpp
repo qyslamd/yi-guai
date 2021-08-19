@@ -15,6 +15,15 @@ void CefAppBrowser::OnBeforeCommandLineProcessing(
         CefRefPtr<CefCommandLine> command_line)
 {
     using namespace client;
+    if(!command_line->HasSwitch("enable-print-preview")){
+      printf("enable-print-preview\n");
+      command_line->AppendSwitch("enable-print-preview");
+    }
+    if(!command_line->HasSwitch("allow-silent-push")){
+      printf("allow-silent-push\n");
+      command_line->AppendSwitch("allow-silent-push");
+    }
+
     /// 关闭同源策略
     command_line->AppendSwitch("--disable-web-security");
     command_line->AppendSwitch("--allow-file-access-from-files");
