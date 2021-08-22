@@ -15,15 +15,15 @@ public:
     class Delegate {
     public:
         virtual void onBrowserWndNewForgroundPage(CefWindowInfo &windowInfo,
-                                                     CefRefPtr<CefClient> &client,
-                                                     CefBrowserSettings &settings) = 0;
+                                                  CefRefPtr<CefClient> &client,
+                                                  CefBrowserSettings &settings) = 0;
         virtual void onBrowserWndPopupWnd(const CefPopupFeatures &popupFeatures,
                                           CefWindowInfo &windowInfo,
                                           CefRefPtr<CefClient> &client,
                                           CefBrowserSettings &settings) = 0;
         virtual void onBrowserWndDevTools(CefWindowInfo& windowInfo,
-                                              CefRefPtr<CefClient>& client,
-                                              CefBrowserSettings& settings) = 0;
+                                          CefRefPtr<CefClient>& client,
+                                          CefBrowserSettings& settings) = 0;
         // Called when the browser has been created.
         virtual void OnBrowserCreated(CefRefPtr<CefBrowser> browser) = 0;
 
@@ -48,6 +48,11 @@ public:
                                              bool *is_keyboard_shortcut) = 0;
         virtual bool onBrowserWndKeyEvent(const CefKeyEvent &event,
                                           CefEventHandle os_event) = 0;
+
+        virtual void onBrowserBeforeContextMenu(CefRefPtr<CefBrowser> browser,
+                                                CefRefPtr<CefFrame> frame,
+                                                CefRefPtr<CefContextMenuParams> params,
+                                                CefRefPtr<CefMenuModel> model) = 0;
     protected:
         virtual ~Delegate() {}
     };
@@ -90,9 +95,13 @@ protected:
     friend struct base::DefaultDeleter<BrowserWindow>;
 
     // ClientHandler::Delegate methods.
+    void onBrowserBeforeContextMenu(CefRefPtr<CefBrowser> browser,
+                                    CefRefPtr<CefFrame> frame,
+                                    CefRefPtr<CefContextMenuParams> params,
+                                    CefRefPtr<CefMenuModel> model) override;
     void onBrowserForgroundTab(CefWindowInfo &windowInfo,
-                                   CefRefPtr<CefClient> &client,
-                                   CefBrowserSettings &settings) override;
+                               CefRefPtr<CefClient> &client,
+                               CefBrowserSettings &settings) override;
     void onBrowserPopupWnd(const CefPopupFeatures& popupFeatures,
                            CefWindowInfo& windowInfo,
                            CefRefPtr<CefClient>& client,

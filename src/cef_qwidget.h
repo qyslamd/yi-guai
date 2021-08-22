@@ -61,6 +61,10 @@ public slots:
     void onTopLevelWindowStateChanged(Qt::WindowStates state, const QVariant &data);
     // BrowserWindow::Delegate interface
 protected:
+    void onBrowserBeforeContextMenu(CefRefPtr<CefBrowser> browser,
+                                    CefRefPtr<CefFrame> frame,
+                                    CefRefPtr<CefContextMenuParams> params,
+                                    CefRefPtr<CefMenuModel> model) override;
     void onBrowserWndNewForgroundPage(CefWindowInfo &windowInfo,
                                          CefRefPtr<CefClient> &client,
                                          CefBrowserSettings &settings) override;

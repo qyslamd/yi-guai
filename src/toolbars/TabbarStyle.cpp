@@ -18,6 +18,7 @@
 TabbarStyle::TabbarStyle(bool isInPrivate)
     : isInprivate_(isInPrivate)
 {
+    progress_timer_id_ = startTimer(40);
 #ifdef Q_OS_WIN
     dpi_ = QApplication::primaryScreen()->logicalDotsPerInch() / 96.0;
 #else
@@ -84,6 +85,17 @@ QRect TabbarStyle::subElementRect(QStyle::SubElement subElement,
     return QProxyStyle::subElementRect(subElement, option, widget);
 }
 
+void TabbarStyle::timerEvent(QTimerEvent *event)
+{
+    if(progress_timer_id_ == event->timerId()){
+        m_nStartAngle += 10 * 16;
+        if(m_nStartAngle == 360 * 16)
+        {
+            m_nStartAngle = 0;
+        }
+    }
+}
+
 void TabbarStyle::drawTabBarTabLabel(const QStyleOption *option,
                                      QPainter *painter,
                                      const QWidget *w) const
@@ -130,10 +142,7 @@ void TabbarStyle::drawTabBarTabLabel(const QStyleOption *option,
                                  Qt::DotLine,
                                  Qt::RoundCap,
                                  Qt::RoundJoin));
-
-            int startAngle(0), spanAngle(0);
-            tabbar->getAngle(startAngle, spanAngle);
-            painter->drawArc(iconRect,startAngle,spanAngle);
+            painter->drawArc(iconRect,m_nStartAngle, m_nSpanAngle);
             painter->restore();
         }else{
             painter->drawPixmap(iconRect, pixmap);

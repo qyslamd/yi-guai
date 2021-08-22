@@ -375,6 +375,14 @@ void CefClientHandler::OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
                                            CefRefPtr<CefContextMenuParams> params,
                                            CefRefPtr<CefMenuModel> model)
 {
+#if 1
+    if(delegate_){
+        delegate_->onBrowserBeforeContextMenu(browser, frame, params, model);
+    }
+    model->Clear();
+    return;
+#endif
+
     Q_UNUSED(browser);
     Q_UNUSED(frame);
     if ((params->GetTypeFlags() & (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_FRAME)) != 0)

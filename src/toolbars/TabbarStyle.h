@@ -16,6 +16,8 @@ public:
                                  const QWidget *widget) const override;
 
 protected:
+    // QObject interface
+    void timerEvent(QTimerEvent *event) override;
     void drawTabBarTabLabel(const QStyleOption *option,
                             QPainter *painter,
                             const QWidget *w) const;
@@ -25,6 +27,9 @@ protected:
                             QPainter *painter,
                             const QWidget *w) const;
 private:
+    int progress_timer_id_;
+    int m_nStartAngle{ 0 };
+    int m_nSpanAngle{ 4320 };
     bool isInprivate_;
     mutable double dpi_;
 

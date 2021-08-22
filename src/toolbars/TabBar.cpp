@@ -53,12 +53,6 @@ int TabBar::insertTab(int index, const QString &text)
     return ret;
 }
 
-void TabBar::getAngle(int &startAngle, int &spanAngle) const
-{
-    startAngle = m_nStartAngle;
-    spanAngle = m_nSpanAngle;
-}
-
 void TabBar::setTabHasAudio(int index, bool has)
 {
     if(has){
@@ -95,13 +89,6 @@ void TabBar::timerEvent(QTimerEvent *event)
         pos = mapFromGlobal(pos);
         if(tabAt(pos) == -1)
             emit showPreview(QPoint(), -1);
-    }else if (timeId == load_progress_timer_id_){
-        m_nStartAngle += 10 * 16;
-        if(m_nStartAngle == 360 * 16)
-        {
-            m_nStartAngle = 0;
-        }
-        update();
     }
 }
 
@@ -136,13 +123,6 @@ void TabBar::tabRemoved(int index)
 
 void TabBar::initUi()
 {
-    // shadow
-    auto effect = new QGraphicsDropShadowEffect(this);
-    effect->setBlurRadius(10);
-    effect->setOffset(0);
-    effect->setColor(QColor(0,0,0, 100));
-    setGraphicsEffect(effect);
-
     setDrawBase(false);
     setTabsClosable(true);
     setMovable(true);
@@ -180,7 +160,6 @@ void TabBar::initUi()
     menu_->addAction(act_add_all_favorates_);
 
     //    check_pos_timer_id_ = startTimer(1000);
-    load_progress_timer_id_ = startTimer(40);
 }
 
 void TabBar::initSignalSlots()

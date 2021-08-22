@@ -56,6 +56,10 @@ public:
                                           bool *is_keyboard_shortcut) = 0;
         virtual bool onBrowserKeyEvent(const CefKeyEvent &event,
                                        CefEventHandle os_event) = 0;
+        virtual void onBrowserBeforeContextMenu(CefRefPtr<CefBrowser> browser,
+                                                CefRefPtr<CefFrame> frame,
+                                                CefRefPtr<CefContextMenuParams> params,
+                                                CefRefPtr<CefMenuModel> model) = 0;
     protected:
         virtual ~Delegate() {}
     };

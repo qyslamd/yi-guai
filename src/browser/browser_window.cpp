@@ -100,6 +100,15 @@ void BrowserWindow::onBrowserComfirmClose()
     client_handler_->DetachDelegate();
 }
 
+void BrowserWindow::onBrowserBeforeContextMenu(CefRefPtr<CefBrowser> browser,
+                                               CefRefPtr<CefFrame> frame,
+                                               CefRefPtr<CefContextMenuParams> params,
+                                               CefRefPtr<CefMenuModel> model)
+{
+    REQUIRE_MAIN_THREAD();
+   delegate_->onBrowserBeforeContextMenu(browser, frame, params, model);
+}
+
 void BrowserWindow::onBrowserForgroundTab(CefWindowInfo &windowInfo,
                                               CefRefPtr<CefClient> &client,
                                               CefBrowserSettings &settings)

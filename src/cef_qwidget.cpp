@@ -25,6 +25,7 @@
 #include <QPixmap>
 #include <QBuffer>
 #include <QScreen>
+#include "popups/StyledMenu.h"
 
 #include <include/base/cef_logging.h>
 #include "mainwindow.h"
@@ -152,6 +153,7 @@ void CefQWidget::GoForward()
 
 void CefQWidget::Refresh()
 {
+    qInfo()<<__FUNCTION__;
     auto browser = browser_window_->GetBrowser();
     if(browser){
         browser->Reload();
@@ -241,7 +243,17 @@ CefWindowHandle CefQWidget::BrowserWindowHandle()
 void CefQWidget::onTopLevelWindowStateChanged(Qt::WindowStates state,
                                               const QVariant &data)
 {
-//    resizeBorser(data.toSize());
+    //    resizeBorser(data.toSize());
+}
+
+void CefQWidget::onBrowserBeforeContextMenu(CefRefPtr<CefBrowser> browser,
+                                            CefRefPtr<CefFrame> frame,
+                                            CefRefPtr<CefContextMenuParams> params,
+                                            CefRefPtr<CefMenuModel> model)
+{
+    StyledMenu menu;
+
+    menu.exec(QCursor::pos());
 }
 
 void CefQWidget::onBrowserWndNewForgroundPage(CefWindowInfo &windowInfo,
