@@ -1,14 +1,6 @@
 ﻿#include "cef_qwidget.h"
-
-#if defined Q_OS_WIN
-#include <Windows.h>
-#include <SHlObj.h>
-#include <WinUser.h>
-#else
-#include "utils/windowskeyboardcodes.h"
-#include "browser/client_types.h"
-#endif
-
+#include <QtGlobal>
+#include <QApplication>
 #include <QtDebug>
 #include <QThread>
 #include <QHBoxLayout>
@@ -25,19 +17,32 @@
 #include <QPixmap>
 #include <QBuffer>
 #include <QScreen>
-#include "popups/StyledMenu.h"
+
+#ifdef Q_OS_WIN
+#include <Windows.h>
+#include <SHlObj.h>
+#include <WinUser.h>
+#else
+#include "utils/windowskeyboardcodes.h"
+#include "browser/client_types.h"
+#endif
 
 #include <include/base/cef_logging.h>
+#include <include/wrapper/cef_helpers.h>
+
+#include "popups/StyledMenu.h"
 #include "mainwindow.h"
 #include "popup.h"
 #include "page.h"
-
 #include "managers/FaviconManager.h"
 #include "managers/MainWindowManager.h"
 #include "managers/AppCfgManager.h"
 #include "managers/HistoryManager.h"
 #include "utils/util_qt.h"
 #include "dialogs/alertdialog.h"
+#include "browser/cef_client_handler.h"
+#include "browser/client_types.h"
+#include "browser/message_loop/main_message_loop.h"
 
 
 #ifdef OS_LINUX
@@ -77,21 +82,17 @@ void SetXWindowBounds(::Window xwindow,
 
 CefQWidget::CefQWidget(const QString &url, QWidget *parent)
     : QWidget(parent)
-    , qwindow_containter_(nullptr)
-    , layout_(new QVBoxLayout(this))
+    , url_(url)
 {
-    window_ = new QWindow(windowHandle());
-    browser_window_.reset(new BrowserWindow(this, url.toStdString()));
+    initUi();
 #if defined (Q_OS_LINUX)
     CefRect rect{x(), y(), window_->size().width(), window_->size().height()};
     CefBrowserSettings browser_settings;
-    browser_window_->CreateBrowser(window_->winId(),
-                                   rect,
-                                   browser_settings,
-                                   nullptr,
-                                   nullptr);
+    CreateBrowser(rect,
+                  browser_settings,
+                  nullptr,
+                  nullptr);
 #endif
-    initUi();
 }
 
 CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
@@ -99,17 +100,12 @@ CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
                        CefBrowserSettings &settings,
                        QWidget *parent)
     : QWidget(parent)
-    , qwindow_containter_(nullptr)
-    , layout_(new QVBoxLayout(this))
 {
-    window_ = new QWindow(windowHandle());
+    initUi();
 #ifdef Q_OS_WIN
     window_->setFlag(Qt::FramelessWindowHint);
 #endif
-    browser_window_.reset(new BrowserWindow(this, ""));
-    browser_window_->GetPopupConfig((ClientWindowHandle)window_->winId(),
-                                    windowInfo, client, settings);
-    initUi();
+    GetPopupConfig( windowInfo, client, settings);
     browser_state_ = Creating;
 }
 
@@ -125,125 +121,98 @@ QSize CefQWidget::sizeHint() const
 
 void CefQWidget::Navigate(const QString &url)
 {
-    auto browser = browser_window_->GetBrowser();
-    if(browser){
-        browser->GetMainFrame()->LoadURL(url.toStdString());
+    if(browser_){
+        browser_->GetMainFrame()->LoadURL(url.toStdString());
     }
 }
 
 void CefQWidget::GoBack()
 {
-    auto browser = browser_window_->GetBrowser();
-    if(browser){
-        if(browser->CanGoBack()){
-            browser->GoBack();
+    if(browser_){
+        if(browser_->CanGoBack()){
+            browser_->GoBack();
         }
     }
 }
 
 void CefQWidget::GoForward()
 {
-    auto browser = browser_window_->GetBrowser();
-    if(browser){
-        if(browser->CanGoForward()){
-            browser->GoForward();
+    if(browser_){
+        if(browser_->CanGoForward()){
+            browser_->GoForward();
         }
     }
 }
 
 void CefQWidget::Refresh()
 {
-    qInfo()<<__FUNCTION__;
-    auto browser = browser_window_->GetBrowser();
-    if(browser){
-        browser->Reload();
+    if(browser_){
+        browser_->Reload();
     }
 }
 
 void CefQWidget::MuteAudio()
 {
-    auto browser = browser_window_->GetBrowser();
-    if(browser){
-        auto host = browser->GetHost();
+    if(browser_){
+        auto host = browser_->GetHost();
         bool ismuted = host->IsAudioMuted();
-        browser->GetHost()->SetAudioMuted(!ismuted);
+        browser_->GetHost()->SetAudioMuted(!ismuted);
     }
 }
 
 void CefQWidget::StopLoading()
 {
-    auto browser = browser_window_->GetBrowser();
-    if(browser){
-        if(browser->IsLoading()){
-            browser->StopLoad();
+    if(browser_){
+        if(browser_->IsLoading()){
+            browser_->StopLoad();
         }
     }
 }
 
 void CefQWidget::ZoomOut()
 {
-    auto browser = browser_window_->GetBrowser();
-    if(browser){
-        auto old = browser->GetHost()->GetZoomLevel();
+    if(browser_){
+        auto old = browser_->GetHost()->GetZoomLevel();
         double delta = old <= -7.0 ? 0.0 : -1.0;
-        browser->GetHost()->SetZoomLevel(old + delta);
+        browser_->GetHost()->SetZoomLevel(old + delta);
     }
 }
 
 void CefQWidget::ZoomIn()
 {
-    auto browser = browser_window_->GetBrowser();
-    if(browser){
-        auto old = browser->GetHost()->GetZoomLevel();
+    if(browser_){
+        auto old = browser_->GetHost()->GetZoomLevel();
         double delta = old >= 9.0 ? 0.0 : 1.0;
-        browser->GetHost()->SetZoomLevel(old + delta);
+        browser_->GetHost()->SetZoomLevel(old + delta);
     }
 }
 
 void CefQWidget::ZoomReset()
 {
-    auto browser = browser_window_->GetBrowser();
-    if(browser){
-        browser->GetHost()->SetZoomLevel(0.0);
+    if(browser_){
+        browser_->GetHost()->SetZoomLevel(0.0);
     }
 }
 
 double CefQWidget::ZoomLevel()
 {
-    auto browser = browser_window_->GetBrowser();
-    if(browser){
-        return browser->GetHost()->GetZoomLevel();
+    if(browser_){
+        return browser_->GetHost()->GetZoomLevel();
     }
     return 0.0;
 }
 
 void CefQWidget::Print()
 {
-    auto browser = browser_window_->GetBrowser();
-    if(browser){
-        browser->GetHost()->Print();
+    if(browser_){
+        browser_->GetHost()->Print();
     }
 }
 
 void CefQWidget::ShowDevTool(const QPoint &pos)
 {
-    browser_window_->GetHandler()->ShowDevTools(browser_window_->GetBrowser(),
-                                                CefPoint(pos.x(), pos.y()));
-}
-
-CefWindowHandle CefQWidget::BrowserWindowHandle()
-{
-    auto browser = browser_window_->GetBrowser();
-    if(browser){
-        return browser->GetHost()->GetWindowHandle();
-    }
-    return 0;
-}
-
-void CefQWidget::onTopLevelWindowStateChanged(Qt::WindowStates state,
-                                              const QVariant &data)
-{
-    //    resizeBorser(data.toSize());
+    client_handler_->ShowDevTools(browser_,
+                                  CefPoint(pos.x(), pos.y()));
 }
 
 void CefQWidget::onBrowserBeforeContextMenu(CefRefPtr<CefBrowser> browser,
@@ -251,21 +220,190 @@ void CefQWidget::onBrowserBeforeContextMenu(CefRefPtr<CefBrowser> browser,
                                             CefRefPtr<CefContextMenuParams> params,
                                             CefRefPtr<CefMenuModel> model)
 {
-    StyledMenu menu;
+    connect(action_back_, &QAction::triggered,[browser](){browser->GoBack();});
+    connect(action_forward_, &QAction::triggered,[browser](){browser->CanGoForward();});
+    connect(action_reload_, &QAction::triggered,[browser](){browser->Reload();});
+    connect(action_reload_ignore_cache_, &QAction::triggered,[browser](){browser->ReloadIgnoreCache();});
+//    connect(action_save_as_, &QAction::triggered,[browser](){browser->ReloadIgnoreCache();});
+    connect(action_print_, &QAction::triggered,[browser](){browser->GetHost()->Print();});
+//    connect(action_view_source_, &QAction::triggered,[browser](){browser->GetHost()->Print();});
+    connect(action_inspect_element_, &QAction::triggered,[this](){ShowDevTool(QPoint());});
+    connect(action_open_link_, &QAction::triggered,[=]()
+    {
+        auto link = params->GetLinkUrl();
+        CefQWidget *window = new CefQWidget(QString::fromStdString(link));
+        emit browserNewForgroundPage(window);
+    });
 
-    menu.exec(QCursor::pos());
+
+    if ((params->GetTypeFlags() & (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_FRAME)) != 0)
+    {
+        // 在 Page 上
+        if ( params->GetTypeFlags() == CM_TYPEFLAG_PAGE )
+        {
+            /**************
+             *   前进
+             *   后退
+             *   刷新
+             *   忽略缓存刷新
+             * -------------
+             *   另存为
+             *   打印
+             * -------------
+             *   查看网页源码
+             *   检查
+             * ************/
+            browser_context_menu_->clear();
+            browser_context_menu_->addAction(action_back_);
+            browser_context_menu_->addAction(action_forward_);
+            browser_context_menu_->addAction(action_reload_);
+            browser_context_menu_->addAction(action_reload_ignore_cache_);
+            browser_context_menu_->addSeparator();
+            browser_context_menu_->addAction(action_save_as_);
+            browser_context_menu_->addAction(action_print_);
+            browser_context_menu_->addSeparator();
+            browser_context_menu_->addAction(action_view_source_);
+            browser_context_menu_->addAction(action_inspect_element_);
+
+            action_back_->setEnabled(browser->CanGoBack());
+            action_forward_->setEnabled(browser->CanGoForward());
+
+            browser_context_menu_->exec(QCursor::pos());
+        }
+
+        // 在有子frame参与的page上
+        if ( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_FRAME) )
+        {
+            browser_context_menu_->clear();
+            browser_context_menu_->addAction(action_back_);
+            browser_context_menu_->addAction(action_forward_);
+            browser_context_menu_->addAction(action_reload_);
+            browser_context_menu_->addAction(action_reload_ignore_cache_);
+            browser_context_menu_->addSeparator();
+            browser_context_menu_->addAction(action_save_as_);
+            browser_context_menu_->addAction(action_print_);
+            browser_context_menu_->addSeparator();
+            browser_context_menu_->addAction(action_view_frame_source_);
+            browser_context_menu_->addAction(action_frame_reload_);
+            browser_context_menu_->addAction(action_inspect_element_);
+
+            action_back_->setEnabled(browser->CanGoBack());
+            action_forward_->setEnabled(browser->CanGoForward());
+
+            browser_context_menu_->exec(QCursor::pos());
+        }
+
+        // 在某个链接地址上
+        if( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_LINK) )
+        {
+            browser_context_menu_->clear();
+            browser_context_menu_->addAction(action_open_link_);
+            browser_context_menu_->addAction(action_open_link_window_);
+            browser_context_menu_->addAction(action_open_link_incognito_);
+            browser_context_menu_->addSeparator();
+            browser_context_menu_->addAction(action_copy_link_);
+            browser_context_menu_->addSeparator();
+            browser_context_menu_->addAction(action_inspect_element_);
+
+            browser_context_menu_->exec(QCursor::pos());
+        }
+        // 输入框
+        if( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_EDITABLE) )
+        {
+            model->InsertItemAt(0, MENU_ID_USER_EMOJI, CefString(QObject::tr("emoji").toStdString()));
+        }
+
+        // 选中非链接地址的内容
+        if( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_SELECTION) )
+        {
+            model->AddItem(MENU_ID_USER_SEARCH_SELECTED, CefString(QObject::tr("Searh in web").toStdString()));
+            model->AddSeparator();
+            model->AddItem(MENU_ID_USER_INSPECT_ELEMENT,
+                            CefString(QObject::tr("Inspect element").toStdString()));
+        }
+
+        // 图片上
+        if( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_MEDIA) )
+        {
+            if(model->Clear()){
+                model->AddItem(MENU_ID_USER_OPEN_IMAGE_PAGE,
+                               CefString(QObject::tr("Open image in new page").toStdString()));
+                model->AddItem(MENU_ID_USER_SAVE_IMAGE_AS,
+                               CefString(QObject::tr("Save image as").toStdString()));
+                model->AddItem(MENU_ID_USER_COPY_IMAGE,
+                               CefString(QObject::tr("Copy image").toStdString()));
+                model->AddItem(MENU_ID_USER_COPY_IMAGE_LIINK,
+                               CefString(QObject::tr("Copy image url").toStdString()));
+                model->AddSeparator();
+                model->AddItem(MENU_ID_USER_INSPECT_ELEMENT,
+                                CefString(QObject::tr("Inspect element").toStdString()));
+            }
+        }
+        // 既是图片又是链接又在Page上
+        if( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_MEDIA | CM_TYPEFLAG_LINK) )
+        {
+            if(model->Clear()){
+                model->AddItem(MENU_ID_USER_OPEN_LINK_PAGE, CefString(QObject::tr("Open the link in a new tab").toStdString()));
+                model->AddItem(MENU_ID_USER_OPEN_LINK_WINDOW, CefString(QObject::tr("Open the link in a new window").toStdString()));
+                model->AddItem(MENU_ID_USER_OPEN_LINK_INPRIVATE,
+                               CefString(QObject::tr("Open the link in private window").toStdString()));
+                model->AddSeparator();
+                model->AddItem(MENU_ID_USER_COPY_LINK_URL, CefString(QObject::tr("Copy link address").toStdString()));
+                model->AddSeparator();
+                model->AddItem(MENU_ID_USER_OPEN_IMAGE_PAGE,
+                               CefString(QObject::tr("Open image in new page").toStdString()));
+                model->AddItem(MENU_ID_USER_SAVE_IMAGE_AS,
+                               CefString(QObject::tr("Save image as").toStdString()));
+                model->AddItem(MENU_ID_USER_COPY_IMAGE,
+                               CefString(QObject::tr("Copy image").toStdString()));
+                model->AddItem(MENU_ID_USER_COPY_IMAGE_LIINK,
+                               CefString(QObject::tr("Copy image url").toStdString()));
+                model->AddSeparator();
+                model->AddItem(MENU_ID_USER_INSPECT_ELEMENT,
+                                CefString(QObject::tr("Inspect element").toStdString()));
+            }
+        }
+        // 在Page上选中内容，选中的内容是链接地址
+        if( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_SELECTION | CM_TYPEFLAG_LINK) )
+        {
+            model->InsertItemAt(0, MENU_ID_USER_OPEN_LINK_PAGE, CefString(QObject::tr("Open the link in a new tab").toStdString()));
+            model->InsertItemAt(1, MENU_ID_USER_OPEN_LINK_WINDOW, CefString(QObject::tr("Open the link in a new window").toStdString()));
+            model->InsertItemAt(2, MENU_ID_USER_OPEN_LINK_INPRIVATE,
+                           CefString(QObject::tr("Open the link in private window").toStdString()));
+            model->InsertSeparatorAt(3);
+            model->InsertItemAt(4, MENU_ID_USER_COPY_LINK_URL, CefString(QObject::tr("Copy link address").toStdString()));
+            model->InsertSeparatorAt(5);
+            // copy
+            model->AddItem(MENU_ID_USER_SEARCH_SELECTED, CefString(QObject::tr("Searh in web").toStdString()));
+            model->AddSeparator();
+            model->AddItem(MENU_ID_USER_INSPECT_ELEMENT,
+                            CefString(QObject::tr("Inspect element").toStdString()));
+        }
+        if( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_SELECTION | CM_TYPEFLAG_LINK | CM_TYPEFLAG_FRAME) )
+        {
+
+        }
+        if( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_MEDIA | CM_TYPEFLAG_LINK | CM_TYPEFLAG_FRAME) )
+        {
+
+        }
+        if( params->GetTypeFlags() == (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_EDITABLE| CM_TYPEFLAG_SELECTION ) )
+        {
+
+        }
+    }
 }
 
-void CefQWidget::onBrowserWndNewForgroundPage(CefWindowInfo &windowInfo,
-                                                 CefRefPtr<CefClient> &client,
-                                                 CefBrowserSettings &settings)
+void CefQWidget::onBrowserForgroundTab(CefWindowInfo &windowInfo,
+                                       CefRefPtr<CefClient> &client,
+                                       CefBrowserSettings &settings)
 {
     CefQWidget *window = new CefQWidget(windowInfo, client, settings);
 
     emit browserNewForgroundPage(window);
 }
 
-void CefQWidget::onBrowserWndPopupWnd(const CefPopupFeatures &popupFeatures,
+void CefQWidget::onBrowserPopupWnd(const CefPopupFeatures &popupFeatures,
                                       CefWindowInfo &windowInfo,
                                       CefRefPtr<CefClient> &client,
                                       CefBrowserSettings &settings)
@@ -313,10 +451,10 @@ void CefQWidget::onBrowserWndPopupWnd(const CefPopupFeatures &popupFeatures,
     popupBrowser->setGeometry(x, y, w, h);
     popupBrowser->show();
 }
+void CefQWidget::onBrowserDeveTools(CefWindowInfo &windowInfo,
+                                    CefRefPtr<CefClient> &client,
+                                    CefBrowserSettings &settings)
 
-void CefQWidget::onBrowserWndDevTools(CefWindowInfo &windowInfo,
-                                          CefRefPtr<CefClient> &client,
-                                          CefBrowserSettings &settings)
 {
     CefQWidget *window = new CefQWidget(windowInfo, client, settings);
     window->is_dev_tool_ = true;
@@ -331,36 +469,40 @@ void CefQWidget::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
     emit browserCreated();
 }
 
-void CefQWidget::OnBrowserWindowClosing()
+void CefQWidget::OnBrowserClosing(CefRefPtr<CefBrowser> browser)
 {
-    emit browserClosing();
+    REQUIRE_MAIN_THREAD();
+    DCHECK_EQ(browser->GetIdentifier(), browser_->GetIdentifier());
+    // 修改标志
+    is_closing_ = true;
 
+    emit browserClosing();
     close();
 }
 
-void CefQWidget::onBrowserWindowAddressChange(const std::string &url)
+void CefQWidget::onBrowserAddressChange(const std::string &url)
 {
     url_ = QString::fromStdString(url);
     emit browserAddressChange(QString::fromStdString(url));
 }
 
-void CefQWidget::onBrowserWindowTitleChange(const std::string &title)
+void CefQWidget::onBrowserTitleChange(const std::string &title)
 {
     title_ = QString::fromStdString(title);
     emit browserTitleChange(title_);
 }
 
-void CefQWidget::onBrowserWndFullscreenChange(bool fullscreen)
+void CefQWidget::onBrowserFullscreenChange(bool fullscreen)
 {
     emit browserFullScnChange(fullscreen);
 }
 
-void CefQWidget::onBrowserWindowStatusMessage(const std::string &msg)
+void CefQWidget::onBrowserStatusMessage(const std::string &msg)
 {
     emit browserStatusMessage(QString::fromStdString(msg));
 }
 
-void CefQWidget::onBrowserWindowFaviconChange(CefRefPtr<CefImage> image,
+void CefQWidget::onBrowserFaviconChange(CefRefPtr<CefImage> image,
                                       const std::string &url)
 {
     if(image == nullptr || image->IsEmpty())
@@ -435,12 +577,12 @@ void CefQWidget::onBrowserWindowFaviconChange(CefRefPtr<CefImage> image,
     Q_UNUSED(url);
 }
 
-void CefQWidget::onBrowerWindowLoadStart(CefLoadHandler::TransitionType transition_type)
+void CefQWidget::onBrowerLoadStart(CefLoadHandler::TransitionType transition_type)
 {
     emit browserLoadStart(transition_type);
 }
 
-void CefQWidget::onBrowerWindowLoadEnd(int httpStatusCode)
+void CefQWidget::onBrowerLoadEnd(int httpStatusCode)
 {
     if(newly_created_){
         emit browserNeedSize();
@@ -454,13 +596,14 @@ void CefQWidget::onBrowerWindowLoadEnd(int httpStatusCode)
     emit browserLoadEnd(httpStatusCode);
 }
 
-void CefQWidget::onBrowserWndLoadingProgressChange(double progress)
+void CefQWidget::onBrowserLoadingProgressChange(CefRefPtr<CefBrowser> browser,
+                                                double progress)
 {
     emit browserLoadingProgress(progress);
 //    qInfo()<<__FUNCTION__<<progress;
 }
 
-void CefQWidget::onBrowserWindowLoadingStateChange(bool isLoading,
+void CefQWidget::onBrowserLoadingStateChange(bool isLoading,
                                                    bool canGoBack,
                                                    bool canGoForward)
 {
@@ -469,14 +612,14 @@ void CefQWidget::onBrowserWindowLoadingStateChange(bool isLoading,
                                    canGoForward);
 }
 
-void CefQWidget::OnBrowserGotFocus()
+void CefQWidget::onBrowserGotFocus(CefRefPtr<CefBrowser> browser)
 {
     emit browserFocusChange(true);
 }
 
-bool CefQWidget::onBrowserWndPreKeyEvent(const CefKeyEvent &event,
-                                         CefEventHandle os_event,
-                                         bool *is_keyboard_shortcut)
+bool CefQWidget::onBrowserPreKeyEvent(const CefKeyEvent &event,
+                                      CefEventHandle os_event,
+                                      bool *is_keyboard_shortcut)
 {
     if(event.focus_on_editable_field){
         return false;
@@ -496,8 +639,8 @@ bool CefQWidget::onBrowserWndPreKeyEvent(const CefKeyEvent &event,
     return false;
 }
 
-bool CefQWidget::onBrowserWndKeyEvent(const CefKeyEvent &event,
-                                      CefEventHandle os_event)
+bool CefQWidget::onBrowserKeyEvent(const CefKeyEvent &event,
+                                   CefEventHandle os_event)
 {
     dealCefKeyEvent(event, os_event, nullptr, false);
     return false;
@@ -785,11 +928,6 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
     }
 }
 
-void CefQWidget::onScreenChanged(QScreen *)
-{
-    resizeBrowser();
-}
-
 void CefQWidget::resizeEvent(QResizeEvent *event)
 {
 #ifdef Q_OS_LINUX
@@ -798,14 +936,12 @@ void CefQWidget::resizeEvent(QResizeEvent *event)
     switch(browser_state_){
     case Empty:
     {
-        auto handle = (ClientWindowHandle)window_->winId();
         CefRect rect{x(), y(), event->size().width(), event->size().height()};
         CefBrowserSettings browser_settings;
-        browser_window_->CreateBrowser(handle,
-                                       rect,
-                                       browser_settings,
-                                       nullptr,
-                                       nullptr);
+        CreateBrowser(rect,
+                      browser_settings,
+                      nullptr,
+                      nullptr);
         browser_state_ = Creating;
     }break;
     case Creating:
@@ -820,14 +956,13 @@ void CefQWidget::resizeEvent(QResizeEvent *event)
 void CefQWidget::closeEvent(QCloseEvent *event)
 {
     // 关闭浏览器触发点
-    if(browser_window_ && !browser_window_->IsClosing()){
+    if(!is_closing_){
         qInfo()<<__FUNCTION__;
-        auto browser = browser_window_->GetBrowser();
-        if(browser){
+        if(browser_){
             // Notify the browser window that we would like to close it. This
             // will result in a call to ClientHandler::DoClose() if the
             // JavaScript 'onbeforeunload' event handler allows it.
-            browser->GetHost()->CloseBrowser(false);
+            browser_->GetHost()->CloseBrowser(false);
         }
         // Cancel the close.
         event->ignore();
@@ -836,16 +971,101 @@ void CefQWidget::closeEvent(QCloseEvent *event)
 
 void CefQWidget::initUi()
 {
-    if(!qwindow_containter_){
-        qwindow_containter_ = QWidget::createWindowContainer(window_);
-    }
-
+    client_handler_ = new CefClientHandler(this, url_.toStdString());
+    window_ = new QWindow(windowHandle());
+    layout_ = new QVBoxLayout(this);
     layout_->setContentsMargins(0,0,0,0);
     layout_->setSpacing(0);
+    qwindow_containter_ = QWidget::createWindowContainer(window_);
     layout_->addWidget(qwindow_containter_);
     setLayout(layout_);
 
-    connect(window_, &QWindow::screenChanged, this, &CefQWidget::onScreenChanged);
+    initContextMenu();
+}
+
+void CefQWidget::initContextMenu()
+{
+    browser_context_menu_ = new StyledMenu(this);
+    action_back_ = new QAction(QIcon(":/icons/resources/imgs/arrow_back_left2_64px.png"), tr("Back"));
+    action_back_->setShortcut(QKeySequence(tr("Alt+Left")));
+
+    action_forward_ = new QAction(QIcon(":/icons/resources/imgs/arrow_right2_64px.png"), tr("Forward"));
+    action_forward_->setShortcut(QKeySequence(tr("Alt+Right")));
+
+    action_reload_ = new QAction(QIcon(":/icons/resources/imgs/reload_64px.png"), tr("Reload"));
+    action_reload_->setShortcut(QKeySequence(tr("Ctrl+R")));
+
+    action_reload_ignore_cache_ = new QAction(QIcon(":/icons/resources/imgs/reload_64px.png"), tr("Reload ignore cache"));
+//    action_reload_ignore_cache_->setShortcut(QKeySequence(tr("Ctrl+R")));
+
+    action_frame_reload_ = new QAction(QIcon(":/icons/resources/imgs/reload_64px.png"), tr("Reload frame"));
+//    action_reload_->setShortcut(QKeySequence(tr("Ctrl+R")));
+
+    action_save_as_ = new QAction(QIcon(":/icons/resources/imgs/reload_64px.png"), tr("Save as"));
+    action_save_as_->setShortcut(QKeySequence(tr("Ctrl+S")));
+
+    action_print_ = new QAction(QIcon(":/icons/resources/imgs/printer_64px.png"), tr("Print"));
+    action_print_->setShortcut(QKeySequence(tr("Ctrl+P")));
+
+    action_view_source_ = new QAction(QIcon(""), tr("View source"));
+    action_view_source_->setShortcut(QKeySequence(tr("Ctrl+U")));
+
+    action_view_frame_source_ = new QAction(QIcon(""), tr("View frame source"));
+//    action_view_frame_source_->setShortcut(QKeySequence(tr("Ctrl+U")));
+
+    action_inspect_element_ = new QAction(QIcon(":/icons/resources/imgs/search2_64px.png"), tr("Inspect element"));
+    action_inspect_element_->setShortcut(QKeySequence(tr("Ctrl+Shift+I")));
+
+    action_open_link_ = new QAction(QIcon(""), tr("Open link in new tab page"));
+//    action_open_link_->setShortcut(QKeySequence(tr("Ctrl+U")));
+
+    action_open_link_window_ = new QAction(QIcon(""), tr("Open link in new window"));
+
+    action_open_link_incognito_ = new QAction(QIcon(""), tr("Open link in incognito window"));
+
+    action_copy_link_ = new QAction(QIcon(""), tr("Copy link address"));
+
+}
+
+bool CefQWidget::CreateBrowser(const CefRect &rect,
+                               const CefBrowserSettings &settings,
+                               CefRefPtr<CefDictionaryValue> extra_info,
+                               CefRefPtr<CefRequestContext> request_context)
+{
+    REQUIRE_MAIN_THREAD();
+    CefWindowInfo window_info;
+#if defined Q_OS_WIN
+    RECT wnd_rect = {rect.x, rect.y, rect.x + rect.width, rect.y + rect.height};
+#else
+    CefRect wnd_rect{rect.x, rect.y, rect.x + rect.width, rect.y + rect.height};
+#endif
+    window_info.SetAsChild((ClientWindowHandle)window_->winId(), wnd_rect);
+
+    return CefBrowserHost::CreateBrowser(window_info, client_handler_,
+                                         client_handler_->startup_url(), settings,
+                                         extra_info, request_context);
+}
+
+void CefQWidget::GetPopupConfig(CefWindowInfo &windowInfo,
+                                CefRefPtr<CefClient> &client,
+                                CefBrowserSettings &settings)
+{
+    CEF_REQUIRE_UI_THREAD();
+    client = client_handler_;
+
+    auto screen = qApp->primaryScreen();
+    auto size = screen->availableSize();
+
+    // The window will be properly sized after the browser is created.
+#if defined(OS_WIN)
+    RECT rect{0,0,size.width(),size.height()};
+    windowInfo.SetAsChild((ClientWindowHandle)window_->winId(), rect);
+#elif defined(OS_LINUX)
+    CefRect rect(0, 0, size.width(), size.height());
+    windowInfo.SetAsChild((ClientWindowHandle)window_->winId(), rect);
+#endif
+
+    Q_UNUSED(settings);
 }
 
 void CefQWidget::resizeBrowser(const QSize &size)
@@ -859,9 +1079,8 @@ void CefQWidget::resizeBrowser(const QSize &size)
         rect.setWidth(size.width());
         rect.setHeight(size.height());
     }
-    auto browser = browser_window_->GetBrowser();
-    if(browser){
-        auto windowHandle = browser->GetHost()->GetWindowHandle();
+    if(browser_){
+        auto windowHandle = browser_->GetHost()->GetWindowHandle();
 #if defined(OS_WIN)
 //        auto hdwp = BeginDeferWindowPos(1);
 //        hdwp = DeferWindowPos(hdwp, windowHandle, HWND_BOTTOM, rect.x(), rect.y(),

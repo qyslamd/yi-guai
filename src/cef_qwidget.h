@@ -1,22 +1,22 @@
 ﻿#ifndef CEF_QWIDGET_H
 #define CEF_QWIDGET_H
+#pragma once
 
+#include "browser/cef_client_handler.h"
 #include <QWidget>
 #include <QWindow>
 #include <memory>
-#include "browser/browser_window.h"
 #include "globaldef.h"
 
 class QHBoxLayout;
 class QVBoxLayout;
-
 class Page;
-class CefQWidget : public QWidget, public BrowserWindow::Delegate
+class StyledMenu;
+class CefQWidget : public QWidget, public CefClientHandler::Delegate
 {
     Q_OBJECT
 public:
     explicit CefQWidget(const QString &url, QWidget *parent = nullptr);
-    CefQWidget(CefWindowInfo &windowInfo, CefRefPtr<CefClient> &client, CefBrowserSettings &settings, QWidget *parent = nullptr);
     ~CefQWidget();
 
     // QWidget interface
@@ -34,8 +34,6 @@ public:
     double ZoomLevel();
     void Print();
     void ShowDevTool(const QPoint &pos);
-
-    CefWindowHandle BrowserWindowHandle();
     bool isDevTool() const { return is_dev_tool_; }
 
 signals:
@@ -57,42 +55,41 @@ signals:
     void browserShortcut(CefShortcutCmd cmd);
     void devToolShortcut(CefShortcutCmd cmd);
 
-public slots:
-    void onTopLevelWindowStateChanged(Qt::WindowStates state, const QVariant &data);
-    // BrowserWindow::Delegate interface
+    // ClientHandler::Delegate methods.
 protected:
     void onBrowserBeforeContextMenu(CefRefPtr<CefBrowser> browser,
                                     CefRefPtr<CefFrame> frame,
                                     CefRefPtr<CefContextMenuParams> params,
                                     CefRefPtr<CefMenuModel> model) override;
-    void onBrowserWndNewForgroundPage(CefWindowInfo &windowInfo,
-                                         CefRefPtr<CefClient> &client,
-                                         CefBrowserSettings &settings) override;
-    void onBrowserWndPopupWnd(const CefPopupFeatures &popupFeatures,
-                              CefWindowInfo &windowInfo,
-                              CefRefPtr<CefClient> &client,
-                              CefBrowserSettings &settings) override;
-    void onBrowserWndDevTools(CefWindowInfo& windowInfo,
+    void onBrowserForgroundTab(CefWindowInfo &windowInfo,
+                               CefRefPtr<CefClient> &client,
+                               CefBrowserSettings &settings) override;
+    void onBrowserPopupWnd(const CefPopupFeatures &popupFeatures,
+                           CefWindowInfo &windowInfo,
+                           CefRefPtr<CefClient> &client,
+                           CefBrowserSettings &settings) override;
+    void onBrowserDeveTools(CefWindowInfo& windowInfo,
                                   CefRefPtr<CefClient>& client,
                                   CefBrowserSettings& settings) override;
     void OnBrowserCreated(CefRefPtr<CefBrowser> browser) override;
-    void OnBrowserWindowClosing() override;
-    void onBrowserWindowAddressChange(const std::string &url) override;
-    void onBrowserWindowTitleChange(const std::string &title) override;
-    void onBrowserWndFullscreenChange(bool fullscreen) override;
-    void onBrowserWindowStatusMessage(const std::string &meg) override;
-    void onBrowserWindowFaviconChange(CefRefPtr<CefImage> image, const std::string &url) override;
-    void onBrowerWindowLoadStart(CefLoadHandler::TransitionType transition_type) override;
-    void onBrowerWindowLoadEnd(int httpStatusCode) override;
-    void onBrowserWndLoadingProgressChange(double progress) override;
-    void onBrowserWindowLoadingStateChange(bool isLoading, bool canGoBack, bool canGoForward) override;
-    void OnBrowserGotFocus() override;
+    void OnBrowserClosing(CefRefPtr<CefBrowser> browser) override;
+    void onBrowserAddressChange(const std::string &url) override;
+    void onBrowserTitleChange(const std::string &title) override;
+    void onBrowserFullscreenChange(bool fullscreen) override;
+    void onBrowserStatusMessage(const std::string &meg) override;
+    void onBrowserFaviconChange(CefRefPtr<CefImage> image, const std::string &url) override;
+    void onBrowerLoadStart(CefLoadHandler::TransitionType transition_type) override;
+    void onBrowerLoadEnd(int httpStatusCode) override;
+    void onBrowserLoadingProgressChange(CefRefPtr<CefBrowser> browser,
+                                        double progress) override;
+    void onBrowserLoadingStateChange(bool isLoading, bool canGoBack, bool canGoForward) override;
+    void onBrowserGotFocus(CefRefPtr<CefBrowser> browser) override;
     // browser keyboard event
-    bool onBrowserWndPreKeyEvent(const CefKeyEvent &event,
-                                 CefEventHandle os_event,
-                                 bool *is_keyboard_shortcut) override;
-    bool onBrowserWndKeyEvent(const CefKeyEvent &event,
-                              CefEventHandle os_event) override;
+    bool onBrowserPreKeyEvent(const CefKeyEvent &event,
+                              CefEventHandle os_event,
+                              bool *is_keyboard_shortcut) override;
+    bool onBrowserKeyEvent(const CefKeyEvent &event,
+                           CefEventHandle os_event) override;
 
     // QWidget interface
 protected:
@@ -100,31 +97,60 @@ protected:
     void closeEvent(QCloseEvent *event) override;
 
 private:
+    CefQWidget(CefWindowInfo &windowInfo,
+               CefRefPtr<CefClient> &client,
+               CefBrowserSettings &settings,
+               QWidget *parent = nullptr);
     enum BrowserState{
         Empty,
         Creating,
         Created
     };
+    bool is_closing_ = false;
     bool newly_created_ = true;
     bool is_dev_tool_ = false;
     BrowserState browser_state_ = Empty;
     CefRefPtr<CefBrowser> browser_;
+    CefRefPtr<CefClientHandler> client_handler_;
 
     QString url_;
     QString title_;
     QWindow *window_;
-    scoped_ptr<BrowserWindow> browser_window_;
     QWidget *qwindow_containter_;
     QVBoxLayout *layout_;
 
+    StyledMenu *browser_context_menu_ = nullptr;
+    QAction *action_back_;
+    QAction *action_forward_;
+    QAction *action_reload_;
+    QAction *action_reload_ignore_cache_;
+    QAction *action_frame_reload_;
+    QAction *action_save_as_;
+    QAction *action_print_;
+    QAction *action_view_source_;
+    QAction *action_view_frame_source_;
+    QAction *action_inspect_element_;
+
+    QAction *action_open_link_;
+    QAction *action_open_link_window_;
+    QAction *action_open_link_incognito_;
+    QAction *action_copy_link_;
+
+
     void initUi();
+    void initContextMenu();
+    bool CreateBrowser(const CefRect& rect,
+                       const CefBrowserSettings& settings,
+                       CefRefPtr<CefDictionaryValue> extra_info,
+                       CefRefPtr<CefRequestContext> request_context);
+    void GetPopupConfig(CefWindowInfo &windowInfo,
+                        CefRefPtr<CefClient> &client,
+                        CefBrowserSettings &settings);
     void resizeBrowser(const QSize &size = QSize());
     void dealCefKeyEvent(const CefKeyEvent &event,
                          CefEventHandle os_event,
                          bool *is_keyboard_shortcut,
                          bool isPre = true);
-private slots:
-    void onScreenChanged(QScreen *);
 };
 
 #endif // CEF_QWIDGET_H
