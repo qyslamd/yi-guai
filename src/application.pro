@@ -55,7 +55,6 @@ SOURCES += \
     toolbars/TabPageBar.cpp \
     toolbars/TabbarStyle.cpp \
     dialogs/alertdialog.cpp \
-    browser/browser_window.cpp \
     browser/cef_app_browser.cpp \
     browser/cef_client_handler.cpp \
     cef_qwidget.cpp \
@@ -111,7 +110,6 @@ HEADERS += \
     toolbars/TabPageBar.h \
     toolbars/TabbarStyle.h \
     dialogs/alertdialog.h \
-    browser/browser_window.h \
     browser/cef_app_browser.h \
     browser/cef_client_handler.h \
     cef_qwidget.h \

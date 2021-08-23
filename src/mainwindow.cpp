@@ -484,12 +484,6 @@ void MainWindow::initPage(Page *page)
 {
     connect(page, &Page::pageCmd, this, &MainWindow::onPageCmd);
     connect(page, &Page::newPage, [this](Page *page){AddNewPage(page);});
-    // 顶层窗口的窗口状态改变应该通知到page去，
-    connect(this, &MainWindow::windowStateChanged, [page](Qt::WindowStates state, const QVariant &data)
-    {
-        page->getBrowserWidget()->onTopLevelWindowStateChanged(state, data);
-    });
-
     connect(page, &Page::browserShortcut, this, &MainWindow::onBrowserShortcut);
 }
 

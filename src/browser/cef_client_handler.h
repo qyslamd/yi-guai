@@ -67,9 +67,6 @@ public:
     CefClientHandler(Delegate* delegate,
                      const std::string& startup_url);
     ~CefClientHandler();
-    // This object may outlive the Delegate object so it's necessary for the
-    // Delegate to detach itself before destruction.
-    void DetachDelegate();
 
     // CefClient interface
     CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override { return this; }

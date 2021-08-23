@@ -46,18 +46,6 @@ CefClientHandler::~CefClientHandler()
     qInfo()<<__FUNCTION__;
 }
 
-void CefClientHandler::DetachDelegate()
-{
-    if (!CURRENTLY_ON_MAIN_THREAD()) {
-        // Execute this method on the main thread.
-        MAIN_POST_CLOSURE(base::Bind(&CefClientHandler::DetachDelegate, this));
-        return;
-    }
-
-    DCHECK(delegate_);
-    delegate_ = nullptr;
-}
-
 bool CefClientHandler::OnBeforePopup(
         CefRefPtr<CefBrowser> browser,
         CefRefPtr<CefFrame> frame,
@@ -376,10 +364,10 @@ void CefClientHandler::OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
                                            CefRefPtr<CefMenuModel> model)
 {
 #if 1
+    model->Clear();
     if(delegate_){
         delegate_->onBrowserBeforeContextMenu(browser, frame, params, model);
     }
-    model->Clear();
     return;
 #endif
 
