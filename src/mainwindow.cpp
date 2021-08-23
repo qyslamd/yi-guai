@@ -49,6 +49,7 @@
 #include <QLocale>
 #include <QStandardItemModel>
 #include <QScreen>
+#include <QDesktopWidget>
 
 #if defined(Q_OS_WIN)
 #include <Windows.h>
@@ -251,14 +252,16 @@ void MainWindow::paintEvent(QPaintEvent *event)
     QtWinFramelessWindow::paintEvent(event);
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
+}
 
-//    p.save();
-//    if(isInprivate()){
-//        p.fillRect(rect(), QColor(0x404244));
-//    }else{
-//        p.fillRect(rect(), QColor(0x609DBF));
+void MainWindow::moveEvent(QMoveEvent *event)
+{
+    QtWinFramelessWindow::moveEvent(event);
+//    auto screenNum = qApp->desktop()->screenNumber(this);
+//    if(screenNum != screen_number_){
+//        resize(width() + 1, height());
+//        screen_number_ = screenNum;
 //    }
-    //    p.restore();
 }
 
 #ifdef Q_OS_WIN
@@ -311,6 +314,7 @@ void MainWindow::initQtShortcut()
 
 void MainWindow::initUi()
 {
+    setMinimumSize(200,200);
     if(auto window = this->windowHandle()){
         connect(window, &QWindow::screenChanged, this, &MainWindow::onScreenChanged);
     }
@@ -509,6 +513,13 @@ Page *MainWindow::GetPage(int index)
 void MainWindow::onScreenChanged(QScreen *screen)
 {
     qInfo()<<__FUNCTION__<<screen;
+    QTimer::singleShot(30, [this]()
+    {
+        static bool ok = false;
+        auto delta = ok ? 1 : -1;
+        ok = !ok;
+        resize(width() + delta,  height());
+    });
 }
 
 void MainWindow::onStatusMessage(const QString &msg)

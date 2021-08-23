@@ -22,6 +22,19 @@
 QtWinFramelessWindow::QtWinFramelessWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    // QWindow的screenChanged信号的触发得是Frameless属性的窗口，我TMD的
+#if 1
+    setWindowFlags(Qt::Window |
+                   Qt::FramelessWindowHint |
+                   Qt::WindowTitleHint |
+                   Qt::WindowSystemMenuHint |
+                   Qt::WindowMinMaxButtonsHint |
+                   Qt::WindowCloseButtonHint |
+                   Qt::WindowFullscreenButtonHint);
+    HWND hwnd = (HWND)this->winId();
+    DWORD style = ::GetWindowLong(hwnd, GWL_STYLE);
+    ::SetWindowLong(hwnd, GWL_STYLE, style | WS_MAXIMIZEBOX | WS_THICKFRAME | WS_CAPTION);
+#endif
 }
 
 bool QtWinFramelessWindow::event(QEvent *ev)
@@ -195,6 +208,11 @@ bool QtWinFramelessWindow::nativeEvent(const QByteArray &eventType, void *messag
         break;
     }
     return QMainWindow::nativeEvent(eventType, message, result);
+}
+
+void QtWinFramelessWindow::moveEvent(QMoveEvent *event)
+{
+    QMainWindow::moveEvent(event);
 }
 
 bool QtWinFramelessWindow::hitTestCaption(const QPoint &gPos)

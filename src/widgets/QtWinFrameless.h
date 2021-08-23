@@ -20,6 +20,7 @@ signals:
 protected:
     virtual bool nativeEvent(const QByteArray &eventType,
                              void *message, long *result) override;
+    virtual void moveEvent(QMoveEvent *event) override;
     ///
     /// \brief Implemention in subclass to judge HTCAPTION
     /// \param gPos - global cursor postion

@@ -64,6 +64,7 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
+    void moveEvent(QMoveEvent *event) override;
 #ifdef Q_OS_WIN
     // QtWinFrameless interface
     bool hitTestCaption(const QPoint &gPos) override;
@@ -77,7 +78,7 @@ private:
 
     MainWindowConfig created_cfg_;
 
-    /*参见：QLayout::setMenuBar(QWidget *menuBar)，*/
+    /*参见：QLayout::setMenuBar(QWidget *menuBar) */
     QWidget *widget_north_ = nullptr;
     QVBoxLayout *widget_north_layout_ = nullptr;
     QMenuBar *menu_bar_ = nullptr;      /*MacOS需要菜单栏*/

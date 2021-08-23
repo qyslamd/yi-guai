@@ -1071,11 +1071,12 @@ void CefQWidget::GetPopupConfig(CefWindowInfo &windowInfo,
 void CefQWidget::resizeBrowser(const QSize &size)
 {
     QRect rect;
+    rect.setX(0);
+    rect.setY(0);
     if(size.isEmpty()){
-        rect = layout_->geometry();
+        rect.setWidth(qwindow_containter_->width());
+        rect.setHeight(qwindow_containter_->height());
     }else{
-        rect.setX(0);
-        rect.setY(0);
         rect.setWidth(size.width());
         rect.setHeight(size.height());
     }

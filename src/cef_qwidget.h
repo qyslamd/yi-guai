@@ -35,7 +35,6 @@ public:
     void Print();
     void ShowDevTool(const QPoint &pos);
     bool isDevTool() const { return is_dev_tool_; }
-
 signals:
     void browserNeedSize();
     void browserCreated();
@@ -143,10 +142,10 @@ private:
                        const CefBrowserSettings& settings,
                        CefRefPtr<CefDictionaryValue> extra_info,
                        CefRefPtr<CefRequestContext> request_context);
+    void resizeBrowser(const QSize &size = QSize());
     void GetPopupConfig(CefWindowInfo &windowInfo,
                         CefRefPtr<CefClient> &client,
                         CefBrowserSettings &settings);
-    void resizeBrowser(const QSize &size = QSize());
     void dealCefKeyEvent(const CefKeyEvent &event,
                          CefEventHandle os_event,
                          bool *is_keyboard_shortcut,
