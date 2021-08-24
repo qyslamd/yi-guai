@@ -35,6 +35,7 @@ public:
     QPoint inprivateBtnPos() const;
     QPoint userBtnPos() const;
     QPoint zoomBtnPos() const;
+    QPoint findHintBtnPos() const;
     void inpWndCntChanged();
     void updatePreference();
 signals:

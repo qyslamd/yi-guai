@@ -162,6 +162,7 @@
         <file>resources/imgs/colorful/baidu_96px.png</file>
         <file>resources/imgs/colorful/bing_96px.png</file>
         <file>resources/imgs/colorful/google_96px.png</file>
+        <file>corgi_64.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file>resources/styles/normal.qss</file>

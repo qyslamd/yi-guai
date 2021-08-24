@@ -21,7 +21,7 @@ class BookmarkBar;
 class NotificationBar;
 class QStackedWidget;
 class QStatusBar;
-class Page;
+class BrowserPage;
 class Tab_Thumbnail_Widget;
 
 class AddBkmkPopup;
@@ -32,17 +32,18 @@ class PopupGeneral;
 class UserInfoPopup;
 class InprivatePopup;
 class QPropertyAnimation;
+class AboutDialog;
 
 class MainWindow : public QtWinFramelessWindow
 {
     Q_OBJECT
 public:
     explicit MainWindow(const MainWindowConfig &cfg, QWidget *parent = nullptr);
-    explicit MainWindow(Page *page, QWidget *parent = nullptr);
+    explicit MainWindow(BrowserPage *page, QWidget *parent = nullptr);
     ~MainWindow();
 
     int AddNewPage(const QString &url, bool switchTo = false);
-    int AddNewPage(Page *page);
+    int AddNewPage(BrowserPage *page);
     void NavigateInCurPage(const QString &url);
     bool isInprivate() const {return created_cfg_.is_inprivate_;}
     void updatePreference();
@@ -112,6 +113,8 @@ private:
 
     UserInfoPopup *userinfo_popup_ = nullptr; /*用户信息 popup*/
 
+    AboutDialog *about_dialog_ = nullptr;
+
     bool first_browser_created_ = false; /*首个浏览器创建完成标志*/
     bool window_closing_ = false;   /*窗口正在关闭标志*/
     bool right_closing_ = false;    /*窗口正在关闭右侧标签页标志*/
@@ -122,10 +125,10 @@ private:
     void setAppearance();
     void initSignalSlot();
 
-    void initPage(Page *page);
-    Page *CurrentPage();
+    void initPage(BrowserPage *page);
+    BrowserPage *CurrentPage();
     int CurrentPageIndex();
-    Page *GetPage(int index);
+    BrowserPage *GetPage(int index);
 
 private slots:
     void onScreenChanged(QScreen *screen);
@@ -164,6 +167,6 @@ private:
     void onWindowStateChanged();
     void onNormalMax();
     void onTabSwitch();
-    void addRecently(Page *page);
+    void addRecently(BrowserPage *page);
 };
 #endif // MAINWINDOW_H

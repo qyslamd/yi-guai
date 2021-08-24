@@ -118,6 +118,11 @@ QPoint NavigateToolBar::zoomBtnPos() const
     return address_bar_->gGeometryBtnZoom().bottomRight();
 }
 
+QPoint NavigateToolBar::findHintBtnPos() const
+{
+    return address_bar_->findButtonGlobalPos();
+}
+
 void NavigateToolBar::inpWndCntChanged()
 {
     if(inprivate_){

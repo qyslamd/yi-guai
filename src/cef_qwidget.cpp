@@ -32,8 +32,8 @@
 
 #include "popups/StyledMenu.h"
 #include "mainwindow.h"
-#include "popup.h"
-#include "page.h"
+#include "popup_browser.h"
+#include "browser_page.h"
 #include "managers/FaviconManager.h"
 #include "managers/MainWindowManager.h"
 #include "managers/AppCfgManager.h"
@@ -410,7 +410,7 @@ void CefQWidget::onBrowserPopupWnd(const CefPopupFeatures &popupFeatures,
 {
     CefQWidget *window = new CefQWidget(windowInfo, client, settings);
 
-    Popup *popupBrowser = new Popup(window);
+    PopupBrowser *popupBrowser = new PopupBrowser(window);
     popupBrowser->setAttribute(Qt::WA_DeleteOnClose);
 
     /* CefPopupFeatures

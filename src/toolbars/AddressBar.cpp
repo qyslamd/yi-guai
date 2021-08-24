@@ -68,6 +68,14 @@ QRect AddressBar::gGeometryBtnZoom() const
                  btn_zoom_hint_->height());
 }
 
+QPoint AddressBar::findButtonGlobalPos() const
+{
+    if(btn_find_hint_){
+        return btn_find_hint_->mapToGlobal(btn_find_hint_->rect().bottomRight());
+    }
+    return QPoint();
+}
+
 void AddressBar::initUi()
 {
     using ShaowEffect = QGraphicsDropShadowEffect;

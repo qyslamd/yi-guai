@@ -1,4 +1,4 @@
-#include "page.h"
+#include "browser_page.h"
 #include "popups/SiteInfoPopup.h"
 #include "popups/ZoomPopup.h"
 
@@ -18,18 +18,20 @@
 #include "managers/AppCfgManager.h"
 #include "managers/CefManager.h"
 #include "dialogs/pagedialog.h"
+#include "toolbars/FindBar.h"
 
 #ifndef Q_OS_WIN
 #include "utils/windowskeyboardcodes.h"
 #endif
 
-Page::Page(const QString &url, QWidget *parent)
+BrowserPage::BrowserPage(const QString &url, QWidget *parent)
     : QMainWindow(parent)
     , main_layout_(new QVBoxLayout)
     , dock_dev_tool_(new QDockWidget)
     , site_info_popup_(new SiteInfoPopup(this))
     , zoom_popup_(new ZoomPopup(this))
     , zoom_bar_timer_(new QTimer(this))
+    , find_bar_(new FindBar(this))
 {
     setMinimumHeight(100);
     if(!centralWidget()){
@@ -47,7 +49,7 @@ Page::Page(const QString &url, QWidget *parent)
     initOthers();
 }
 
-Page::Page(CefQWidget*browser, QWidget *parent)
+BrowserPage::BrowserPage(CefQWidget*browser, QWidget *parent)
     : QMainWindow(parent)
     , main_layout_(new QVBoxLayout)
     , browser_widget_(browser)
@@ -55,6 +57,7 @@ Page::Page(CefQWidget*browser, QWidget *parent)
     , site_info_popup_(new SiteInfoPopup(this))
     , zoom_popup_(new ZoomPopup(this))
     , zoom_bar_timer_(new QTimer(this))
+    , find_bar_(new FindBar(this))
 {
     setMinimumHeight(100);
     if(!centralWidget()){
@@ -70,12 +73,12 @@ Page::Page(CefQWidget*browser, QWidget *parent)
     initOthers();
 }
 
-Page::~Page()
+BrowserPage::~BrowserPage()
 {
 
 }
 
-bool Page::eventFilter(QObject *obj, QEvent *ev)
+bool BrowserPage::eventFilter(QObject *obj, QEvent *ev)
 {
     if(obj == dock_dev_tool_){
         if(ev->type() == QEvent::Close){
@@ -94,17 +97,17 @@ bool Page::eventFilter(QObject *obj, QEvent *ev)
     return QMainWindow::eventFilter(obj, ev);
 }
 
-CefQWidget* Page::getBrowserWidget()
+CefQWidget* BrowserPage::getBrowserWidget()
 {
     return browser_widget_;
 }
 
-QString Page::url() const
+QString BrowserPage::url() const
 {
     return edited_flag_ ? edited_txt_ : url_;
 }
 
-void Page::setEditedText(const QString &txt)
+void BrowserPage::setEditedText(const QString &txt)
 {
     if(url_.compare(txt, Qt::CaseInsensitive) == 0 || txt.isEmpty()){
         edited_flag_ = false;
@@ -114,7 +117,7 @@ void Page::setEditedText(const QString &txt)
     edited_txt_ = txt;
 }
 
-void Page::showSiteInfomation(const QPoint &pos)
+void BrowserPage::showSiteInfomation(const QPoint &pos)
 {
     /*设置必要的信息*/
     site_info_popup_->setDomain(QUrl(url_).host());
@@ -123,7 +126,7 @@ void Page::showSiteInfomation(const QPoint &pos)
     site_info_popup_->show();
 }
 
-void Page::showZoomBar(const QPoint &pos)
+void BrowserPage::showZoomBar(const QPoint &pos)
 {
     auto pos1 = pos;
     pos1.rx() -= zoom_popup_->width();
@@ -133,7 +136,7 @@ void Page::showZoomBar(const QPoint &pos)
     zoom_popup_->show();
 }
 
-void Page::openDevTool()
+void BrowserPage::openDevTool()
 {
     auto cef_qwidget = qobject_cast<CefQWidget *>(dock_dev_tool_->widget());
     if(cef_qwidget && cef_qwidget->isDevTool())
@@ -144,13 +147,13 @@ void Page::openDevTool()
     }
 }
 
-void Page::closeEvent(QCloseEvent *event)
+void BrowserPage::closeEvent(QCloseEvent *event)
 {
     browser_widget_->close();
     QMainWindow::closeEvent(event);
 }
 
-void Page::initBrowser()
+void BrowserPage::initBrowser()
 {
     connect(browser_widget_, &CefQWidget::browserNeedSize, [this]()
     {
@@ -165,10 +168,10 @@ void Page::initBrowser()
         emit pageCmd(PageCmd::Closing, QVariant());
     });
     connect(browser_widget_, &CefQWidget::browserNewForgroundPage, [this](CefQWidget *browser){
-        Page *page = new Page(browser);
+        BrowserPage *page = new BrowserPage(browser);
         emit newPage(page);
     });
-    connect(browser_widget_, &CefQWidget::browserDevTool, this, &Page::onBrowserDevTool);
+    connect(browser_widget_, &CefQWidget::browserDevTool, this, &BrowserPage::onBrowserDevTool);
 
     connect(browser_widget_, &CefQWidget::browserAddressChange, [this](const QString &url)
     {
@@ -241,12 +244,12 @@ void Page::initBrowser()
     });
 }
 
-void Page::initOthers()
+void BrowserPage::initOthers()
 {
     dock_dev_tool_->installEventFilter(this);
     connect(dock_dev_tool_, &QDockWidget::topLevelChanged,
-            this, &Page::onDockDevToolTopLevelChanged);
-    connect(dock_dev_tool_, &QDockWidget::dockLocationChanged, this, &Page::onDockDevToolLocChanged);
+            this, &BrowserPage::onDockDevToolTopLevelChanged);
+    connect(dock_dev_tool_, &QDockWidget::dockLocationChanged, this, &BrowserPage::onDockDevToolLocChanged);
 
     connect(zoom_popup_, &ZoomPopup::zoomOut, this, [this](){
         emit pageCmd(PageCmd::ZoomOut, "");
@@ -264,11 +267,18 @@ void Page::initOthers()
         emit pageCmd(PageCmd::OpenUrl, url);
     });
 
-    connect(zoom_bar_timer_, &QTimer::timeout,this, &Page::onZoomBarTimer);
+    connect(zoom_bar_timer_, &QTimer::timeout,this, &BrowserPage::onZoomBarTimer);
     zoom_bar_timer_->start(2000);
+
+    find_bar_->hide();
 }
 
-void Page::onBrowserDevTool(CefQWidget *devTool)
+void BrowserPage::moveFindBar()
+{
+
+}
+
+void BrowserPage::onBrowserDevTool(CefQWidget *devTool)
 {
     qInfo()<<__FUNCTION__<<devTool;
     connect(devTool, &CefQWidget::browserShortcut, this, [=](CefShortcutCmd cmd){
@@ -283,14 +293,15 @@ void Page::onBrowserDevTool(CefQWidget *devTool)
     dock_dev_tool_->show();
 }
 
-void Page::onDockDevToolTopLevelChanged(bool isFloating)
+void BrowserPage::onDockDevToolTopLevelChanged(bool isFloating)
 {
     if(!isFloating){
         return ;
     }
     auto geo = AppCfgMgr::devToolGeometry();
     if(!geo.isEmpty()){
-        static QWidget w;   // 这就很像工具人
+        /* tool widget, for using restoreGeometry function */
+        static QWidget w;
         w.hide();
         if(w.restoreGeometry(geo))
         {
@@ -302,7 +313,7 @@ void Page::onDockDevToolTopLevelChanged(bool isFloating)
     }
 }
 
-void Page::onDockDevToolLocChanged(Qt::DockWidgetArea area)
+void BrowserPage::onDockDevToolLocChanged(Qt::DockWidgetArea area)
 {
     switch (area) {
     case Qt::LeftDockWidgetArea:
@@ -320,7 +331,7 @@ void Page::onDockDevToolLocChanged(Qt::DockWidgetArea area)
     }
 }
 
-void Page::onDevToolShortcut(CefQWidget *devTool, CefShortcutCmd cmd)
+void BrowserPage::onDevToolShortcut(CefQWidget *devTool, CefShortcutCmd cmd)
 {
     qInfo()<<__FUNCTION__;
     switch (cmd){
@@ -354,7 +365,7 @@ void Page::onDevToolShortcut(CefQWidget *devTool, CefShortcutCmd cmd)
     }
 }
 
-void Page::onZoomBarTimer()
+void BrowserPage::onZoomBarTimer()
 {
     auto zoomLevel = browser_widget_->ZoomLevel();
     if(zoomLevel == 0.0){

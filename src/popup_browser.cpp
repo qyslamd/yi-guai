@@ -1,5 +1,5 @@
-#include "popup.h"
-#include "ui_popup.h"
+#include "popup_browser.h"
+#include "ui_popup_browser.h"
 #include "popups/SiteInfoPopup.h"
 #include <QAction>
 #include <QToolButton>
@@ -9,9 +9,9 @@
 
 #include "cef_qwidget.h"
 
-Popup::Popup(CefQWidget *browser, QWidget *parent)
+PopupBrowser::PopupBrowser(CefQWidget *browser, QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::Popup)
+    , ui(new Ui::PopupBrowser)
     , action_site_info_(new QAction(this))
     , site_info_widget_(new SiteInfoPopup(this))
     , browser_(browser)
@@ -27,9 +27,9 @@ Popup::Popup(CefQWidget *browser, QWidget *parent)
 
     ui->verticalLayout->addWidget(browser_);
 
-    action_site_info_->setIcon(QIcon(":/icons/resources/imgs/site_info_26px.png"));
+    action_site_info_->setIcon(QIcon(":/icons/resources/imgs/ios7/protect_50px.png"));
     ui->lineEdit->addAction(action_site_info_, QLineEdit::LeadingPosition);
-    connect(action_site_info_, &QAction::triggered, this, &Popup::onSiteInfoClicked);
+    connect(action_site_info_, &QAction::triggered, this, &PopupBrowser::onSiteInfoClicked);
 
     site_info_widget_->hide();
 
@@ -44,18 +44,18 @@ Popup::Popup(CefQWidget *browser, QWidget *parent)
         }
     }
 
-    connect(browser_, &CefQWidget::browserTitleChange, this, &Popup::onBrowserTitleChange);
-    connect(browser_, &CefQWidget::browserAddressChange, this, &Popup::onBrowserAddrChange);
-    connect(browser_, &CefQWidget::browserFaviconChange, this, &Popup::onBrowserFavicon);
+    connect(browser_, &CefQWidget::browserTitleChange, this, &PopupBrowser::onBrowserTitleChange);
+    connect(browser_, &CefQWidget::browserAddressChange, this, &PopupBrowser::onBrowserAddrChange);
+    connect(browser_, &CefQWidget::browserFaviconChange, this, &PopupBrowser::onBrowserFavicon);
 }
 
-Popup::~Popup()
+PopupBrowser::~PopupBrowser()
 {
     qInfo()<<__FUNCTION__;
     delete ui;
 }
 
-void Popup::onSiteInfoClicked()
+void PopupBrowser::onSiteInfoClicked()
 {
     QPoint pos;
     if(internal_btn_siteInfo_){
@@ -70,17 +70,17 @@ void Popup::onSiteInfoClicked()
     site_info_widget_->show();
 }
 
-void Popup::onBrowserTitleChange(const QString &txt)
+void PopupBrowser::onBrowserTitleChange(const QString &txt)
 {
     setWindowTitle(txt);
 }
 
-void Popup::onBrowserAddrChange(const QString &txt)
+void PopupBrowser::onBrowserAddrChange(const QString &txt)
 {
     ui->lineEdit->setText(txt);
 }
 
-void Popup::onBrowserFavicon(const QPixmap &pix)
+void PopupBrowser::onBrowserFavicon(const QPixmap &pix)
 {
     setWindowIcon(QIcon(pix));
 }

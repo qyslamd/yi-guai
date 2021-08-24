@@ -9,6 +9,7 @@ class QLineEdit;
 class QToolButton;
 class QCompleter;
 class QStringListModel;
+class QAbstractButton;
 
 class AddressBar final: public QFrame
 {
@@ -24,6 +25,7 @@ public:
     QRect gGeometryBtnSiteInfo() const;
     QRect gGeometryBtnAddBkmk() const;
     QRect gGeometryBtnZoom() const;
+    QPoint findButtonGlobalPos() const;
 
 signals:
     void viewSiteInfo();

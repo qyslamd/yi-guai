@@ -1,26 +1,26 @@
-#ifndef POPUP_H
-#define POPUP_H
+#ifndef POPUP_BROWSER_H
+#define POPUP_BROWSER_H
 
 #include <QWidget>
 
 
 namespace Ui {
-class Popup;
+class PopupBrowser;
 }
 
 class QAction;
 class SiteInfoPopup;
 class QToolButton;
 class CefQWidget;
-class Popup : public QWidget
+class PopupBrowser : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit Popup(CefQWidget *browser, QWidget *parent = nullptr);
-    ~Popup();
+    explicit PopupBrowser(CefQWidget *browser, QWidget *parent = nullptr);
+    ~PopupBrowser();
 private:
-    Ui::Popup *ui;
+    Ui::PopupBrowser *ui;
 
     QAction *action_site_info_;
     SiteInfoPopup *site_info_widget_;
@@ -34,4 +34,4 @@ private slots:
     void onBrowserFavicon(const QPixmap &pix);
 };
 
-#endif // POPUP_H
+#endif // POPUP_BROWSER_H

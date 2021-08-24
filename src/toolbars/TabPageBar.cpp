@@ -165,9 +165,9 @@ void TabPageToolBar::initUi()
     btn_dock_tabs_->setToolTip(tr("open vertical tabs"));
     btn_add_page_->setToolTip(tr("Add a tab page"));
 
-    QSize iconSize(20,20);
-    btn_dock_tabs_->setIconSize(iconSize);
-    btn_add_page_->setIconSize(QSize(18, 18));
+//    QSize iconSize(20,20);
+//    btn_dock_tabs_->setIconSize(iconSize);
+//    btn_add_page_->setIconSize(QSize(18, 18));
 
     connect(tab_bar_, &TabBar::currentChanged, this, &TabPageToolBar::currentChanged);
     connect(tab_bar_, &TabBar::tabCloseRequested, this, &TabPageToolBar::tabCloseRequested);

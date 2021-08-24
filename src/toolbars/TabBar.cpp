@@ -102,9 +102,9 @@ void TabBar::tabInserted(int index)
 {
     update();
     if(auto closeBtn = tabButton(index, QTabBar::RightSide)){
-        closeBtn->setMinimumSize(18, 18);
         if(auto btn = qobject_cast<QAbstractButton *>(closeBtn))
         {
+            btn->setMinimumSize(18, 18);
             if(inprivate_){
                 btn->setIcon(QIcon(":/icons/resources/imgs/dark/delete_64px.png"));
             }else{

@@ -27,6 +27,8 @@ SOURCES += \
     browser/client_app.cpp \
     browser/client_switches.cc \
     browser/scheme_handler.cpp \
+    browser_page.cpp \
+    dialogs/aboutdialog.cpp \
     dialogs/pagedialog.cpp \
     managers/AppCfgManager.cpp \
     managers/BookmarkManager.cpp \
@@ -35,8 +37,7 @@ SOURCES += \
     managers/FaviconManager.cpp \
     managers/HistoryManager.cpp \
     managers/MainWindowManager.cpp \
-    page.cpp \
-    popup.cpp \
+    popup_browser.cpp \
     popups/AddBookmarkPopup.cpp \
     popups/InprivatePopup.cpp \
     popups/PopupBase.cpp \
@@ -45,9 +46,9 @@ SOURCES += \
     popups/StyledMenu.cpp \
     popups/UserInfoPopup.cpp \
     popups/ZoomPopup.cpp \
-    test/test.cpp \
     toolbars/AddressBar.cpp \
     toolbars/BookmarkBar.cpp \
+    toolbars/FindBar.cpp \
     toolbars/NavigationBar.cpp \
     toolbars/NotificationBar.cpp \
     toolbars/SearchBar.cpp \
@@ -81,6 +82,8 @@ HEADERS += \
     browser/client_app.h \
     browser/client_switches.h \
     browser/scheme_handler.h \
+    browser_page.h \
+    dialogs/aboutdialog.h \
     dialogs/pagedialog.h \
     globaldef.h \
     managers/AppCfgManager.h \
@@ -90,8 +93,7 @@ HEADERS += \
     managers/FaviconManager.h \
     managers/HistoryManager.h \
     managers/MainWindowManager.h \
-    page.h \
-    popup.h \
+    popup_browser.h \
     popups/AddBookmarkPopup.h \
     popups/InprivatePopup.h \
     popups/PopupBase.h \
@@ -100,9 +102,9 @@ HEADERS += \
     popups/StyledMenu.h \
     popups/UserInfoPopup.h \
     popups/ZoomPopup.h \
-    test/test.h \
     toolbars/AddressBar.h \
     toolbars/BookmarkBar.h \
+    toolbars/FindBar.h \
     toolbars/NavigationBar.h \
     toolbars/NotificationBar.h \
     toolbars/SearchBar.h \
@@ -130,16 +132,17 @@ HEADERS += \
     utils/windowskeyboardcodes.h
 
 FORMS += \
+    dialogs/aboutdialog.ui \
     dialogs/alertdialog.ui \
     dialogs/pagedialog.ui \
-    popup.ui \
+    popup_browser.ui \
     popups/AddBookmarkPopup.ui \
     popups/InprivatePopup.ui \
     popups/PopupBase.ui \
     popups/SiteInfoPopup.ui \
     popups/UserInfoPopup.ui \
     popups/ZoomPopup.ui \
-    test/test.ui \
+    toolbars/FindBar.ui \
     toolbars/NotificationBar.ui \
     widgets/BookmarkWidget.ui \
     widgets/DownloadWidget.ui \

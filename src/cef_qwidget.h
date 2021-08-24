@@ -10,7 +10,7 @@
 
 class QHBoxLayout;
 class QVBoxLayout;
-class Page;
+class BrowserPage;
 class StyledMenu;
 class CefQWidget : public QWidget, public CefClientHandler::Delegate
 {

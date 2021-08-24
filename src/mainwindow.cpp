@@ -1,6 +1,6 @@
 ﻿#include "mainwindow.h"
 
-#include "page.h"
+#include "browser_page.h"
 #include "cef_qwidget.h"
 #include "browser/cef_client_handler.h"
 #include "utils/util_qt.h"
@@ -25,6 +25,8 @@
 #include "popups/PopupGeneral.h"
 #include "popups/InprivatePopup.h"
 #include "popups/UserInfoPopup.h"
+
+#include "dialogs/aboutdialog.h"
 
 #include <QAction>
 #include <QVBoxLayout>
@@ -80,7 +82,7 @@ MainWindow::MainWindow(const MainWindowConfig &cfg, QWidget *parent)
     });
 }
 
-MainWindow::MainWindow(Page *page, QWidget *parent)
+MainWindow::MainWindow(BrowserPage *page, QWidget *parent)
     : QtWinFramelessWindow(parent)
 {
     initQtShortcut();
@@ -104,7 +106,7 @@ int MainWindow::AddNewPage(const QString &url, bool switchTo)
     if(url1.isEmpty()){
         url1 = AppCfgMgr::gDefautlUrl;
     }
-    Page *page = new Page(url1, this);
+    BrowserPage *page = new BrowserPage(url1, this);
     // stackedWidget 有bug,page的大小很小，这里限定一下，等到加载结束的时候
     // 设置最小大小为默认值
     page->setMinimumSize(stack_browsers_->size());
@@ -118,7 +120,7 @@ int MainWindow::AddNewPage(const QString &url, bool switchTo)
     return index;
 }
 
-int MainWindow::AddNewPage(Page *page)
+int MainWindow::AddNewPage(BrowserPage *page)
 {
     initPage(page);
     auto index = stack_browsers_->addWidget(page);
@@ -484,18 +486,18 @@ void MainWindow::initSignalSlot()
     connect(bookmark_widget_, &BookmarkWidget::pinOrCloseClicked, this, &MainWindow::onPinOrCloseBookmarkWidget);
 }
 
-void MainWindow::initPage(Page *page)
+void MainWindow::initPage(BrowserPage *page)
 {
-    connect(page, &Page::pageCmd, this, &MainWindow::onPageCmd);
-    connect(page, &Page::newPage, [this](Page *page){AddNewPage(page);});
-    connect(page, &Page::browserShortcut, this, &MainWindow::onBrowserShortcut);
+    connect(page, &BrowserPage::pageCmd, this, &MainWindow::onPageCmd);
+    connect(page, &BrowserPage::newPage, [this](BrowserPage *page){AddNewPage(page);});
+    connect(page, &BrowserPage::browserShortcut, this, &MainWindow::onBrowserShortcut);
 }
 
-Page *MainWindow::CurrentPage()
+BrowserPage *MainWindow::CurrentPage()
 {
     auto widget = stack_browsers_->currentWidget();
     if(widget){
-        return qobject_cast<Page *>(widget);
+        return qobject_cast<BrowserPage *>(widget);
     }
     return nullptr;
 }
@@ -505,9 +507,9 @@ int MainWindow::CurrentPageIndex()
     return tab_bar_->currentIndex();
 }
 
-Page *MainWindow::GetPage(int index)
+BrowserPage *MainWindow::GetPage(int index)
 {
-    return qobject_cast<Page*>(stack_browsers_->widget(index));
+    return qobject_cast<BrowserPage*>(stack_browsers_->widget(index));
 }
 
 void MainWindow::onScreenChanged(QScreen *screen)
@@ -739,7 +741,16 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         onSettings();
         break;
     case NaviBarCmd::About:
-        AddNewPage(AppCfgMgr::gProjectUrl, true);
+    {
+        if(!about_dialog_){
+            about_dialog_ = new AboutDialog(this);
+        }
+        auto pos = this->pos();
+        pos.rx() += 8;
+        about_dialog_->move(pos);
+        about_dialog_->resize(size());
+        about_dialog_->exec();
+    }
         break;
     case NaviBarCmd::Feedback:
         AddNewPage(AppCfgMgr::gProjectUrl, true);
@@ -764,9 +775,9 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
 void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
 {
     auto sender = QObject::sender();
-    Page *page = nullptr;
+    BrowserPage *page = nullptr;
     if(sender){
-        page = qobject_cast<Page *>(sender);
+        page = qobject_cast<BrowserPage *>(sender);
     }else{
         qInfo()<<__FUNCTION__<<"fatal error!";
         return;
@@ -1328,7 +1339,7 @@ void MainWindow::onTabSwitch()
     }
 }
 
-void MainWindow::addRecently(Page *)
+void MainWindow::addRecently(BrowserPage *)
 {
 //    for(auto item : RecentlyHistory){
 //        if(item.url == page->url()){
