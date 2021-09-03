@@ -10,20 +10,30 @@
 #include <QApplication>
 #include <QScreen>
 #include <QtDebug>
+#include <QTimer>
 
 #include "utils/util_qt.h"
 
 #include "toolbars/TabBar.h"
 
-TabbarStyle::TabbarStyle(bool isInPrivate)
-    : isInprivate_(isInPrivate)
+TabbarStyle::TabbarStyle(QWidget *widget, bool isInPrivate)
+    : widget_(widget)
+    , isInprivate_(isInPrivate)
 {
-    progress_timer_id_ = startTimer(40);
-#ifdef Q_OS_WIN
-    dpi_ = QApplication::primaryScreen()->logicalDotsPerInch() / 96.0;
-#else
-    dpi_ = 1.0;
-#endif
+    auto timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, [this]()
+    {
+        m_nStartAngle += 10 * 16;
+        if(m_nStartAngle == 360 * 16)
+        {
+            m_nStartAngle = 0;
+        }
+
+        if(widget_){
+            widget_->update();
+        }
+    });
+    timer->start(40);
 }
 
 void TabbarStyle::drawControl(QStyle::ControlElement element,
@@ -85,17 +95,6 @@ QRect TabbarStyle::subElementRect(QStyle::SubElement subElement,
     return QProxyStyle::subElementRect(subElement, option, widget);
 }
 
-void TabbarStyle::timerEvent(QTimerEvent *event)
-{
-    if(progress_timer_id_ == event->timerId()){
-        m_nStartAngle += 10 * 16;
-        if(m_nStartAngle == 360 * 16)
-        {
-            m_nStartAngle = 0;
-        }
-    }
-}
-
 void TabbarStyle::drawTabBarTabLabel(const QStyleOption *option,
                                      QPainter *painter,
                                      const QWidget *w) const
@@ -108,8 +107,8 @@ void TabbarStyle::drawTabBarTabLabel(const QStyleOption *option,
 
     QRect iconRect(tabRect.x() + iconSize.width() / 2,
              tabRect.y() + ( tabRect.height() - iconSize.height()) / 2,
-             iconSize.width() / dpi_,
-             iconSize.height() / dpi_);
+             iconSize.width(),
+             iconSize.height());
 
     // Since the first tab borrows the range, the icon needs to be moved to the right
     if(tabOption->position == QStyleOptionTab::Beginning || tabOption->position == QStyleOptionTab::OnlyOneTab)

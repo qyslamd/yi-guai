@@ -47,6 +47,7 @@ private:
     act_add_all_favorates_;
 
     int check_pos_timer_id_;
+    int draw_progress_timer_id_;
     int menu_triggered_index_;
 
     const int LHideW = 80;

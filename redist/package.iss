@@ -2,10 +2,10 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define WhereAreFiles "G:\self\works\workspace\build-YiGuai-Desktop_Qt_5_15_2_MSVC2019_32bit-Release\src\bin"
-#define WhereToOutput "C:\Users\slamdd\Desktop\termp"
+#define WhereToOutput "./"
 
 #define MyAppName "YiGuai"
-#define MyAppVersion "1.0"
+#define MyAppVersion "0.0.0.1"
 #define MyAppPublisher "zhouyohu@163.com"
 #define MyAppURL "zhouyohu@163.com"
 #define MyAppExeName "YiGuai.exe"
