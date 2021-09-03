@@ -83,12 +83,14 @@ void TabBar::setTabHasAudio(int index, bool has)
 void TabBar::timerEvent(QTimerEvent *event)
 {
     QTabBar::timerEvent(event);
-    auto timeId = event->timerId();
-    if(timeId == check_pos_timer_id_){
+    auto timerId = event->timerId();
+    if(timerId == check_pos_timer_id_){
         auto pos = QCursor::pos();
         pos = mapFromGlobal(pos);
         if(tabAt(pos) == -1)
             emit showPreview(QPoint(), -1);
+    }else if(timerId == draw_progress_timer_id_){
+        update();
     }
 }
 
@@ -126,7 +128,7 @@ void TabBar::initUi()
     setDrawBase(false);
     setTabsClosable(true);
     setMovable(true);
-    setStyle(new TabbarStyle(inprivate_));
+    setStyle(new TabbarStyle(this, inprivate_));
 
     menu_ = new StyledMenu(this);
 
@@ -160,6 +162,8 @@ void TabBar::initUi()
     menu_->addAction(act_add_all_favorates_);
 
     //    check_pos_timer_id_ = startTimer(1000);
+
+    draw_progress_timer_id_ = startTimer(33);
 }
 
 void TabBar::initSignalSlots()

@@ -638,7 +638,7 @@ void NavigateToolBar::setIcons()
     action_about_cef_->setIcon(QIcon(":/icons/resources/imgs/cef.png"));
     action_quit_->setIcon(QIcon());
 
-    QSize iconSize(20,20);
+    QSize iconSize(18,18);
     for(auto item : this->children()){
         if(item->isWidgetType() &&
                 item->metaObject()->className() == QString("QToolButton"))
@@ -647,8 +647,8 @@ void NavigateToolBar::setIcons()
             btn->setIconSize(iconSize);
         }
     }
-    btn_inprivate_->setIconSize(iconSize);
+//    btn_inprivate_->setIconSize(iconSize);
 
-    btn_back_->setIconSize(QSize(26,26));
-    btn_forward_->setIconSize(QSize(26,26));
+//    btn_back_->setIconSize(QSize(26,26));
+//    btn_forward_->setIconSize(QSize(26,26));
 }
