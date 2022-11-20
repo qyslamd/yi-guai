@@ -1,4 +1,4 @@
-﻿#if defined(__linux__) || defined(__linux)
+#if defined(__linux__) || defined(__linux)
 #include <gtk/gtk.h>
 #endif
 
@@ -24,8 +24,8 @@
 #endif
 
 #include "managers/MainWindowManager.h"
+#include "managers/CefManager.h"
 #include "managers/AppCfgManager.h"
-#include "browser/CefManager.h"
 #include "browser/cef_app_browser.h"
 #include "browser/cef_app_render.h"
 #include "browser/cef_app_other.h"
@@ -33,9 +33,7 @@
 #include "browser/message_loop/main_message_loop.h"
 #include "browser/message_loop/main_message_loop_external_pump.h"
 
-#include "cef_qwidget.h"
-#include "utils/util_qt.h"
-#include "widgets/QtFramelessWnd.h"
+#include "demo_cef_qwidget.h"
 
 #if defined(__linux__) || defined(__linux)
 #include <gtk/gtkgl.h>
@@ -64,7 +62,6 @@ void TerminationSignalHandler(int signatl) {
 }
 #endif
 
-void intializeQtApp(QApplication *app);
 int initializeCef(int argc, char *argv[]);
 void allocConsoleWin();
 void freeConsoleWin();
@@ -127,7 +124,6 @@ int main(int argc, char *argv[])
     }
 
     QApplication qt_app(argc, argv);
-    intializeQtApp(&qt_app);
     if(initializeCef(argc, argv) == -1)
     {
         QMessageBox::warning(nullptr, QObject::tr("warning"),
@@ -135,17 +131,9 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-#if 1
-    MainWindowConfig cfg;
-    cfg.url_ = "https://cn.bing.com/";
-    MainWndMgr::Instance().createWindow(cfg);
-#else
-    QtFrameLessWnd w;
-    MainWindow widget(MainWindowConfig{});
-    w.setWidget(&widget);
-    w.resize(1024,768);
+    DemoCefQWidget w/*("https://www.baidu.com/")*/;
+    w.resize(1024, 768);
     w.show();
-#endif
 
     message_loop->Run();
 
@@ -159,22 +147,6 @@ int main(int argc, char *argv[])
 
 //    freeConsoleWin();
     return result;
-}
-
-void intializeQtApp(QApplication *app)
-{
-    // 样式表
-    QFile file(":/styles/resources/styles/normal.qss");
-    if(file.open(QIODevice::ReadOnly | QIODevice::Text)){
-        auto all = file.readAll();
-        file.close();
-        app->setStyleSheet(all);
-    }
-
-    //翻译
-    QTranslator *ts = new QTranslator(app);
-    ts->load(":/i18ns/resources/i18n/YiGuai_zh.qm");
-    app->installTranslator(ts);
 }
 
 int initializeCef(int argc, char *argv[])
@@ -291,3 +263,4 @@ void freeConsoleWin()
     FreeConsole();
 #endif
 }
+

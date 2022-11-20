@@ -4,6 +4,8 @@ CONFIG += c++11
 
 TARGET = YiGuai
 
+include($$PWD/browser/browser.pri)
+
 win32{
     QT += winextras
     VERSION = 0.0.1.12
@@ -22,17 +24,11 @@ win32{
 }
 
 SOURCES += \
-    browser/cef_app_other.cpp \
-    browser/cef_app_render.cpp \
-    browser/client_app.cpp \
-    browser/client_switches.cc \
-    browser/scheme_handler.cpp \
     browser_page.cpp \
     dialogs/aboutdialog.cpp \
     dialogs/pagedialog.cpp \
     managers/AppCfgManager.cpp \
     managers/BookmarkManager.cpp \
-    managers/CefManager.cpp \
     managers/DisplayMgr.cpp \
     managers/FaviconManager.cpp \
     managers/HistoryManager.cpp \
@@ -56,13 +52,8 @@ SOURCES += \
     toolbars/TabPageBar.cpp \
     toolbars/TabbarStyle.cpp \
     dialogs/alertdialog.cpp \
-    browser/cef_app_browser.cpp \
-    browser/cef_client_handler.cpp \
     cef_qwidget.cpp \
     main.cpp \
-    browser/message_loop/main_message_loop.cc \
-    browser/message_loop/main_message_loop_external_pump.cc \
-    browser/message_loop/main_message_loop_std.cc \
     mainwindow.cpp \
     utils/util_qt.cpp \
     utils/util_win.cc \
@@ -77,18 +68,12 @@ SOURCES += \
 
 
 HEADERS += \
-    browser/cef_app_other.h \
-    browser/cef_app_render.h \
-    browser/client_app.h \
-    browser/client_switches.h \
-    browser/scheme_handler.h \
     browser_page.h \
     dialogs/aboutdialog.h \
     dialogs/pagedialog.h \
     globaldef.h \
     managers/AppCfgManager.h \
     managers/BookmarkManager.h \
-    managers/CefManager.h \
     managers/DisplayMgr.h \
     managers/FaviconManager.h \
     managers/HistoryManager.h \
@@ -112,13 +97,7 @@ HEADERS += \
     toolbars/TabPageBar.h \
     toolbars/TabbarStyle.h \
     dialogs/alertdialog.h \
-    browser/cef_app_browser.h \
-    browser/cef_client_handler.h \
     cef_qwidget.h \
-    browser/client_types.h \
-    browser/message_loop/main_message_loop.h \
-    browser/message_loop/main_message_loop_external_pump.h \
-    browser/message_loop/main_message_loop_std.h \
     mainwindow.h \
     utils/util_qt.h \
     widgets/BookmarkWidget.h \
@@ -163,17 +142,14 @@ msvc {
 win32{
     DESTDIR = $$OUT_PWD/bin
 
-    SOURCES +=\
-    browser/message_loop/main_message_loop_external_pump_win.cc \
-    browser/message_loop/main_message_loop_multithreaded_win.cc
-
-    HEADERS +=\
-    browser/message_loop/main_message_loop_multithreaded_win.h \
-    utils/util_win.h
+    HEADERS += \
+        utils/util_win.h
 
     equals(QT_ARCH,i386){
         CEF_DEP_PATH = $$PWD/../../cef_depends/cef_4240_chromium_86/x86
-    }else{
+    }
+
+    equals(QT_ARCH,x86_64){
         CEF_DEP_PATH = $$PWD/../../cef_depends/cef_4240_chromium_86/x64
     }
 
@@ -210,9 +186,6 @@ win32{
 unix:!macx{
     OBJECTS_DIR = .obj
     MOC_DIR = .moc
-
-    SOURCES += \
-    browser/message_loop/main_message_loop_external_pump_linux.cc
 
     CONFIG += link_pkgconfig
     PKGCONFIG += x11
