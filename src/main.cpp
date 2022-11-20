@@ -66,6 +66,8 @@ void TerminationSignalHandler(int signatl) {
 
 void intializeQtApp(QApplication *app);
 int initializeCef(int argc, char *argv[]);
+void allocConsoleWin();
+void freeConsoleWin();
 
 namespace  {
 // message loop object.
@@ -74,6 +76,8 @@ scoped_ptr<client::MainMessageLoop> message_loop;
 
 int main(int argc, char *argv[])
 {
+//    allocConsoleWin();
+
     // Enable High-DPI support on Windows 7 or newer.
     CefEnableHighDPISupport();
 
@@ -117,6 +121,7 @@ int main(int argc, char *argv[])
         int exit_code = CefExecuteProcess(main_args, app, sandboxInfo);
         if (exit_code >= 0) {
             // The sub-process has completed so return here.
+//            freeConsoleWin();
             return exit_code;
         }
     }
@@ -131,9 +136,13 @@ int main(int argc, char *argv[])
     }
 
 #if 1
-    MainWindowConfig cfg;
-    cfg.url_ = "https://cn.bing.com/";
-    MainWndMgr::Instance().createWindow(cfg);
+//    MainWindowConfig cfg;
+//    cfg.url_ = "https://cn.bing.com/";
+//    MainWndMgr::Instance().createWindow(cfg);
+
+    CefQWidget w("https://www.baidu.com/");
+    w.resize(1024, 768);
+    w.show();
 #else
     QtFrameLessWnd w;
     MainWindow widget(MainWindowConfig{});
@@ -152,6 +161,7 @@ int main(int argc, char *argv[])
     message_loop.reset();
     qInfo()<<__FUNCTION__<<"after cef shutdown:"<<message_loop.get();
 
+//    freeConsoleWin();
     return result;
 }
 
@@ -268,4 +278,20 @@ int initializeCef(int argc, char *argv[])
 
     custom_scheme::RegisterSchemeHandlers();
     return 0;
+}
+
+void allocConsoleWin()
+{
+#ifdef Q_OS_WIN
+    AllocConsole();
+    freopen("CONOUT$","w+t",stdout);
+    freopen("CONIN$","r+t",stdin);
+#endif
+}
+
+void freeConsoleWin()
+{
+#ifdef Q_OS_WIN
+    FreeConsole();
+#endif
 }

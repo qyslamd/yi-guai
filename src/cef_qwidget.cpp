@@ -956,9 +956,9 @@ void CefQWidget::resizeEvent(QResizeEvent *event)
 void CefQWidget::closeEvent(QCloseEvent *event)
 {
     // 关闭浏览器触发点
-    if(!is_closing_){
+    if (!is_closing_) {
         qInfo()<<__FUNCTION__;
-        if(browser_){
+        if(browser_) {
             // Notify the browser window that we would like to close it. This
             // will result in a call to ClientHandler::DoClose() if the
             // JavaScript 'onbeforeunload' event handler allows it.
@@ -966,6 +966,12 @@ void CefQWidget::closeEvent(QCloseEvent *event)
         }
         // Cancel the close.
         event->ignore();
+    } else {
+        if(!this->parentWidget()) {
+            if (browser_) {
+                qInfo() << __FUNCTION__<<"cef has CefBrowser ref";
+            }
+        }
     }
 }
 
