@@ -16,7 +16,7 @@
 #include <QToolButton>
 
 #include "managers/AppCfgManager.h"
-#include "managers/CefManager.h"
+#include "browser/CefManager.h"
 #include "dialogs/pagedialog.h"
 #include "toolbars/FindBar.h"
 

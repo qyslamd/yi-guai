@@ -1056,7 +1056,7 @@ void CefQWidget::GetPopupConfig(CefWindowInfo &windowInfo,
                                 CefRefPtr<CefClient> &client,
                                 CefBrowserSettings &settings)
 {
-    CEF_REQUIRE_UI_THREAD();
+    CEF_REQUIRE_UI_THREAD()
     client = client_handler_;
 
     auto screen = qApp->primaryScreen();
@@ -1071,7 +1071,7 @@ void CefQWidget::GetPopupConfig(CefWindowInfo &windowInfo,
     windowInfo.SetAsChild((ClientWindowHandle)window_->winId(), rect);
 #endif
 
-    Q_UNUSED(settings);
+    Q_UNUSED(settings)
 }
 
 void CefQWidget::resizeBrowser(const QSize &size)

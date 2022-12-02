@@ -73,8 +73,8 @@ void CefManager::populateSettings(CefSettings &settings, int argc, char *argv[])
     // Parse command-line arguments for use in this method.
     CefRefPtr<CefCommandLine> command_line = CefCommandLine::CreateCommandLine();
 #ifdef OS_WIN
-    Q_UNUSED(argc);
-    Q_UNUSED(argv);
+    Q_UNUSED(argc)
+    Q_UNUSED(argv)
     command_line->InitFromString(::GetCommandLineW());
 #else
     command_line->InitFromArgv(argc, argv);
@@ -106,6 +106,18 @@ void CefManager::populateSettings(CefSettings &settings, int argc, char *argv[])
     settings.background_color = background_color;
     settings.persist_session_cookies = persist_session_cookies;
     settings.persist_user_preferences = persist_user_preferences;
+    settings.no_sandbox = true;
+    settings.multi_threaded_message_loop = command_line->HasSwitch("multi-threaded-message-loop");
+
+    if(!settings.multi_threaded_message_loop)
+    {
+        settings.external_message_pump = command_line->HasSwitch("external-message-pump");
+    }
+    settings.external_message_pump = true;
+    if (command_line->HasSwitch("enable-chrome-runtime")) {
+        // Enable experimental Chrome runtime. See issue #2969 for details.
+        settings.chrome_runtime = true;
+    }
 }
 
 CefManager::CefManager()

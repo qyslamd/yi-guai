@@ -12,7 +12,7 @@
 #include <QTimer>
 
 #include "utils/util_qt.h"
-#include "managers/CefManager.h"
+#include "browser/CefManager.h"
 #include "managers/BookmarkManager.h"
 
 AddressBar::AddressBar(bool inprivate, QWidget *parent)

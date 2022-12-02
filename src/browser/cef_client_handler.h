@@ -36,6 +36,8 @@ public:
         // Called when the browser is closing.
         virtual void OnBrowserClosing(CefRefPtr<CefBrowser> browser) = 0;
         virtual void onBrowserAddressChange(const std::string &url) = 0;
+        virtual void onBrowserBeforClose(){}
+
         virtual void onBrowserTitleChange(const std::string &url) = 0;
         virtual void onBrowserFullscreenChange(bool fullscreen) = 0;
         virtual void onBrowserStatusMessage(const std::string &msg) = 0;
@@ -206,6 +208,7 @@ private:
                              CefRefPtr<CefClient>& client,
                              CefBrowserSettings& settings);
     void NotifyBrowserCreated(CefRefPtr<CefBrowser> browser);
+    void NotifyBrowserBeforeClose(CefRefPtr<CefBrowser> browser);
     void NotifyBrowserClosing(CefRefPtr<CefBrowser> browser);
     void NotifyBrowserClosed(CefRefPtr<CefBrowser> browser);
 

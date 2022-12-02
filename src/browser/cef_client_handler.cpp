@@ -134,7 +134,7 @@ void CefClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 
 bool CefClientHandler::DoClose(CefRefPtr<CefBrowser> browser)
 {
-    CEF_REQUIRE_UI_THREAD();
+    CEF_REQUIRE_UI_THREAD()
     qInfo()<<__FUNCTION__<<"browser closing ";
 
     NotifyBrowserClosing(browser);
@@ -151,10 +151,12 @@ bool CefClientHandler::DoClose(CefRefPtr<CefBrowser> browser)
 
 void CefClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 {
-    CEF_REQUIRE_UI_THREAD();
+    CEF_REQUIRE_UI_THREAD()
     gBrowserCount --;
     browser_count_--;
     qInfo()<<__FUNCTION__<<browser<<"closed."<<"browser remain count:"<<gBrowserCount;
+
+    NotifyBrowserBeforeClose(browser);
 }
 
 void CefClientHandler::NotifyBrowserCreated(CefRefPtr<CefBrowser> browser)
@@ -168,6 +170,19 @@ void CefClientHandler::NotifyBrowserCreated(CefRefPtr<CefBrowser> browser)
 
     if (delegate_)
         delegate_->OnBrowserCreated(browser);
+}
+
+void CefClientHandler::NotifyBrowserBeforeClose(CefRefPtr<CefBrowser> browser)
+{
+    if (!CURRENTLY_ON_MAIN_THREAD()) {
+        // Execute this method on the main thread.
+        MAIN_POST_CLOSURE(
+                    base::Bind(&CefClientHandler::NotifyBrowserBeforeClose, this, browser));
+        return;
+    }
+
+    if (delegate_)
+        delegate_->onBrowserBeforClose();
 }
 
 void CefClientHandler::NotifyBrowserClosing(CefRefPtr<CefBrowser> browser)

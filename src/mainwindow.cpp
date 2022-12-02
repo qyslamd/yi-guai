@@ -19,7 +19,7 @@
 
 #include "managers/BookmarkManager.h"
 #include "managers/AppCfgManager.h"
-#include "managers/CefManager.h"
+#include "browser/CefManager.h"
 
 #include "popups/AddBookmarkPopup.h"
 #include "popups/PopupGeneral.h"

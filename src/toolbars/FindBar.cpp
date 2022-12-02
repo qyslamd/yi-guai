@@ -95,7 +95,7 @@ void FindBar::onBtnDownClicked()
     emit searchDown(ui->lineEdit->text(), true);
 }
 
-void FindBar::onLineEditTextChanged([[maybe_unused]] const QString &arg1)
+void FindBar::onLineEditTextChanged(const QString &arg1)
 {
     ui->buttonUp->setEnabled(!ui->lineEdit->text().isEmpty());
     ui->buttonDown->setEnabled(!ui->lineEdit->text().isEmpty());

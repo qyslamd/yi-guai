@@ -17,7 +17,7 @@ class CefQWidget : public QWidget, public CefClientHandler::Delegate
     Q_OBJECT
 public:
     explicit CefQWidget(const QString &url, QWidget *parent = nullptr);
-    ~CefQWidget();
+    ~CefQWidget() override;
 
     // QWidget interface
     QSize sizeHint() const override;

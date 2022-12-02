@@ -146,11 +146,11 @@ win32{
         utils/util_win.h
 
     equals(QT_ARCH,i386){
-        CEF_DEP_PATH = $$PWD/../../cef_depends/cef_4240_chromium_86/x86
+        CEF_DEP_PATH = $$PWD/../../cef_depends/$$CEF_VERSION/x86
     }
 
     equals(QT_ARCH,x86_64){
-        CEF_DEP_PATH = $$PWD/../../cef_depends/cef_4240_chromium_86/x64
+        CEF_DEP_PATH = $$PWD/../../cef_depends/$$CEF_VERSION/x64
     }
 
     MANI_PATH = $$CEF_DEP_PATH/manifests

@@ -4,7 +4,7 @@
 #include "utils/util_qt.h"
 
 #include "managers/AppCfgManager.h"
-#include "managers/CefManager.h"
+#include "browser/CefManager.h"
 #include "managers/MainWindowManager.h"
 #include "managers/BookmarkManager.h"
 #include "popups/ZoomPopup.h"

@@ -1,3 +1,7 @@
+
+CEF_VERSION = cef_4240_chromium_86
+CEF_VERSION = cef_4389_chromium_89
+
 SOURCES += \
     $$PWD/cef_app_other.cpp \
     $$PWD/cef_app_render.cpp \
