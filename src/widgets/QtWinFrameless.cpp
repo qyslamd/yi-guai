@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QtDebug>
 #include <QScreen>
+#include <QWindow>
 
 #include "utils/util_qt.h"
 
@@ -16,8 +17,34 @@
 #pragma comment (lib,"Dwmapi.lib") // Adds missing library, fixes error LNK2019: unresolved external symbol __imp__DwmExtendFrameIntoClientArea
 #pragma comment (lib,"user32.lib")
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 9, 0))
+#include <QOperatingSystemVersion>
+#else
+#include <QSysInfo>
+#endif
 
 #define LOG_MACRO(x) #x
+
+static bool isWin8OrGreater()
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 9, 0))
+    return QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows8;
+#else
+    return QSysInfo::WindowsVersion >= QSysInfo::WV_WINDOWS8;
+#endif
+}
+
+static bool isWin7OrLower()
+{
+    return !isWin8OrGreater();
+}
+
+static void InvalidateNC(HWND handle)
+{
+    if(handle){
+        SendMessage(handle, WM_NCPAINT, 0, 0);
+    }
+}
 
 QtWinFramelessWindow::QtWinFramelessWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -72,6 +99,35 @@ bool QtWinFramelessWindow::nativeEvent(const QByteArray &eventType, void *messag
         emit dpiChanged(HIWORD(msg->wParam));
         // 不处理，返回false
         return false;
+    }
+    case WM_NCMOUSELEAVE:
+    {
+        if (isWin7OrLower()) {
+            *result = 0;
+            return true;
+        } else {
+            return false;
+        }
+    }
+    case WM_NCACTIVATE:
+    {
+        if (isWin7OrLower()) {
+            *result = 1;
+            InvalidateNC(msg->hwnd);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    case WM_NCLBUTTONDOWN:
+    {
+        if (isWin7OrLower()) {
+            InvalidateNC(msg->hwnd);
+            *result = 0;
+            return false;
+        } else {
+            return false;
+        }
     }
     case WM_NCCALCSIZE:
     {
@@ -220,6 +276,7 @@ bool QtWinFramelessWindow::hitTestCaption(const QPoint &gPos)
     Q_UNUSED(gPos);
     return false;
 }
+
 #elif defined (Q_OS_LINUX1)
 #include <QHBoxLayout>
 #include <QHelpEvent>

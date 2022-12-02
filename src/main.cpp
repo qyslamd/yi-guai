@@ -35,7 +35,7 @@
 
 #include "cef_qwidget.h"
 #include "utils/util_qt.h"
-#include "widgets/QtFramelessWnd.h"
+#include "widgets/QtWinFramelessOld.h"
 
 #if defined(__linux__) || defined(__linux)
 #include <gtk/gtkgl.h>

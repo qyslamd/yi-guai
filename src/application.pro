@@ -60,10 +60,10 @@ SOURCES += \
     widgets/AppConfigWidget.cpp \
     widgets/BookmarkWidget.cpp \
     widgets/DownloadWidget.cpp \
-    widgets/QtFramelessWnd.cpp \
     widgets/HistoryWidget.cpp \
     widgets/FullScnHint.cpp \
     widgets/QtWinFrameless.cpp \
+    widgets/QtWinFramelessOld.cpp \
     widgets/TabThumbnailWidget.cpp
 
 
@@ -105,9 +105,9 @@ HEADERS += \
     widgets/HistoryWidget.h \
     widgets/FullscnHint.h \
     widgets/QtWinFrameless.h \
+    widgets/QtWinFramelessOld.h \
     widgets/TabThumbnailWidget.h \
     widgets/AppConfigWidget.h \
-    widgets/QtFramelessWnd.h \
     utils/windowskeyboardcodes.h
 
 FORMS += \
