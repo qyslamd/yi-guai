@@ -1,6 +1,12 @@
 ﻿#include "cef_client_handler.h"
 #include "message_loop/main_message_loop.h"
 
+#include <include/base/cef_callback.h>
+#include <include/cef_browser.h>
+#include <include/cef_frame.h>
+#include <include/cef_parser.h>
+#include <include/cef_ssl_status.h>
+#include <include/cef_x509_certificate.h>
 #include <include/wrapper/cef_closure_task.h>
 #include <include/wrapper/cef_helpers.h>
 
@@ -9,7 +15,6 @@
 #include "dialogs/alertdialog.h"
 #include "utils/util_qt.h"
 #include "globaldef.h"
-
 
 int CefClientHandler::gBrowserCount = 0;
 
@@ -154,7 +159,7 @@ void CefClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
     CEF_REQUIRE_UI_THREAD()
     gBrowserCount --;
     browser_count_--;
-    qInfo()<<__FUNCTION__<<browser<<"closed."<<"browser remain count:"<<gBrowserCount;
+    qInfo()<<__FUNCTION__<<browser.get()<<"closed."<<"browser remain count:"<<gBrowserCount;
 
     NotifyBrowserBeforeClose(browser);
 }
@@ -164,11 +169,11 @@ void CefClientHandler::NotifyBrowserCreated(CefRefPtr<CefBrowser> browser)
     if (!CURRENTLY_ON_MAIN_THREAD()) {
         // Execute this method on the main thread.
         MAIN_POST_CLOSURE(
-                    base::Bind(&CefClientHandler::NotifyBrowserCreated, this, browser));
+            base::BindOnce(&CefClientHandler::NotifyBrowserCreated, this, browser));
         return;
-    }
+      }
 
-    if (delegate_)
+      if (delegate_)
         delegate_->OnBrowserCreated(browser);
 }
 
@@ -177,7 +182,7 @@ void CefClientHandler::NotifyBrowserBeforeClose(CefRefPtr<CefBrowser> browser)
     if (!CURRENTLY_ON_MAIN_THREAD()) {
         // Execute this method on the main thread.
         MAIN_POST_CLOSURE(
-                    base::Bind(&CefClientHandler::NotifyBrowserBeforeClose, this, browser));
+                    base::BindOnce(&CefClientHandler::NotifyBrowserBeforeClose, this, browser));
         return;
     }
 
@@ -190,7 +195,7 @@ void CefClientHandler::NotifyBrowserClosing(CefRefPtr<CefBrowser> browser)
     if (!CURRENTLY_ON_MAIN_THREAD()) {
         // Execute this method on the main thread.
         MAIN_POST_CLOSURE(
-                    base::Bind(&CefClientHandler::NotifyBrowserClosing, this, browser));
+                    base::BindOnce(&CefClientHandler::NotifyBrowserClosing, this, browser));
         return;
     }
 
@@ -205,7 +210,7 @@ void CefClientHandler::NotifyBrowserAddressChange(CefRefPtr<CefBrowser> browser,
     if (!CURRENTLY_ON_MAIN_THREAD()) {
         // Execute this method on the main thread.
         MAIN_POST_CLOSURE(
-                    base::Bind(&CefClientHandler::NotifyBrowserAddressChange, this, browser, frame, url));
+                    base::BindOnce(&CefClientHandler::NotifyBrowserAddressChange, this, browser, frame, url));
         return;
     }
 
@@ -219,7 +224,7 @@ void CefClientHandler::NotifyBrowserTitleChange(CefRefPtr<CefBrowser> browser,
     if (!CURRENTLY_ON_MAIN_THREAD()) {
         // Execute this method on the main thread.
         MAIN_POST_CLOSURE(
-                    base::Bind(&CefClientHandler::NotifyBrowserTitleChange, this, browser, title));
+                    base::BindOnce(&CefClientHandler::NotifyBrowserTitleChange, this, browser, title));
         return;
     }
 
@@ -233,7 +238,7 @@ void CefClientHandler::NotifyFullscreenModeChange(CefRefPtr<CefBrowser> browser,
     if (!CURRENTLY_ON_MAIN_THREAD()) {
         // Execute this method on the main thread.
         MAIN_POST_CLOSURE(
-                    base::Bind(&CefClientHandler::NotifyFullscreenModeChange,
+                    base::BindOnce(&CefClientHandler::NotifyFullscreenModeChange,
                                this,
                                browser,
                                fullscreen));
@@ -249,7 +254,7 @@ void CefClientHandler::NotifyStatusMessage(const CefString &msg)
     if (!CURRENTLY_ON_MAIN_THREAD()) {
         // Execute this method on the main thread.
         MAIN_POST_CLOSURE(
-                    base::Bind(&CefClientHandler::NotifyStatusMessage,
+                    base::BindOnce(&CefClientHandler::NotifyStatusMessage,
                                this,
                                msg));
         return;
@@ -265,7 +270,7 @@ void CefClientHandler::NotifyBrowserFavicon(CefRefPtr<CefImage> image,
     if (!CURRENTLY_ON_MAIN_THREAD()) {
         // Execute this method on the main thread.
         MAIN_POST_CLOSURE(
-                    base::Bind(&CefClientHandler::NotifyBrowserFavicon,
+                    base::BindOnce(&CefClientHandler::NotifyBrowserFavicon,
                                this,
                                image,
                                icon_url));
@@ -657,7 +662,7 @@ void CefClientHandler::ShowDevTools(CefRefPtr<CefBrowser> browser,
 {
     if (!CefCurrentlyOn(TID_UI)) {
       // Execute this method on the UI thread.
-      CefPostTask(TID_UI, base::Bind(&CefClientHandler::ShowDevTools,
+      CefPostTask(TID_UI, base::BindOnce(&CefClientHandler::ShowDevTools,
                                      this, browser,
                                      inspect_element_at));
       return;
@@ -700,7 +705,7 @@ void CefClientHandler::NotifyForgroundTab(CefWindowInfo &windowInfo,
 //    if (!CURRENTLY_ON_MAIN_THREAD()) {
 //        // Execute this method on the main thread.
 //        MAIN_POST_CLOSURE(
-//                    base::Bind(&CefClientHandler::NotifyForgroundTab, this,
+//                    base::BindOnce(&CefClientHandler::NotifyForgroundTab, this,
 //                               windowInfo,
 //                               client,
 //                               settings));
@@ -721,7 +726,7 @@ void CefClientHandler::NotifyPopupWindow(const CefPopupFeatures &popupFeatures,
 //    if (!CURRENTLY_ON_MAIN_THREAD()) {
 //        // Execute this method on the main thread.
 //        MAIN_POST_CLOSURE(
-//                    base::Bind(&CefClientHandler::NotifyPopupWindow,
+//                    base::BindOnce(&CefClientHandler::NotifyPopupWindow,
 //                               this,
 //                               popupFeatures,
 //                               windowInfo,

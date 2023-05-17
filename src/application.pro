@@ -1,6 +1,6 @@
 QT       += core gui network widgets sql
 
-CONFIG += c++11
+#CONFIG += c++14
 
 TARGET = YiGuai
 
@@ -27,6 +27,8 @@ SOURCES += \
     browser_page.cpp \
     dialogs/aboutdialog.cpp \
     dialogs/pagedialog.cpp \
+    main_linux.cpp \
+    main_win.cpp \
     managers/AppCfgManager.cpp \
     managers/BookmarkManager.cpp \
     managers/DisplayMgr.cpp \
@@ -53,7 +55,6 @@ SOURCES += \
     toolbars/TabbarStyle.cpp \
     dialogs/alertdialog.cpp \
     cef_qwidget.cpp \
-    main.cpp \
     mainwindow.cpp \
     utils/util_qt.cpp \
     utils/util_win.cc \
@@ -184,33 +185,38 @@ win32{
 }
 
 unix:!macx{
+    HEADERS += \
+            utils/util_gtk.h
+
+    SOURCES += \
+    utils/util_gtk.cpp
+
+    CONFIG += no_keywords
+
+    DESTDIR = $$OUT_PWD/bin
+
     OBJECTS_DIR = .obj
     MOC_DIR = .moc
 
     CONFIG += link_pkgconfig
     PKGCONFIG += x11
     PKGCONFIG += glib-2.0
-    PKGCONFIG += gmodule-2.0 gtk+-2.0 gthread-2.0 gtk+-unix-print-2.0 gtkglext-1.0
+    PKGCONFIG += gmodule-2.0 gtk+-3.0 gthread-2.0 gtk+-unix-print-3.0 xi
 
-    CEF_DEP_PATH = $$PWD/../../cef_binary_86.0.21+g6a2c8e7+chromium-86.0.4240.183_linux64
+    CEF_DEP_PATH = $$PWD/../../../files/cef_binary_99.2.15+g71e9523+chromium-99.0.4844.84_linux64
     OUTPUT_BIN_DIR = $$DESTDIR
 
-#    QMAKE_LFLAGS += -Wl,-rpath,\'$$OUT_PWD/bin\'
+    QMAKE_LFLAGS += -Wl,-rpath,\'$$OUT_PWD/bin\'
 
     INCLUDEPATH += $$CEF_DEP_PATH
     CONFIG(debug, debug|release){
+        message("SB debug")
         LIBS += -L$$CEF_DEP_PATH/Debug -lcef
-        LIBS += -L$$CEF_DEP_PATH/DebugBuild/libcef_dll_wrapper -lcef_dll_wrapper
-
-#        QMAKE_POST_LINK += \
-#        cp -R $$CEF_DEP_PATH/Debug/* $$OUTPUT_BIN_DIR
-
+        LIBS += -L$$CEF_DEP_PATH/build-debug/libcef_dll_wrapper -lcef_dll_wrapper
     }else:CONFIG(release, debug|release){
-        LIBS += -L$$CEF_DEP_PATH/Release -lcef
-        LIBS += -L$$CEF_DEP_PATH/ReleaseBuild/libcef_dll_wrapper -lcef_dll_wrapper
-
-#        QMAKE_POST_LINK += \
-#        cp -R $$CEF_DEP_PATH/Release/* $$OUTPUT_BIN_DIR
+        DEFINES += NDEBUG
+        LIBS += $$CEF_DEP_PATH/Release/libcef.so
+        LIBS += $$CEF_DEP_PATH/build-release/libcef_dll_wrapper/libcef_dll_wrapper.a
     }
 }
 
@@ -218,16 +224,3 @@ RESOURCES += \
     resource.qrc
 
 TRANSLATIONS +=$$PWD/resources/i18n/$$TARGET"_zh.ts"
-
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../3rdparty/qt-material-widgets/components/release/ -lcomponents
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../3rdparty/qt-material-widgets/components/debug/ -lcomponents
-else:unix:!macx: LIBS += -L$$OUT_PWD/../3rdparty/qt-material-widgets/components/ -lcomponents
-
-INCLUDEPATH += $$PWD/../3rdparty/qt-material-widgets/components
-DEPENDPATH += $$PWD/../3rdparty/qt-material-widgets/components
-
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../3rdparty/qt-material-widgets/components/release/libcomponents.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../3rdparty/qt-material-widgets/components/debug/libcomponents.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../3rdparty/qt-material-widgets/components/release/components.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../3rdparty/qt-material-widgets/components/debug/components.lib
-else:unix:!macx: PRE_TARGETDEPS += $$OUT_PWD/../3rdparty/qt-material-widgets/components/libcomponents.a

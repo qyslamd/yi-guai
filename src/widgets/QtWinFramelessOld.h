@@ -25,7 +25,7 @@ public:
     QMargins contentsMargins() const;
     QRect contentsRect() const;
     void getContentsMargins(int *left, int *top, int *right, int *bottom) const;
-signals:
+Q_SIGNALS:
     void DwmCompsitionChanged();
     void dpiChanged(const int xdpi, const int ydpi);
 protected:
@@ -36,7 +36,7 @@ protected:
     const QMargins NormalMarginsWin10{1,1,1,1};
     const QMargins NormalMarginsWin7{1,2,1,1};
 
-public slots:
+public Q_SLOTS:
     void showFullScreen();
 private:
     int m_borderWidth;

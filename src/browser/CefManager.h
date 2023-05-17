@@ -3,6 +3,7 @@
 #pragma once
 
 #include <include/cef_base.h>
+#include <include/cef_command_line.h>
 #include <QString>
 
 class CefManager
@@ -12,7 +13,8 @@ protected:
 public:
     static CefManager& Instance();
     static std::string cefVersion();
-    void populateSettings(CefSettings &settings, int argc, char *argv[]);
+    void populateSettings(CefSettings &settings,
+                          CefRefPtr<CefCommandLine> command_line);
 
     static bool seperate_sub_process;
     ///

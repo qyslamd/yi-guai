@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2016 The Chromium Embedded Framework Authors. All rights
+// Copyright (c) 2016 The Chromium Embedded Framework Authors. All rights
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 
@@ -6,8 +6,7 @@
 #define CEF_TESTS_SHARED_BROWSER_MAIN_MESSAGE_LOOP_EXTERNAL_PUMP_H_
 #pragma once
 
-#include "main_message_loop_std.h"
-#include <include/base/cef_scoped_ptr.h>
+#include "tests/shared/browser/main_message_loop_std.h"
 
 namespace client {
 
@@ -24,7 +23,7 @@ class MainMessageLoopExternalPump : public MainMessageLoopStd {
  public:
   // Creates the singleton instance of this object. Must be called on the main
   // application thread.
-  static scoped_ptr<MainMessageLoopExternalPump> Create();
+  static std::unique_ptr<MainMessageLoopExternalPump> Create();
 
   // Returns the singleton instance of this object. Safe to call from any
   // thread.
@@ -36,8 +35,8 @@ class MainMessageLoopExternalPump : public MainMessageLoopStd {
   virtual void OnScheduleMessagePumpWork(int64 delay_ms) = 0;
 
  protected:
-  // Only allow deletion via scoped_ptr.
-  friend struct base::DefaultDeleter<MainMessageLoopExternalPump>;
+  // Only allow deletion via std::unique_ptr.
+  friend std::default_delete<MainMessageLoopExternalPump>;
 
   // Construct and destruct this object on the main application thread.
   MainMessageLoopExternalPump();

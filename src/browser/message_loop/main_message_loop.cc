@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015 The Chromium Embedded Framework Authors. All rights
+// Copyright (c) 2015 The Chromium Embedded Framework Authors. All rights
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 
@@ -6,6 +6,8 @@
 
 #include "include/cef_task.h"
 #include "include/wrapper/cef_closure_task.h"
+#include <QtDebug>
+#include <iostream>
 
 namespace client {
 
@@ -16,8 +18,8 @@ MainMessageLoop* g_main_message_loop = nullptr;
 }  // namespace
 
 MainMessageLoop::MainMessageLoop() {
-  DCHECK(!g_main_message_loop);
-  g_main_message_loop = this;
+    DCHECK(!g_main_message_loop);
+    g_main_message_loop = this;
 }
 
 MainMessageLoop::~MainMessageLoop() {
@@ -30,7 +32,11 @@ MainMessageLoop* MainMessageLoop::Get() {
   return g_main_message_loop;
 }
 
-void MainMessageLoop::PostClosure(const base::Closure& closure) {
+void MainMessageLoop::PostClosure(base::OnceClosure closure) {
+  PostTask(CefCreateClosureTask(std::move(closure)));
+}
+
+void MainMessageLoop::PostClosure(const base::RepeatingClosure& closure) {
   PostTask(CefCreateClosureTask(closure));
 }
 

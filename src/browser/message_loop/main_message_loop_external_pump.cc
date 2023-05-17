@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2016 The Chromium Embedded Framework Authors. All rights
+// Copyright (c) 2016 The Chromium Embedded Framework Authors. All rights
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 
@@ -8,7 +8,7 @@
 
 #include "include/cef_app.h"
 #include "include/wrapper/cef_helpers.h"
-#include "main_message_loop.h"
+#include "tests/shared/browser/main_message_loop.h"
 
 namespace client {
 

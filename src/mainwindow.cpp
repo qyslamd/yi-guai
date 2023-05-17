@@ -790,6 +790,7 @@ void MainWindow::onPageCmd(PageCmd cmd, const QVariant &para)
         break;
     case PageCmd::Created:
     {
+        qInfo() << __FUNCTION__ << "PageCmd::BrowserCreated";
         if(!first_browser_created_){
             first_browser_created_ = true;
             if(!created_cfg_.load_after_created_.isEmpty()){
@@ -1296,7 +1297,7 @@ void MainWindow::onSettings()
 
 void MainWindow::onWindowStateChanged()
 {
-    emit windowStateChanged(windowState(),
+    Q_EMIT windowStateChanged(windowState(),
                             stack_browsers_->currentWidget()->size());
     if(windowState() & Qt::WindowFullScreen){
         widget_north_->hide();

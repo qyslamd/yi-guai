@@ -23,7 +23,7 @@ public:
 
 protected:
     void showEvent(QShowEvent *event) override;
-signals:
+Q_SIGNALS:
     void pinOrCloseClicked(bool pin);
     void menuCmd(HistoryCmd cmd, const QVariant &para);
 
@@ -50,7 +50,7 @@ private:
     void setIcons();
 
     void loadRecentlyHistories();
-private slots:
+private Q_SLOTS:
     void onTreeAllHisItemClicked(const QModelIndex &index);
     void onTreeAllHisContextMenu(const QPoint &pos);
 };

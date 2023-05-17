@@ -256,14 +256,14 @@ bool QtWinFramelessWindowOld::nativeEventWin7(const QByteArray &eventType, void 
     case WM_DWMCOLORIZATIONCOLORCHANGED:
     {
         // 只是获取颜色改变通知，不处理，返回false
-        emit DwmCompsitionChanged();
+        Q_EMIT DwmCompsitionChanged();
         return false;
     }
     case WM_DPICHANGED:
     {
         auto xdpi = LOWORD(msg->wParam);
         auto ydpi = HIWORD(msg->wParam);
-        emit dpiChanged(xdpi, ydpi);
+        Q_EMIT dpiChanged(xdpi, ydpi);
         return false;
     }
     case WM_NCMOUSELEAVE:
@@ -519,14 +519,14 @@ bool QtWinFramelessWindowOld::nativeEventWin8_OrNewer(const QByteArray &eventTyp
     case WM_DWMCOLORIZATIONCOLORCHANGED:
     {
         // 只是获取颜色改变通知，不处理，返回false
-        emit DwmCompsitionChanged();
+        Q_EMIT DwmCompsitionChanged();
         return false;
     }
     case WM_DPICHANGED:
     {
         auto xdpi = LOWORD(msg->wParam);
         auto ydpi = HIWORD(msg->wParam);
-        emit dpiChanged(xdpi, ydpi);
+        Q_EMIT dpiChanged(xdpi, ydpi);
         return false;
     }
     case WM_NCMOUSELEAVE:

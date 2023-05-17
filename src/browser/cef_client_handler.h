@@ -66,8 +66,7 @@ public:
         virtual ~Delegate() {}
     };
 
-    CefClientHandler(Delegate* delegate,
-                     const std::string& startup_url);
+    CefClientHandler(Delegate* delegate, const std::string& startup_url);
     ~CefClientHandler();
 
     // CefClient interface
@@ -238,5 +237,4 @@ private:
     IMPLEMENT_REFCOUNTING(CefClientHandler);
     DISALLOW_COPY_AND_ASSIGN(CefClientHandler);
 };
-
 #endif // CEFCLIENTHANDLER_H

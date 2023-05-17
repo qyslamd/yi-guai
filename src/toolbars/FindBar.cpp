@@ -32,9 +32,9 @@ void FindBar::closeFind()
 {
     ui->label->setText("");
     ui->label->hide();
-    emit search("", true);
+    Q_EMIT search("", true);
     close();
-    emit searchStop();
+    Q_EMIT searchStop();
 }
 
 void FindBar::showEvent(QShowEvent *event)
@@ -82,17 +82,17 @@ void FindBar::onLineEditTextEdited(const QString &arg1)
         ui->label->setText("");
     }
 
-    emit search(arg1, true);
+    Q_EMIT search(arg1, true);
 }
 
 void FindBar::onBtnUpClicked()
 {
-    emit searchUp(ui->lineEdit->text(), true);
+    Q_EMIT searchUp(ui->lineEdit->text(), true);
 }
 
 void FindBar::onBtnDownClicked()
 {
-    emit searchDown(ui->lineEdit->text(), true);
+    Q_EMIT searchDown(ui->lineEdit->text(), true);
 }
 
 void FindBar::onLineEditTextChanged(const QString &arg1)
@@ -103,5 +103,5 @@ void FindBar::onLineEditTextChanged(const QString &arg1)
 
 void FindBar::onLineEditReturnPressed()
 {
-    emit searchDown(ui->lineEdit->text(), true);
+    Q_EMIT searchDown(ui->lineEdit->text(), true);
 }

@@ -31,7 +31,7 @@ bool TabBar::event(QEvent *e)
         auto rect = tabRect(index);
         auto pos = QPoint(rect.x() + rect.width() / 2, rect.y() + rect.height());
         pos = mapToGlobal(pos);
-//        emit showPreview(pos, index);
+//        Q_EMIT showPreview(pos, index);
     }break;
     case QEvent::ChildAdded:
     {
@@ -88,7 +88,7 @@ void TabBar::timerEvent(QTimerEvent *event)
         auto pos = QCursor::pos();
         pos = mapFromGlobal(pos);
         if(tabAt(pos) == -1)
-            emit showPreview(QPoint(), -1);
+            Q_EMIT showPreview(QPoint(), -1);
     }else if(timerId == draw_progress_timer_id_){
         update();
     }
@@ -169,24 +169,24 @@ void TabBar::initUi()
 void TabBar::initSignalSlots()
 {
     connect(act_new_tab, &QAction::triggered, this, [this](){
-        emit menuTriggered(TabBarCmd::NewTabPage, menu_triggered_index_);
+        Q_EMIT menuTriggered(TabBarCmd::NewTabPage, menu_triggered_index_);
     });
     connect(act_reload_, &QAction::triggered, this,[this](){
 
-        emit menuTriggered(TabBarCmd::Reload, menu_triggered_index_);
+        Q_EMIT menuTriggered(TabBarCmd::Reload, menu_triggered_index_);
     });
     connect(act_mute_, &QAction::triggered, this,[this](){
 
-        emit menuTriggered(TabBarCmd::Mute, menu_triggered_index_);
+        Q_EMIT menuTriggered(TabBarCmd::Mute, menu_triggered_index_);
     });
     connect(act_close_this_, &QAction::triggered, this,[this](){
-        emit menuTriggered(TabBarCmd::CloseTab, menu_triggered_index_);
+        Q_EMIT menuTriggered(TabBarCmd::CloseTab, menu_triggered_index_);
     });
     connect(act_close_right_, &QAction::triggered, this,[this](){
-        emit menuTriggered(TabBarCmd::CloseRight, menu_triggered_index_);
+        Q_EMIT menuTriggered(TabBarCmd::CloseRight, menu_triggered_index_);
     });
     connect(act_close_others_, &QAction::triggered, this,[this](){
-        emit menuTriggered(TabBarCmd::CloseOther, menu_triggered_index_);
+        Q_EMIT menuTriggered(TabBarCmd::CloseOther, menu_triggered_index_);
     });
 }
 
@@ -219,7 +219,7 @@ void TabBar::showHideTabButton()
 void TabBar::mousePressEvent(QMouseEvent *event)
 {
     QTabBar::mousePressEvent(event);
-    emit showPreview(QPoint(), -1);
+    Q_EMIT showPreview(QPoint(), -1);
 }
 
 QSize TabBar::tabSizeHint(int index) const

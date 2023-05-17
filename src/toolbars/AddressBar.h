@@ -27,7 +27,7 @@ public:
     QRect gGeometryBtnZoom() const;
     QPoint findButtonGlobalPos() const;
 
-signals:
+Q_SIGNALS:
     void viewSiteInfo();
     void showZoomBar();
     void addFavorite();
@@ -51,7 +51,7 @@ private:
 
     void initUi();
 
-private slots:
+private Q_SLOTS:
     void onEditingFinished();
     void onTextEdited(const QString &text);
 };
