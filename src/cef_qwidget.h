@@ -37,7 +37,7 @@ public:
     void Print();
     void ShowDevTool(const QPoint &pos);
     bool isDevTool() const { return is_dev_tool_; }
-Q_SIGNALS:
+signals:
     void browserNeedSize();
     void browserCreated();
     void browserClosing();
@@ -133,7 +133,8 @@ private:
     QString url_;
     QString title_;
     QWindow *window_;
-    QWidget *qwindow_containter_;
+    QWindow *qwindow_for_native_ = nullptr;
+    QWidget *qwindow_containter_ = nullptr;
     QVBoxLayout *layout_;
 
     StyledMenu *browser_context_menu_ = nullptr;

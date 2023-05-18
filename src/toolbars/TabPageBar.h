@@ -16,11 +16,11 @@ public:
     int reservedWidth() const;
     QRect windowBtnRect();
     bool hitTestCaption(const QPoint &gPos);
-Q_SIGNALS:
+signals:
     void minBtnClicked();
     void normalMaxBtnClicked();
     void closeBtnClicked();
-public Q_SLOTS:
+public slots:
     void onWndStateChanged(Qt::WindowStates state, const QVariant &data);
 protected:
     virtual void paintEvent(QPaintEvent *event) override;
@@ -99,7 +99,7 @@ public:
     void setTabHasAudio(int index, bool has);
 
     const int rightReserved = 180;
-Q_SIGNALS:
+signals:
     void currentChanged(int index);
     void tabCloseRequested(int index);
     void tabMoved(int from, int to);
@@ -108,7 +108,7 @@ Q_SIGNALS:
     void showDockPage();
     void tabbarMenuTriggered(TabBarCmd cmd, const QVariant &data);
     void testBtnClicked();
-public Q_SLOTS:
+public slots:
     void setCurrentIndex(int index);
     void onDwmColorChanged();
 protected:

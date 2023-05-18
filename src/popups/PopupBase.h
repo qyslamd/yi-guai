@@ -1,13 +1,13 @@
 #ifndef POPUPBASE_H
 #define POPUPBASE_H
 
-#include <QWidget>
+#include <QFrame>
 
 namespace Ui {
 class PopupBase;
 }
 
-class PopupBase : public QWidget
+class PopupBase : public QFrame
 {
     Q_OBJECT
 

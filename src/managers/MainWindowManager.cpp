@@ -6,6 +6,7 @@
 #include <QWindow>
 #include <QElapsedTimer>
 #include <QApplication>
+#include <QTimer>
 
 #include "AppCfgManager.h"
 #include "BookmarkManager.h"
@@ -15,6 +16,7 @@
 #include "widgets/AppConfigWidget.h"
 #include "widgets/FullscnHint.h"
 #include "popups/InprivatePopup.h"
+#include "browser/message_loop/main_message_loop.h"
 
 int MainWndMgr::newWndOffsetX = 22;
 int MainWndMgr::newWndOffsetY = 30;
@@ -69,8 +71,9 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
     // otherwise the resource will not be released
     window->setAttribute(Qt::WA_DeleteOnClose, true);
     connect(this, &MainWndMgr::inprivateWndCntChanged, window, &MainWindow::onInpWndCntChanged);
+
     // if window destroyed,remove reference in set and map.
-    connect(window, &MainWindow::destroyed, this, [=](QObject *){ onWndDestroyed(window);});
+    connect(window, &MainWindow::onBeforeClose, this, &MainWndMgr::onBeforeWndClose);
     // 先改变位置，再记录，不然获取到的记录是空的
     relocateWindow(window, cfg.bounds_);
 
@@ -79,7 +82,7 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
     wnd_map_.insert(wnd_index++, window);
     if(cfg.is_inprivate_){
         updatePrivateWndCount();
-        Q_EMIT inprivateWndCntChanged();
+        emit inprivateWndCntChanged();
     }
 
     if(!cfg.initially_hidden_)
@@ -108,7 +111,7 @@ void MainWndMgr::quitApplication()
             (*it)->close();
         }
     }
-    quit_app_flag_ = true;
+//    quit_app_flag_ = true;
 }
 
 void MainWndMgr::closeAllInprivate()
@@ -122,7 +125,7 @@ void MainWndMgr::closeAllInprivate()
             (*it)->close();
         }
     }
-    quit_app_flag_ = true;
+//    quit_app_flag_ = true;
 }
 
 size_t MainWndMgr::inprivateCount() const
@@ -215,15 +218,18 @@ void MainWndMgr::onAppCfgChanged()
     }
 }
 
-void MainWndMgr::onWndDestroyed(MainWindow *window)
+void MainWndMgr::onBeforeWndClose(MainWindow *window)
 {
     windows_.remove(window);
-    wnd_map_.remove( wnd_map_.key(window));
-    Q_EMIT inprivateWndCntChanged();
+
+    auto index = wnd_map_.key(window);
+    wnd_map_.remove(index);
+    emit inprivateWndCntChanged();
 
     // if quit application flag is set and window set is empty,quit the application
-    if(quit_app_flag_ && windows_.isEmpty())
+    if(/*quit_app_flag_ && */windows_.isEmpty())
     {
-        qApp->quit();
+        client::MainMessageLoop::Get()->Quit();
+        QTimer::singleShot(0, qApp,  &QApplication::quit);
     }
 }

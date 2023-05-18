@@ -117,13 +117,13 @@ void HistoryMgr::addHistoryRecord(const History &data)
 void HistoryMgr::doLoadWork()
 {
     worker_thread_.start();
-    Q_EMIT load();
+    emit load();
 }
 
 void HistoryMgr::doSaveWork()
 {
     worker_thread_.start();
-    Q_EMIT save();
+    emit save();
 }
 
 void HistoryMgr::onWorkerLoadFinished()
@@ -139,7 +139,7 @@ void HistoryMgr::onWorkerLoadFinished()
         doSaveWork();
     }
 
-    Q_EMIT historyChanged();
+    emit historyChanged();
 }
 
 void HistoryMgr::onWorkerSaveFinished()
@@ -226,7 +226,7 @@ void HistoryWorker::loadFromFile()
         }
     }
     qInfo()<<"\033[32m[Execute Time]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";
-    Q_EMIT loadFinished();
+    emit loadFinished();
 }
 
 void HistoryWorker::saveToFile()
@@ -250,5 +250,5 @@ void HistoryWorker::saveToFile()
 
     UtilQt::writeStringToFile(record_file_path_, strJson);
 
-    Q_EMIT saveFinished();
+    emit saveFinished();
 }

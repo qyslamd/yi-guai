@@ -16,6 +16,7 @@
 #include <QFontMetrics>
 #include <QSysInfo>
 #include <QDateTime>
+#include <QRandomGenerator>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -322,11 +323,10 @@ namespace UtilQt {
             QString strG = "";
             QString strB = "";
 
-            qsrand(QTime(0,0,0).msecsTo(QTime::currentTime()));
-
-            r = rand() % 256;
-            g = rand() % 256;
-            b = rand() % 256;
+            quint32 value = QRandomGenerator::global()->generate();
+            r = value % 256;
+            g = value % 256;
+            b = value % 256;
 
             bool ok = true;
             strR.setNum(r,16);

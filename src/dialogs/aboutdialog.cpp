@@ -4,6 +4,9 @@
 #include <QGraphicsDropShadowEffect>
 #include <QPropertyAnimation>
 #include <QTimer>
+#include <QtGlobal>
+
+#include "browser/CefManager.h"
 
 AboutDialog::AboutDialog(QWidget *parent) :
     QDialog(parent),
@@ -38,6 +41,8 @@ AboutDialog::AboutDialog(QWidget *parent) :
 
     ui->frame->move(- ui->frame->width(),
                     (ui->frameShadow->height() - ui->frame->height()) / 2);
+
+    initUi();
 }
 
 AboutDialog::~AboutDialog()
@@ -53,6 +58,15 @@ void AboutDialog::showEvent(QShowEvent *event)
         moveFrame(QPoint(- ui->frame->width(), y),
                   QPoint((ui->frameShadow->width() - ui->frame->width()) / 2, y));
     });
+}
+
+void AboutDialog::initUi()
+{
+    // cef xx.xx.xx + chrormium-86.0.3945.130,Qt 5.12.4
+    auto versionStr = QString("cef %1, Qt %2")
+                          .arg(QString::fromStdString(CefManager::cefVersion()))
+                          .arg(QString(qVersion()));
+    ui->label_4->setText(versionStr);
 }
 
 void AboutDialog::moveFrame(const QPoint &start, const QPoint &end, int duration)

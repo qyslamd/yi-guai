@@ -21,7 +21,7 @@ public:
     void addIconRecord(const QString &urlIndex, const QString &filePath);
     void addIconsMap(const QMap<QString, QString> &icons);
     QIcon getFavicon(const QString &urlIndex);
-Q_SIGNALS:
+signals:
     void iconUpdated(const QString &urlDomain);
 private:
     QString record_file_path_;

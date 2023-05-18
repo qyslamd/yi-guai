@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>PopupBase</class>
- <widget class="QWidget" name="PopupBase">
+ <widget class="QFrame" name="PopupBase">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -12,6 +12,13 @@
   </property>
   <property name="windowTitle">
    <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QFrame#PopupBase{
+border-radius:12px;
+background-color: transparent;
+background:transparent;
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="leftMargin">

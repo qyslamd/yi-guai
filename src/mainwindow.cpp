@@ -51,7 +51,6 @@
 #include <QLocale>
 #include <QStandardItemModel>
 #include <QScreen>
-#include <QDesktopWidget>
 
 #if defined(Q_OS_WIN)
 #include <Windows.h>
@@ -202,6 +201,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     {
         // 真正的关闭
         AppCfgMgr::setWindowGeometry(saveGeometry());
+        emit onBeforeClose(this);
         event->accept();
     }
 }
@@ -745,10 +745,13 @@ void MainWindow::onNaviBarCmd(NaviBarCmd cmd, const QVariant &para)
         if(!about_dialog_){
             about_dialog_ = new AboutDialog(this);
         }
+#ifdef Q_OS_WIN
         auto pos = this->pos();
         pos.rx() += 8;
         about_dialog_->move(pos);
-        about_dialog_->resize(size());
+#else
+        about_dialog_->setGeometry(this->geometry());
+#endif
         about_dialog_->exec();
     }
         break;
@@ -1297,7 +1300,7 @@ void MainWindow::onSettings()
 
 void MainWindow::onWindowStateChanged()
 {
-    Q_EMIT windowStateChanged(windowState(),
+    emit windowStateChanged(windowState(),
                             stack_browsers_->currentWidget()->size());
     if(windowState() & Qt::WindowFullScreen){
         widget_north_->hide();

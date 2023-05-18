@@ -44,7 +44,7 @@ public:
     void showZoomBar(const QPoint &pos);
     void openDevTool();
 
-Q_SIGNALS:
+signals:
     void pageCmd(PageCmd cmd, const QVariant &data);
     void newPage(BrowserPage *page);
     void browserShortcut(CefShortcutCmd cmd);
@@ -73,13 +73,13 @@ private:
     void initBrowser();
     void initOthers();
     void moveFindBar();
-private Q_SLOTS:
+private slots:
     void onBrowserDevTool(CefQWidget *devTool);
     void onDockDevToolTopLevelChanged(bool isFloating);
     void onDockDevToolLocChanged(Qt::DockWidgetArea area);
     void onDevToolShortcut(CefQWidget *devTool, CefShortcutCmd cmd);
 
-private Q_SLOTS:
+private slots:
     void onZoomBarTimer();
 };
 

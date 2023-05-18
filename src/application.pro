@@ -185,13 +185,7 @@ win32{
 }
 
 unix:!macx{
-    HEADERS += \
-            utils/util_gtk.h
-
-    SOURCES += \
-    utils/util_gtk.cpp
-
-    CONFIG += no_keywords
+#    CONFIG += no_keywords
 
     DESTDIR = $$OUT_PWD/bin
 
@@ -201,7 +195,8 @@ unix:!macx{
     CONFIG += link_pkgconfig
     PKGCONFIG += x11
     PKGCONFIG += glib-2.0
-    PKGCONFIG += gmodule-2.0 gtk+-3.0 gthread-2.0 gtk+-unix-print-3.0 xi
+#    PKGCONFIG += gmodule-2.0 gtk+-3.0 gthread-2.0 gtk+-unix-print-3.0 xi
+    PKGCONFIG += gmodule-2.0 gthread-2.0 xi
 
     CEF_DEP_PATH = $$PWD/../../../files/cef_binary_99.2.15+g71e9523+chromium-99.0.4844.84_linux64
     OUTPUT_BIN_DIR = $$DESTDIR

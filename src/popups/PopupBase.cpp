@@ -6,13 +6,16 @@
 #include <QtDebug>
 
 PopupBase::PopupBase(QWidget *parent) :
-    QWidget(parent),
+    QFrame(parent),
     ui(new Ui::PopupBase)
 {
     ui->setupUi(this);
-    setAttribute(Qt::WA_TranslucentBackground, true);
     ui->frameShadow->setAutoFillBackground(true);
-    setWindowFlags(Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+    setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
+#ifdef Q_OS_WIN
+    setAttribute(Qt::WA_TranslucentBackground, true);
+    setWindowFlag(Qt::NoDropShadowWindowHint, true);
+#endif
 
     QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
     shadow->setOffset(0, 0);
@@ -56,5 +59,5 @@ PopupBase::~PopupBase()
 void PopupBase::mousePressEvent(QMouseEvent *event)
 {
     setAttribute(Qt::WA_NoMouseReplay);
-    QWidget::mousePressEvent(event);
+    QFrame::mousePressEvent(event);
 }

@@ -116,7 +116,7 @@ font-family:&quot;微软雅黑&quot;;
 font-size:12pt;</string>
          </property>
          <property name="text">
-          <string>YiGuai browser 0.0.0.1(build:0001)32bit</string>
+          <string>YiGuai browser 0.0.0.1(build:0001)64bit</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -124,7 +124,7 @@ font-size:12pt;</string>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_4">
+        <widget class="QLabel" name="veesionLabel">
          <property name="text">
           <string>cef xx.xx.xx + chrormium-86.0.3945.130,Qt 5.12.4</string>
          </property>
@@ -172,7 +172,7 @@ font-size:12pt;</string>
 color:#999999;</string>
          </property>
          <property name="text">
-          <string notr="true">Copyright 2019-2021 Zhouyohu. All rights reserved.</string>
+          <string notr="true">Copyright 2019-2023 Zhouyohu. All rights reserved.</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

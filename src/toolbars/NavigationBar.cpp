@@ -406,163 +406,163 @@ void NavigateToolBar::initSignalSlot()
 {
     connect(address_bar_, &AddressBar::returnPressed, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::Navigate, address_bar_->text());
+        emit naviBarCmd(NaviBarCmd::Navigate, address_bar_->text());
     });
     connect(address_bar_, &AddressBar::viewSiteInfo, this, [this]()
     {
         auto rect = address_bar_->gGeometryBtnSiteInfo();
-        Q_EMIT naviBarCmd(NaviBarCmd::ViewSiteInfo, rect.bottomLeft());
+        emit naviBarCmd(NaviBarCmd::ViewSiteInfo, rect.bottomLeft());
     });
     connect(address_bar_, &AddressBar::addFavorite, this, [this]()
     {
         auto rect = address_bar_->gGeometryBtnAddBkmk();
-        Q_EMIT naviBarCmd(NaviBarCmd::AddFavorite, rect.bottomRight());
+        emit naviBarCmd(NaviBarCmd::AddFavorite, rect.bottomRight());
     });
     connect(address_bar_, &AddressBar::textEdited, this, [this](const QString &txt)
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::AddressEdited, txt);
+        emit naviBarCmd(NaviBarCmd::AddressEdited, txt);
     });
     connect(address_bar_, &AddressBar::showZoomBar, this, [this]()
     {
         auto rect = address_bar_->gGeometryBtnZoom();
-        Q_EMIT naviBarCmd(NaviBarCmd::ShowZoomBar, rect.bottomRight());
+        emit naviBarCmd(NaviBarCmd::ShowZoomBar, rect.bottomRight());
     });
     connect(btn_back_, &QToolButton::clicked, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::Back, QVariant());
+        emit naviBarCmd(NaviBarCmd::Back, QVariant());
     });
     connect(btn_home_, &QToolButton::clicked, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::HomePage, QVariant());
+        emit naviBarCmd(NaviBarCmd::HomePage, QVariant());
     });
     connect(btn_forward_, &QToolButton::clicked, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::Forward, QVariant());
+        emit naviBarCmd(NaviBarCmd::Forward, QVariant());
     });
     connect(btn_refresh_, &QToolButton::clicked, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::Refresh, QVariant());
+        emit naviBarCmd(NaviBarCmd::Refresh, QVariant());
     });
     connect(btn_stop_, &QToolButton::clicked, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::StopLoading, QVariant());
+        emit naviBarCmd(NaviBarCmd::StopLoading, QVariant());
     });
     connect(btn_favorites_, &QToolButton::clicked, this, [this]()
     {
         auto pos = mapToGlobal(btn_favorites_->geometry().bottomRight());
-        Q_EMIT naviBarCmd(NaviBarCmd::Favorite, pos);
+        emit naviBarCmd(NaviBarCmd::Favorite, pos);
     });
     connect(btn_history_, &QToolButton::clicked, this, [this]()
     {
         auto pos = mapToGlobal(btn_history_->geometry().bottomRight());
-        Q_EMIT naviBarCmd(NaviBarCmd::History, pos);
+        emit naviBarCmd(NaviBarCmd::History, pos);
     });
     connect(btn_download_, &QToolButton::clicked, this, [this]()
     {
         auto pos = mapToGlobal(btn_download_->geometry().bottomRight());
-        Q_EMIT naviBarCmd(NaviBarCmd::Download, pos);
+        emit naviBarCmd(NaviBarCmd::Download, pos);
     });
     connect(btn_capture_, &QToolButton::clicked, this, [this]()
     {
         auto pos = mapToGlobal(btn_capture_->geometry().bottomRight());
-        Q_EMIT naviBarCmd(NaviBarCmd::Capture, pos);
+        emit naviBarCmd(NaviBarCmd::Capture, pos);
     });
     connect(btn_inprivate_, &QPushButton::clicked, this, [this]()
     {
         auto pos = mapToGlobal(btn_inprivate_->geometry().bottomRight());
-        Q_EMIT naviBarCmd(NaviBarCmd::Inprivate, pos);
+        emit naviBarCmd(NaviBarCmd::Inprivate, pos);
     });
     connect(btn_user_, &QToolButton::clicked, this, [this]()
     {
         auto pos = mapToGlobal(btn_user_->geometry().bottomRight());
-        Q_EMIT naviBarCmd(NaviBarCmd::User, pos);
+        emit naviBarCmd(NaviBarCmd::User, pos);
     });
     connect(action_new_tab_, &QAction::triggered, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::NewTabPage, QVariant());
+        emit naviBarCmd(NaviBarCmd::NewTabPage, QVariant());
     });
     connect(action_new_window_, &QAction::triggered, this, [this]()
     {
         qInfo()<<"new window";
-        Q_EMIT naviBarCmd(NaviBarCmd::NewWindow, QVariant());
+        emit naviBarCmd(NaviBarCmd::NewWindow, QVariant());
     });
     connect(action_new_inprivate_window_, &QAction::triggered, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::NewInprivateWindow, QVariant());
+        emit naviBarCmd(NaviBarCmd::NewInprivateWindow, QVariant());
     });
     connect(btn_zoom_out_, &QToolButton::clicked, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::ZoomOut, QVariant());
+        emit naviBarCmd(NaviBarCmd::ZoomOut, QVariant());
     });
     connect(btn_zoom_in_, &QToolButton::clicked, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::ZoomIn, QVariant());
+        emit naviBarCmd(NaviBarCmd::ZoomIn, QVariant());
     });
     connect(btn_fullscreen_, &QToolButton::clicked, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::FullScreen, QVariant());
+        emit naviBarCmd(NaviBarCmd::FullScreen, QVariant());
         menu_more_options_->hide();
     });
     connect(action_favorates_, &QAction::triggered, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::Favorite, QVariant());
+        emit naviBarCmd(NaviBarCmd::Favorite, QVariant());
     });
     connect(action_history_, &QAction::triggered, this, [this]()
     {
         auto pos = mapToGlobal(btn_history_->geometry().bottomRight());
-        Q_EMIT naviBarCmd(NaviBarCmd::History, pos);
+        emit naviBarCmd(NaviBarCmd::History, pos);
     });
     connect(action_download_, &QAction::triggered, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::Download, QVariant());
+        emit naviBarCmd(NaviBarCmd::Download, QVariant());
     });
     connect(action_print_, &QAction::triggered, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::Print, QVariant());
+        emit naviBarCmd(NaviBarCmd::Print, QVariant());
     });
     connect(action_capture_, &QAction::triggered, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::Capture, QVariant());
+        emit naviBarCmd(NaviBarCmd::Capture, QVariant());
     });
     connect(action_find_, &QAction::triggered, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::Find, QVariant());
+        emit naviBarCmd(NaviBarCmd::Find, QVariant());
     });
     connect(action_task_mgr_, &QAction::triggered, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::TaskMgr, QVariant());
+        emit naviBarCmd(NaviBarCmd::TaskMgr, QVariant());
     });
     connect(action_dev_tools_, &QAction::triggered, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::DevTool, QVariant());
+        emit naviBarCmd(NaviBarCmd::DevTool, QVariant());
     });
     connect(action_settings_, &QAction::triggered, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::Settings, QVariant());
+        emit naviBarCmd(NaviBarCmd::Settings, QVariant());
     });
     connect(action_help_you_, &QAction::triggered, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::About, QVariant());
+        emit naviBarCmd(NaviBarCmd::About, QVariant());
     });
     connect(action_feed_back_, &QAction::triggered, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::Feedback, QVariant());
+        emit naviBarCmd(NaviBarCmd::Feedback, QVariant());
     });
     connect(action_like_, &QAction::triggered, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::Like, QVariant());
+        emit naviBarCmd(NaviBarCmd::Like, QVariant());
     });
     connect(action_about_qt_, &QAction::triggered, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::AboutQt, QVariant());
+        emit naviBarCmd(NaviBarCmd::AboutQt, QVariant());
     });
     connect(action_about_cef_, &QAction::triggered, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::AboutCef, QVariant());
+        emit naviBarCmd(NaviBarCmd::AboutCef, QVariant());
     });
     connect(action_quit_, &QAction::triggered, this, [this]()
     {
-        Q_EMIT naviBarCmd(NaviBarCmd::QuitApp, QVariant());
+        emit naviBarCmd(NaviBarCmd::QuitApp, QVariant());
     });
 
 }

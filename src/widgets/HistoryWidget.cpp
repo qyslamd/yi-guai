@@ -106,16 +106,16 @@ void HistoryWidget::initSignalSlots()
             this, &HistoryWidget::pinOrCloseClicked);
 
     connect(ac_open_, &QAction::triggered, this, [this](){
-        Q_EMIT menuCmd(HistoryCmd::Open, menu_trigger_data_.url);
+        emit menuCmd(HistoryCmd::Open, menu_trigger_data_.url);
     });
     connect(ac_open_in_new_tab_, &QAction::triggered, this, [this](){
-        Q_EMIT menuCmd(HistoryCmd::OpenInNewPage, menu_trigger_data_.url);
+        emit menuCmd(HistoryCmd::OpenInNewPage, menu_trigger_data_.url);
     });
     connect(ac_open_in_new_window_, &QAction::triggered, this, [this](){
-        Q_EMIT menuCmd(HistoryCmd::OpenInNewWnd, menu_trigger_data_.url);
+        emit menuCmd(HistoryCmd::OpenInNewWnd, menu_trigger_data_.url);
     });
     connect(ac_open_in_inpriavte_, &QAction::triggered, this, [this](){
-        Q_EMIT menuCmd(HistoryCmd::OpenInInprivate, menu_trigger_data_.url);
+        emit menuCmd(HistoryCmd::OpenInInprivate, menu_trigger_data_.url);
     });
 }
 
@@ -153,7 +153,7 @@ void HistoryWidget::onTreeAllHisItemClicked(const QModelIndex &index)
     auto isData = item->data(Qt::UserRole + 1).value<bool>();
     if(isData){
         auto data = item->data(Qt::UserRole + 2).value<History>();
-        Q_EMIT menuCmd(HistoryCmd::Open, data.url);
+        emit menuCmd(HistoryCmd::Open, data.url);
     }
 }
 

@@ -383,6 +383,7 @@ void CefClientHandler::OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
                                            CefRefPtr<CefContextMenuParams> params,
                                            CefRefPtr<CefMenuModel> model)
 {
+    return CefContextMenuHandler::OnBeforeContextMenu(browser, frame, params, model);
 #if 1
     model->Clear();
     if(delegate_){
@@ -551,7 +552,7 @@ bool CefClientHandler::OnContextMenuCommand(CefRefPtr<CefBrowser> browser,
                                             int command_id,
                                             CefContextMenuHandler::EventFlags event_flags)
 {
-    return false;
+    return CefContextMenuHandler::OnContextMenuCommand(browser, frame, params, command_id, event_flags);
 }
 
 void CefClientHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser,

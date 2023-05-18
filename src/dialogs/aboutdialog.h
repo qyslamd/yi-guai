@@ -19,6 +19,8 @@ protected:
     void showEvent(QShowEvent *event) override;
 
 private:
+    void initUi();
+private:
     Ui::AboutDialog *ui;
     QPropertyAnimation *anime_;
     bool need_close_ = false;

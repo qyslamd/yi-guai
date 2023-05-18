@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QtDebug>
+#include <QVariant>
 
 class QSettings;
 
@@ -38,7 +39,7 @@ public:
     ~AppCfgMgr() {
         qInfo()<<__FUNCTION__;
     }
-Q_SIGNALS:
+signals:
     void preferenceChanged();
 private:
     QSettings *settings_ = nullptr;

@@ -8,6 +8,7 @@ SOURCES += \
     $$PWD/cef_app_render.cpp \
     $$PWD/client_app.cpp \
     $$PWD/client_switches.cc \
+    $$PWD/message_loop/main_message_loop_externam_pump_qt.cc \
     $$PWD/scheme_handler.cpp \
     $$PWD/cef_app_browser.cpp \
     $$PWD/cef_client_handler.cpp \
@@ -40,9 +41,5 @@ win32{
 
 unix:!macx{
     SOURCES += \
-    $$PWD/message_loop/main_message_loop_external_pump_linux.cc \
-    $$PWD/message_loop/main_message_loop_multithreaded_gtk.cc
-
-    HEADERS += \
-    $$PWD/message_loop/main_message_loop_multithreaded_gtk.h
+    $$PWD/message_loop/main_message_loop_external_pump_linux.cc
 }
