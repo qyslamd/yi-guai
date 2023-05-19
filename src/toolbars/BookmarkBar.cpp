@@ -42,7 +42,7 @@ void BookmarkBar::paintEvent(QPaintEvent *event)
 
     if(!loaded_){
         p.save();
-        QString hint = QStringLiteral("正在加载书签");
+        QString hint = QString("正在加载书签");
         QFontMetrics fm(this->font());
 #if (QT_VERSION == QT_VERSION_CHECK(5, 11, 1))
         auto width = fm.horizontalAdvance(hint);
@@ -101,12 +101,12 @@ void BookmarkBar::initUi()
     {
         emit appBtnClicked(mapToGlobal(btn_application_->geometry().bottomRight()));
     });
-    label_empty_ = new QLabel(QStringLiteral("你还没有书签，赶紧添加一个吧"), this);
+    label_empty_ = new QLabel(QString("你还没有书签，赶紧添加一个吧"), this);
 
     toolbar_ = new BookmarkToolBar(this);
     toolbar_->setIconSize(QSize(16,16));
 
-    btn_others_ = new QPushButton(FaviconMgr::systemDirIcon, QStringLiteral("其它书签"), this);
+    btn_others_ = new QPushButton(FaviconMgr::systemDirIcon, QString("其它书签"), this);
     QFrame* line = new QFrame(this);
     line->setStyleSheet("margin-top:4px;margin-bottom:4px;");
     line->setObjectName("line");

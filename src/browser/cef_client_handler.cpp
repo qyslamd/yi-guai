@@ -10,6 +10,8 @@
 #include "utils/util_qt.h"
 #include "globaldef.h"
 
+#include <QtDebug>
+
 
 int CefClientHandler::gBrowserCount = 0;
 
@@ -586,6 +588,16 @@ void CefClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser,
     if(delegate_){
         delegate_->onBrowerLoadEnd(httpStatusCode);
     }
+
+    auto cefRect2QRect = [](const CefRect &rect) -> QRect
+    {
+        QRect ret;
+        ret.setX(rect.x);
+        ret.setY(rect.y);
+        ret.setWidth(rect.width);
+        ret.setHeight(rect.height);
+        return ret;
+    };
 }
 
 void CefClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser,

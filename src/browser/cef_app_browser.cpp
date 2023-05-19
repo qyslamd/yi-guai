@@ -30,6 +30,7 @@ void CefAppBrowser::OnBeforeCommandLineProcessing(
 
     // 开启摄像头
     command_line->AppendSwitch("enable-media-stream");
+    command_line->AppendSwitchWithValue("enable-media-stream", "1");
     command_line->AppendSwitch("enable-speech-input");
     command_line->AppendSwitch("enable-desktop-notifications");
 
