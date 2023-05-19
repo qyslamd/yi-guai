@@ -27,7 +27,7 @@ private:
     CefQWidget *browser_;
     QToolButton *internal_btn_siteInfo_ = nullptr;
 
-private Q_SLOTS:
+private slots:
     void onSiteInfoClicked();
     void onBrowserTitleChange(const QString &text);
     void onBrowserAddrChange(const QString &text);

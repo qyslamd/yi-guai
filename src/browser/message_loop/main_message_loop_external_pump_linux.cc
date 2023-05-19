@@ -294,9 +294,9 @@ bool MainMessageLoopExternalPumpLinux::IsTimerPending() {
 }  // namespace
 
 // static
-std::unique_ptr<MainMessageLoopExternalPump>
-MainMessageLoopExternalPump::Create() {
-  return std::make_unique<MainMessageLoopExternalPumpLinux>();
-}
+//std::unique_ptr<MainMessageLoopExternalPump>
+//MainMessageLoopExternalPump::Create() {
+//  return std::make_unique<MainMessageLoopExternalPumpLinux>();
+//}
 
 }  // namespace client

@@ -81,13 +81,13 @@ private:
     bool loaded_ = false;
     QStandardItem *menu_trigger_item_ = nullptr;
     void initActions();
-Q_SIGNALS:
+signals:
     void load();
     void save();
     void loadFinished();
     void bookmarksChanged();
     void menuCmd(BookmarkCmd cmd,  const QVariant &para);
-private Q_SLOTS:
+private slots:
     void doLoadWork();
     void doSaveWork();
     void onWokerLoadFinished();
@@ -105,10 +105,10 @@ public:
     BookmarkWorker();
     ~BookmarkWorker();
 
-public Q_SLOTS:
+public slots:
     void loadFromFile();
     void saveToFile();
-Q_SIGNALS:
+signals:
     void loadFinished();
     void saveFinished();
 
@@ -139,10 +139,10 @@ public:
     QMenu *others_menu_;
     bool  loaded() const {return loaded_;}
 
-Q_SIGNALS:
+signals:
     void menuActionTriggered(const QVariant &data);
     void loadToUiFinished();
-public Q_SLOTS:
+public slots:
     void onBookmarksLoaded();
 
 private:
@@ -161,7 +161,7 @@ public:
 private:
     void initUi();
 
-private Q_SLOTS:
+private slots:
     void onCustomContextMenuRequested(const QPoint &pos);
 };
 

@@ -19,7 +19,7 @@ public:
 
     void setDomain(const QString &domain);
     void setLevel(SecurityLevel level);
-Q_SIGNALS:
+signals:
     void openUrl(const QUrl &link);
 protected:
     void showEvent(QShowEvent *ev) override;

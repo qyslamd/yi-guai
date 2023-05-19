@@ -22,7 +22,7 @@ private:
         ~Gc(){if(gInst){delete gInst;gInst = nullptr;}}
     };
 
-Q_SIGNALS:
+signals:
 
 };
 

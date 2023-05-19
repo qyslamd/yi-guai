@@ -47,7 +47,7 @@ public:
     void NavigateInCurPage(const QString &url);
     bool isInprivate() const {return created_cfg_.is_inprivate_;}
     void updatePreference();
-Q_SIGNALS:
+signals:
     void windowStateChanged(Qt::WindowStates state, const QVariant &data);
 #ifdef Q_OS_WIN
     void dwmColorChanged();
@@ -55,7 +55,7 @@ Q_SIGNALS:
 public:
     // QObject interface
     bool eventFilter(QObject *obj, QEvent *event) override;
-public Q_SLOTS:
+public slots:
     void onInpWndCntChanged();
     void onBookmarkCmd(BookmarkCmd cmd, const QVariant &para);
 protected:
@@ -130,7 +130,7 @@ private:
     int CurrentPageIndex();
     BrowserPage *GetPage(int index);
 
-private Q_SLOTS:
+private slots:
     void onScreenChanged(QScreen *screen);
     void onTabBarCurrentChanged(int index);
     void onTabBarCloseRequested(int index);

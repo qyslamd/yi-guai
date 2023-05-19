@@ -31,7 +31,7 @@ public:
 
     bool isLoaded() const{return loaded_;}
     void addHistoryRecord(const History &data);
-Q_SIGNALS:
+signals:
     void load();
     void save();
     void historyChanged();
@@ -49,7 +49,7 @@ private:
     HistoryWorker *worker_;
     bool loaded_ = false;
     QList<History> pending_list_;
-private Q_SLOTS:
+private slots:
     void doLoadWork();
     void doSaveWork();
     void onWorkerLoadFinished();
@@ -62,10 +62,10 @@ class HistoryWorker : public QObject
 public:
     HistoryWorker();
     ~HistoryWorker();
-public Q_SLOTS:
+public slots:
     void loadFromFile();
     void saveToFile();
-Q_SIGNALS:
+signals:
     void loadFinished();
     void saveFinished();
 

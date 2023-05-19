@@ -169,7 +169,7 @@ void CefClientHandler::NotifyBrowserCreated(CefRefPtr<CefBrowser> browser)
     if (!CURRENTLY_ON_MAIN_THREAD()) {
         // Execute this method on the main thread.
         MAIN_POST_CLOSURE(
-            base::BindOnce(&CefClientHandler::NotifyBrowserCreated, this, browser));
+            base::Bind(&CefClientHandler::NotifyBrowserCreated, this, browser));
         return;
       }
 
@@ -182,7 +182,7 @@ void CefClientHandler::NotifyBrowserBeforeClose(CefRefPtr<CefBrowser> browser)
     if (!CURRENTLY_ON_MAIN_THREAD()) {
         // Execute this method on the main thread.
         MAIN_POST_CLOSURE(
-                    base::BindOnce(&CefClientHandler::NotifyBrowserBeforeClose, this, browser));
+                    base::Bind(&CefClientHandler::NotifyBrowserBeforeClose, this, browser));
         return;
     }
 
@@ -195,7 +195,7 @@ void CefClientHandler::NotifyBrowserClosing(CefRefPtr<CefBrowser> browser)
     if (!CURRENTLY_ON_MAIN_THREAD()) {
         // Execute this method on the main thread.
         MAIN_POST_CLOSURE(
-                    base::BindOnce(&CefClientHandler::NotifyBrowserClosing, this, browser));
+                    base::Bind(&CefClientHandler::NotifyBrowserClosing, this, browser));
         return;
     }
 
@@ -210,7 +210,7 @@ void CefClientHandler::NotifyBrowserAddressChange(CefRefPtr<CefBrowser> browser,
     if (!CURRENTLY_ON_MAIN_THREAD()) {
         // Execute this method on the main thread.
         MAIN_POST_CLOSURE(
-                    base::BindOnce(&CefClientHandler::NotifyBrowserAddressChange, this, browser, frame, url));
+                    base::Bind(&CefClientHandler::NotifyBrowserAddressChange, this, browser, frame, url));
         return;
     }
 
@@ -224,7 +224,7 @@ void CefClientHandler::NotifyBrowserTitleChange(CefRefPtr<CefBrowser> browser,
     if (!CURRENTLY_ON_MAIN_THREAD()) {
         // Execute this method on the main thread.
         MAIN_POST_CLOSURE(
-                    base::BindOnce(&CefClientHandler::NotifyBrowserTitleChange, this, browser, title));
+                    base::Bind(&CefClientHandler::NotifyBrowserTitleChange, this, browser, title));
         return;
     }
 
@@ -238,7 +238,7 @@ void CefClientHandler::NotifyFullscreenModeChange(CefRefPtr<CefBrowser> browser,
     if (!CURRENTLY_ON_MAIN_THREAD()) {
         // Execute this method on the main thread.
         MAIN_POST_CLOSURE(
-                    base::BindOnce(&CefClientHandler::NotifyFullscreenModeChange,
+                    base::Bind(&CefClientHandler::NotifyFullscreenModeChange,
                                this,
                                browser,
                                fullscreen));
@@ -254,7 +254,7 @@ void CefClientHandler::NotifyStatusMessage(const CefString &msg)
     if (!CURRENTLY_ON_MAIN_THREAD()) {
         // Execute this method on the main thread.
         MAIN_POST_CLOSURE(
-                    base::BindOnce(&CefClientHandler::NotifyStatusMessage,
+                    base::Bind(&CefClientHandler::NotifyStatusMessage,
                                this,
                                msg));
         return;
@@ -270,7 +270,7 @@ void CefClientHandler::NotifyBrowserFavicon(CefRefPtr<CefImage> image,
     if (!CURRENTLY_ON_MAIN_THREAD()) {
         // Execute this method on the main thread.
         MAIN_POST_CLOSURE(
-                    base::BindOnce(&CefClientHandler::NotifyBrowserFavicon,
+                    base::Bind(&CefClientHandler::NotifyBrowserFavicon,
                                this,
                                image,
                                icon_url));
@@ -672,7 +672,7 @@ void CefClientHandler::ShowDevTools(CefRefPtr<CefBrowser> browser,
 {
     if (!CefCurrentlyOn(TID_UI)) {
       // Execute this method on the UI thread.
-      CefPostTask(TID_UI, base::BindOnce(&CefClientHandler::ShowDevTools,
+      CefPostTask(TID_UI, base::Bind(&CefClientHandler::ShowDevTools,
                                      this, browser,
                                      inspect_element_at));
       return;
@@ -715,7 +715,7 @@ void CefClientHandler::NotifyForgroundTab(CefWindowInfo &windowInfo,
 //    if (!CURRENTLY_ON_MAIN_THREAD()) {
 //        // Execute this method on the main thread.
 //        MAIN_POST_CLOSURE(
-//                    base::BindOnce(&CefClientHandler::NotifyForgroundTab, this,
+//                    base::Bind(&CefClientHandler::NotifyForgroundTab, this,
 //                               windowInfo,
 //                               client,
 //                               settings));
@@ -736,7 +736,7 @@ void CefClientHandler::NotifyPopupWindow(const CefPopupFeatures &popupFeatures,
 //    if (!CURRENTLY_ON_MAIN_THREAD()) {
 //        // Execute this method on the main thread.
 //        MAIN_POST_CLOSURE(
-//                    base::BindOnce(&CefClientHandler::NotifyPopupWindow,
+//                    base::Bind(&CefClientHandler::NotifyPopupWindow,
 //                               this,
 //                               popupFeatures,
 //                               windowInfo,

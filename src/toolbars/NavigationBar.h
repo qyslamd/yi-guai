@@ -38,9 +38,9 @@ public:
     QPoint findHintBtnPos() const;
     void inpWndCntChanged();
     void updatePreference();
-Q_SIGNALS:
+signals:
     void naviBarCmd(NaviBarCmd cmd, const QVariant &para);
-public Q_SLOTS:
+public slots:
     void onToolWndVisibleChanged(ToolWndType type, bool visible);
 protected:
     void paintEvent(QPaintEvent *event) override;

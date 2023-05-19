@@ -55,7 +55,7 @@ public:
     static InprivatePopup* gInprivatePopup;
     static AppCfgWidget* gAppCfgWidget;
     static FullscnHint* gFullscrnWidget;
-Q_SIGNALS:
+signals:
     void inprivateWndCntChanged();
 private:
     QSet<MainWindow *> windows_;
@@ -70,7 +70,7 @@ private:
 
     void updatePrivateWndCount();
     void relocateWindow(MainWindow *window, const QRect &bounds);
-private Q_SLOTS:
+private slots:
     void onBkmkMgrMenuCmd(BookmarkCmd cmd, const QVariant &data);
     void onAppCfgChanged();
     void onWndDestroyed(MainWindow *obj);

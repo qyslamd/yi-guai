@@ -13,7 +13,7 @@ class QtWinFramelessWindow : public QMainWindow
 public:
     explicit QtWinFramelessWindow(QWidget *parent = 0);
     virtual bool event(QEvent *ev) override;
-Q_SIGNALS:
+signals:
     void DwmCompsitionChanged();
     void dpiChanged(const int dpi);
     void screenChanged(QScreen *screen);

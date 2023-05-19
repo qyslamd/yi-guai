@@ -89,14 +89,14 @@ bool QtWinFramelessWindow::nativeEvent(const QByteArray &eventType, void *messag
     case WM_DWMCOLORIZATIONCOLORCHANGED:
     {
         // 发出颜色改变通知
-        Q_EMIT DwmCompsitionChanged();
+        emit DwmCompsitionChanged();
         // 不处理，返回false
         return false;
     }
     case WM_DPICHANGED:
     {
         // 发出DPI改变通知
-        Q_EMIT dpiChanged(HIWORD(msg->wParam));
+        emit dpiChanged(HIWORD(msg->wParam));
         // 不处理，返回false
         return false;
     }

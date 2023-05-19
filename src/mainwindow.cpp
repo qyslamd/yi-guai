@@ -1297,7 +1297,7 @@ void MainWindow::onSettings()
 
 void MainWindow::onWindowStateChanged()
 {
-    Q_EMIT windowStateChanged(windowState(),
+    emit windowStateChanged(windowState(),
                             stack_browsers_->currentWidget()->size());
     if(windowState() & Qt::WindowFullScreen){
         widget_north_->hide();

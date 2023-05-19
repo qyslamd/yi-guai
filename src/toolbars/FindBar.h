@@ -16,7 +16,7 @@ public:
     ~FindBar();
     void setFindResult(int count, int index);
     void closeFind();
-Q_SIGNALS:
+signals:
     void searchStop();
     void search(const QString &arg, bool matchCase);
     void searchUp(const QString &arg, bool matchCase);
@@ -27,7 +27,7 @@ protected:
 private:
     Ui::FindBar *ui;
     void initUi();
-private Q_SLOTS:
+private slots:
     void onBtnUpClicked();
     void onBtnDownClicked();
     void onLineEditTextEdited(const QString &arg1);

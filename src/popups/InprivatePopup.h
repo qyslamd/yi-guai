@@ -17,7 +17,7 @@ public:
 private:
     Ui::InprivatePopup *ui;
 
-private Q_SLOTS:
+private slots:
     void onCloseAllInprivateWnds();
 };
 

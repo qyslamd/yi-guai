@@ -303,7 +303,7 @@ void CefQWidget::onBrowserBeforeContextMenu(CefRefPtr<CefBrowser> browser,
     {
         auto link = params->GetLinkUrl();
         CefQWidget *window = new CefQWidget(QString::fromStdString(link));
-        Q_EMIT browserNewForgroundPage(window);
+        emit browserNewForgroundPage(window);
     });
 
 
@@ -471,7 +471,7 @@ void CefQWidget::onBrowserForgroundTab(CefWindowInfo &windowInfo,
 {
     CefQWidget *window = new CefQWidget(windowInfo, client, settings);
 
-    Q_EMIT browserNewForgroundPage(window);
+    emit browserNewForgroundPage(window);
 }
 
 void CefQWidget::onBrowserPopupWnd(const CefPopupFeatures &popupFeatures,
@@ -529,7 +529,7 @@ void CefQWidget::onBrowserDeveTools(CefWindowInfo &windowInfo,
 {
     CefQWidget *window = new CefQWidget(windowInfo, client, settings);
     window->is_dev_tool_ = true;
-    Q_EMIT browserDevTool(window);
+    emit browserDevTool(window);
 }
 
 void CefQWidget::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
@@ -539,25 +539,7 @@ void CefQWidget::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
     browser_ = browser;
     browser_state_ = Created;
     resizeBrowser();
-    Q_EMIT browserCreated();
-
-    // test code
-    if(0){
-        ScopedGdkThreadsEnter scoped_gdk_threads;
-
-        ::Display* xdisplay1 = X11GetDisplay(this);
-        ::Display* xdisplay2 = XOpenDisplay(NULL);
-        ::Display* xdisplay3 = cef_get_xdisplay();
-
-        ::Window xwindow = browser->GetHost()->GetWindowHandle();
-
-//        SetXWindowVisible(xdisplay1, xwindow, true);
-        SetXWindowVisible(xdisplay2, xwindow, true);
-        SetXWindowVisible(xdisplay3, xwindow, true);
-    }
-
-    if (::XMapWindow(cef_get_xdisplay(), browser->GetHost()->GetWindowHandle()) <= 0)
-        qWarning() << "Failed to move input focus";
+    emit browserCreated();
 }
 
 void CefQWidget::OnBrowserClosing(CefRefPtr<CefBrowser> browser)
@@ -567,30 +549,30 @@ void CefQWidget::OnBrowserClosing(CefRefPtr<CefBrowser> browser)
     // 修改标志
     is_closing_ = true;
 
-    Q_EMIT browserClosing();
+    emit browserClosing();
     close();
 }
 
 void CefQWidget::onBrowserAddressChange(const std::string &url)
 {
     url_ = QString::fromStdString(url);
-    Q_EMIT browserAddressChange(QString::fromStdString(url));
+    emit browserAddressChange(QString::fromStdString(url));
 }
 
 void CefQWidget::onBrowserTitleChange(const std::string &title)
 {
     title_ = QString::fromStdString(title);
-    Q_EMIT browserTitleChange(title_);
+    emit browserTitleChange(title_);
 }
 
 void CefQWidget::onBrowserFullscreenChange(bool fullscreen)
 {
-    Q_EMIT browserFullScnChange(fullscreen);
+    emit browserFullScnChange(fullscreen);
 }
 
 void CefQWidget::onBrowserStatusMessage(const std::string &msg)
 {
-    Q_EMIT browserStatusMessage(QString::fromStdString(msg));
+    emit browserStatusMessage(QString::fromStdString(msg));
 }
 
 void CefQWidget::onBrowserFaviconChange(CefRefPtr<CefImage> image,
@@ -663,20 +645,20 @@ void CefQWidget::onBrowserFaviconChange(CefRefPtr<CefImage> image,
     else {
         pixmap = style()->standardPixmap(QStyle::SP_FileIcon);
     }
-    Q_EMIT browserFaviconChange(pixmap);
+    emit browserFaviconChange(pixmap);
 
     Q_UNUSED(url);
 }
 
 void CefQWidget::onBrowerLoadStart(CefLoadHandler::TransitionType transition_type)
 {
-    Q_EMIT browserLoadStart(transition_type);
+    emit browserLoadStart(transition_type);
 }
 
 void CefQWidget::onBrowerLoadEnd(int httpStatusCode)
 {
     if(newly_created_){
-        Q_EMIT browserNeedSize();
+        emit browserNeedSize();
         newly_created_ = false;
     }
     HistoryMgr::Instance()->addHistoryRecord(
@@ -684,13 +666,13 @@ void CefQWidget::onBrowerLoadEnd(int httpStatusCode)
                         url_,
                         title_,
                         0});
-    Q_EMIT browserLoadEnd(httpStatusCode);
+    emit browserLoadEnd(httpStatusCode);
 }
 
 void CefQWidget::onBrowserLoadingProgressChange(CefRefPtr<CefBrowser> browser,
                                                 double progress)
 {
-    Q_EMIT browserLoadingProgress(progress);
+    emit browserLoadingProgress(progress);
 //    qInfo()<<__FUNCTION__<<progress;
 }
 
@@ -698,14 +680,14 @@ void CefQWidget::onBrowserLoadingStateChange(bool isLoading,
                                                    bool canGoBack,
                                                    bool canGoForward)
 {
-    Q_EMIT browserLoadingStateChange(isLoading,
+    emit browserLoadingStateChange(isLoading,
                                    canGoBack,
                                    canGoForward);
 }
 
 void CefQWidget::onBrowserGotFocus(CefRefPtr<CefBrowser> browser)
 {
-    Q_EMIT browserFocusChange(true);
+    emit browserFocusChange(true);
 }
 
 bool CefQWidget::onBrowserPreKeyEvent(const CefKeyEvent &event,
@@ -753,7 +735,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
             if(isPre && is_keyboard_shortcut){
                 *is_keyboard_shortcut = true;
             }else{
-                Q_EMIT browserShortcut(CefShortcutCmd::Refresh);
+                emit browserShortcut(CefShortcutCmd::Refresh);
             }
     }
 
@@ -766,7 +748,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::Fullscreen);
+            emit browserShortcut(CefShortcutCmd::Fullscreen);
         }
     }
 
@@ -779,7 +761,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::DevTool);
+            emit browserShortcut(CefShortcutCmd::DevTool);
         }
     }
 
@@ -792,7 +774,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::ZoomOut);
+            emit browserShortcut(CefShortcutCmd::ZoomOut);
         }
     }
 
@@ -805,7 +787,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::ZoomOut);
+            emit browserShortcut(CefShortcutCmd::ZoomOut);
         }
     }
 
@@ -823,7 +805,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::ZoomReset);
+            emit browserShortcut(CefShortcutCmd::ZoomReset);
         }
     }
 
@@ -836,7 +818,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::ZoomReset);
+            emit browserShortcut(CefShortcutCmd::ZoomReset);
         }
     }
 
@@ -849,7 +831,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::ZoomIn);
+            emit browserShortcut(CefShortcutCmd::ZoomIn);
         }
     }
 
@@ -862,7 +844,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::ZoomIn);
+            emit browserShortcut(CefShortcutCmd::ZoomIn);
         }
     }
 
@@ -875,7 +857,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::Print);
+            emit browserShortcut(CefShortcutCmd::Print);
         }
     }
 
@@ -888,7 +870,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::Refresh);
+            emit browserShortcut(CefShortcutCmd::Refresh);
         }
     }
 
@@ -901,7 +883,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::NewTab);
+            emit browserShortcut(CefShortcutCmd::NewTab);
         }
     }
 
@@ -914,7 +896,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::NewWnd);
+            emit browserShortcut(CefShortcutCmd::NewWnd);
         }
     }
 
@@ -927,7 +909,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::NewPrivateWnd);
+            emit browserShortcut(CefShortcutCmd::NewPrivateWnd);
         }
     }
 
@@ -940,7 +922,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::DevTool);
+            emit browserShortcut(CefShortcutCmd::DevTool);
         }
     }
 
@@ -953,7 +935,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::History);
+            emit browserShortcut(CefShortcutCmd::History);
         }
     }
 
@@ -966,7 +948,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::Download);
+            emit browserShortcut(CefShortcutCmd::Download);
         }
     }
 
@@ -979,7 +961,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::CloseTab);
+            emit browserShortcut(CefShortcutCmd::CloseTab);
         }
     }
 
@@ -992,7 +974,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::SwitchTab);
+            emit browserShortcut(CefShortcutCmd::SwitchTab);
         }
     }
     // Alt + <--(左箭头)
@@ -1003,7 +985,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::NaviBack);
+            emit browserShortcut(CefShortcutCmd::NaviBack);
         }
     }
     // Alt + -->(右箭头)
@@ -1014,7 +996,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            Q_EMIT browserShortcut(CefShortcutCmd::NaviForward);
+            emit browserShortcut(CefShortcutCmd::NaviForward);
         }
     }
 }

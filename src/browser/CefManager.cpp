@@ -87,7 +87,7 @@ void CefManager::populateSettings(CefSettings &settings,
 //    }else{
 //        settings.remote_debugging_port = remote_debugging_port;
 //    }
-    settings.log_severity = LOGSEVERITY_DEFAULT;
+    settings.log_severity = LOGSEVERITY_WARNING;
     settings.no_sandbox = true;
 #ifdef Q_OS_LINUX
 //    seperate_sub_process = true;

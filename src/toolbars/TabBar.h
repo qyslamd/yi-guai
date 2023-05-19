@@ -18,7 +18,7 @@ public:
     bool event(QEvent *e) override;
     int insertTab(int index, const QString &text);
     void setTabHasAudio(int index, bool has);
-Q_SIGNALS:
+signals:
     void menuTriggered(TabBarCmd cmd, const QVariant &data);
     void showPreview(const QPoint &g_pos, const int index);
 protected:

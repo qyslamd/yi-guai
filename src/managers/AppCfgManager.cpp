@@ -121,11 +121,11 @@ void AppCfgMgr::setValue(const QString &group,
     settings_->setValue(key, data);
     settings_->endGroup();
 
-    Q_EMIT preferenceChanged();
+    emit preferenceChanged();
 }
 
 void AppCfgMgr::setValue(const QString &key, const QVariant &data)
 {
     settings_->setValue(key, data);
-    Q_EMIT preferenceChanged();
+    emit preferenceChanged();
 }

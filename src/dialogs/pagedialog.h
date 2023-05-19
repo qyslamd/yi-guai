@@ -14,7 +14,7 @@ class PageDialog : public QWidget
 public:
     explicit PageDialog(QWidget *parent = nullptr);
     ~PageDialog();
-Q_SIGNALS:
+signals:
     void btnOkClicked();
 private:
     Ui::PageDialog *ui;

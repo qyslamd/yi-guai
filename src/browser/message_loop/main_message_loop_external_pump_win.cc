@@ -144,9 +144,9 @@ LRESULT CALLBACK MainMessageLoopExternalPumpWin::WndProc(HWND hwnd,
 }  // namespace
 
 // static
-scoped_ptr<MainMessageLoopExternalPump> MainMessageLoopExternalPump::Create() {
-  return scoped_ptr<MainMessageLoopExternalPump>(
-      new MainMessageLoopExternalPumpWin());
-}
+//scoped_ptr<MainMessageLoopExternalPump> MainMessageLoopExternalPump::Create() {
+//  return scoped_ptr<MainMessageLoopExternalPump>(
+//      new MainMessageLoopExternalPumpWin());
+//}
 
 }  // namespace client

@@ -37,7 +37,7 @@ public:
     void Print();
     void ShowDevTool(const QPoint &pos);
     bool isDevTool() const { return is_dev_tool_; }
-Q_SIGNALS:
+signals:
     void browserNeedSize();
     void browserCreated();
     void browserClosing();

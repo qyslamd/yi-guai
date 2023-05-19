@@ -8,7 +8,7 @@
 
 #include "include/cef_app.h"
 #include "include/wrapper/cef_helpers.h"
-#include "tests/shared/browser/main_message_loop.h"
+#include "main_message_loop.h"
 
 namespace client {
 

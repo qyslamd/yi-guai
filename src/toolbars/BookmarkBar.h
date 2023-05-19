@@ -22,7 +22,7 @@ class BookmarkBar : public QFrame
 public:
     explicit BookmarkBar(QWidget *parent = nullptr);
 
-Q_SIGNALS:
+signals:
     void cmdTriggered(BookmarkCmd cmd, const QVariant &data);
     void appBtnClicked(const QVariant &data);
 protected:
@@ -42,7 +42,7 @@ private:
 
     BookmarkMenu *makeMenu(const QStandardItem *item);
 
-private Q_SLOTS:
+private slots:
     void onCustomContextMenuRequested(const QPoint &pos);
     void loadBookmarks();
 

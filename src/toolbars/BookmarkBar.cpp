@@ -99,7 +99,7 @@ void BookmarkBar::initUi()
     btn_application_->setIcon(QIcon(":/icons/resources/imgs/gray/squared_menu_96px.png"));
     connect(btn_application_, &QPushButton::clicked, this, [this]()
     {
-        Q_EMIT appBtnClicked(mapToGlobal(btn_application_->geometry().bottomRight()));
+        emit appBtnClicked(mapToGlobal(btn_application_->geometry().bottomRight()));
     });
     label_empty_ = new QLabel(QString("你还没有书签，赶紧添加一个吧"), this);
 
@@ -150,7 +150,7 @@ BookmarkMenu *BookmarkBar::makeMenu(const QStandardItem *item)
             }else if(type == "url"){
                 connect(action, &QAction::triggered,[=](){
                     if(auto dataItem = (QStandardItem *)action->data().value<void *>()){
-                        Q_EMIT cmdTriggered(BookmarkCmd::Open, dataItem->data(BookmarkMgr::Url));
+                        emit cmdTriggered(BookmarkCmd::Open, dataItem->data(BookmarkMgr::Url));
                     }
                 });
                 auto url = child->data(BookmarkMgr::Url).toString();

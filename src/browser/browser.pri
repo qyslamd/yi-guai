@@ -8,6 +8,7 @@ SOURCES += \
     $$PWD/cef_app_render.cpp \
     $$PWD/client_app.cpp \
     $$PWD/client_switches.cc \
+    $$PWD/message_loop/main_message_loop_externam_pump_qt.cc \
     $$PWD/scheme_handler.cpp \
     $$PWD/cef_app_browser.cpp \
     $$PWD/cef_client_handler.cpp \

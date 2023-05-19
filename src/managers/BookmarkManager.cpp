@@ -149,7 +149,7 @@ void BookmarkMgr::initActions()
         if(menu_trigger_item_){
             QList<QString> data = getChildUrls(menu_trigger_item_);
             if(!data.isEmpty()){
-                Q_EMIT menuCmd(BookmarkCmd::OpenInNewPage, QVariant::fromValue(data));
+                emit menuCmd(BookmarkCmd::OpenInNewPage, QVariant::fromValue(data));
             }
             menu_trigger_item_ = nullptr;
         }
@@ -158,7 +158,7 @@ void BookmarkMgr::initActions()
         if(menu_trigger_item_){
             QList<QString> data = getChildUrls(menu_trigger_item_);
             if(!data.isEmpty()){
-                Q_EMIT menuCmd(BookmarkCmd::OpenInNewWnd, QVariant::fromValue(data));
+                emit menuCmd(BookmarkCmd::OpenInNewWnd, QVariant::fromValue(data));
             }
             menu_trigger_item_ = nullptr;
         }
@@ -167,7 +167,7 @@ void BookmarkMgr::initActions()
         if(menu_trigger_item_){
             QList<QString> data = getChildUrls(menu_trigger_item_);
             if(!data.isEmpty()){
-                Q_EMIT menuCmd(BookmarkCmd::OpenInInprivate, QVariant::fromValue(data));
+                emit menuCmd(BookmarkCmd::OpenInInprivate, QVariant::fromValue(data));
             }
             menu_trigger_item_ = nullptr;
         }
@@ -244,13 +244,13 @@ BookmarkMgr::~BookmarkMgr()
 void BookmarkMgr::doLoadWork()
 {
     worker_thread_.start();
-    Q_EMIT load();
+    emit load();
 }
 
 void BookmarkMgr::doSaveWork()
 {
 //    worker_thread_.start();
-//    Q_EMIT save();
+//    emit save();
 }
 
 void BookmarkMgr::onWokerLoadFinished()
@@ -258,7 +258,7 @@ void BookmarkMgr::onWokerLoadFinished()
     loaded_ = true;
     worker_thread_.quit();
     worker_thread_.wait();
-    Q_EMIT loadFinished();
+    emit loadFinished();
 }
 
 void BookmarkMgr::onWokerSaveFinished()
@@ -327,7 +327,7 @@ void BookmarkWorker::loadFromFile()
     }
     qInfo()<<"\033[32m[Execute Time]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";
     qInfo()<<__FUNCTION__<<"count:"<<BookmarkMgr::gIdSet.count();
-    Q_EMIT loadFinished();
+    emit loadFinished();
 }
 
 void BookmarkWorker::saveToFile()
@@ -387,7 +387,7 @@ void BookmarkWorker::saveToFile()
 
     UtilQt::writeDataToFile(R"(C:\Users\slamdd\Desktop\Bookmarks.json)",
                             QJsonDocument(docRoot).toJson());
-    Q_EMIT saveFinished();
+    emit saveFinished();
 
     qInfo()<<"\033[32m[Execute Time]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";
 }
@@ -550,7 +550,7 @@ void ToolBarProviderWnd::onBookmarksLoaded()
 
                     connect(action, &QAction::triggered, this, [this, url]()
                     {
-                        Q_EMIT menuActionTriggered(url);
+                        emit menuActionTriggered(url);
                     });
                 }
                 action->setData(QVariant::fromValue<void *>(child));
@@ -562,7 +562,7 @@ void ToolBarProviderWnd::onBookmarksLoaded()
         others_menu_ = makeMenu(otherItem);
     }
     loaded_ = true;
-    Q_EMIT loadToUiFinished();
+    emit loadToUiFinished();
     qInfo()<<"\033[32m[Execute Time]"<<__FUNCTION__<<":" << timer.elapsed() << "ms"<<"\033[0m";
 }
 
@@ -592,7 +592,7 @@ BookmarkMenu *ToolBarProviderWnd::makeMenu(const QStandardItem *item)
 
                 connect(action, &QAction::triggered, this, [this, url]()
                 {
-                    Q_EMIT menuActionTriggered(url);
+                    emit menuActionTriggered(url);
                 });
             }
             action->setData(QVariant::fromValue<void *>(child));
