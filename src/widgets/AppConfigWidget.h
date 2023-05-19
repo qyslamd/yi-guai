@@ -18,7 +18,7 @@ public:
 private:
     Ui::AppCfgWidget *ui;
 
-private slots:
+private Q_SLOTS:
     void onNaviButtonClicked();
 };
 

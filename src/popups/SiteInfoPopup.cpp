@@ -27,7 +27,7 @@ SiteInfoPopup::SiteInfoPopup(QWidget *parent)
     });
     connect(ui->textBrowserSiteDesc, &QTextBrowser::anchorClicked, this, [this](const QUrl &link){
         hide();
-        emit openUrl(link);
+        Q_EMIT openUrl(link);
     });
 }
 

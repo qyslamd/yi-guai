@@ -305,16 +305,16 @@ void CaptionFrame::mouseReleaseEvent(QMouseEvent *event)
         if(btnRect(CaptionButtons::Button_Mini).contains(event->pos())
                 && min_button_press_)
         {
-            emit minBtnClicked();
+            Q_EMIT minBtnClicked();
             min_button_press_ = false;
         }else if(btnRect(CaptionButtons::Button_NormalMax).contains(event->pos())
                  && max_buttton_press_)
         {
-            emit normalMaxBtnClicked();
+            Q_EMIT normalMaxBtnClicked();
             max_buttton_press_ = false;
         }else if(btnRect(CaptionButtons::Button_Close).contains(event->pos())
                  && close_button_press_){
-            emit closeBtnClicked();
+            Q_EMIT closeBtnClicked();
             close_button_press_ = false;
         }else{
             return QFrame::mouseReleaseEvent(event);

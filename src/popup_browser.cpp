@@ -34,7 +34,7 @@ PopupBrowser::PopupBrowser(CefQWidget *browser, QWidget *parent)
     site_info_widget_->hide();
 
 
-    foreach(auto w , action_site_info_->associatedWidgets()){
+    for(auto w : action_site_info_->associatedWidgets()){
         if(w->metaObject()->superClass()->className() == QString("QToolButton"))
         {
             internal_btn_siteInfo_ = qobject_cast<QToolButton *>(w);

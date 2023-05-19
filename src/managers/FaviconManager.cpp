@@ -46,7 +46,7 @@ void FaviconMgr::addIconRecord(const QString &urlIndex,
         return;
 
     icons_path_cache_.insert(qUrl.host(), filePath);
-    emit iconUpdated(qUrl.host());
+    Q_EMIT iconUpdated(qUrl.host());
 
     saveToFile();
 }

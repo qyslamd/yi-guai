@@ -1,10 +1,11 @@
 ﻿#ifndef CEF_QWIDGET_H
 #define CEF_QWIDGET_H
-#pragma once
 
 #include "browser/cef_client_handler.h"
 #include <QWidget>
 #include <QWindow>
+#include <QScopedPointer>
+#include <QBackingStore>
 #include <memory>
 #include "globaldef.h"
 
@@ -12,6 +13,7 @@ class QHBoxLayout;
 class QVBoxLayout;
 class BrowserPage;
 class StyledMenu;
+class EmbededWindow;
 class CefQWidget : public QWidget, public CefClientHandler::Delegate
 {
     Q_OBJECT
@@ -35,7 +37,7 @@ public:
     void Print();
     void ShowDevTool(const QPoint &pos);
     bool isDevTool() const { return is_dev_tool_; }
-signals:
+Q_SIGNALS:
     void browserNeedSize();
     void browserCreated();
     void browserClosing();
@@ -94,7 +96,23 @@ protected:
 protected:
     void resizeEvent(QResizeEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
+    void showEvent(QShowEvent *event) override;
 
+private:
+    void initUi();
+    void initContextMenu();
+    bool CreateBrowser(const CefRect& rect,
+                       const CefBrowserSettings& settings,
+                       CefRefPtr<CefDictionaryValue> extra_info,
+                       CefRefPtr<CefRequestContext> request_context);
+    void resizeBrowser(const QSize &size = QSize());
+    void GetPopupConfig(CefWindowInfo &windowInfo,
+                        CefRefPtr<CefClient> &client,
+                        CefBrowserSettings &settings);
+    void dealCefKeyEvent(const CefKeyEvent &event,
+                         CefEventHandle os_event,
+                         bool *is_keyboard_shortcut,
+                         bool isPre = true);
 private:
     CefQWidget(CefWindowInfo &windowInfo,
                CefRefPtr<CefClient> &client,
@@ -134,22 +152,23 @@ private:
     QAction *action_open_link_window_;
     QAction *action_open_link_incognito_;
     QAction *action_copy_link_;
+};
 
 
-    void initUi();
-    void initContextMenu();
-    bool CreateBrowser(const CefRect& rect,
-                       const CefBrowserSettings& settings,
-                       CefRefPtr<CefDictionaryValue> extra_info,
-                       CefRefPtr<CefRequestContext> request_context);
-    void resizeBrowser(const QSize &size = QSize());
-    void GetPopupConfig(CefWindowInfo &windowInfo,
-                        CefRefPtr<CefClient> &client,
-                        CefBrowserSettings &settings);
-    void dealCefKeyEvent(const CefKeyEvent &event,
-                         CefEventHandle os_event,
-                         bool *is_keyboard_shortcut,
-                         bool isPre = true);
+class EmbededWindow : public QWindow
+{
+    Q_OBJECT
+public:
+    EmbededWindow(QWindow *parent);
+
+    bool event(QEvent *event) override;
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+    void exposeEvent(QExposeEvent *event) override;
+private:
+    void renderNow();
+private:
+    QScopedPointer<QBackingStore> store_;
 };
 
 #endif // CEF_QWIDGET_H

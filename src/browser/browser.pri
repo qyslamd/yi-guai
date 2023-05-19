@@ -1,6 +1,7 @@
 
-CEF_VERSION = cef_4240_chromium_86
+#CEF_VERSION = cef_4240_chromium_86
 CEF_VERSION = cef_4389_chromium_89
+#CEF_VERSION = cef_4844_chromium_99
 
 SOURCES += \
     $$PWD/cef_app_other.cpp \
@@ -39,5 +40,9 @@ win32{
 
 unix:!macx{
     SOURCES += \
-    $$PWD/message_loop/main_message_loop_external_pump_linux.cc
+    $$PWD/message_loop/main_message_loop_external_pump_linux.cc \
+    $$PWD/message_loop/main_message_loop_multithreaded_gtk.cc
+
+    HEADERS += \
+    $$PWD/message_loop/main_message_loop_multithreaded_gtk.h
 }

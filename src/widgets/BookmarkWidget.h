@@ -22,7 +22,7 @@ public:
     ~BookmarkWidget();
 
     void onShowModeChanged(ToolWndShowMode mode);
-signals:
+Q_SIGNALS:
     void pinOrCloseClicked();
 public:
     bool eventFilter(QObject *watched, QEvent *event) override;
@@ -38,7 +38,7 @@ private:
 protected:
     void showEvent(QShowEvent *event) override;
 
-private slots:
+private Q_SLOTS:
     void onBookmarksChanged();
     void onAllBkmkTreeCustomContextMenu(const QPoint &pos);
 };

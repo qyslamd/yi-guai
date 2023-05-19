@@ -1,4 +1,5 @@
 ﻿#include "cef_qwidget.h"
+
 #include <QtGlobal>
 #include <QApplication>
 #include <QtDebug>
@@ -17,6 +18,8 @@
 #include <QPixmap>
 #include <QBuffer>
 #include <QScreen>
+#include <QPainter>
+#include <QPainterPath>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -44,20 +47,72 @@
 #include "browser/client_types.h"
 #include "browser/message_loop/main_message_loop.h"
 
-
-#ifdef OS_LINUX
+#ifdef Q_OS_LINUX
+#include <gdk/gdk.h>
+#include <gdk/gdkx.h>
 #include <X11/Xlib.h>
+#include <gtk/gtk.h>
+#include "utils/util_gtk.h"
+
+#ifdef signals
+#undef signals
+#endif
 #undef Success     // Definition conflicts with cef_message_router.h
 #undef RootWindow  // Definition conflicts with root_window.h
 #undef Bool // Definition conflicts with X11/Xlib.h
 
-namespace  {
-void SetXWindowBounds(::Window xwindow,
+namespace {
+
+::Window GetXWindowForWidget(GtkWidget* widget) {
+  ScopedGdkThreadsEnter scoped_gdk_threads;
+
+  // The GTK window must be visible before we can retrieve the XID.
+  ::Window xwindow = GDK_WINDOW_XID(gtk_widget_get_window(widget));
+  DCHECK(xwindow);
+  return xwindow;
+}
+
+void SetXWindowVisible(XDisplay* xdisplay, ::Window xwindow, bool visible) {
+  CHECK(xdisplay != 0);
+
+  // Retrieve the atoms required by the below XChangeProperty call.
+  const char* kAtoms[] = {"_NET_WM_STATE", "ATOM", "_NET_WM_STATE_HIDDEN"};
+  Atom atoms[3];
+  int result =
+      XInternAtoms(xdisplay, const_cast<char**>(kAtoms), 3, false, atoms);
+  if (!result)
+    NOTREACHED();
+
+  if (!visible) {
+    // Set the hidden property state value.
+    std::unique_ptr<Atom[]> data(new Atom[1]);
+    data[0] = atoms[2];
+
+    XChangeProperty(xdisplay, xwindow,
+                    atoms[0],  // name
+                    atoms[1],  // type
+                    32,        // size in bits of items in 'value'
+                    PropModeReplace,
+                    reinterpret_cast<const unsigned char*>(data.get()),
+                    1);  // num items
+  } else {
+    // Set an empty array of property state values.
+    XChangeProperty(xdisplay, xwindow,
+                    atoms[0],  // name
+                    atoms[1],  // type
+                    32,        // size in bits of items in 'value'
+                    PropModeReplace, nullptr,
+                    0);  // num items
+  }
+}
+
+void SetXWindowBounds(XDisplay* xdisplay,
+                      ::Window xwindow,
                       int x,
                       int y,
                       size_t width,
                       size_t height) {
-    ::Display* xdisplay = cef_get_xdisplay();
+    CHECK(xdisplay != 0);
     XWindowChanges changes = {0};
     changes.x = x;
     changes.y = y;
@@ -66,14 +121,33 @@ void SetXWindowBounds(::Window xwindow,
     XConfigureWindow(xdisplay, xwindow, CWX | CWY | CWHeight | CWWidth, &changes);
 }
 
-//::Window GetXWindowForWidget(GtkWidget* widget) {
-//  ScopedGdkThreadsEnter scoped_gdk_threads;
 
-//  // The GTK window must be visible before we can retrieve the XID.
-//  ::Window xwindow = GDK_WINDOW_XID(gtk_widget_get_window(widget));
-//  DCHECK(xwindow);
-//  return xwindow;
-//}
+Display* X11GetDisplay(QWidget* widget)
+{
+  Q_ASSERT_X(widget, "X11GetDisplay", "Invalid parameter widget");
+  if (!widget) {
+    qWarning("Invalid parameter widget");
+    return nullptr;
+  }
+
+  auto platformInterface = QApplication::platformNativeInterface();
+  Q_ASSERT_X(platformInterface, "X11GetDisplay", "Failed to get platform native interface");
+  if (!platformInterface) {
+    qWarning("Failed to get platform native interface");
+    return nullptr;
+  }
+
+  auto screen = widget->window()->windowHandle()->screen();
+  Q_ASSERT_X(screen, "X11GetDisplay", "Failed to get screen");
+  if (!screen) {
+    qWarning("Failed to get screen");
+    return nullptr;
+  }
+
+//  return (Display*)platformInterface->nativeResourceForScreen("display", screen);
+  return (Display*)screen->handle();
+  return nullptr;
+}
 
 }  // namespace
 
@@ -86,12 +160,12 @@ CefQWidget::CefQWidget(const QString &url, QWidget *parent)
 {
     initUi();
 #if defined (Q_OS_LINUX)
-    CefRect rect{x(), y(), window_->size().width(), window_->size().height()};
     CefBrowserSettings browser_settings;
-    CreateBrowser(rect,
+    auto ret = CreateBrowser({x(), y(), window_->size().width(), window_->size().height()},
                   browser_settings,
                   nullptr,
                   nullptr);
+    qInfo() << "Create browser:" << ret;
 #endif
 }
 
@@ -102,9 +176,6 @@ CefQWidget::CefQWidget(CefWindowInfo &windowInfo,
     : QWidget(parent)
 {
     initUi();
-#ifdef Q_OS_WIN
-    window_->setFlag(Qt::FramelessWindowHint);
-#endif
     GetPopupConfig( windowInfo, client, settings);
     browser_state_ = Creating;
 }
@@ -232,7 +303,7 @@ void CefQWidget::onBrowserBeforeContextMenu(CefRefPtr<CefBrowser> browser,
     {
         auto link = params->GetLinkUrl();
         CefQWidget *window = new CefQWidget(QString::fromStdString(link));
-        emit browserNewForgroundPage(window);
+        Q_EMIT browserNewForgroundPage(window);
     });
 
 
@@ -400,7 +471,7 @@ void CefQWidget::onBrowserForgroundTab(CefWindowInfo &windowInfo,
 {
     CefQWidget *window = new CefQWidget(windowInfo, client, settings);
 
-    emit browserNewForgroundPage(window);
+    Q_EMIT browserNewForgroundPage(window);
 }
 
 void CefQWidget::onBrowserPopupWnd(const CefPopupFeatures &popupFeatures,
@@ -458,15 +529,35 @@ void CefQWidget::onBrowserDeveTools(CefWindowInfo &windowInfo,
 {
     CefQWidget *window = new CefQWidget(windowInfo, client, settings);
     window->is_dev_tool_ = true;
-    emit browserDevTool(window);
+    Q_EMIT browserDevTool(window);
 }
 
 void CefQWidget::OnBrowserCreated(CefRefPtr<CefBrowser> browser)
 {
+    qInfo() << __FUNCTION__;
+
     browser_ = browser;
     browser_state_ = Created;
     resizeBrowser();
-    emit browserCreated();
+    Q_EMIT browserCreated();
+
+    // test code
+    if(0){
+        ScopedGdkThreadsEnter scoped_gdk_threads;
+
+        ::Display* xdisplay1 = X11GetDisplay(this);
+        ::Display* xdisplay2 = XOpenDisplay(NULL);
+        ::Display* xdisplay3 = cef_get_xdisplay();
+
+        ::Window xwindow = browser->GetHost()->GetWindowHandle();
+
+//        SetXWindowVisible(xdisplay1, xwindow, true);
+        SetXWindowVisible(xdisplay2, xwindow, true);
+        SetXWindowVisible(xdisplay3, xwindow, true);
+    }
+
+    if (::XMapWindow(cef_get_xdisplay(), browser->GetHost()->GetWindowHandle()) <= 0)
+        qWarning() << "Failed to move input focus";
 }
 
 void CefQWidget::OnBrowserClosing(CefRefPtr<CefBrowser> browser)
@@ -476,30 +567,30 @@ void CefQWidget::OnBrowserClosing(CefRefPtr<CefBrowser> browser)
     // 修改标志
     is_closing_ = true;
 
-    emit browserClosing();
+    Q_EMIT browserClosing();
     close();
 }
 
 void CefQWidget::onBrowserAddressChange(const std::string &url)
 {
     url_ = QString::fromStdString(url);
-    emit browserAddressChange(QString::fromStdString(url));
+    Q_EMIT browserAddressChange(QString::fromStdString(url));
 }
 
 void CefQWidget::onBrowserTitleChange(const std::string &title)
 {
     title_ = QString::fromStdString(title);
-    emit browserTitleChange(title_);
+    Q_EMIT browserTitleChange(title_);
 }
 
 void CefQWidget::onBrowserFullscreenChange(bool fullscreen)
 {
-    emit browserFullScnChange(fullscreen);
+    Q_EMIT browserFullScnChange(fullscreen);
 }
 
 void CefQWidget::onBrowserStatusMessage(const std::string &msg)
 {
-    emit browserStatusMessage(QString::fromStdString(msg));
+    Q_EMIT browserStatusMessage(QString::fromStdString(msg));
 }
 
 void CefQWidget::onBrowserFaviconChange(CefRefPtr<CefImage> image,
@@ -572,20 +663,20 @@ void CefQWidget::onBrowserFaviconChange(CefRefPtr<CefImage> image,
     else {
         pixmap = style()->standardPixmap(QStyle::SP_FileIcon);
     }
-    emit browserFaviconChange(pixmap);
+    Q_EMIT browserFaviconChange(pixmap);
 
     Q_UNUSED(url);
 }
 
 void CefQWidget::onBrowerLoadStart(CefLoadHandler::TransitionType transition_type)
 {
-    emit browserLoadStart(transition_type);
+    Q_EMIT browserLoadStart(transition_type);
 }
 
 void CefQWidget::onBrowerLoadEnd(int httpStatusCode)
 {
     if(newly_created_){
-        emit browserNeedSize();
+        Q_EMIT browserNeedSize();
         newly_created_ = false;
     }
     HistoryMgr::Instance()->addHistoryRecord(
@@ -593,13 +684,13 @@ void CefQWidget::onBrowerLoadEnd(int httpStatusCode)
                         url_,
                         title_,
                         0});
-    emit browserLoadEnd(httpStatusCode);
+    Q_EMIT browserLoadEnd(httpStatusCode);
 }
 
 void CefQWidget::onBrowserLoadingProgressChange(CefRefPtr<CefBrowser> browser,
                                                 double progress)
 {
-    emit browserLoadingProgress(progress);
+    Q_EMIT browserLoadingProgress(progress);
 //    qInfo()<<__FUNCTION__<<progress;
 }
 
@@ -607,14 +698,14 @@ void CefQWidget::onBrowserLoadingStateChange(bool isLoading,
                                                    bool canGoBack,
                                                    bool canGoForward)
 {
-    emit browserLoadingStateChange(isLoading,
+    Q_EMIT browserLoadingStateChange(isLoading,
                                    canGoBack,
                                    canGoForward);
 }
 
 void CefQWidget::onBrowserGotFocus(CefRefPtr<CefBrowser> browser)
 {
-    emit browserFocusChange(true);
+    Q_EMIT browserFocusChange(true);
 }
 
 bool CefQWidget::onBrowserPreKeyEvent(const CefKeyEvent &event,
@@ -662,7 +753,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
             if(isPre && is_keyboard_shortcut){
                 *is_keyboard_shortcut = true;
             }else{
-                emit browserShortcut(CefShortcutCmd::Refresh);
+                Q_EMIT browserShortcut(CefShortcutCmd::Refresh);
             }
     }
 
@@ -675,7 +766,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::Fullscreen);
+            Q_EMIT browserShortcut(CefShortcutCmd::Fullscreen);
         }
     }
 
@@ -688,7 +779,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::DevTool);
+            Q_EMIT browserShortcut(CefShortcutCmd::DevTool);
         }
     }
 
@@ -701,7 +792,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::ZoomOut);
+            Q_EMIT browserShortcut(CefShortcutCmd::ZoomOut);
         }
     }
 
@@ -714,7 +805,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::ZoomOut);
+            Q_EMIT browserShortcut(CefShortcutCmd::ZoomOut);
         }
     }
 
@@ -732,7 +823,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::ZoomReset);
+            Q_EMIT browserShortcut(CefShortcutCmd::ZoomReset);
         }
     }
 
@@ -745,7 +836,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::ZoomReset);
+            Q_EMIT browserShortcut(CefShortcutCmd::ZoomReset);
         }
     }
 
@@ -758,7 +849,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::ZoomIn);
+            Q_EMIT browserShortcut(CefShortcutCmd::ZoomIn);
         }
     }
 
@@ -771,7 +862,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::ZoomIn);
+            Q_EMIT browserShortcut(CefShortcutCmd::ZoomIn);
         }
     }
 
@@ -784,7 +875,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::Print);
+            Q_EMIT browserShortcut(CefShortcutCmd::Print);
         }
     }
 
@@ -797,7 +888,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::Refresh);
+            Q_EMIT browserShortcut(CefShortcutCmd::Refresh);
         }
     }
 
@@ -810,7 +901,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::NewTab);
+            Q_EMIT browserShortcut(CefShortcutCmd::NewTab);
         }
     }
 
@@ -823,7 +914,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::NewWnd);
+            Q_EMIT browserShortcut(CefShortcutCmd::NewWnd);
         }
     }
 
@@ -836,7 +927,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::NewPrivateWnd);
+            Q_EMIT browserShortcut(CefShortcutCmd::NewPrivateWnd);
         }
     }
 
@@ -849,7 +940,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::DevTool);
+            Q_EMIT browserShortcut(CefShortcutCmd::DevTool);
         }
     }
 
@@ -862,7 +953,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::History);
+            Q_EMIT browserShortcut(CefShortcutCmd::History);
         }
     }
 
@@ -875,7 +966,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::Download);
+            Q_EMIT browserShortcut(CefShortcutCmd::Download);
         }
     }
 
@@ -888,7 +979,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::CloseTab);
+            Q_EMIT browserShortcut(CefShortcutCmd::CloseTab);
         }
     }
 
@@ -901,7 +992,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::SwitchTab);
+            Q_EMIT browserShortcut(CefShortcutCmd::SwitchTab);
         }
     }
     // Alt + <--(左箭头)
@@ -912,7 +1003,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::NaviBack);
+            Q_EMIT browserShortcut(CefShortcutCmd::NaviBack);
         }
     }
     // Alt + -->(右箭头)
@@ -923,7 +1014,7 @@ void CefQWidget::dealCefKeyEvent(const CefKeyEvent &event,
         if(isPre && is_keyboard_shortcut){
             *is_keyboard_shortcut = true;
         }else{
-            emit browserShortcut(CefShortcutCmd::NaviForward);
+            Q_EMIT browserShortcut(CefShortcutCmd::NaviForward);
         }
     }
 }
@@ -975,10 +1066,18 @@ void CefQWidget::closeEvent(QCloseEvent *event)
     }
 }
 
+void CefQWidget::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+}
+
 void CefQWidget::initUi()
 {
     client_handler_ = new CefClientHandler(this, url_.toStdString());
     window_ = new QWindow(windowHandle());
+    window_->setFlag(Qt::FramelessWindowHint);
+    window_->setMinimumSize(QSize(500, 500));
+
     layout_ = new QVBoxLayout(this);
     layout_->setContentsMargins(0,0,0,0);
     layout_->setSpacing(0);
@@ -986,7 +1085,7 @@ void CefQWidget::initUi()
     layout_->addWidget(qwindow_containter_);
     setLayout(layout_);
 
-    initContextMenu();
+//    initContextMenu();
 }
 
 void CefQWidget::initContextMenu()
@@ -1039,6 +1138,8 @@ bool CefQWidget::CreateBrowser(const CefRect &rect,
                                CefRefPtr<CefRequestContext> request_context)
 {
     REQUIRE_MAIN_THREAD();
+    qInfo() << "CefQWidget::CreateBrowser";
+
     CefWindowInfo window_info;
 #if defined Q_OS_WIN
     RECT wnd_rect = {rect.x, rect.y, rect.x + rect.width, rect.y + rect.height};
@@ -1097,10 +1198,64 @@ void CefQWidget::resizeBrowser(const QSize &size)
         ::SetWindowPos(windowHandle, HWND_BOTTOM,rect.x(), rect.y(), rect.width(), rect.height(), SWP_NOACTIVATE);
 #elif defined(OS_LINUX)
         ::Window xwindow = windowHandle;
-        SetXWindowBounds(xwindow, 0, 0,
+        ::Display* xdisplay = cef_get_xdisplay();
+        DCHECK(xwindow);
+        DCHECK(xdisplay);
+
+        SetXWindowBounds(xdisplay, xwindow,
+                         0,
+                         0,
                          static_cast<size_t>(rect.width()),
                          static_cast<size_t>(rect.height()));
+        SetXWindowVisible(xdisplay, xwindow, true);
 #else
+        //TODO:
 #endif
     }
+}
+
+EmbededWindow::EmbededWindow(QWindow *parent)
+    : QWindow(parent)
+{
+    store_.reset(new QBackingStore(this));
+}
+
+bool EmbededWindow::event(QEvent *event)
+{
+    if (event->type() == QEvent::UpdateRequest) {
+        renderNow();
+        return true;
+    }
+    return QWindow::event(event);
+}
+
+void EmbededWindow::resizeEvent(QResizeEvent *event)
+{
+    store_->resize(event->size());
+}
+
+void EmbededWindow::exposeEvent(QExposeEvent *event)
+{
+    if (isExposed()) {
+        renderNow();
+    }
+    QWindow::exposeEvent(event);
+}
+
+void EmbededWindow::renderNow()
+{
+    if(!isExposed()) {
+        return;
+    }
+
+    QRect rect(0, 0, width(), height());
+
+    store_->beginPaint(rect);
+    auto device = store_->paintDevice();
+    QPainter p(device);
+
+    p.fillRect(rect, QColor(238,130,238, 200));
+    p.end();
+    store_->endPaint();
+    store_->flush(rect);
 }

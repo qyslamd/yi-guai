@@ -79,7 +79,7 @@ void MainWndMgr::createWindow(const MainWindowConfig &cfg)
     wnd_map_.insert(wnd_index++, window);
     if(cfg.is_inprivate_){
         updatePrivateWndCount();
-        emit inprivateWndCntChanged();
+        Q_EMIT inprivateWndCntChanged();
     }
 
     if(!cfg.initially_hidden_)
@@ -219,7 +219,7 @@ void MainWndMgr::onWndDestroyed(MainWindow *window)
 {
     windows_.remove(window);
     wnd_map_.remove( wnd_map_.key(window));
-    emit inprivateWndCntChanged();
+    Q_EMIT inprivateWndCntChanged();
 
     // if quit application flag is set and window set is empty,quit the application
     if(quit_app_flag_ && windows_.isEmpty())

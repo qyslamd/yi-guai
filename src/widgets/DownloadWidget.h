@@ -16,7 +16,7 @@ public:
      explicit DownloadWidget(QWidget *parent = nullptr);
     ~DownloadWidget();
     void onShowModeChanged(ToolWndShowMode mode);
-signals:
+Q_SIGNALS:
     void pinOrCloseClicked(bool pin);
 
 private:

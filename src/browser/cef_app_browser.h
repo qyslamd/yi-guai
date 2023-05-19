@@ -11,7 +11,7 @@ public:
 
     // CefApp methods:
     virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler()
-    OVERRIDE {
+    override {
         return this;
     }
     void OnBeforeCommandLineProcessing(const CefString& process_type,

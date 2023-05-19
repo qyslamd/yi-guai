@@ -38,7 +38,7 @@ public:
     ~AppCfgMgr() {
         qInfo()<<__FUNCTION__;
     }
-signals:
+Q_SIGNALS:
     void preferenceChanged();
 private:
     QSettings *settings_ = nullptr;

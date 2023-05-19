@@ -157,19 +157,19 @@ void BrowserPage::initBrowser()
 {
     connect(browser_widget_, &CefQWidget::browserNeedSize, [this]()
     {
-        emit pageCmd(PageCmd::NeedSize, QVariant());
+        Q_EMIT pageCmd(PageCmd::NeedSize, QVariant());
     });
     connect(browser_widget_, &CefQWidget::browserCreated, [this]()
     {
-        emit pageCmd(PageCmd::Created, QVariant());
+        Q_EMIT pageCmd(PageCmd::Created, QVariant());
     });
     connect(browser_widget_, &CefQWidget::browserClosing, [this]()
     {
-        emit pageCmd(PageCmd::Closing, QVariant());
+        Q_EMIT pageCmd(PageCmd::Closing, QVariant());
     });
     connect(browser_widget_, &CefQWidget::browserNewForgroundPage, [this](CefQWidget *browser){
         BrowserPage *page = new BrowserPage(browser);
-        emit newPage(page);
+        Q_EMIT newPage(page);
     });
     connect(browser_widget_, &CefQWidget::browserDevTool, this, &BrowserPage::onBrowserDevTool);
 
@@ -177,25 +177,25 @@ void BrowserPage::initBrowser()
     {
         setEditedText("");
         url_ = url;
-        emit pageCmd(PageCmd::Address, url);
+        Q_EMIT pageCmd(PageCmd::Address, url);
     });
     connect(browser_widget_, &CefQWidget::browserTitleChange, [this](const QString &title)
     {
         title_ = title;
-        emit pageCmd(PageCmd::Title, title);
+        Q_EMIT pageCmd(PageCmd::Title, title);
     });
     connect(browser_widget_, &CefQWidget::browserFullScnChange, [this](bool fullscreen)
     {
-        emit pageCmd(PageCmd::FullScreen, fullscreen);
+        Q_EMIT pageCmd(PageCmd::FullScreen, fullscreen);
     });
     connect(browser_widget_, &CefQWidget::browserStatusMessage, [this](const QString &msg)
     {
-        emit pageCmd(PageCmd::StatusMessage, msg);
+        Q_EMIT pageCmd(PageCmd::StatusMessage, msg);
     });
     connect(browser_widget_, &CefQWidget::browserLoadStart, [this](CefLoadHandler::TransitionType transition_type)
     {
         setMinimumSize(QSize(0,0));
-        emit pageCmd(PageCmd::LoadStart, (int)transition_type);
+        Q_EMIT pageCmd(PageCmd::LoadStart, (int)transition_type);
     });
     connect(browser_widget_, &CefQWidget::browserLoadEnd, [this](int httpStatusCode)
     {
@@ -204,19 +204,19 @@ void BrowserPage::initBrowser()
 //        if(parts.count()  > 0){
 //            auto scheme = parts.at(0).toLower();
 //            if(customSchemes.contains(scheme)){
-//                emit pageCmd(PageCmd::Favicon, style()->standardPixmap(QStyle::SP_MessageBoxInformation));
+//                Q_EMIT pageCmd(PageCmd::Favicon, style()->standardPixmap(QStyle::SP_MessageBoxInformation));
 //            }
 //        }
 
 //        if(url_.startsWith("file://",Qt::CaseInsensitive)){
-//            emit pageCmd(PageCmd::Favicon, style()->standardPixmap(QStyle::SP_FileIcon));
+//            Q_EMIT pageCmd(PageCmd::Favicon, style()->standardPixmap(QStyle::SP_FileIcon));
 //        }
         setMinimumSize(QSize(0,0));
-        emit pageCmd(PageCmd::LoadEnd, httpStatusCode);
+        Q_EMIT pageCmd(PageCmd::LoadEnd, httpStatusCode);
     });
     connect(browser_widget_, &CefQWidget::browserLoadingProgress, [this](double progress)
     {
-        emit pageCmd(PageCmd::LoadingProgress, progress);
+        Q_EMIT pageCmd(PageCmd::LoadingProgress, progress);
     });
     connect(browser_widget_, &CefQWidget::browserLoadingStateChange, [this](bool a, bool b, bool c)
     {
@@ -225,21 +225,21 @@ void BrowserPage::initBrowser()
         isLoading_ = a;
         canGoBack_ = b;
         canGoForward_ = c;
-        emit pageCmd(PageCmd::LoadingState, QVariant());
+        Q_EMIT pageCmd(PageCmd::LoadingState, QVariant());
     });
     connect(browser_widget_, &CefQWidget::browserFocusChange, [this](bool focus)
     {
-        emit pageCmd(PageCmd::FocusChange, focus);
+        Q_EMIT pageCmd(PageCmd::FocusChange, focus);
     });
     connect(browser_widget_, &CefQWidget::browserFaviconChange, [this](const QPixmap &pix)
     {
         favicon_ = pix;
-        emit pageCmd(PageCmd::Favicon, pix);
+        Q_EMIT pageCmd(PageCmd::Favicon, pix);
     });
 
     connect(browser_widget_, &CefQWidget::browserShortcut, this, [=](CefShortcutCmd cmd){
         if(!browser_widget_->isDevTool()){
-            emit browserShortcut(cmd);
+            Q_EMIT browserShortcut(cmd);
         }
     });
 }
@@ -252,19 +252,19 @@ void BrowserPage::initOthers()
     connect(dock_dev_tool_, &QDockWidget::dockLocationChanged, this, &BrowserPage::onDockDevToolLocChanged);
 
     connect(zoom_popup_, &ZoomPopup::zoomOut, this, [this](){
-        emit pageCmd(PageCmd::ZoomOut, "");
+        Q_EMIT pageCmd(PageCmd::ZoomOut, "");
     });
     connect(zoom_popup_, &ZoomPopup::zoomIn, this, [this](){
-        emit pageCmd(PageCmd::ZoomIn, "");
+        Q_EMIT pageCmd(PageCmd::ZoomIn, "");
     });
     connect(zoom_popup_, &ZoomPopup::zoomReset, this, [this](){
-        emit pageCmd(PageCmd::ZoomReset, "");
+        Q_EMIT pageCmd(PageCmd::ZoomReset, "");
     });
 
 
     connect(site_info_popup_, &SiteInfoPopup::openUrl, this,[this](const QUrl &url)
     {
-        emit pageCmd(PageCmd::OpenUrl, url);
+        Q_EMIT pageCmd(PageCmd::OpenUrl, url);
     });
 
     connect(zoom_bar_timer_, &QTimer::timeout,this, &BrowserPage::onZoomBarTimer);

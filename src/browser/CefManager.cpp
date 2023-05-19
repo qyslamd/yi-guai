@@ -11,7 +11,7 @@
 #include "utils/util_qt.h"
 #include <include/internal/cef_types.h>
 #include <include/cef_version.h>
-#include <include/base/cef_scoped_ptr.h>
+#include <include/internal/cef_ptr.h>
 #include <include/cef_command_line.h>
 
 #include "browser/client_switches.h"
@@ -68,18 +68,9 @@ std::string CefManager::cefVersion()
     return ss.str();
 }
 
-void CefManager::populateSettings(CefSettings &settings, int argc, char *argv[])
+void CefManager::populateSettings(CefSettings &settings,
+                                  CefRefPtr<CefCommandLine> command_line)
 {
-    // Parse command-line arguments for use in this method.
-    CefRefPtr<CefCommandLine> command_line = CefCommandLine::CreateCommandLine();
-#ifdef OS_WIN
-    Q_UNUSED(argc)
-    Q_UNUSED(argv)
-    command_line->InitFromString(::GetCommandLineW());
-#else
-    command_line->InitFromArgv(argc, argv);
-#endif
-
     CefString(&settings.cache_path) = cache_path;
     CefString(&settings.root_cache_path) = root_cache_path;
     // linux会默认加载Locale
@@ -88,32 +79,30 @@ void CefManager::populateSettings(CefSettings &settings, int argc, char *argv[])
     CefString(&settings.accept_language_list) = accept_language_list;
 #endif
 
-    if(command_line->HasSwitch("remote-debugging-port"))
-    {
-        std::string port = command_line->GetSwitchValue("remote-debugging-port");
-        uint portI = QString::fromStdString(port).toUInt();
-        settings.remote_debugging_port = portI == 0 ? remote_debugging_port : portI;
-    }else{
-        settings.remote_debugging_port = remote_debugging_port;
-    }
-    settings.log_severity = LOGSEVERITY_WARNING;
-#ifdef Q_OS_LINUX
-    settings.log_severity = LOGSEVERITY_ERROR;
-    seperate_sub_process = true;
-//    CefString(&settings.browser_subprocess_path) = browser_sub_process_path;
-    CefString(&settings.resources_dir_path) = resource_directory_path;
-#endif
-    settings.background_color = background_color;
-    settings.persist_session_cookies = persist_session_cookies;
-    settings.persist_user_preferences = persist_user_preferences;
+//    if(command_line->HasSwitch("remote-debugging-port"))
+//    {
+//        std::string port = command_line->GetSwitchValue("remote-debugging-port");
+//        uint portI = QString::fromStdString(port).toUInt();
+//        settings.remote_debugging_port = portI == 0 ? remote_debugging_port : portI;
+//    }else{
+//        settings.remote_debugging_port = remote_debugging_port;
+//    }
+    settings.log_severity = LOGSEVERITY_DEFAULT;
     settings.no_sandbox = true;
+#ifdef Q_OS_LINUX
+//    seperate_sub_process = true;
+//    CefString(&settings.browser_subprocess_path) = browser_sub_process_path;
+//    qInfo() << __FUNCTION__<< QString::fromStdString(resource_directory_path);
+//    CefString(&settings.resources_dir_path) = "/home/yohu/works/task1/workspace/build-YiGuai-Desktop_Qt_5_15_2_GCC_64bit-Debug/src/bin/Resources/";
+#endif
+//    settings.background_color = background_color;
+//    settings.persist_session_cookies = persist_session_cookies;
+//    settings.persist_user_preferences = persist_user_preferences;
     settings.multi_threaded_message_loop = command_line->HasSwitch("multi-threaded-message-loop");
-
-    if(!settings.multi_threaded_message_loop)
-    {
+    if(!settings.multi_threaded_message_loop) {
         settings.external_message_pump = command_line->HasSwitch("external-message-pump");
     }
-    settings.external_message_pump = true;
+
     if (command_line->HasSwitch("enable-chrome-runtime")) {
         // Enable experimental Chrome runtime. See issue #2969 for details.
         settings.chrome_runtime = true;

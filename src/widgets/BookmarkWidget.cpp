@@ -108,7 +108,7 @@ void BookmarkWidget::initSignalSlots()
     // pin or close clicked
     connect(ui->buttonPinOrClose, &QToolButton::clicked, [this]()
     {
-        emit pinOrCloseClicked();
+        Q_EMIT pinOrCloseClicked();
     });
     // QTreeWidget 右键菜单
     connect(ui->treeView, &QTreeWidget::customContextMenuRequested,

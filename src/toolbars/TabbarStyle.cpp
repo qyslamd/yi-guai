@@ -20,20 +20,20 @@ TabbarStyle::TabbarStyle(QWidget *widget, bool isInPrivate)
     : widget_(widget)
     , isInprivate_(isInPrivate)
 {
-    auto timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, [this]()
-    {
-        m_nStartAngle += 10 * 16;
-        if(m_nStartAngle == 360 * 16)
-        {
-            m_nStartAngle = 0;
-        }
+//    auto timer = new QTimer(this);
+//    connect(timer, &QTimer::timeout, this, [this]()
+//    {
+//        m_nStartAngle += 10 * 16;
+//        if(m_nStartAngle == 360 * 16)
+//        {
+//            m_nStartAngle = 0;
+//        }
 
-        if(widget_){
-            widget_->update();
-        }
-    });
-    timer->start(40);
+//        if(widget_){
+//            widget_->update();
+//        }
+//    });
+//    timer->start(40);
 }
 
 void TabbarStyle::drawControl(QStyle::ControlElement element,

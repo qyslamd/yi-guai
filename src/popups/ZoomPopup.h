@@ -15,7 +15,7 @@ public:
     explicit ZoomPopup(QWidget *parent = nullptr);
     ~ZoomPopup();
     void setZoomLevelStr(const QString &str);
-signals:
+Q_SIGNALS:
     void zoomIn();
     void zoomOut();
     void zoomReset();
